@@ -2,14 +2,33 @@ require "ostruct"
 
 class StaticPagesController < ApplicationController
   def home
-    @stock_planchas = 1250
-    @sobrantes_disponibles = 320
-    @proyectos_en_curso = 12
-    @proyectos_finalizados_mes = 3
+    load_dashboard_data
+  end
 
-    # Placeholder for recent projects data
-    # In a real application, you would fetch these from your database
-    @recent_projects = [
+  private
+
+  def load_dashboard_data
+    @stock_data = load_stock_data
+    @projects_data = load_projects_data
+    @recent_projects = load_recent_projects
+  end
+
+  def load_stock_data
+    {
+      total_sheets: 1250,
+      available_scraps: 320
+    }
+  end
+
+  def load_projects_data
+    {
+      active_projects: 12,
+      completed_this_month: 3
+    }
+  end
+
+  def load_recent_projects
+    [
       OpenStruct.new(
         client_name: "Constructora del Sol",
         description: "Edificio \"Amanecer\"",

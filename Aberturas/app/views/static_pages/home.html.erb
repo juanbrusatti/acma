@@ -36,57 +36,25 @@
               </tr>
             </thead>
             <tbody class="[&_tr:last-child]:border-0">
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                  <div class="font-medium">Constructora del Sol</div>
-                  <div class="hidden text-sm text-muted-foreground md:inline">Edificio "Amanecer"</div>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">
-                  <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">
-                    En Proceso
-                  </span>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">2025-07-15</td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                  <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                    Ver
-                  </button>
-                </td>
-              </tr>
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                  <div class="font-medium">Familia Pérez</div>
-                  <div class="hidden text-sm text-muted-foreground md:inline">Cerramiento de balcón</div>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">
-                  <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                    Terminado
-                  </span>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">2025-06-28</td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                  <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                    Ver
-                  </button>
-                </td>
-              </tr>
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                  <div class="font-medium">Oficinas Central</div>
-                  <div class="hidden text-sm text-muted-foreground md:inline">Divisiones internas</div>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">
-                  <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">
-                    En Proceso
-                  </span>
-                </td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">2025-07-05</td>
-                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                  <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                    Ver
-                  </button>
-                </td>
-              </tr>
+              <% @recent_projects.each do |project| %>
+                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
+                    <div class="font-medium"><%= project.client_name %></div>
+                    <div class="hidden text-sm text-muted-foreground md:inline"><%= project.description %></div>
+                  </td>
+                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">
+                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= project_status_badge_class(project.status) %>">
+                      <%= project.status %>
+                    </span>
+                  </td>
+                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell"><%= format_delivery_date(project.delivery_date) %></td>
+                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
+                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3">
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              <% end %>
             </tbody>
           </table>
         </div>
