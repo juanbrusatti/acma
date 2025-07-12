@@ -3,7 +3,7 @@ class GlassplatesController < ApplicationController
 
   # GET /glassplates or /glassplates.json
   def index
-    @glassplates = Glassplate.all
+    load_stock_data
   end
 
   # GET /glassplates/1 or /glassplates/1.json
@@ -25,7 +25,7 @@ class GlassplatesController < ApplicationController
 
     respond_to do |format|
       if @glassplate.save
-        format.html { redirect_to @glassplate, notice: "Glassplate was successfully created." }
+        format.html { redirect_to glassplates_path, notice: "Material agregado exitosamente al stock." }
         format.json { render :show, status: :created, location: @glassplate }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +38,7 @@ class GlassplatesController < ApplicationController
   def update
     respond_to do |format|
       if @glassplate.update(glassplate_params)
-        format.html { redirect_to @glassplate, notice: "Glassplate was successfully updated." }
+        format.html { redirect_to glassplates_path, notice: "Material actualizado exitosamente." }
         format.json { render :show, status: :ok, location: @glassplate }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,19 +52,34 @@ class GlassplatesController < ApplicationController
     @glassplate.destroy!
 
     respond_to do |format|
-      format.html { redirect_to glassplates_path, status: :see_other, notice: "Glassplate was successfully destroyed." }
+      format.html { redirect_to glassplates_path, status: :see_other, notice: "Material eliminado exitosamente." }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_glassplate
-      @glassplate = Glassplate.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def glassplate_params
-      params.expect(glassplate: [ :width, :height, :color, :type ])
-    end
+  def load_stock_data
+    @complete_sheets = Glassplate.complete_sheets.includes(:glassplate)
+    @scraps = Glassplate.scraps.includes(:glassplate)
+    @stock_summary = calculate_stock_summary
+  end
+
+  def calculate_stock_summary
+    {
+      total_sheets: Glassplate.complete_sheets.sum(:quantity),
+      total_scraps: Glassplate.scraps.count,
+      available_scraps: Glassplate.scraps.available.count,
+      reserved_scraps: Glassplate.scraps.reserved.count
+    }
+  end
+
+  def set_glassplate
+    @glassplate = Glassplate.find(params[:id])
+  end
+
+  def glassplate_params
+    params.require(:glassplate).permit(:width, :height, :color, :type, :thickness,
+                                      :standard_measures, :quantity, :location, :status, :is_scrap)
+  end
 end
