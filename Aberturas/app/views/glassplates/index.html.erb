@@ -2,7 +2,7 @@
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
       <h1 class="text-2xl font-semibold">Gestión de Stock</h1>
-      <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3 ml-auto" do %>
+      <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3 ml-auto" do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M8 12h8"></path>
@@ -78,7 +78,7 @@
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
       <div class="border-b p-4">
         <div class="flex space-x-2">
-          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm" data-tab="planchas">
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90" data-tab="planchas">
             Planchas Completas
           </button>
           <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground" data-tab="sobrantes">
