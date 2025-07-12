@@ -65,6 +65,8 @@ class GlassplatesController < ApplicationController
     @stock_summary = calculate_stock_summary
   end
 
+  # Calculate stock summary
+  # This method aggregates the stock data for display in the dashboard.
   def calculate_stock_summary
     {
       total_sheets: Glassplate.complete_sheets.sum(:quantity),

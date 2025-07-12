@@ -7,10 +7,10 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# Crear datos de ejemplo para glassplates
+# Create some fake data
 puts "Creando datos de ejemplo para glassplates..."
 
-# Planchas completas
+# Example complete sheets
 Glassplate.create!(
   glass_type: "Incoloro",
   thickness: "4mm",
@@ -63,7 +63,7 @@ Glassplate.create!(
   is_scrap: false
 )
 
-# Sobrantes/Recortes
+# Example scraps
 Glassplate.create!(
   glass_type: "Incoloro",
   thickness: "4mm",

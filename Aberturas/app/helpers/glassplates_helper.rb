@@ -1,4 +1,6 @@
 module GlassplatesHelper
+
+  # This method format the status of the glassplate for display
   def status_badge_class(status)
     case status
     when 'disponible'
@@ -12,10 +14,12 @@ module GlassplatesHelper
     end
   end
 
+  # This method seems to be used for displaying the type of material
   def material_type_label(is_scrap)
     is_scrap ? 'Sobrante/Recorte' : 'Plancha Completa'
   end
 
+  # This method formats the measurements of the glassplate
   def format_measures(width, height)
     "#{width.to_i}x#{height.to_i}"
   end
