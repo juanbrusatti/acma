@@ -1,0 +1,40 @@
+<% content_for :title, "Gestión de Proyectos" %>
+
+<div class="flex flex-1 flex-col gap-8 p-4 md:gap-12 md:p-12 max-w-5xl mx-auto">
+  <div class="flex items-center mb-8">
+    <h1 class="text-2xl font-semibold">Gestión de Proyectos</h1>
+    <%= link_to new_project_path, class: "ml-auto flex items-center gap-1 rounded-lg px-5 py-3 bg-black hover:bg-gray-800 text-white font-medium transition text-base shadow" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>
+      Crear Nuevo Proyecto
+    <% end %>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-3xl shadow-lg mt-8">
+    <div class="p-10 border-b border-gray-100 rounded-t-3xl">
+      <h2 class="text-2xl font-bold mb-2">Listado de Proyectos</h2>
+      <p class="text-gray-400 text-base">Obras en curso, finalizadas y pendientes.</p>
+    </div>
+    <div class="p-10 rounded-b-3xl">
+      <table class="w-full rounded-2xl overflow-hidden">
+        <thead>
+          <tr>
+            <th class="text-left text-base font-semibold text-gray-400 py-5 px-6">Proyecto / Cliente</th>
+            <th class="text-left text-base font-semibold text-gray-400 py-5 px-6 hidden sm:table-cell">Estado</th>
+            <th class="text-right text-base font-semibold text-gray-400 py-5 px-6 hidden sm:table-cell">Fecha de Entrega</th>
+            <th class="text-right text-base font-semibold text-gray-400 py-5 px-6">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @projects.any? %>
+            <% @projects.each do |project| %>
+              <%= render partial: "project_row", locals: { project: project } %>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="4" class="text-center py-10 text-gray-400">No hay proyectos cargados.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

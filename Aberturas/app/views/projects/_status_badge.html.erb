@@ -1,0 +1,17 @@
+<%# Partial para badge de estado %>
+<%# status es un string: 'En Proceso', 'Terminado', 'Pendiente' %>
+<% badge_class =
+  case status
+  when 'Terminado'
+    'bg-gray-100 text-gray-500'
+  when 'En Proceso'
+    'bg-gray-100 text-gray-800'
+  when 'Pendiente'
+    'bg-blue-100 text-blue-800'
+  else
+    'bg-gray-100 text-gray-400'
+  end
+%>
+<span class="inline-block rounded-full px-6 py-3 text-xs font-semibold <%= badge_class %> shadow-sm">
+  <%= status %>
+</span>

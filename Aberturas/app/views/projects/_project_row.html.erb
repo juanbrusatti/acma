@@ -1,0 +1,15 @@
+<tr class="border-b last:border-0 border-gray-100">
+  <td class="py-6 px-6">
+    <div class="font-medium text-lg mb-2"><%= project.name %></div>
+    <div class="text-base text-gray-400"><%= project.description %></div>
+  </td>
+  <td class="hidden sm:table-cell py-6 px-6">
+    <%= render partial: "status_badge", locals: { status: project.status } %>
+  </td>
+  <td class="hidden sm:table-cell text-right text-gray-700 font-medium py-6 px-6">
+    <%= project.delivery_date&.strftime('%Y-%m-%d') %>
+  </td>
+  <td class="text-right py-6 px-6">
+    <%= link_to "Ver Detalles", project_path(project), class: "rounded-lg px-5 py-3 bg-white border border-gray-200 hover:bg-gray-100 text-black font-medium transition text-base shadow-sm" %>
+  </td>
+</tr>
