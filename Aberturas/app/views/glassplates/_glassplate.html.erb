@@ -1,18 +1,71 @@
-<div id="<%= dom_id glassplate %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Width:</strong>
-    <%= glassplate.width %>
+<div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg p-4">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center space-x-2">
+      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
+        <%= glassplate.status %>
+      </span>
+      <span class="text-xs text-muted-foreground">
+        <%= glassplate.is_scrap? ? 'Sobrante' : 'Plancha' %>
+      </span>
+    </div>
+    <span class="text-xs text-muted-foreground">#<%= glassplate.id %></span>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Height:</strong>
-    <%= glassplate.height %>
+
+  <div class="space-y-2">
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-medium">Tipo:</span>
+      <span class="text-sm"><%= glassplate.type %></span>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-medium">Espesor:</span>
+      <span class="text-sm"><%= glassplate.thickness %></span>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-medium">Color:</span>
+      <span class="text-sm"><%= glassplate.color %></span>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-medium">Medidas:</span>
+      <span class="text-sm font-medium"><%= glassplate.measures %> mm</span>
+    </div>
+
+    <% unless glassplate.is_scrap? %>
+      <div class="flex justify-between items-center">
+        <span class="text-sm font-medium">Cantidad:</span>
+        <span class="text-sm font-medium"><%= glassplate.quantity %></span>
+      </div>
+    <% end %>
+
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-medium">Ubicación:</span>
+      <span class="text-sm"><%= glassplate.location %></span>
+    </div>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Color:</strong>
-    <%= glassplate.color %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Type:</strong>
-    <%= glassplate.type %>
+
+  <div class="flex justify-end space-x-2 mt-4 pt-3 border-t">
+    <%= link_to glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    <% end %>
+
+    <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+        <path d="m15 5 4 4"></path>
+      </svg>
+    <% end %>
+
+    <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+        <path d="M3 6h18"></path>
+        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+      </svg>
+    <% end %>
   </div>
 </div>
