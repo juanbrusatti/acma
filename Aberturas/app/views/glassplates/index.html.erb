@@ -110,7 +110,7 @@
               <tbody class="[&_tr:last-child]:border-0">
                 <% @complete_sheets.each do |glassplate| %>
                   <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.type %></td>
+                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.glass_type %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.thickness %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.color %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.standard_measures %></td>
@@ -165,7 +165,7 @@
                   <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.id %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.type %></td>
+                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.glass_type %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.location %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
                       <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">

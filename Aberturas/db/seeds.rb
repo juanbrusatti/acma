@@ -12,7 +12,7 @@ puts "Creando datos de ejemplo para glassplates..."
 
 # Planchas completas
 Glassplate.create!(
-  type: "Incoloro",
+  glass_type: "Incoloro",
   thickness: "4mm",
   color: "transparente",
   width: 2500,
@@ -25,7 +25,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Laminado 3+3",
+  glass_type: "Laminado 3+3",
   thickness: "6mm",
   color: "transparente",
   width: 2500,
@@ -38,7 +38,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "DVH 4/9/4",
+  glass_type: "DVH 4/9/4",
   thickness: "17mm",
   color: "transparente",
   width: 2500,
@@ -51,7 +51,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Espejo",
+  glass_type: "Espejo",
   thickness: "3mm",
   color: "plata",
   width: 2440,
@@ -65,7 +65,7 @@ Glassplate.create!(
 
 # Sobrantes/Recortes
 Glassplate.create!(
-  type: "Incoloro",
+  glass_type: "Incoloro",
   thickness: "4mm",
   color: "transparente",
   width: 800,
@@ -78,7 +78,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Laminado 3+3",
+  glass_type: "Laminado 3+3",
   thickness: "6mm",
   color: "transparente",
   width: 500,
@@ -91,7 +91,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Espejo",
+  glass_type: "Espejo",
   thickness: "3mm",
   color: "plata",
   width: 1500,
@@ -104,7 +104,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Templado",
+  glass_type: "Templado",
   thickness: "8mm",
   color: "gris",
   width: 1200,
@@ -117,7 +117,7 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  type: "Doble",
+  glass_type: "Doble",
   thickness: "12mm",
   color: "azul",
   width: 900,
