@@ -5,9 +5,9 @@ module DashboardHelper
     when "Terminado"
       "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
     when "En Proceso"
-      "text-foreground"
+      "border-transparent bg-warning text-warning-foreground hover:bg-warning/80"
     else
-      "text-foreground"
+      "border-transparent bg-muted text-muted-foreground hover:bg-muted/80"
     end
   end
 
