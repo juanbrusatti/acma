@@ -60,8 +60,8 @@ class GlassplatesController < ApplicationController
   private
 
   def load_stock_data
-    @complete_sheets = Glassplate.complete_sheets.includes(:glassplate)
-    @scraps = Glassplate.scraps.includes(:glassplate)
+    @complete_sheets = Glassplate.complete_sheets
+    @scraps = Glassplate.scraps
     @stock_summary = calculate_stock_summary
   end
 
@@ -79,7 +79,7 @@ class GlassplatesController < ApplicationController
   end
 
   def glassplate_params
-    params.require(:glassplate).permit(:width, :height, :color, :type, :thickness,
+    params.require(:glassplate).permit(:width, :height, :color, :glass_type, :thickness,
                                       :standard_measures, :quantity, :location, :status, :is_scrap)
   end
 end

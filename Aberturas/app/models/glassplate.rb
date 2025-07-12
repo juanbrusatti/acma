@@ -6,9 +6,9 @@ class Glassplate < ApplicationRecord
     message: "debe ser uno de: transparente, gris, azul, verde, negro, plata, N/A"
   }
 
-  # Type validation
-  validates :type, presence: true
-  validates :type, inclusion: {
+  # Glass type validation
+  validates :glass_type, presence: true
+  validates :glass_type, inclusion: {
     in: [ "Incoloro", "Laminado 3+3", "DVH 4/9/4", "Espejo", "Templado", "Doble" ],
     message: "debe ser uno de: Incoloro, Laminado 3+3, DVH 4/9/4, Espejo, Templado, Doble"
   }
@@ -34,7 +34,7 @@ class Glassplate < ApplicationRecord
   end
 
   def full_description
-    "#{type} #{thickness} - #{color}"
+    "#{glass_type} #{thickness} - #{color}"
   end
 
   def available?
