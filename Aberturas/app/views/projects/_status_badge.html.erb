@@ -3,15 +3,16 @@
 <% badge_class =
   case status
   when 'Terminado'
-    'bg-gray-100 text-gray-500'
+    'bg-green-100 text-green-700'
   when 'En Proceso'
-    'bg-gray-100 text-gray-800'
+    'bg-blue-100 text-blue-700'
   when 'Pendiente'
-    'bg-blue-100 text-blue-800'
+    'bg-yellow-100 text-yellow-700'
   else
-    'bg-gray-100 text-gray-400'
+    'bg-gray-100 text-gray-500'
   end
 %>
-<span class="inline-block rounded-full px-6 py-3 text-xs font-semibold <%= badge_class %> shadow-sm">
+<span class="inline-block rounded-full px-4 py-1 text-xs font-semibold <%= badge_class %> shadow-sm border border-transparent">
   <%= status %>
 </span>
+<div class="bg-green-100 text-green-700 p-4">TEST</div>
