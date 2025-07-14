@@ -1,0 +1,2 @@
+class PrecioVidrio < ApplicationRecord
+end

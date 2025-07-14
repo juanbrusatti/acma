@@ -1,0 +1,9 @@
+<% content_for :title, "New precio vidrio" %>
+
+<div class="md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">New precio vidrio</h1>
+
+  <%= render "form", precio_vidrio: @precio_vidrio %>
+
+  <%= link_to "Back to precio vidrios", precio_vidrios_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+</div>

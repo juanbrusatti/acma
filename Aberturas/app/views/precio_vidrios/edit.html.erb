@@ -1,0 +1,15 @@
+<% content_for :title, "Editar precio de vidrio" %>
+
+<div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg mt-8 md:w-2/3 w-full mx-auto">
+  <div class="flex flex-col space-y-1.5 p-6">
+    <h1 class="text-2xl font-semibold leading-none tracking-tight">Editar precio de vidrio</h1>
+    <p class="text-sm text-muted-foreground">Modifica los datos y guarda los cambios.</p>
+  </div>
+  <div class="p-6 pt-0">
+    <%= render "form", precio_vidrio: @precio_vidrio %>
+    <div class="mt-4">
+      <%= link_to "Ver este precio", @precio_vidrio, class: "mr-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+      <%= link_to "Volver a la lista", precio_vidrios_path, class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+    </div>
+  </div>
+</div>

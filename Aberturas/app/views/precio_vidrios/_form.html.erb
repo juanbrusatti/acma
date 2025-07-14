@@ -1,0 +1,47 @@
+<%= form_with(model: precio_vidrio, class: "contents") do |form| %>
+  <% if precio_vidrio.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(precio_vidrio.errors.count, "error") %> prohibited this precio_vidrio from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% precio_vidrio.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :alto %>
+    <%= form.text_field :alto, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:alto].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:alto].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :ancho %>
+    <%= form.text_field :ancho, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:ancho].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:ancho].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :color %>
+    <%= form.text_field :color, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:color].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:color].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :tipo %>
+    <%= form.text_field :tipo, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:tipo].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:tipo].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :grosor %>
+    <%= form.text_field :grosor, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:grosor].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:grosor].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :precio %>
+    <%= form.text_field :precio, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:precio].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:precio].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
