@@ -1,0 +1,94 @@
+<% content_for :title, "Nuevo Proyecto" %>
+
+<div class="w-full p-4 md:p-8">
+  <h1 class="text-2xl font-semibold mb-6">Generar Proyecto</h1>
+
+  <%= form_with(model: @project, local: true) do |f| %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Columna principal (2/3) -->
+      <div class="space-y-6 md:col-span-2">
+
+        <!-- Card: Datos del Proyecto -->
+        <div class="bg-white rounded-md border border-gray-200 shadow-sm p-6">
+          <h2 class="text-lg font-semibold mb-4">Datos del Proyecto</h2>
+          <div class="space-y-4">
+            <div>
+              <%= f.label :name, "Nombre del Proyecto", class: "block text-sm font-medium mb-1" %>
+              <%= f.text_field :name, class: "w-full border border-gray-300 rounded px-3 py-2" %>
+            </div>
+
+            <div>
+              <%= f.label :description, "Descripción", class: "block text-sm font-medium mb-1" %>
+              <%= f.text_area :description, rows: 4, class: "w-full border border-gray-300 rounded px-3 py-2" %>
+            </div>
+
+            <div>
+              <%= f.label :delivery_date, "Fecha de Entrega", class: "block text-sm font-medium mb-1" %>
+              <%= f.date_field :delivery_date, class: "w-full border border-gray-300 rounded px-3 py-2" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Aberturas Requeridas -->
+        <div class="bg-white rounded-md border border-gray-200 shadow-sm p-6">
+          <h2 class="text-lg font-semibold mb-4">Vidrios solicitados</h2>
+
+          <!-- Tabla de aberturas -->
+          <table class="w-full text-left mb-4">
+            <thead>
+              <tr class="border-b">
+                <th class="py-2">Cant.</th>
+                <th class="py-2">Tipo</th>
+                <th class="py-2">Ancho (mm)</th>
+                <th class="py-2">Alto (mm)</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+
+          <!-- Inputs para agregar abertura -->
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <button type="button" class="w-full bg-black text-white rounded px-3 py-2">Agregar</button>
+          </div>
+          <p class="text-sm text-gray-500 mt-2">Usá Glassplate o DVH según corresponda.</p>
+        </div>
+
+      </div>
+
+      <!-- Columna lateral (1/3) -->
+      <div class="space-y-6">
+        <div class="bg-white rounded-md border border-gray-200 shadow-sm p-6 space-y-4">
+          <h2 class="text-lg font-semibold mb-4">Resumen y Acciones</h2>
+
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Subtotal</span>
+            <span>$<%= number_with_precision(@project.try(:subtotal) || 0, precision: 2, delimiter: ".") %></span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">IVA (21%)</span>
+            <span>$<%= number_with_precision(@project.try(:iva) || 0, precision: 2, delimiter: ".") %></span>
+          </div>
+
+          <hr />
+
+          <div class="flex items-center justify-between font-bold">
+            <span class="text-lg">Total Estimado</span>
+            <span class="text-lg">$<%= number_with_precision(@project.try(:total) || 0, precision: 2, delimiter: ".") %></span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <%= f.submit "Guardar como Presupuesto", class: "w-full bg-black text-white rounded px-4 py-3 font-medium" %>
+            <button type="button" class="w-full bg-black text-white rounded px-4 py-3 font-medium">Optimizar</button>
+            <button type="button" class="w-full border border-gray-300 rounded px-4 py-3">Enviar</button>
+            <button type="button" class="w-full border border-gray-300 rounded px-4 py-3">Guardar PDF</button>
+            <%= link_to "Cancelar", projects_path, class: "w-full border border-gray-300 rounded px-4 py-3 text-center" %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  <% end %>
+</div>
