@@ -1,0 +1,5 @@
+<turbo-stream target="precio_vidrio_<%= @precio_vidrio.id %>" action="replace">
+  <template>
+    <%= render partial: 'fila_precio_vidrio', formats: [:html], locals: { precio_vidrio: @precio_vidrio } %>
+  </template>
+</turbo-stream> 

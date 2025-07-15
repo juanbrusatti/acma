@@ -10,7 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_13_233741) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_15_223821) do
+  create_table "glassplates", force: :cascade do |t|
+    t.float "width"
+    t.float "height"
+    t.string "color"
+    t.string "glass_type"
+    t.boolean "deleted", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "thickness"
+    t.string "standard_measures"
+    t.integer "quantity"
+    t.string "location"
+    t.string "status"
+    t.boolean "is_scrap"
+  end
+
+  create_table "insumos", force: :cascade do |t|
+    t.string "nombre"
+    t.decimal "precio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "precio_vidrios", force: :cascade do |t|
+    t.string "color"
+    t.string "tipo"
+    t.decimal "grosor"
+    t.decimal "precio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "precio_m2"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"

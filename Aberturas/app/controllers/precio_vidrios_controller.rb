@@ -3,7 +3,13 @@ class PrecioVidriosController < ApplicationController
 
   # GET /precio_vidrios or /precio_vidrios.json
   def index
-    @precio_vidrios = PrecioVidrio.all
+    @combinaciones = PrecioVidrio.combinaciones_posibles.map do |comb|
+      record = PrecioVidrio.find_or_initialize_by(comb)
+      if record.new_record?
+        record.save(validate: false)
+      end
+      record
+    end
   end
 
   # GET /precio_vidrios/1 or /precio_vidrios/1.json
@@ -38,8 +44,9 @@ class PrecioVidriosController < ApplicationController
   def update
     respond_to do |format|
       if @precio_vidrio.update(precio_vidrio_params)
-        format.html { redirect_to @precio_vidrio, notice: "Precio vidrio was successfully updated." }
+        format.html { redirect_to precio_vidrios_path, notice: "Precio actualizado correctamente." }
         format.json { render :show, status: :ok, location: @precio_vidrio }
+        format.turbo_stream
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @precio_vidrio.errors, status: :unprocessable_entity }
@@ -65,6 +72,6 @@ class PrecioVidriosController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def precio_vidrio_params
-      params.expect(precio_vidrio: [ :alto, :ancho, :color, :tipo, :grosor, :precio ])
+      params.require(:precio_vidrio).permit(:tipo, :grosor, :color, :precio_m2)
     end
 end

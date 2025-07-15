@@ -1,8 +1,7 @@
 <%= form_with(model: precio_vidrio, class: "contents") do |form| %>
   <% if precio_vidrio.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(precio_vidrio.errors.count, "error") %> prohibited this precio_vidrio from being saved:</h2>
-
+      <h2><%= pluralize(precio_vidrio.errors.count, "error") %> impidieron guardar este precio:</h2>
       <ul class="list-disc ml-6">
         <% precio_vidrio.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -12,33 +11,41 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :alto %>
-    <%= form.text_field :alto, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:alto].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:alto].any?}] %>
+    <label class="block font-medium mb-1">Tipo</label>
+    <input type="text" value="<%= precio_vidrio.tipo %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <%= form.label :ancho %>
-    <%= form.text_field :ancho, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:ancho].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:ancho].any?}] %>
+    <label class="block font-medium mb-1">Grosor</label>
+    <input type="text" value="<%= precio_vidrio.grosor %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <%= form.label :color %>
-    <%= form.text_field :color, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:color].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:color].any?}] %>
+    <label class="block font-medium mb-1">Color</label>
+    <input type="text" value="<%= precio_vidrio.color %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <%= form.label :tipo %>
-    <%= form.text_field :tipo, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:tipo].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:tipo].any?}] %>
+    <%= form.label :precio_m2, "Precio por m²" %>
+    <%= form.text_field :precio_m2, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:precio_m2].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:precio_m2].any?}] %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :grosor %>
-    <%= form.text_field :grosor, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:grosor].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:grosor].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :precio %>
-    <%= form.text_field :precio, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:precio].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:precio].any?}] %>
+  <div class="my-5 flex gap-6">
+    <div>
+      <%= form.label :tamiz do %>
+        <%= form.check_box :tamiz %> Tamiz
+      <% end %>
+    </div>
+    <div>
+      <%= form.label :hotmelt do %>
+        <%= form.check_box :hotmelt %> Hotmelt
+      <% end %>
+    </div>
+    <div>
+      <%= form.label :cinta do %>
+        <%= form.check_box :cinta %> Cinta
+      <% end %>
+    </div>
   </div>
 
   <div class="inline">
