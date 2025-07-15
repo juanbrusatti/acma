@@ -22,6 +22,19 @@ class Project < ApplicationRecord
     (delivery_date - Date.current).to_i
   end
 
+  def subtotal
+    #openings.sum { |o| (o.width.to_f * o.height.to_f * o.quantity.to_i * precio_unitario) }  # Ejemplo
+    0
+  end
+  
+  def iva
+    subtotal * 0.21
+  end
+  
+  def total
+    subtotal + iva
+  end
+
   def status_color
     case status
     when 'Terminado'
