@@ -1,4 +1,5 @@
 class ProjectsController < ApplicationController
+
   def index
     @projects = Project.all
     @projects = @projects.where(status: params[:status]) if params[:status].present?
@@ -7,13 +8,17 @@ class ProjectsController < ApplicationController
 
   def new
     @project = Project.new
+    #@project.glasscuttings.build
+    #@project.dvhs.build
   end
 
   def create
     @project = Project.new(project_params)
+    puts project_params.inspect
     if @project.save
       redirect_to projects_path, notice: 'Proyecto creado exitosamente.'
     else
+      puts @project.errors.full_messages
       render :new, status: :unprocessable_entity
     end
   end
@@ -44,6 +49,27 @@ class ProjectsController < ApplicationController
   private
 
   def project_params
-    params.require(:project).permit(:name, :description, :status, :delivery_date)
+    params.require(:project).permit(
+      :name,
+      :phone,
+      :address,
+      :delivery_date,
+      :description,
+      :status,
+      glasscuttings_attributes: [:glass_type, :thickness, :height, :width, :color, :location],
+      dvhs_attributes: [
+        :innertube,
+        :location,
+        :height,
+        :width,
+        :glasscutting1_type,
+        :glasscutting1_thickness,
+        :glasscutting1_color,
+        :glasscutting2_type,
+        :glasscutting2_thickness,
+        :glasscutting2_color,
+        :gas_type
+      ]
+    )
   end
 end 
