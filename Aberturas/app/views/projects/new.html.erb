@@ -190,6 +190,11 @@
       </div>
     </div>
 
+    <!-- Confirm Button -->
+    <div class="mt-4">
+      <button type="button" class="confirm-dvh bg-green-600 text-white px-3 py-1 rounded">Confirmar</button>
+    </div>
+
   </div>
 </template>
 
@@ -233,6 +238,32 @@
     // Handle delete button click - removes the entire glasscutting row
     if (e.target.classList.contains("delete-glass")) {
       const container = e.target.closest(".glasscutting-fields");
+      container.remove();
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener("click", function (e) {
+    // Confirm DVH
+    if (e.target.classList.contains("confirm-dvh")) {
+      const container = e.target.closest(".dvh-fields");
+      const inputs = container.querySelectorAll("input");
+
+      inputs.forEach(input => input.setAttribute("readonly", true));
+
+      const confirmButton = e.target;
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.textContent = "Eliminar";
+      deleteButton.className = "delete-dvh bg-red-500 text-white px-3 py-1 rounded mt-4";
+
+      confirmButton.replaceWith(deleteButton);
+    }
+
+    // Remove DVH
+    if (e.target.classList.contains("delete-dvh")) {
+      const container = e.target.closest(".dvh-fields");
       container.remove();
     }
   });
