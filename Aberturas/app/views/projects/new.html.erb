@@ -1,4 +1,5 @@
 <%# Title for the page #%>
+<%#  Sets the page title %>
 <% content_for :title, "Crear proyecto" %>
 
 <div class="w-full p-4 md:p-8">
@@ -6,117 +7,21 @@
 
   <%= form_with(model: @project, local: true) do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Client Information Section -->
-      <div class="bg-white rounded-md border border-gray-200 shadow-sm p-4">
-        <h2 class="text-base font-semibold mb-2">Datos del cliente</h2>
-        <div class="space-y-2">
-          <div>
-            <%= f.label :name, "Nombre del cliente" %>
-            <%= f.text_field :name, class: "w-full border rounded px-2 py-1 text-sm" %>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div>
-              <%= f.label :phone, "Teléfono" %>
-              <%= f.telephone_field :phone, class: "w-full border rounded px-2 py-1 text-sm" %>
-            </div>
-            <div>
-              <%= f.label :address, "Domicilio" %>
-              <%= f.text_field :address, class: "w-full border rounded px-2 py-1 text-sm" %>
-            </div>
-          </div>
-          <div>
-            <%= f.label :description, "Descripción del proyecto" %>
-            <%= f.text_area :description, rows: 3, class: "w-full border rounded px-2 py-1 text-sm" %>
-          </div>
-          <div>
-            <%= f.label :delivery_date, "Fecha de entrega estimada" %>
-            <%= f.date_field :delivery_date, class: "w-full border rounded px-2 py-1 text-sm" %>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resumen y acciones (moderno, simple, sin colores) -->
-      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 space-y-6">
-        <div class="space-y-4">
-          <h2 class="text-lg font-semibold text-gray-800">Resumen y acciones</h2>
-      
-          <div class="flex justify-between text-sm text-gray-600">
-            <span>Subtotal</span>
-            <span id="total-estimado">$<%= number_with_precision(@project.try(:total) || 0, precision: 2) %></span>
-          </div>
-      
-          <div class="flex justify-between text-sm text-gray-600">
-            <span>IVA (21%)</span>
-            <span>$<%= number_with_precision(@project.try(:iva) || 0, precision: 2) %></span>
-          </div>
-      
-          <div class="border-t border-gray-200 pt-4 flex justify-between text-base font-bold text-gray-900">
-            <span>Total estimado</span>
-            <span id="total-estimado">$<%= number_with_precision(@project.try(:total) || 0, precision: 2) %></span>
-          </div>
-        </div>
-      
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <%= f.submit "Guardar como presupuesto", class: "w-full bg-black text-white font-medium rounded-lg py-2 text-sm hover:opacity-90 transition" %>
-          <button type="button" class="w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition">Optimizar</button>
-          <button type="button" class="w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition">Guardar PDF</button>
-          <%= link_to "Volver a proyectos", projects_path, class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm text-center hover:bg-gray-50 transition" %>
-        </div>
-      </div>
+      <%= render partial: "info_client", locals: { f: f } %>
+      <%= render partial: "info_project", locals: { f: f } %>
     </div>
 
-    <!-- Simple Glass Cuttings Table Section -->
-    <div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
-      <h2 class="text-base font-semibold mb-4">Vidrios simples</h2>
-
-      <!-- Container for dynamic glasscutting fields -->
-      <div id="glasscuttings-wrapper">
-        <%= f.fields_for :glasscuttings do |gc| %>
-          <!-- Glasscutting form row with 8 columns for better layout -->
-          <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
-            <div><%= gc.label :glass_type, "Tipo de vidrio" %> <%= gc.text_field :glass_type, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= gc.label :thickness, "Grosor" %> <%= gc.text_field :thickness, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= gc.label :height, "Alto (mm)" %> <%= gc.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= gc.label :width, "Ancho (mm)" %> <%= gc.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= gc.label :color, "Color" %> <%= gc.text_field :color, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= gc.label :location, "Ubicación" %> <%= gc.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Button to add new glasscutting fields -->
-      <button type="button" id="add-glasscutting" class="mt-4 bg-black text-white px-4 py-2 rounded">Agregar vidrio simple</button>
-    </div>
-
-    <!-- DVH (Double Glazing) Table Section -->
-    <div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
-      <h2 class="text-base font-semibold mb-4">DVH</h2>
-
-      <!-- Container for dynamic DVH fields -->
-      <div id="dvhs-wrapper">
-        <%= f.fields_for :dvhs do |dvh| %>
-          <!-- DVH form row with improved labels -->
-          <div class="grid grid-cols-7 gap-4 mb-4 dvh-fields">
-            <div><%= dvh.label :innertube, "Camara" %> <%= dvh.text_field :innertube, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= dvh.label :location, "Ubicación" %> <%= dvh.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= dvh.label :height, "Alto (mm)" %> <%= dvh.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= dvh.label :glasscutting1_type, "Tipo vidrio 1" %> <%= dvh.text_field :glasscutting1_type, class: "w-full border rounded px-2 py-1" %></div>
-            <div><%= dvh.label :glasscutting2_type, "Tipo vidrio 2" %> <%= dvh.text_field :glasscutting2_type, class: "w-full border rounded px-2 py-1" %></div>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Button to add new DVH fields -->
-      <button type="button" id="add-dvh" class="mt-4 bg-black text-white px-4 py-2 rounded">Agregar DVH</button>
-    </div>
+    <%= render partial: "info_glasscuttings", locals: { f: f } %>
+    <%= render partial: "info_dvhs", locals: { f: f } %>
 
   <% end %>
 </div>
 
 <!-- Hidden template for cloning glasscutting fields -->
+<!--  Template for dynamically adding new glasscutting rows -->
 <template id="glasscutting-template">
   <!-- Template for new glasscutting row with 8 columns and action buttons -->
+  <!--  Each row contains 8 columns for glasscutting attributes and action buttons -->
   <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
     <div><label>Tipo</label><input name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1"></div>
     <div><label>Grosor</label><input name="project[glasscuttings_attributes][][thickness]" class="w-full border rounded px-2 py-1"></div>
@@ -125,6 +30,7 @@
     <div><label>Color</label><input name="project[glasscuttings_attributes][][color]" class="w-full border rounded px-2 py-1"></div>
     <div><label>Ubicación</label><input name="project[glasscuttings_attributes][][location]" class="w-full border rounded px-2 py-1"></div>
     <!-- Action buttons spanning 2 columns -->
+    <!--  Action buttons for confirming the row, spanning 2 columns -->
     <div class="actions space-x-2 mt-2 col-span-2">
       <button type="button" class="confirm-glass bg-green-600 text-white px-3 py-1 rounded mt-4">Confirmar</button>
     </div>
@@ -132,10 +38,12 @@
 </template>
 
 <!-- Hidden template for cloning DVH fields -->
+<!--  Template for dynamically adding new DVH rows -->
 <template id="dvh-template">
   <div class="border border-gray-300 rounded p-4 mb-4 dvh-fields space-y-4">
 
     <!-- Row 1: Basic DVH information -->
+    <!--  First row: basic DVH information (innertube, location, width, height) -->
     <div class="grid grid-cols-5 gap-4">
       <div>
         <label>Cámara</label>
@@ -156,6 +64,7 @@
     </div>
 
     <!-- Row 2: Glass 1 specifications -->
+    <!--  Second row: specifications for Glass 1 -->
     <div>
       <h3 class="font-semibold text-sm mb-2">Cristal 1</h3>
       <div class="grid grid-cols-5 gap-4">
@@ -175,6 +84,7 @@
     </div>
 
     <!-- Row 3: Glass 2 specifications -->
+    <!--  Third row: specifications for Glass 2 -->
     <div>
       <h3 class="font-semibold text-sm mb-2">Cristal 2</h3>
       <div class="grid grid-cols-5 gap-4">
@@ -193,7 +103,8 @@
       </div>
     </div>
 
-    <!-- Confirm Button -->
+    <!-- Confirm button -->
+    <!--  Button to confirm the DVH row -->
     <div class="mt-4">
       <button type="button" class="confirm-dvh bg-green-600 text-white px-3 py-1 rounded">Confirmar</button>
     </div>
