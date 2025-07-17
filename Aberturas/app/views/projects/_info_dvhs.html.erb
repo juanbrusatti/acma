@@ -1,0 +1,22 @@
+<!-- DVH table section -->
+<div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
+    <h2 class="text-base font-semibold mb-4">DVH</h2>
+
+    <!-- Container for dynamic DVH fields -->
+    <div id="dvhs-wrapper">
+    <%= f.fields_for :dvhs do |dvh| %>
+        <!-- DVH form row with improved labels -->
+        <div class="grid grid-cols-7 gap-4 mb-4 dvh-fields">
+        <div><%= dvh.label :innertube, "Camara" %> <%= dvh.text_field :innertube, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= dvh.label :location, "Ubicación" %> <%= dvh.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= dvh.label :height, "Alto (mm)" %> <%= dvh.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= dvh.label :glasscutting1_type, "Tipo vidrio 1" %> <%= dvh.text_field :glasscutting1_type, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= dvh.label :glasscutting2_type, "Tipo vidrio 2" %> <%= dvh.text_field :glasscutting2_type, class: "w-full border rounded px-2 py-1" %></div>
+        </div>
+    <% end %>
+    </div>
+
+    <!-- Button to add new DVH fields -->
+    <button type="button" id="add-dvh" class="mt-4 bg-black text-white px-4 py-2 rounded">Agregar DVH</button>
+</div>
