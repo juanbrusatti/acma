@@ -1,0 +1,22 @@
+<!-- glasscuttings table section -->
+<div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
+    <h2 class="text-base font-semibold mb-4">Vidrios simples</h2>
+
+    <!-- Container for dynamic glasscutting fields -->
+    <div id="glasscuttings-wrapper">
+    <%= f.fields_for :glasscuttings do |gc| %>
+        <!-- Glasscutting form row with 8 columns for better layout -->
+        <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
+        <div><%= gc.label :glass_type, "Tipo de vidrio" %> <%= gc.text_field :glass_type, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= gc.label :thickness, "Grosor" %> <%= gc.text_field :thickness, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= gc.label :height, "Alto (mm)" %> <%= gc.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= gc.label :width, "Ancho (mm)" %> <%= gc.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= gc.label :color, "Color" %> <%= gc.text_field :color, class: "w-full border rounded px-2 py-1" %></div>
+        <div><%= gc.label :location, "Ubicación" %> <%= gc.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
+        </div>
+    <% end %>
+    </div>
+
+    <!-- Button to add new glasscutting fields -->
+    <button type="button" id="add-glasscutting" class="mt-4 bg-black text-white px-4 py-2 rounded">Agregar vidrio simple</button>
+</div>
