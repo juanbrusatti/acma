@@ -29,4 +29,4 @@ class DvhsTest < ApplicationSystemTestCase
     assert_text "Obra Norte"
     assert_text "Incoloro"
   end
-end 
+end

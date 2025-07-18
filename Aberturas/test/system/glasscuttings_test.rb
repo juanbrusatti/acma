@@ -29,4 +29,4 @@ class GlasscuttingsTest < ApplicationSystemTestCase
     assert_text "Laminado"
     assert_text "Transparente"
   end
-end 
+end

@@ -9,10 +9,10 @@ Rails.application.routes.draw do
 
   # Nested routes for projects, dvhs, and glasscuttings
   resources :projects do
-    resources :dvhs, only: [:create]
-    resources :glasscuttings, only: [:create]
+    resources :dvhs, only: [ :create ]
+    resources :glasscuttings, only: [ :create ]
   end
-  
+
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

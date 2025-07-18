@@ -1,5 +1,4 @@
 class ProjectsController < ApplicationController
-
   def index
     @projects = Project.all
     @projects = @projects.where(status: params[:status]) if params[:status].present?
@@ -8,15 +7,15 @@ class ProjectsController < ApplicationController
 
   def new
     @project = Project.new
-    #@project.glasscuttings.build
-    #@project.dvhs.build
+    # @project.glasscuttings.build
+    # @project.dvhs.build
   end
 
   def create
     @project = Project.new(project_params)
     puts project_params.inspect
     if @project.save
-      redirect_to projects_path, notice: 'Proyecto creado exitosamente.'
+      redirect_to projects_path, notice: "Proyecto creado exitosamente."
     else
       puts @project.errors.full_messages
       render :new, status: :unprocessable_entity
@@ -34,7 +33,7 @@ class ProjectsController < ApplicationController
   def update
     @project = Project.find(params[:id])
     if @project.update(project_params)
-      redirect_to projects_path, notice: 'Proyecto actualizado exitosamente.'
+      redirect_to projects_path, notice: "Proyecto actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,7 +42,7 @@ class ProjectsController < ApplicationController
   def destroy
     @project = Project.find(params[:id])
     @project.destroy
-    redirect_to projects_path, notice: 'Proyecto eliminado exitosamente.'
+    redirect_to projects_path, notice: "Proyecto eliminado exitosamente."
   end
 
   private
@@ -56,7 +55,7 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
-      glasscuttings_attributes: [:glass_type, :thickness, :height, :width, :color, :location],
+      glasscuttings_attributes: [ :glass_type, :thickness, :height, :width, :color, :location ],
       dvhs_attributes: [
         :innertube,
         :location,
@@ -72,4 +71,4 @@ class ProjectsController < ApplicationController
       ]
     )
   end
-end 
+end

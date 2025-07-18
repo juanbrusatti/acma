@@ -18,8 +18,8 @@ class DvhsControllerTest < ActionDispatch::IntegrationTest
           glasscutting1_color: "Transparente",
           glasscutting2_type: "Incoloro",
           glasscutting2_thickness: "4mm",
-          glasscutting2_color: "Transparente",
-          #gas_type: "Argón"
+          glasscutting2_color: "Transparente"
+          # gas_type: "Argón"
         }
       }
     end
