@@ -1,6 +1,6 @@
 class Dvh < ApplicationRecord
   belongs_to :project
-  has_many :glasscuttings, dependent: :nullify
+  #has_many :glasscuttings, dependent: :nullify
 
   # Si usás glassplates como modelos separados, agregalos también
   # belongs_to :glassplate1, class_name: "Glassplate", optional: true

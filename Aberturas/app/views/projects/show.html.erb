@@ -9,8 +9,89 @@
     <p class="mb-2"><strong>Fecha de entrega:</strong> <%= @project.delivery_date.strftime('%d-%m-%Y') %></p>
   <% end %>
   <p class="mb-2 text-sm text-gray-400">ID: <%= @project.id %></p>
+
+  <% if @project.glasscuttings.any? %>
+    <div class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Vidrios del Proyecto</h2>
+      <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipo</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Espesor</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ubicación</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @project.glasscuttings.each do |glass| %>
+              <tr>
+                <td class="text-center px-4 py-2"><%= glass.glass_type %></td>
+                <td class="text-center px-4 py-2"><%= glass.thickness %></td>
+                <td class="text-center px-4 py-2"><%= glass.color %></td>
+                <td class="text-center px-4 py-2"><%= glass.location %></td>
+                <td class="text-center px-4 py-2"><%= glass.height %></td>
+                <td class="text-center px-4 py-2"><%= glass.width %></td>
+                <td class="text-center px-4 py-2"><%= number_to_currency(glass.price, unit: "$", precision: 2) if glass.price.present? %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @project.dvhs.any? %>
+    <div class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">DVH del Proyecto</h2>
+      <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ubicación</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Camara</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Vidrio 1</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Vidrio 2</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @project.dvhs.each do |dvh| %>
+              <tr>
+                <td class="text-center px-4 py-2"><%= dvh.location %></td>
+                <td class="text-center px-4 py-2"><%= dvh.height %></td>
+                <td class="text-center px-4 py-2"><%= dvh.width %></td>
+                <td class="text-center px-4 py-2"><%= dvh.innertube %></td>
+                <td class="text-center px-4 py-2">
+                  <% if dvh.glasscutting1_type.present? %>
+                    <span class="block"><%= dvh.glasscutting1_type %></span>
+                    <span class="block text-xs text-gray-500"><%= dvh.glasscutting1_thickness %></span>
+                    <span class="block text-xs text-gray-500"><%= dvh.glasscutting1_color %></span>
+                  <% end %>
+                </td>
+                <td class=" text-center px-4 py-2">
+                  <% if dvh.glasscutting2_type.present? %>
+                    <span class="block"><%= dvh.glasscutting2_type %></span>
+                    <span class="block text-xs text-gray-500"><%= dvh.glasscutting2_thickness %></span>
+                    <span class="block text-xs text-gray-500"><%= dvh.glasscutting2_color %></span>
+                  <% end %>
+                </td>
+                <td class="text-center px-4 py-2"><%= number_to_currency(dvh.price, unit: "$", precision: 2) if dvh.price.present? %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
   <div class="mt-6 flex gap-2">
     <%= link_to "Editar", edit_project_path(@project), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
   </div>
-</div> 
+</div>
