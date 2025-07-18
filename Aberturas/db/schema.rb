@@ -47,6 +47,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
   end
 
+  create_table "insumos", force: :cascade do |t|
+    t.string "nombre"
+    t.decimal "precio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "precio_vidrios", force: :cascade do |t|
+    t.string "color"
+    t.string "tipo"
+    t.decimal "grosor"
+    t.decimal "precio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "precio_m2"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
