@@ -14,50 +14,50 @@ document.getElementById('add-dvh').addEventListener('click', () => {
 // Event delegation for confirm and delete buttons
 document.addEventListener("click", function (e) {
 // Handle confirm button click - locks the fields and replaces with delete button
-if (e.target.classList.contains("confirm-glass")) {
-    const container = e.target.closest(".glasscutting-fields");
-    const inputs = container.querySelectorAll("input");
+    if (e.target.classList.contains("confirm-glass")) {
+        const container = e.target.closest(".glasscutting-fields");
+        const inputs = container.querySelectorAll("input");
 
-    // Disable all input fields to lock the values
-    inputs.forEach(input => input.setAttribute("readonly", true));
+        // Disable all input fields to lock the values
+        inputs.forEach(input => input.setAttribute("readonly", true));
 
-    // Replace confirm button with delete button
-    const confirmButton = e.target;
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.textContent = "Eliminar";
-    deleteButton.className = "delete-glass bg-red-500 text-white px-3 py-1 rounded mt-4";
+        // Replace confirm button with delete button
+        const confirmButton = e.target;
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "delete-glass bg-red-500 text-white px-3 py-1 rounded mt-4";
 
-    confirmButton.replaceWith(deleteButton);
-}
+        confirmButton.replaceWith(deleteButton);
+    }
 
-// Handle delete button click - removes the entire glasscutting row
-if (e.target.classList.contains("delete-glass")) {
-    const container = e.target.closest(".glasscutting-fields");
-    container.remove();
-}
+    // Handle delete button click - removes the entire glasscutting row
+    if (e.target.classList.contains("delete-glass")) {
+        const container = e.target.closest(".glasscutting-fields");
+        container.remove();
+    }
 });
 
 document.addEventListener("click", function (e) {
-// Confirm DVH
-if (e.target.classList.contains("confirm-dvh")) {
-    const container = e.target.closest(".dvh-fields");
-    const inputs = container.querySelectorAll("input");
+    // Confirm DVH
+    if (e.target.classList.contains("confirm-dvh")) {
+        const container = e.target.closest(".dvh-fields");
+        const inputs = container.querySelectorAll("input");
 
-    inputs.forEach(input => input.setAttribute("readonly", true));
+        inputs.forEach(input => input.setAttribute("readonly", true));
 
-    const confirmButton = e.target;
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.textContent = "Eliminar";
-    deleteButton.className = "delete-dvh bg-red-500 text-white px-3 py-1 rounded mt-4";
+        const confirmButton = e.target;
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "delete-dvh bg-red-500 text-white px-3 py-1 rounded mt-4";
 
-    confirmButton.replaceWith(deleteButton);
-}
+        confirmButton.replaceWith(deleteButton);
+    }
 
-// Remove DVH
-if (e.target.classList.contains("delete-dvh")) {
-    const container = e.target.closest(".dvh-fields");
-    container.remove();
-}
+    // Remove DVH
+    if (e.target.classList.contains("delete-dvh")) {
+        const container = e.target.closest(".dvh-fields");
+        container.remove();
+    }
 });
