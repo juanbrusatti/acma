@@ -7,66 +7,42 @@
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.3.1
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM ruby:3.2
 
-# Rails app lives here
-WORKDIR /rails
+# Install nependencies
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  libsqlite3-dev \
+  nodejs \
+  yarn \
+  git \
+  curl
 
-# Install base packages
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+# Create app directory
+WORKDIR /app
 
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+# Copy Gemfile and Gemfile.lock
+COPY ./Aberturas/Gemfile ./Aberturas/Gemfile.lock ./
 
-# Throw-away build stage to reduce size of final image
-FROM base AS build
+# Install gems
+RUN gem install bundler
+RUN bundle install
 
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Install application gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
-
-# Copy application code
+# Copy the rest of the application code
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# Precompile tailwindcss assets (only production)
+# RUN bundle exec rails tailwindcss:build
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Entrypoint script to set up the environment
+COPY ./entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
 
+# Set Rails port
+EXPOSE 3000
 
+# Use script as entrypoint
+ENTRYPOINT ["entrypoint.sh"]
 
-
-# Final stage for app image
-FROM base
-
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
-
-# Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER 1000:1000
-
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Default command to run the Rails server
+CMD ["rails", "server", "-b", "0.0.0.0"]
