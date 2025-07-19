@@ -67,8 +67,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "status"
     t.date "delivery_date"
     t.string "phone"

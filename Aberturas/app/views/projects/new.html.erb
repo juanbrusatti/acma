@@ -5,6 +5,17 @@
 <div class="w-full p-4 md:p-8">
   <h1 class="text-lg font-semibold mb-3">Generar proyecto</h1>
 
+  <% if @project.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold mb-2">Errores al guardar el proyecto:</h2>
+      <ul>
+        <% @project.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <%= form_with(model: @project, local: true) do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <%= render partial: "info_client", locals: { f: f } %>
