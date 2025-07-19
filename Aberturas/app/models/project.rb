@@ -11,7 +11,7 @@ class Project < ApplicationRecord
   validates :name, presence: true, length: { minimum: 0, maximum: 100 }
   validates :description, presence: true, length: { minimum: 0, maximum: 500 }
   # validates :status, presence: true, inclusion: { in: %w[Pendiente En\ Proceso Terminado] }
-  validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, allow_nil: true
+  validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, if: -> { status == "Pendiente" }
 
   # Scopes for filtering projects by status and dates
   scope :active, -> { where(status: "En Proceso") }
