@@ -33,9 +33,23 @@ class ProjectsController < ApplicationController
   def update
     @project = Project.find(params[:id])
     if @project.update(project_params)
-      redirect_to projects_path, notice: "Proyecto actualizado exitosamente."
+      respond_to do |format|
+        format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
+        format.json {
+          render json: {
+            success: true,
+            project: @project.as_json(only: [:id, :name, :description, :status, :delivery_date], include: { glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } }),
+            status_badge_html: render_to_string(partial: "status_badge", locals: { status: @project.status }, formats: [:html])
+          }
+        }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json {
+          render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
+        }
+      end
     end
   end
 
@@ -55,7 +69,7 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
-      glasscuttings_attributes: [ :glass_type, :thickness, :height, :width, :color, :location ],
+      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location ],
       dvhs_attributes: [
         :innertube,
         :location,
