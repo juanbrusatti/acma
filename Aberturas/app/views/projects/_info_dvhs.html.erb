@@ -2,7 +2,10 @@
 <div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
     <h2 class="text-base font-semibold mb-4">DVH</h2>
 
-    <!-- Container for dynamic DVH fields -->
+    <!-- Contenedor donde JS insertará la tabla de DVH confirmados si hay alguno -->
+    <div id="dvhs-table-container"></div>
+
+    <!-- Formulario de creación de DVH -->
     <div id="dvhs-wrapper">
     <%= f.fields_for :dvhs do |dvh| %>
         <!-- DVH form row with improved labels -->
@@ -13,6 +16,10 @@
         <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
         <div><%= dvh.label :glasscutting1_type, "Tipo vidrio 1" %> <%= dvh.text_field :glasscutting1_type, class: "w-full border rounded px-2 py-1" %></div>
         <div><%= dvh.label :glasscutting2_type, "Tipo vidrio 2" %> <%= dvh.text_field :glasscutting2_type, class: "w-full border rounded px-2 py-1" %></div>
+        <div class="actions space-x-2 mt-2 flex gap-2">
+          <button type="button" class="confirm-dvh bg-green-600 text-white px-3 py-1 rounded mt-4">Confirmar</button>
+          <button type="button" class="cancel-dvh bg-red-500 text-white px-3 py-1 rounded mt-4">Cancelar</button>
+        </div>
         </div>
     <% end %>
     </div>
