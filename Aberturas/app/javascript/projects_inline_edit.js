@@ -1,4 +1,3 @@
-// Edición inline para proyectos y vidrios
 export function setupProjectEditInline() {
   const editBtn = document.getElementById('edit-btn');
   const confirmBtn = document.getElementById('confirm-btn');
@@ -6,7 +5,6 @@ export function setupProjectEditInline() {
   const actionsView = document.getElementById('project-actions-view');
   const actionsEdit = document.getElementById('project-actions-edit');
 
-  // Campos generales
   const nameView = document.getElementById('project-name-view');
   const nameEdit = document.getElementById('project-name-edit');
   const descView = document.getElementById('project-desc-view');
@@ -25,11 +23,10 @@ export function setupProjectEditInline() {
     descEdit.style.display = editing ? '' : 'none';
     statusView.style.display = editing ? 'none' : '';
     statusEdit.style.display = editing ? '' : 'none';
-    if(dateView && dateEdit) {
+    if (dateView && dateEdit) {
       dateView.style.display = editing ? 'none' : '';
       dateEdit.style.display = editing ? '' : 'none';
     }
-    // Glasscuttings
     document.querySelectorAll('.glass-type-view').forEach(e => e.style.display = editing ? 'none' : '');
     document.querySelectorAll('.glass-type-edit').forEach(e => e.style.display = editing ? '' : 'none');
     document.querySelectorAll('.glass-thickness-view').forEach(e => e.style.display = editing ? 'none' : '');
@@ -46,19 +43,20 @@ export function setupProjectEditInline() {
     actionsEdit.style.display = editing ? '' : 'none';
   }
 
-  editBtn.onclick = function(e) {
+  editBtn.onclick = function (e) {
     e.preventDefault();
     toggleEditMode(true);
   };
 
-  cancelBtn.onclick = function(e) {
+  cancelBtn.onclick = function (e) {
     e.preventDefault();
     toggleEditMode(false);
   };
 
-  confirmBtn.onclick = function(e) {
+  confirmBtn.onclick = function (e) {
     e.preventDefault();
-    // Construir datos generales
+    toggleEditMode(false);
+
     const data = {
       project: {
         name: nameEdit.value,
@@ -68,7 +66,7 @@ export function setupProjectEditInline() {
         glasscuttings_attributes: []
       }
     };
-    // Recolectar datos de los vidrios
+
     const rows = document.querySelectorAll('#glasscuttings-table-body tr');
     rows.forEach((row) => {
       data.project.glasscuttings_attributes.push({
@@ -81,6 +79,7 @@ export function setupProjectEditInline() {
         width: row.querySelector('.glass-width-edit').value
       });
     });
+
     fetch(window.location.pathname, {
       method: 'PATCH',
       headers: {
@@ -89,16 +88,31 @@ export function setupProjectEditInline() {
       },
       body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(json => {
-      if(json.success) {
-        window.location.reload();
-      } else {
-        alert('Error al guardar: ' + (json.errors ? json.errors.join(', ') : 'Error desconocido'));
-      }
-    });
+      .then(response => {
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        return response.json();
+      })
+      .then(json => {
+        if (json.success) {
+          const match = window.location.pathname.match(/\/projects\/(\d+)/);
+          const projectId = match?.[1] || json.project?.id;
+          if (projectId) {
+            if (window.Turbo) {
+              Turbo.visit(`/projects/${projectId}`, { action: 'replace' });
+            } else {
+              window.location.href = `/projects/${projectId}`;
+            }
+          } else {
+            window.location.href = '/projects';
+          }
+        } else {
+          alert('Error al guardar: ' + (json.errors ? json.errors.join(', ') : 'Error desconocido'));
+        }
+      })
+      .catch(error => {
+        alert('Ocurrió un error al guardar: ' + error.message);
+      });
   };
 }
 
-document.addEventListener('DOMContentLoaded', setupProjectEditInline);
-document.addEventListener('turbo:load', setupProjectEditInline); 
+document.addEventListener('turbo:load', setupProjectEditInline);

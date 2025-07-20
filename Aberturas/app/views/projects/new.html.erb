@@ -31,15 +31,40 @@
 <!-- Hidden template for cloning glasscutting fields -->
 <!--  Template for dynamically adding new glasscutting rows -->
 <template id="glasscutting-template">
-  <!-- Template for new glasscutting row with 8 columns and action buttons -->
-  <!--  Each row contains 8 columns for glasscutting attributes and action buttons -->
   <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
-    <div><label>Tipo</label><input name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1"></div>
-    <div><label>Grosor</label><input name="project[glasscuttings_attributes][][thickness]" class="w-full border rounded px-2 py-1"></div>
-    <div><label>Alto</label><input type="number" name="project[glasscuttings_attributes][][height]" class="w-full border rounded px-2 py-1"></div>
-    <div><label>Ancho</label><input type="number" name="project[glasscuttings_attributes][][width]" class="w-full border rounded px-2 py-1"></div>
-    <div><label>Color</label><input name="project[glasscuttings_attributes][][color]" class="w-full border rounded px-2 py-1"></div>
-    <div><label>Ubicación</label><input name="project[glasscuttings_attributes][][location]" class="w-full border rounded px-2 py-1"></div>
+    <div>
+      <label>Tipo</label>
+      <select name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1 glass-type-select">
+        <option value="">Seleccionar</option>
+        <option value="Laminado">LAM</option>
+        <option value="Float">FLO</option>
+        <option value="Cool lite">Cool lite</option>
+      </select>
+    </div>
+    <div>
+      <label>Grosor</label>
+      <select name="project[glasscuttings_attributes][][thickness]" class="w-full border rounded px-2 py-1 glass-thickness-select">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+    <div>
+      <label>Alto</label>
+      <input type="number" name="project[glasscuttings_attributes][][height]" class="w-full border rounded px-2 py-1">
+    </div>
+    <div>
+      <label>Ancho</label>
+      <input type="number" name="project[glasscuttings_attributes][][width]" class="w-full border rounded px-2 py-1">
+    </div>
+    <div>
+      <label>Color</label>
+      <select name="project[glasscuttings_attributes][][color]" class="w-full border rounded px-2 py-1 glass-color-select">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+    <div>
+      <label>Ubicación</label>
+      <input name="project[glasscuttings_attributes][][location]" class="w-full border rounded px-2 py-1">
+    </div>
     <div class="actions space-x-2 mt-2 col-span-2">
       <button type="button" class="confirm-glass bg-green-600 text-white px-3 py-1 rounded mt-4">Confirmar</button>
     </div>
