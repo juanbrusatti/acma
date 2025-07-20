@@ -10,6 +10,60 @@ let dvhTable = null;
 let dvhTbody = null;
 let isListenerRegistered = false;
 
+// Configuración de tipos, grosores y colores válidos
+const GLASS_OPTIONS = {
+  "Laminado": {
+    grosores: ["3+3", "4+4", "5+5"],
+    colores: ["incoloro", "esmerilado"]
+  },
+  "Float": {
+    grosores: ["5mm"],
+    colores: ["incoloro", "gris", "bronce"]
+  },
+  "Cool lite": {
+    grosores: ["4+4"],
+    colores: ["incoloro"]
+  }
+};
+
+function updateGlassSelects(container) {
+  const typeSelect = container.querySelector('.glass-type-select');
+  const thicknessSelect = container.querySelector('.glass-thickness-select');
+  const colorSelect = container.querySelector('.glass-color-select');
+
+  if (!typeSelect || !thicknessSelect || !colorSelect) return;
+
+  function fillOptions() {
+    const tipo = typeSelect.value;
+    thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+    if (GLASS_OPTIONS[tipo]) {
+      GLASS_OPTIONS[tipo].grosores.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        thicknessSelect.appendChild(opt);
+      });
+      GLASS_OPTIONS[tipo].colores.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        colorSelect.appendChild(opt);
+      });
+    }
+  }
+
+  // Inicializar según valor actual
+  fillOptions();
+
+  // Cuando cambia el tipo, actualizar grosores y colores
+  typeSelect.addEventListener('change', fillOptions);
+}
+
+function setupAllGlassSelects() {
+  document.querySelectorAll('.glasscutting-fields').forEach(updateGlassSelects);
+}
+
 function ensureGlasscuttingTable() {
   // Check if table already exists in the container
   const container = document.getElementById('glasscuttings-table-container');
@@ -101,10 +155,10 @@ function removeDvhTableIfEmpty() {
 
 // Event delegation for confirm and delete buttons (works for dynamically added elements)
 function handleGlasscuttingAndDvhEvents(e) {
-  // Handle confirm button click for Glasscutting - replace with read-only view and delete button
+  // Handle confirm button click for Glasscutting - add to table
   if (e.target.classList.contains("confirm-glass")) {
     const container = e.target.closest(".glasscutting-fields");
-    const inputs = container.querySelectorAll("input");
+    const inputs = container.querySelectorAll("input, select");
     // Recolectar valores
     const values = {};
     inputs.forEach(input => {
@@ -234,6 +288,11 @@ document.addEventListener('turbo:load', () => {
     newAddGlasscuttingBtn.addEventListener('click', () => {
       const template = document.getElementById('glasscutting-template').content.cloneNode(true);
       document.getElementById('glasscuttings-wrapper').appendChild(template);
+      setTimeout(() => {
+        // Solo el último agregado
+        const fields = document.querySelectorAll('.glasscutting-fields');
+        updateGlassSelects(fields[fields.length - 1]);
+      }, 0);
     });
   }
 
@@ -245,4 +304,7 @@ document.addEventListener('turbo:load', () => {
       document.getElementById('dvhs-wrapper').appendChild(template);
     });
   }
+
+  // Inicializar selects dependientes en los ya existentes
+  setupAllGlassSelects();
 });

@@ -9,15 +9,33 @@
     <div id="glasscuttings-wrapper">
       <%= f.fields_for :glasscuttings do |gc| %>
         <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
-          <div><%= gc.label :glass_type, "Tipo de vidrio" %> <%= gc.text_field :glass_type, class: "w-full border rounded px-2 py-1" %></div>
-          <div><%= gc.label :thickness, "Grosor" %> <%= gc.text_field :thickness, class: "w-full border rounded px-2 py-1" %></div>
+          <div>
+            <%= gc.label :glass_type, "Tipo de vidrio" %>
+            <select class="w-full border rounded px-2 py-1 glass-type-select" name="project[glasscuttings_attributes][][glass_type]">
+              <option value="">Seleccionar</option>
+              <option value="Laminado">Laminado</option>
+              <option value="Float">Float</option>
+              <option value="Cool lite">Cool lite</option>
+            </select>
+          </div>
+          <div>
+            <%= gc.label :thickness, "Grosor" %>
+            <select class="w-full border rounded px-2 py-1 glass-thickness-select" name="project[glasscuttings_attributes][][thickness]">
+              <option value="">Seleccionar</option>
+            </select>
+          </div>
+          <div>
+            <%= gc.label :color, "Color" %>
+            <select class="w-full border rounded px-2 py-1 glass-color-select" name="project[glasscuttings_attributes][][color]">
+              <option value="">Seleccionar</option>
+            </select>
+          </div>
+          <div><%= gc.label :location, "Ubicación" %> <%= gc.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
           <div><%= gc.label :height, "Alto (mm)" %> <%= gc.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
           <div><%= gc.label :width, "Ancho (mm)" %> <%= gc.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
-          <div><%= gc.label :color, "Color" %> <%= gc.text_field :color, class: "w-full border rounded px-2 py-1" %></div>
-          <div><%= gc.label :location, "Ubicación" %> <%= gc.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
           <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
-            <button type="button" class="confirm-glass bg-green-600 text-white px-3 py-1 rounded mt-4">Confirmar</button>
-            <button type="button" class="cancel-glass bg-red-500 text-white px-3 py-1 rounded mt-4">Cancelar</button>
+              <button type="button" class="confirm-glass bg-green-600 text-white px-3 py-1 rounded mt-4">Confirmar</button>
+              <button type="button" class="cancel-glass bg-red-500 text-white px-3 py-1 rounded mt-4">Cancelar</button>
           </div>
         </div>
       <% end %>
