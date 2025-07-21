@@ -1,6 +1,6 @@
 require "test_helper"
 
-class InsumoTest < ActiveSupport::TestCase
+class SupplyTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

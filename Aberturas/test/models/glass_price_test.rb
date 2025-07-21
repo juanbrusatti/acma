@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PrecioVidrioTest < ActiveSupport::TestCase
+class GlassPriceTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type: Laminated
+  thickness: 3+3
+  color: incolor
+  price: 9.99
+  price_m2: 12.34
+
+two:
+  type: Float
+  thickness: 5mm
+  color: gris
+  price: 8.50
+  price_m2: 10.00
