@@ -1,9 +1,9 @@
-<%= form_with(model: precio_vidrio, class: "contents") do |form| %>
-  <% if precio_vidrio.errors.any? %>
+<%= form_with(model: glass_price, class: "contents") do |form| %>
+  <% if glass_price.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(precio_vidrio.errors.count, "error") %> impidieron guardar este precio:</h2>
+      <h2><%= pluralize(glass_price.errors.count, "error") %> impidieron guardar este precio:</h2>
       <ul class="list-disc ml-6">
-        <% precio_vidrio.errors.each do |error| %>
+        <% glass_price.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
@@ -12,28 +12,28 @@
 
   <div class="my-5">
     <label class="block font-medium mb-1">Tipo</label>
-    <input type="text" value="<%= precio_vidrio.tipo %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+    <input type="text" value="<%= glass_price.glass_type %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
     <label class="block font-medium mb-1">Grosor</label>
-    <input type="text" value="<%= precio_vidrio.grosor %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+    <input type="text" value="<%= glass_price.thickness %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
     <label class="block font-medium mb-1">Color</label>
-    <input type="text" value="<%= precio_vidrio.color %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+    <input type="text" value="<%= glass_price.color %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <%= form.label :precio_m2, "Precio por m²" %>
-    <%= form.text_field :precio_m2, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": precio_vidrio.errors[:precio_m2].none?, "border-red-400 focus:outline-red-600": precio_vidrio.errors[:precio_m2].any?}] %>
+    <%= form.label :price_m2, "Precio por m²" %>
+    <%= form.text_field :price_m2, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glass_price.errors[:price_m2].none?, "border-red-400 focus:outline-red-600": glass_price.errors[:price_m2].any?}] %>
   </div>
 
   <div class="my-5 flex gap-6">
     <div>
-      <%= form.label :tamiz do %>
-        <%= form.check_box :tamiz %> Tamiz
+      <%= form.label :sieve do %>
+        <%= form.check_box :sieve %> Tamiz
       <% end %>
     </div>
     <div>
@@ -42,8 +42,8 @@
       <% end %>
     </div>
     <div>
-      <%= form.label :cinta do %>
-        <%= form.check_box :cinta %> Cinta
+      <%= form.label :tape do %>
+        <%= form.check_box :tape %> Cinta
       <% end %>
     </div>
   </div>

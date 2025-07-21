@@ -19,8 +19,8 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <% @combinaciones.each do |precio_vidrio| %>
-              <%= render partial: "partials/glass_prices/fila_precio_vidrio", locals: { precio_vidrio: precio_vidrio } %>
+            <% @combinations.each do |glass_price| %>
+              <%= render partial: "partials/glass_prices/glass_price_row", locals: { glass_price: glass_price } %>
             <% end %>
           </tbody>
         </table>

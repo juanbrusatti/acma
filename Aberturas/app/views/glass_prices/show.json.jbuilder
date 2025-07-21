@@ -1,1 +1,1 @@
-json.partial! "precio_vidrios/precio_vidrio", precio_vidrio: @precio_vidrio
+json.partial! "glass_prices/glass_price", glass_price: @glass_price

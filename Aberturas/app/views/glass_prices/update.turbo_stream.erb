@@ -1,5 +1,3 @@
-<turbo-stream target="precio_vidrio_<%= @precio_vidrio.id %>" action="replace">
-  <template>
-    <%= render partial: 'fila_precio_vidrio', formats: [:html], locals: { precio_vidrio: @precio_vidrio } %>
-  </template>
+<turbo-stream target="glass_price_<%= @glass_price.id %>" action="replace">
+  <%= render partial: 'glass_price_row', formats: [:html], locals: { glass_price: @glass_price } %>
 </turbo-stream> 

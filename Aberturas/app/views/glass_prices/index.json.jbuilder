@@ -1,1 +1,1 @@
-json.array! @precio_vidrios, partial: "precio_vidrios/precio_vidrio", as: :precio_vidrio
+json.array! @glass_prices, partial: "glass_prices/glass_price", as: :glass_price
