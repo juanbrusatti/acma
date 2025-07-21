@@ -100,10 +100,9 @@
               <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                   <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Espesor</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Grosor</th>
                   <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Color</th>
                   <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Medidas Estándar</th>
-                  <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Cantidad</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
                 </tr>
               </thead>
@@ -114,7 +113,6 @@
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.thickness %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.color %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.standard_measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right"><%= glassplate.quantity %></td>
                     <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-center">
                       <div class="flex justify-center space-x-2">
                         <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>

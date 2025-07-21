@@ -69,7 +69,7 @@ class GlassplatesController < ApplicationController
   # This method aggregates the stock data for display in the dashboard.
   def calculate_stock_summary
     {
-      total_sheets: Glassplate.complete_sheets.sum(:quantity),
+      total_sheets: Glassplate.complete_sheets.count,
       total_scraps: Glassplate.scraps.count,
       available_scraps: Glassplate.scraps.available.count,
       reserved_scraps: Glassplate.scraps.reserved.count
@@ -82,6 +82,6 @@ class GlassplatesController < ApplicationController
 
   def glassplate_params
     params.require(:glassplate).permit(:width, :height, :color, :glass_type, :thickness,
-                                      :standard_measures, :quantity, :location, :status, :is_scrap)
+                                      :standard_measures, :location, :work, :origin, :status, :is_scrap)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_12_213246) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_21_222032) do
   create_table "glassplates", force: :cascade do |t|
     t.float "width"
     t.float "height"
@@ -21,9 +21,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_12_213246) do
     t.datetime "updated_at", null: false
     t.string "thickness"
     t.string "standard_measures"
-    t.integer "quantity"
     t.string "location"
-    t.string "status"
     t.boolean "is_scrap"
+    t.string "work"
+    t.string "origin"
+    t.string "status"
   end
 end

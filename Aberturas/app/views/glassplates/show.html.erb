@@ -53,11 +53,6 @@
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Cantidad:</span>
-              <span class="text-sm font-medium"><%= @glassplate.quantity %></span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Estado:</span>
               <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= @glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
                 <%= @glassplate.status %>
@@ -68,6 +63,20 @@
               <span class="text-sm font-medium text-muted-foreground">Tipo de Material:</span>
               <span class="text-sm"><%= @glassplate.is_scrap? ? 'Sobrante/Recorte' : 'Plancha Completa' %></span>
             </div>
+
+            <% if @glassplate.work.present? %>
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Trabajo/Obra:</span>
+              <span class="text-sm"><%= @glassplate.work %></span>
+            </div>
+            <% end %>
+
+            <% if @glassplate.origin.present? %>
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Origen:</span>
+              <span class="text-sm"><%= @glassplate.origin %></span>
+            </div>
+            <% end %>
           </div>
         </div>
       </div>

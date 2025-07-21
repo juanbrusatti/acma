@@ -1,8 +1,7 @@
 <%= form_with(model: glassplate, class: "contents") do |form| %>
   <% if glassplate.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(glassplate.errors.count, "error") %> prohibited this glassplate from being saved:</h2>
-
+      <h2><%= pluralize(glassplate.errors.count, "error") %> impidieron guardar este material:</h2>
       <ul class="list-disc ml-6">
         <% glassplate.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -12,23 +11,81 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :width %>
-    <%= form.text_field :width, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glassplate.errors[:width].none?, "border-red-400 focus:outline-red-600": glassplate.errors[:width].any?}] %>
+    <%= form.label :glass_type, "Tipo de vidrio" %>
+    <%= form.select :glass_type, options_for_select([
+      ['Laminado', 'Laminado'],
+      ['Float', 'Float'],
+      ['Cool Lite', 'Cool Lite']
+    ], glassplate.glass_type), { prompt: 'Selecciona un tipo de vidrio' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
   </div>
 
   <div class="my-5">
-    <%= form.label :height %>
-    <%= form.text_field :height, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glassplate.errors[:height].none?, "border-red-400 focus:outline-red-600": glassplate.errors[:height].any?}] %>
+    <%= form.label :thickness, "Espesor" %>
+    <%= form.select :thickness, options_for_select([
+      ['3+3', '3+3'],
+      ['4+4', '4+4'],
+      ['5+5', '5+5'],
+      ['5mm', '5mm']
+    ], glassplate.thickness), { prompt: 'Selecciona un espesor' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
   </div>
 
   <div class="my-5">
     <%= form.label :color %>
-    <%= form.text_field :color, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glassplate.errors[:color].none?, "border-red-400 focus:outline-red-600": glassplate.errors[:color].any?}] %>
+    <%= form.select :color, options_for_select([
+      ['Incoloro', 'Incoloro'],
+      ['Esmerilado', 'Esmerilado'],
+      ['Gris', 'Gris'],
+      ['Bronce', 'Bronce']
+    ], glassplate.color), { prompt: 'Selecciona un color' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
   </div>
 
   <div class="my-5">
-    <%= form.label :type %>
-    <%= form.text_field :type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glassplate.errors[:type].none?, "border-red-400 focus:outline-red-600": glassplate.errors[:type].any?}] %>
+    <%= form.label :standard_measures, "Medidas estándar" %>
+    <%= form.text_field :standard_measures, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :width, "Ancho (mm)" %>
+    <%= form.number_field :width, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :height, "Alto (mm)" %>
+    <%= form.number_field :height, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :location, "Ubicación" %>
+    <%= form.text_field :location, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :status, "Estado" %>
+    <%= form.select :status, options_for_select([
+      ['Disponible', 'disponible'],
+      ['Reservado', 'reservado'],
+      ['Usado', 'usado']
+    ], glassplate.status), { prompt: 'Selecciona un estado' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :is_scrap, "¿Es sobrante/recorte?" %>
+    <%= form.check_box :is_scrap %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :work, "Trabajo/Obra" %>
+    <%= form.text_field :work, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :origin, "Origen" %>
+    <%= form.text_field :origin, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :deleted, "¿Eliminado?" %>
+    <%= form.check_box :deleted %>
   </div>
 
   <div class="inline">

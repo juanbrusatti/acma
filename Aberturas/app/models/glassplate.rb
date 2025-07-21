@@ -2,15 +2,15 @@ class Glassplate < ApplicationRecord
   # Color validation
   validates :color, presence: true
   validates :color, inclusion: {
-    in: [ "transparente", "gris", "azul", "verde", "negro", "plata", "N/A" ],
-    message: "debe ser uno de: transparente, gris, azul, verde, negro, plata, N/A"
+    in: [ "Incoloro", "Esmerilado", "Gris", "Bronce" ],
+    message: "debe ser uno de: Incoloro, Esmerilado, Gris, Bronce"
   }
 
   # Glass type validation
   validates :glass_type, presence: true
   validates :glass_type, inclusion: {
-    in: [ "Incoloro", "Laminado 3+3", "DVH 4/9/4", "Espejo", "Templado", "Doble" ],
-    message: "debe ser uno de: Incoloro, Laminado 3+3, DVH 4/9/4, Espejo, Templado, Doble"
+    in: [ "Laminado", "Float", "Cool Lite" ],
+    message: "debe ser uno de: Laminado, Float, Cool Lite"
   }
 
   # Validations for width and height
@@ -18,7 +18,10 @@ class Glassplate < ApplicationRecord
 
   # New field validations
   validates :thickness, presence: true
-  validates :quantity, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :thickness, inclusion: {
+    in: [ "3+3", "4+4", "5+5", "5mm"],
+    message: "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+  }
   validates :status, inclusion: { in: %w[disponible reservado usado], allow_nil: true }
   validates :is_scrap, inclusion: { in: [true, false] }
 

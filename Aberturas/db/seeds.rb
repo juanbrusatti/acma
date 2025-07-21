@@ -12,121 +12,130 @@ puts "Creando datos de ejemplo para glassplates..."
 
 # Example complete sheets
 Glassplate.create!(
-  glass_type: "Incoloro",
-  thickness: "4mm",
-  color: "transparente",
+  glass_type: "Float",
+  thickness: "5mm",
+  color: "Incoloro",
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
-  quantity: 15,
   location: "Estante Principal",
   status: "disponible",
-  is_scrap: false
+  is_scrap: false,
+  work: nil,
+  origin: "Proveedor A"
 )
 
 Glassplate.create!(
-  glass_type: "Laminado 3+3",
-  thickness: "6mm",
-  color: "transparente",
+  glass_type: "Laminado",
+  thickness: "3+3",
+  color: "Incoloro",
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
-  quantity: 8,
   location: "Estante Principal",
   status: "disponible",
-  is_scrap: false
+  is_scrap: false,
+  work: nil,
+  origin: "Proveedor B"
 )
 
 Glassplate.create!(
-  glass_type: "DVH 4/9/4",
-  thickness: "17mm",
-  color: "transparente",
+  glass_type: "Cool Lite",
+  thickness: "5mm",
+  color: "Gris",
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
-  quantity: 12,
   location: "Estante Principal",
   status: "disponible",
-  is_scrap: false
+  is_scrap: false,
+  work: nil,
+  origin: "Proveedor A"
 )
 
 Glassplate.create!(
-  glass_type: "Espejo",
-  thickness: "3mm",
-  color: "plata",
+  glass_type: "Float",
+  thickness: "4+4",
+  color: "Bronce",
   width: 2440,
   height: 3660,
   standard_measures: "2440x3660",
-  quantity: 20,
   location: "Estante Principal",
   status: "disponible",
-  is_scrap: false
+  is_scrap: false,
+  work: nil,
+  origin: "Proveedor C"
 )
 
 # Example scraps
 Glassplate.create!(
-  glass_type: "Incoloro",
-  thickness: "4mm",
-  color: "transparente",
+  glass_type: "Float",
+  thickness: "5mm",
+  color: "Incoloro",
   width: 800,
   height: 1200,
   standard_measures: "800x1200",
-  quantity: 1,
   location: "Estante A3",
   status: "disponible",
-  is_scrap: true
+  is_scrap: true,
+  work: "Ventana Oficina",
+  origin: "Recorte interno"
 )
 
 Glassplate.create!(
-  glass_type: "Laminado 3+3",
-  thickness: "6mm",
-  color: "transparente",
+  glass_type: "Laminado",
+  thickness: "3+3",
+  color: "Esmerilado",
   width: 500,
   height: 950,
   standard_measures: "500x950",
-  quantity: 1,
   location: "Estante B1",
   status: "disponible",
-  is_scrap: true
+  is_scrap: true,
+  work: "Puerta Principal",
+  origin: "Recorte interno"
 )
 
 Glassplate.create!(
-  glass_type: "Espejo",
-  thickness: "3mm",
-  color: "plata",
+  glass_type: "Float",
+  thickness: "4+4",
+  color: "Gris",
   width: 1500,
   height: 400,
   standard_measures: "1500x400",
-  quantity: 1,
   location: "Estante A1",
-  status: "reservado",
-  is_scrap: true
+  status: "disponible",
+  is_scrap: true,
+  work: "Baño Principal",
+  origin: "Recorte interno"
 )
 
 Glassplate.create!(
-  glass_type: "Templado",
-  thickness: "8mm",
-  color: "gris",
+  glass_type: "Cool Lite",
+  thickness: "5+5",
+  color: "Bronce",
   width: 1200,
   height: 800,
   standard_measures: "1200x800",
-  quantity: 1,
   location: "Estante C2",
   status: "disponible",
-  is_scrap: true
+  is_scrap: true,
+  work: "Divisor Cocina",
+  origin: "Recorte interno"
 )
 
 Glassplate.create!(
-  glass_type: "Doble",
-  thickness: "12mm",
-  color: "azul",
+  glass_type: "Laminado",
+  thickness: "4+4",
+  color: "Gris",
   width: 900,
   height: 600,
   standard_measures: "900x600",
-  quantity: 1,
   location: "Estante D1",
-  status: "disponible",
-  is_scrap: true
+  status: "reservado",
+  is_scrap: true,
+  work: "Ventana Pequeña",
+  origin: "Recorte interno"
 )
 
 puts "Datos de ejemplo creados exitosamente!"
