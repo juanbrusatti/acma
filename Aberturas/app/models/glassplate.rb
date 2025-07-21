@@ -19,7 +19,7 @@ class Glassplate < ApplicationRecord
   # New field validations
   validates :thickness, presence: true
   validates :thickness, inclusion: {
-    in: [ "3+3", "4+4", "5+5", "5mm"],
+    in: [ "3+3", "4+4", "5+5", "5mm" ],
     message: "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
   }
   validates :status, inclusion: { in: %w[disponible reservado usado], allow_nil: true }
