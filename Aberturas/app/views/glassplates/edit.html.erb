@@ -46,12 +46,9 @@
               <%= form.label :glass_type, "Tipo", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
               <%= form.select :glass_type,
                   options_for_select([
-                    ['Incoloro', 'Incoloro'],
-                    ['Laminado 3+3', 'Laminado 3+3'],
-                    ['DVH 4/9/4', 'DVH 4/9/4'],
-                    ['Espejo', 'Espejo'],
-                    ['Templado', 'Templado'],
-                    ['Doble', 'Doble']
+                    ['Laminado', 'Laminado'],
+                    ['Float', 'Float'],
+                    ['Cool Lite', 'Cool Lite']
                   ], @glassplate.glass_type),
                   { prompt: "Seleccionar tipo" },
                   { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
@@ -59,28 +56,28 @@
 
             <div class="space-y-4">
               <%= form.label :thickness, "Espesor", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.text_field :thickness, placeholder: "ej: 4mm", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+              <%= form.select :thickness,
+                  options_for_select([
+                    ['3+3', '3+3'],
+                    ['4+4', '4+4'],
+                    ['5+5', '5+5'],
+                    ['5mm', '5mm']
+                  ], @glassplate.thickness),
+                  { prompt: "Seleccionar espesor" },
+                  { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
             </div>
 
             <div class="space-y-4">
               <%= form.label :color, "Color", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
               <%= form.select :color,
                   options_for_select([
-                    ['Transparente', 'transparente'],
-                    ['Gris', 'gris'],
-                    ['Azul', 'azul'],
-                    ['Verde', 'verde'],
-                    ['Negro', 'negro'],
-                    ['Plata', 'plata'],
-                    ['N/A', 'N/A']
+                    ['Incoloro', 'Incoloro'],
+                    ['Esmerilado', 'Esmerilado'],
+                    ['Gris', 'Gris'],
+                    ['Bronce', 'Bronce']
                   ], @glassplate.color),
                   { prompt: "Seleccionar color" },
                   { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :quantity, "Cantidad", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.number_field :quantity, min: 1, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
             </div>
 
             <div class="space-y-4">
@@ -113,6 +110,16 @@
                   ], @glassplate.status),
                   {},
                   { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
+            </div>
+
+            <div class="space-y-4">
+              <%= form.label :work, "Trabajo/Obra", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+              <%= form.text_field :work, placeholder: "ej: Ventana Principal", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+            </div>
+
+            <div class="space-y-4">
+              <%= form.label :origin, "Origen", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+              <%= form.text_field :origin, placeholder: "ej: Proveedor A", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
             </div>
 
             <div class="space-y-4 md:col-span-2">
