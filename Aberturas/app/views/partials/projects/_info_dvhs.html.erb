@@ -20,13 +20,13 @@
         <div><%= dvh.label :glasscutting1_type, "Tipo vidrio 1" %> <%= dvh.text_field :glasscutting1_type, class: "w-full border rounded px-2 py-1" %></div>
         <div><%= dvh.label :glasscutting2_type, "Tipo vidrio 2" %> <%= dvh.text_field :glasscutting2_type, class: "w-full border rounded px-2 py-1" %></div>
         <div class="actions space-x-2 mt-2 flex gap-2">
-          <button type="button" class="confirm-dvh bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
-          <button type="button" class="cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
+          <%= button_tag "Confirmar", type: "button", class: "confirm-dvh bg-black text-white px-3 py-1 rounded mt-4" %>
+          <%= button_tag "Cancelar", type: "button", class: "cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4" %>
         </div>
         </div>
     <% end %>
     </div>
 
     <!-- Button to add new DVH fields -->
-    <button type="button" id="add-dvh" class="mt-4 bg-black text-white px-4 py-2 rounded">Agregar DVH</button>
+    <%= button_tag "Agregar DVH", type: "button", id: "add-dvh", class: "mt-4 bg-black text-white px-4 py-2 rounded" %>
 </div>

@@ -20,8 +20,8 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
     <%= f.submit "Guardar como presupuesto", class: "w-full bg-black text-white font-medium rounded-lg py-2 text-sm hover:opacity-90 transition" %>
-    <button type="button" class="w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition">Optimizar</button>
-    <button type="button" class="w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition">Guardar PDF</button>
+    <%= button_tag "Optimizar", type: "button", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>
+    <%= button_tag "Guardar PDF", type: "button", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>
     <%= link_to "Volver a proyectos", projects_path, class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm text-center hover:bg-gray-50 transition" %>
   </div>
 </div>
