@@ -21,12 +21,15 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= javascript_include_tag "projects_form", "data-turbo-track": "reload" %>
   </head>
 
   <body>
-    <div class="flex">
-      <%= render 'shared/sidebar' %>
-      <div class="flex-1">
+    <div class="flex h-screen overflow-hidden">
+      <div class="fixed h-screen w-64 z-10">
+        <%= render 'shared/sidebar' %>
+      </div>
+      <div class="flex-1 ml-64 overflow-auto">
         <%= yield %>
       </div>
     </div>

@@ -1,0 +1,46 @@
+<table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg border border-gray-200 shadow p-4 overflow-hidden">
+  <thead class="bg-gray-50">
+    <tr>
+      <th class="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipo</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Espesor</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ubicación</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-100" id="glasscuttings-table-body">
+    <% project.glasscuttings.each_with_index do |glass, idx| %>
+      <tr>
+        <td class="text-center px-4 py-2">
+          <span class="glass-type-view"><%= glass.glass_type %></span>
+          <input type="text" class="glass-type-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.glass_type %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <span class="glass-thickness-view"><%= glass.thickness %></span>
+          <input type="text" class="glass-thickness-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.thickness %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <span class="glass-color-view"><%= glass.color %></span>
+          <input type="text" class="glass-color-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.color %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <span class="glass-location-view"><%= glass.location %></span>
+          <input type="text" class="glass-location-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.location %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <span class="glass-height-view"><%= glass.height %></span>
+          <input type="number" class="glass-height-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.height %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <span class="glass-width-view"><%= glass.width %></span>
+          <input type="number" class="glass-width-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.width %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
+        <td class="text-center px-4 py-2">
+          <%= number_to_currency(glass.price, unit: "$", precision: 2) if glass.price.present? %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "supply_#{@supply.id}" do %>
+  <%= turbo_frame_tag "supply_#{@supply.id}" do %>
+    <%= render partial: "partials/supplies/price_display", locals: { supply: @supply } %>
+  <% end %>
+<% end %>

@@ -1,0 +1,8 @@
+<tr id="supply_row_<%= supply.id %>">
+  <td class="px-4 py-2"><%= supply.name %></td>
+  <td class="px-4 py-2">
+    <%= turbo_frame_tag "supply_#{supply.id}" do %>
+      <%= render partial: "partials/supplies/price_display", locals: { supply: supply } %>
+    <% end %>
+  </td>
+</tr>

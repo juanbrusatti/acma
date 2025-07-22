@@ -1,0 +1,9 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <% if @projects.any? %>
+    <% @projects.each do |project| %>
+      <%= render partial: "partials/projects/project_card", locals: { project: project } %>
+    <% end %>
+  <% else %>
+    <%= render "partials/projects/empty_state" %>
+  <% end %>
+</div> 

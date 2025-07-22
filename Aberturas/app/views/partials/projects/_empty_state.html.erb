@@ -1,0 +1,27 @@
+<div class="col-span-full">
+  <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg p-8 text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-muted-foreground mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    <h3 class="text-lg font-semibold mb-2">
+      <% if params[:status].present? %>
+        No hay proyectos <%= params[:status].downcase %>
+      <% else %>
+        No hay proyectos
+      <% end %>
+    </h3>
+    <p class="text-sm text-muted-foreground mb-4">
+      <% if params[:status].present? %>
+        No se encontraron proyectos con el estado "<%= params[:status] %>"
+      <% else %>
+        Comienza creando tu primer proyecto
+      <% end %>
+    </p>
+    <%= link_to new_project_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Crear Proyecto
+    <% end %>
+  </div>
+</div> 

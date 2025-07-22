@@ -1,0 +1,5 @@
+log/*
+tmp/*
+node_modules
+vendor/bundle
+yarn-error.log

@@ -113,3 +113,5 @@ pytestdebug.log
 # Thumbnails
 ._*
 
+node_modules/
+Aberturas/node_modules/

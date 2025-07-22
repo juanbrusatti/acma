@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "glass_price_#{@glass_price.id}" do %>
+  <%= render partial: "partials/glass_prices/form_glass_price_inline", locals: { glass_price: @glass_price } %>
+<% end %>
