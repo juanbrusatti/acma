@@ -7,9 +7,9 @@
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-FROM ruby:3.2
+FROM ruby:3.3
 
-# Install nependencies
+# Install dependencies
 RUN apt-get update -qq && apt-get install -y \
   build-essential \
   libsqlite3-dev \
@@ -29,7 +29,7 @@ RUN gem install bundler
 RUN bundle install
 
 # Copy the rest of the application code
-COPY . .
+COPY ./Aberturas/ .
 
 # Precompile tailwindcss assets (only production)
 # RUN bundle exec rails tailwindcss:build

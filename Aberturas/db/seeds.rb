@@ -1,6 +1,5 @@
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-<<<<<<< HEAD
 
 # Crear proyectos de ejemplo
 projects_data = [
@@ -45,13 +44,6 @@ projects_data.each do |project_data|
 end
 
 puts "✅ Proyectos de ejemplo creados exitosamente!"
-=======
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
 
 # Create some fake data
 puts "Creando datos de ejemplo para glassplates..."
@@ -185,4 +177,3 @@ Glassplate.create!(
 )
 
 puts "Datos de ejemplo creados exitosamente!"
->>>>>>> main
