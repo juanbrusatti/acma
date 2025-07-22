@@ -84,6 +84,7 @@ export function setupProjectEditInline() {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json', // <-- agregado para asegurar respuesta JSON
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
       },
       body: JSON.stringify(data)
