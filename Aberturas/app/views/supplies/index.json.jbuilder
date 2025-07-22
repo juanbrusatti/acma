@@ -1,1 +1,1 @@
-json.array! @insumos, partial: "insumos/insumo", as: :insumo
+json.array! @supplies, partial: "supplies/supply", as: :supply

@@ -1,4 +1,4 @@
-<% content_for :title, "Insumos" %>
+<% content_for :title, "Supplies" %>
 
 <div class="w-full">
   <% if notice.present? %>
@@ -6,20 +6,20 @@
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Insumos</h1>
-    <%= link_to "New insumo", new_insumo_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="font-bold text-4xl">Supplies</h1>
+    <%= link_to "New supply", new_supply_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
 
-  <div id="insumos" class="min-w-full">
-    <% if @insumos.any? %>
-      <% @insumos.each do |insumo| %>
-        <%= render insumo %>
+  <div id="supplies" class="min-w-full">
+    <% if @supplies.any? %>
+      <% @supplies.each do |supply| %>
+        <%= render supply %>
         <p>
-          <%= link_to "Show this insumo", insumo, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+          <%= link_to "Show this supply", supply, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
         </p>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No insumos found.</p>
+      <p class="text-center my-10">No supplies found.</p>
     <% end %>
   </div>
 </div>

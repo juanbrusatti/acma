@@ -2,7 +2,9 @@
   <td class="px-4 py-2"><%= glass_price.glass_type %></td>
   <td class="px-4 py-2"><%= glass_price.thickness %></td>
   <td class="px-4 py-2"><%= glass_price.color %></td>
-  <td class="px-4 py-2 font-semibold text-green-700">
-    <%= render partial: "form_glass_price_inline", locals: { glass_price: glass_price } %>
+  <td class="px-4 py-2">
+    <%= turbo_frame_tag "glass_price_#{glass_price.id}" do %>
+      <%= render partial: "partials/glass_prices/price_display", locals: { glass_price: glass_price } %>
+    <% end %>
   </td>
-</tr> 
+</tr>

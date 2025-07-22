@@ -35,7 +35,7 @@ class SuppliesControllerTest < ActionDispatch::IntegrationTest
 
   test "should update supply" do
     patch supply_url(@supply), params: { supply: { name: @supply.name, price: @supply.price } }
-    assert_redirected_to supply_url(@supply)
+    assert_redirected_to supplies_url
   end
 
   test "should destroy supply" do

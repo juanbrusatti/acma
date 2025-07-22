@@ -1,1 +1,1 @@
-json.partial! "insumos/insumo", insumo: @insumo
+json.partial! "supplies/supply", supply: @supply

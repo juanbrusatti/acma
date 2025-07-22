@@ -1,0 +1,16 @@
+<div class="flex items-center gap-2">
+  <span class="font-semibold text-green-700">
+    <% if supply.price.present? && supply.price > 0 %>
+      $<%= number_with_precision(supply.price, precision: 2) %>
+    <% else %>
+      N/A
+    <% end %>
+  </span>
+  <%= link_to edit_supply_path(supply),
+      data: { turbo_frame: "supply_#{supply.id}" },
+      class: "inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150" do %>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+    </svg>
+  <% end %>
+</div>

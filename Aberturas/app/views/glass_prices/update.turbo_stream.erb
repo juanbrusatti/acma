@@ -1,3 +1,7 @@
-<turbo-stream target="glass_price_<%= @glass_price.id %>" action="replace">
-  <%= render partial: 'glass_price_row', formats: [:html], locals: { glass_price: @glass_price } %>
-</turbo-stream> 
+<turbo-stream target="glass_price_#{@glass_price.id}" action="replace">
+  <template>
+    <%= turbo_frame_tag "glass_price_#{@glass_price.id}" do %>
+      <%= render partial: "partials/glass_prices/price_display", formats: [:html], locals: { glass_price: @glass_price } %>
+    <% end %>
+  </template>
+</turbo-stream>

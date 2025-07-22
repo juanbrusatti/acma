@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_22_212041) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
@@ -27,6 +27,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
     t.string "glasscutting2_thickness"
     t.string "glasscutting2_color"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
+  end
+
+  create_table "glass_prices", force: :cascade do |t|
+    t.string "color"
+    t.string "glass_type"
+    t.decimal "thickness"
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "price_m2"
   end
 
   create_table "glasscuttings", force: :cascade do |t|
@@ -47,21 +57,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
   end
 
-  create_table "insumos", force: :cascade do |t|
-    t.string "nombre"
-    t.decimal "precio"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "precio_vidrios", force: :cascade do |t|
+  create_table "glassplates", force: :cascade do |t|
+    t.float "width"
+    t.float "height"
     t.string "color"
-    t.string "tipo"
-    t.decimal "grosor"
-    t.decimal "precio"
+    t.string "glass_type"
+    t.boolean "deleted", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "precio_m2"
+    t.string "thickness"
+    t.string "standard_measures"
+    t.string "location"
+    t.boolean "is_scrap"
+    t.string "work"
+    t.string "origin"
+    t.string "status"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -73,5 +83,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_18_205037) do
     t.date "delivery_date"
     t.string "phone"
     t.string "address"
+  end
+
+  create_table "supplies", force: :cascade do |t|
+    t.string "name"
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 end

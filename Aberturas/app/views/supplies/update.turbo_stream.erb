@@ -1,5 +1,7 @@
-<turbo-stream target="insumo_<%= @insumo.id %>" action="replace">
+<turbo-stream target="supply_#{@supply.id}" action="replace">
   <template>
-    <%= render "fila_insumo", insumo: @insumo %>
+    <%= turbo_frame_tag "supply_#{@supply.id}" do %>
+      <%= render partial: "partials/supplies/price_display", formats: [:html], locals: { supply: @supply } %>
+    <% end %>
   </template>
-</turbo-stream> 
+</turbo-stream>

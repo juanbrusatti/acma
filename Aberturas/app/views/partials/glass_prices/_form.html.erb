@@ -1,7 +1,7 @@
 <%= form_with(model: glass_price, class: "contents") do |form| %>
   <% if glass_price.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(glass_price.errors.count, "error") %> impidieron guardar este precio:</h2>
+      <h2><%= pluralize(glass_price.errors.count, "error") %> prevented saving this price:</h2>
       <ul class="list-disc ml-6">
         <% glass_price.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -11,12 +11,12 @@
   <% end %>
 
   <div class="my-5">
-    <label class="block font-medium mb-1">Tipo</label>
+    <label class="block font-medium mb-1">Type</label>
     <input type="text" value="<%= glass_price.glass_type %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <label class="block font-medium mb-1">Grosor</label>
+    <label class="block font-medium mb-1">Thickness</label>
     <input type="text" value="<%= glass_price.thickness %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
@@ -26,14 +26,14 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :price_m2, "Precio por m²" %>
+    <%= form.label :price_m2, "Price per m²" %>
     <%= form.text_field :price_m2, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glass_price.errors[:price_m2].none?, "border-red-400 focus:outline-red-600": glass_price.errors[:price_m2].any?}] %>
   </div>
 
   <div class="my-5 flex gap-6">
     <div>
       <%= form.label :sieve do %>
-        <%= form.check_box :sieve %> Tamiz
+        <%= form.check_box :sieve %> Sieve
       <% end %>
     </div>
     <div>
@@ -43,12 +43,12 @@
     </div>
     <div>
       <%= form.label :tape do %>
-        <%= form.check_box :tape %> Cinta
+        <%= form.check_box :tape %> Tape
       <% end %>
     </div>
   </div>
 
   <div class="inline">
-    <%= submit_tag "Guardar", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= submit_tag "Save", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>

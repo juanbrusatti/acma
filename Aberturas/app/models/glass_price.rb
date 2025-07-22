@@ -15,14 +15,14 @@ class GlassPrice < ApplicationRecord
   }
 
   def self.combinations_possible
-    TYPES.flat_map do |type, options|
+    TYPES.flat_map do |glass_type, options|
       options[:thicknesses].product(options[:colors]).map do |thickness, color|
-        { type: type, thickness: thickness, color: color }
+        { glass_type: glass_type, thickness: thickness, color: color }
       end
     end
   end
 
-  def self.find_or_build_by_comb(type:, thickness:, color:)
-    find_or_initialize_by(type: type, thickness: thickness, color: color)
+  def self.find_or_build_by_comb(glass_type:, thickness:, color:)
+    find_or_initialize_by(glass_type: glass_type, thickness: thickness, color: color)
   end
 end
