@@ -1,0 +1,173 @@
+<% content_for :title, "Showing glassplate" %>
+
+<div class="flex min-h-screen w-full flex-col">
+  <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <div class="flex items-center">
+      <h1 class="text-2xl font-semibold">Detalles del Material</h1>
+      <div class="ml-auto flex space-x-2">
+        <%= link_to edit_glassplate_path(@glassplate), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+            <path d="m15 5 4 4"></path>
+          </svg>
+          Editar
+        <% end %>
+        <%= link_to glassplates_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M19 12H5"></path>
+            <path d="M12 19l-7-7 7-7"></path>
+          </svg>
+          Volver al Stock
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <!-- Información Principal -->
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="p-6">
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold">Información del Material</h3>
+            <p class="text-sm text-muted-foreground">Detalles básicos del material en stock.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">ID:</span>
+              <span class="text-sm"><%= @glassplate.id %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Tipo:</span>
+              <span class="text-sm font-medium"><%= @glassplate.glass_type %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Espesor:</span>
+              <span class="text-sm"><%= @glassplate.thickness %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Color:</span>
+              <span class="text-sm"><%= @glassplate.color %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Cantidad:</span>
+              <span class="text-sm font-medium"><%= @glassplate.quantity %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Estado:</span>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= @glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
+                <%= @glassplate.status %>
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Tipo de Material:</span>
+              <span class="text-sm"><%= @glassplate.is_scrap? ? 'Sobrante/Recorte' : 'Plancha Completa' %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medidas y Ubicación -->
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="p-6">
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold">Medidas y Ubicación</h3>
+            <p class="text-sm text-muted-foreground">Dimensiones y ubicación física del material.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Ancho:</span>
+              <span class="text-sm"><%= @glassplate.width %> mm</span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Alto:</span>
+              <span class="text-sm"><%= @glassplate.height %> mm</span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Medidas:</span>
+              <span class="text-sm font-medium"><%= @glassplate.measures %> mm</span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Medidas Estándar:</span>
+              <span class="text-sm"><%= @glassplate.standard_measures %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Ubicación:</span>
+              <span class="text-sm"><%= @glassplate.location %></span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-b">
+              <span class="text-sm font-medium text-muted-foreground">Área Total:</span>
+              <span class="text-sm font-medium"><%= number_with_precision(@glassplate.width * @glassplate.height / 1000000, precision: 2) %> m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Sistema -->
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg md:col-span-2">
+        <div class="p-6">
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold">Información del Sistema</h3>
+            <p class="text-sm text-muted-foreground">Metadatos del registro en el sistema.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="space-y-2">
+              <span class="text-sm font-medium text-muted-foreground">Creado:</span>
+              <p class="text-sm"><%= @glassplate.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-sm font-medium text-muted-foreground">Última Actualización:</span>
+              <p class="text-sm"><%= @glassplate.updated_at.strftime("%d/%m/%Y %H:%M") %></p>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-sm font-medium text-muted-foreground">Descripción Completa:</span>
+              <p class="text-sm font-medium"><%= @glassplate.full_description %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex justify-center space-x-4 pt-6">
+      <%= link_to glassplates_path, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2">
+          <path d="M19 12H5"></path>
+          <path d="M12 19l-7-7 7-7"></path>
+        </svg>
+        Volver al Stock
+      <% end %>
+
+      <%= link_to edit_glassplate_path(@glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+          <path d="m15 5 4 4"></path>
+        </svg>
+        Editar Material
+      <% end %>
+
+      <%= link_to glassplate_path(@glassplate), method: :delete, data: { confirm: "¿Estás seguro de que quieres eliminar este material?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+        </svg>
+        Eliminar Material
+      <% end %>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,74 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+complete_sheet:
+  width: 600
+  height: 400
+  color: transparente
+  glass_type: Incoloro
+  thickness: 4mm
+  standard_measures: 600x400mm
+  quantity: 10
+  location: Estante A
+  status: disponible
+  is_scrap: false
+
+scrap:
+  width: 300
+  height: 200
+  color: transparente
+  glass_type: Incoloro
+  thickness: 4mm
+  standard_measures: 300x200mm
+  quantity: 1
+  location: Rack de sobrantes
+  status: disponible
+  is_scrap: true
+
+available:
+  width: 500
+  height: 300
+  color: azul
+  glass_type: Templado
+  thickness: 6mm
+  standard_measures: 500x300mm
+  quantity: 5
+  location: Estante B
+  status: disponible
+  is_scrap: true
+
+reserved:
+  width: 400
+  height: 250
+  color: verde
+  glass_type: Laminado 3+3
+  thickness: 8mm
+  standard_measures: 400x250mm
+  quantity: 1
+  location: Estante C
+  status: reservado
+  is_scrap: true
+
+# Legacy fixtures for backward compatibility
+one:
+  width: 600
+  height: 400
+  color: transparente
+  glass_type: Incoloro
+  thickness: 4mm
+  standard_measures: 600x400mm
+  quantity: 5
+  location: Estante A
+  status: disponible
+  is_scrap: false
+
+two:
+  width: 800
+  height: 600
+  color: azul
+  glass_type: Templado
+  thickness: 6mm
+  standard_measures: 800x600mm
+  quantity: 3
+  location: Estante B
+  status: disponible
+  is_scrap: false
