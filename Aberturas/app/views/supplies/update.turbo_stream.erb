@@ -1,7 +1,5 @@
-<turbo-stream target="supply_#{@supply.id}" action="replace">
-  <template>
-    <%= turbo_frame_tag "supply_#{@supply.id}" do %>
-      <%= render partial: "partials/supplies/price_display", formats: [:html], locals: { supply: @supply } %>
-    <% end %>
-  </template>
-</turbo-stream>
+<%= turbo_stream.replace "supply_#{@supply.id}" do %>
+  <%= turbo_frame_tag "supply_#{@supply.id}" do %>
+    <%= render partial: "partials/supplies/price_display", locals: { supply: @supply } %>
+  <% end %>
+<% end %>
