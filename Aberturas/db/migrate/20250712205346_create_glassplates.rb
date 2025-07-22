@@ -6,7 +6,6 @@ class CreateGlassplates < ActiveRecord::Migration[8.0]
       t.string :color
       t.string :type
       t.boolean :deleted, default: false
-
       t.timestamps
     end
   end

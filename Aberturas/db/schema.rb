@@ -10,7 +10,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema[8.0].define(version: 2025_07_22_212041) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -58,9 +57,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_212041) do
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
   end
 
-=======
-ActiveRecord::Schema[8.0].define(version: 2025_07_12_213246) do
->>>>>>> main
   create_table "glassplates", force: :cascade do |t|
     t.float "width"
     t.float "height"
@@ -71,7 +67,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_12_213246) do
     t.datetime "updated_at", null: false
     t.string "thickness"
     t.string "standard_measures"
-<<<<<<< HEAD
     t.string "location"
     t.boolean "is_scrap"
     t.string "work"
@@ -95,11 +90,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_12_213246) do
     t.decimal "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-=======
-    t.integer "quantity"
-    t.string "location"
-    t.string "status"
-    t.boolean "is_scrap"
->>>>>>> main
   end
 end
