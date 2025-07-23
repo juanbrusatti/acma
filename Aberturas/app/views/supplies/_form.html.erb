@@ -1,7 +1,7 @@
 <%= form_with(model: supply, local: true) do |form| %>
   <% if supply.errors.any? %>
     <div id="error_explanation" class="bg-red-50 p-4 rounded-md">
-      <h2 class="text-red-800 font-medium"><%= pluralize(supply.errors.count, "error") %> prohibido guardar el insumo:</h2>
+      <h2 class="text-red-800 font-medium"><%= pluralize(supply.errors.count, "error") %> No se pudo guardar el insumo:</h2>
 
       <ul class="mt-2 text-sm text-red-700">
         <% supply.errors.full_messages.each do |message| %>
