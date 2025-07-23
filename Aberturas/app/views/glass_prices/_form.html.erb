@@ -1,7 +1,7 @@
 <%= form_with(model: glass_price, local: true) do |form| %>
   <% if glass_price.errors.any? %>
     <div id="error_explanation" class="bg-red-50 p-4 rounded-md">
-      <h2 class="text-red-800 font-medium"><%= pluralize(glass_price.errors.count, "error") %> prohibited this glass price from being saved:</h2>
+      <h2 class="text-red-800 font-medium"><%= pluralize(glass_price.errors.count, "error") %> prohibido guardar el precio del vidrio:</h2>
 
       <ul class="mt-2 text-sm text-red-700">
         <% glass_price.errors.full_messages.each do |message| %>
@@ -18,22 +18,22 @@
 
   <div class="my-5">
     <%= form.label :thickness, class: "block font-medium mb-1" %>
-    <%= form.text_field :thickness, class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    <%= form.text_field :thickness, placeholder: "mm", class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
   </div>
 
   <div class="my-5">
     <%= form.label :color, class: "block font-medium mb-1" %>
-    <%= form.text_field :color, class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    <%= form.text_field :color, placeholder: "Color", class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
   </div>
 
   <div class="my-5">
     <%= form.label :price, class: "block font-medium mb-1" %>
-    <%= form.number_field :price, step: :any, class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    <%= form.number_field :price, step: :any, placeholder: "Precio", class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
   </div>
 
   <div class="my-5">
     <%= form.label :price_m2, class: "block font-medium mb-1" %>
-    <%= form.number_field :price_m2, step: :any, class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    <%= form.number_field :price_m2, step: :any, placeholder: "Precio m²", class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
   </div>
 
   <div class="inline">
