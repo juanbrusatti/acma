@@ -28,6 +28,13 @@
     </div>
   <% end %>
 
+  <% if @project.dvhs.any? %>
+    <div class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">DVHs del Proyecto</h2>
+      <%= render partial: "partials/projects/dvhs_table", locals: { project: @project } %>
+    </div>
+  <% end %>
+
   <div class="mt-6 flex gap-2" id="project-actions-view">
     <%= link_to "Editar", edit_project_path(@project), id: "edit-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
