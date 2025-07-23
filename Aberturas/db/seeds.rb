@@ -7,31 +7,41 @@ projects_data = [
     name: "Instalación de Aberturas - Casa López",
     description: "Instalación completa de ventanas y puertas en residencia familiar",
     status: "En Proceso",
-    delivery_date: Date.current + 15.days
+    delivery_date: Date.current + 15.days,
+    phone: "011-4555-1234",
+    address: "Av. Corrientes 1234, Buenos Aires"
   },
   {
     name: "Renovación Comercial - Local Centro",
     description: "Reemplazo de aberturas en local comercial del centro",
     status: "Terminado",
-    delivery_date: Date.current - 5.days
+    delivery_date: Date.current - 5.days,
+    phone: "011-4555-5678",
+    address: "Florida 567, Capital Federal"
   },
   {
     name: "Proyecto Residencial - Edificio Norte",
     description: "Instalación de aberturas en edificio de 12 departamentos",
     status: "Pendiente",
-    delivery_date: Date.current + 30.days
+    delivery_date: Date.current + 30.days,
+    phone: "011-4555-9012",
+    address: "Av. Santa Fe 2890, Buenos Aires"
   },
   {
     name: "Oficinas Corporativas - Torre Sur",
     description: "Aberturas para oficinas corporativas en torre de 20 pisos",
     status: "En Proceso",
-    delivery_date: Date.current + 10.days
+    delivery_date: Date.current + 10.days,
+    phone: "011-4555-3456",
+    address: "Puerto Madero 123, Buenos Aires"
   },
   {
     name: "Casa de Campo - Estancia Los Pinos",
     description: "Aberturas especiales para casa de campo con vista al lago",
     status: "Terminado",
-    delivery_date: Date.current - 10.days
+    delivery_date: Date.current - 10.days,
+    phone: "011-4555-7890",
+    address: "Ruta 8 Km 45, Pilar"
   }
 ]
 
@@ -40,6 +50,8 @@ projects_data.each do |project_data|
     project.description = project_data[:description]
     project.status = project_data[:status]
     project.delivery_date = project_data[:delivery_date]
+    project.phone = project_data[:phone]
+    project.address = project_data[:address]
   end
 end
 
@@ -177,3 +189,58 @@ Glassplate.create!(
 )
 
 puts "Datos de ejemplo creados exitosamente!"
+
+# Crear precios de ejemplo para todas las combinaciones posibles de GlassPrice
+puts "Creando precios de ejemplo para todas las combinaciones de vidrios..."
+
+# Precios de ejemplo basados en valores reales del mercado
+sample_prices = {
+  # LAM (Laminado) - precios por m²
+  { glass_type: "LAM", thickness: "3+3", color: "INC" } => 32776.47,
+  { glass_type: "LAM", thickness: "3+3", color: "ESM" } => 60613.11,
+  { glass_type: "LAM", thickness: "4+4", color: "INC" } => 40938.20,
+  { glass_type: "LAM", thickness: "5+5", color: "INC" } => 49212.72,
+
+  # FLO (Float) - precios por m²
+  { glass_type: "FLO", thickness: "5mm", color: "INC" } => 13379.15,
+  { glass_type: "FLO", thickness: "5mm", color: "GRS/BCE" } => 20088.71,
+
+  # COL (Cool Lite) - precios por m²
+  { glass_type: "COL", thickness: "4+4", color: "-" } => 94080.59
+}
+
+# Crear todos los registros de GlassPrice con precios de ejemplo
+sample_prices.each do |combination, price_m2|
+  glass_price = GlassPrice.find_or_initialize_by(combination)
+  glass_price.price_m2 = price_m2
+  glass_price.price = (price_m2 * 1.0).round(2) # Precio base por unidad (1m²)
+
+  if glass_price.save
+    puts "✅ Precio creado: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]} - $#{price_m2}/m²"
+  else
+    puts "❌ Error creando precio para: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]}"
+    puts "   Errores: #{glass_price.errors.full_messages.join(', ')}"
+  end
+end
+
+puts "✅ Precios de ejemplo para todas las combinaciones creados exitosamente!"
+
+sample_supply_prices = {
+  {name: "Tamiz"} => 1000,
+  {name: "Hotmelt"} => 2000,
+  {name: "Cinta"} => 3000
+}
+
+# Crear todos los registros de Supply con precios de ejemplo
+sample_supply_prices.each do |combination, price|
+  supply = Supply.find_or_initialize_by(combination)
+  supply.price = price
+  supply.price = (price * 1.0).round(2) # Precio base por unidad (1m²)
+
+  if supply.save
+    puts "✅ Precio creado: #{combination[:name]} - $#{price}/m²"
+  else
+    puts "❌ Error creando precio para: #{combination[:name]}"
+    puts "   Errores: #{supply.errors.full_messages.join(', ')}"
+  end
+end
