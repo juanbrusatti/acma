@@ -1,16 +1,16 @@
 class GlassPrice < ApplicationRecord
   TYPES = {
-    "Laminated" => {
+    "LAM" => {
       thicknesses: ["3+3", "4+4", "5+5"],
-      colors: ["incolor", "esmerilado"]
+      colors: ["INC", "esmerilado"]
     },
-    "Float" => {
+    "FLO" => {
       thicknesses: ["5mm"],
-      colors: ["incolor", "gris", "bronce"]
+      colors: ["INC", "gris", "bronce"]
     },
-    "Cool lite" => {
+    "COL" => {
       thicknesses: ["4+4"],
-      colors: ["incolor"]
+      colors: ["INC"]
     }
   }
 

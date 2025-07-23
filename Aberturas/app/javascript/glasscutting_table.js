@@ -49,7 +49,7 @@ export function removeGlasscuttingTableIfEmpty() {
 }
 
 export function handleGlasscuttingEvents(e) {
-  // Confirmar
+  // Confirm
   if (e.target.classList.contains("confirm-glass")) {
     const container = e.target.closest(".glasscutting-fields");
     const inputs = container.querySelectorAll("input, select");
@@ -59,6 +59,9 @@ export function handleGlasscuttingEvents(e) {
     });
     ensureGlasscuttingTable();
     const tr = document.createElement("tr");
+    const price_m2 = getPriceM2(values.glass_type, values.thickness, values.color);
+    const area_m2 = (parseFloat(values.height) / 1000) * (parseFloat(values.width) / 1000);
+    const price = Math.round(area_m2 * price_m2 * 100) / 100; // redondeamos a 2 decimales
     tr.className = "divide-x divide-gray-200";
     tr.innerHTML = `
       <td class='px-2 py-1'>${glasscuttingIdCounter}</td>
@@ -68,10 +71,11 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1'>${values.location || ''}</td>
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
-      <td class='px-2 py-1'></td>
+      <td class='px-2 py-1'>${price || ''}</td>
       <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
     glasscuttingTbody.appendChild(tr);
+    updateSubtotalPrice();
     // Agregar inputs ocultos
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
@@ -94,6 +98,7 @@ export function handleGlasscuttingEvents(e) {
     const tr = e.target.closest("tr");
     if (tr) {
       tr.remove();
+      updateSubtotalPrice();
       removeGlasscuttingTableIfEmpty();
       // Eliminar también el set de inputs ocultos correspondiente
       const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");
@@ -115,4 +120,55 @@ export function resetGlasscuttingTableVars() {
   glasscuttingIdCounter = 1;
   glasscuttingTable = null;
   glasscuttingTbody = null;
+}
+
+// Returns the price per m2 for a given type, thickness, and color from the global GLASS_PRICES array
+function getPriceM2(type, thickness, color) {
+  if (!window.GLASS_PRICES) return 0;
+  const found = window.GLASS_PRICES.find(p =>
+    p.glass_type === type && p.thickness === thickness && p.color === color
+  );
+  return found ? found.price_m2 : 0;
+}
+
+// Calculates the subtotal by summing the price of each confirmed glasscutting row
+// Then updates the subtotal, IVA, and total in the DOM
+function updateSubtotalPrice() {
+  let subtotal = 0;
+  // Iterate over each row in the glasscuttings table and sum the prices
+  document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
+    const priceCell = tr.querySelector('td:nth-child(8)');
+    if (priceCell) {
+      const price = parseFloat(priceCell.textContent.replace(',', '.')) || 0;
+      subtotal += price;
+    }
+  });
+  // Update the subtotal in the DOM
+  const subtotalPriceElem = document.getElementById('subtotal-price');
+  if (subtotalPriceElem) {
+    subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
+  }
+  // Update IVA and total as well
+  updateTotalWithIVA(subtotal);
+}
+
+// Calculates and updates the IVA (21% of subtotal) in the DOM
+export function updateIVA(subtotal) {
+  const iva = subtotal * 0.21;
+  const ivaElem = document.getElementById('iva-value');
+  if (ivaElem) {
+    ivaElem.textContent = '$' + iva.toFixed(2);
+  }
+  return iva;
+}
+
+// Calculates and updates the total price (subtotal + IVA) in the DOM
+export function updateTotalWithIVA(subtotal) {
+  const iva = updateIVA(subtotal);
+  const total = subtotal + iva;
+  const totalElem = document.getElementById('price-total');
+  if (totalElem) {
+    totalElem.textContent = '$' + total.toFixed(2);
+  }
+  return total;
 }

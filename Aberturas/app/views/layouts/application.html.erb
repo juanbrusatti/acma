@@ -33,5 +33,15 @@
         <%= yield %>
       </div>
     </div>
+    <script>
+      window.GLASS_PRICES = <%= GlassPrice.all.map { |gp|
+        {
+          glass_type: gp.glass_type,
+          thickness: gp.thickness,
+          color: gp.color,
+          price_m2: gp.price_m2.to_f
+        }
+      }.to_json.html_safe %>;
+    </script>
   </body>
 </html>

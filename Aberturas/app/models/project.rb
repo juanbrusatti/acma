@@ -8,10 +8,11 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :dvhs, allow_destroy: true
 
   # Validations
-  validates :name, presence: true, length: { minimum: 0, maximum: 100 }
-  validates :description, presence: true, length: { minimum: 0, maximum: 500 }
+  validates :name, presence: true, length: { maximum: 100 }
+  validates :phone, presence: true # Podriamos agregar un limite minimo de caracteres, como un telefono
+  # validates :description, presence: true, length: { minimum: 0, maximum: 500 }
   # validates :status, presence: true, inclusion: { in: %w[Pendiente En\ Proceso Terminado] }
-  validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, if: -> { status == "Pendiente" }
+  # validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, if: -> { status == "Pendiente" }
 
   # Scopes for filtering projects by status and dates
   scope :active, -> { where(status: "En Proceso") }
