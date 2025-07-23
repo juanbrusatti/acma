@@ -1,19 +1,26 @@
 // glasscutting_selects.js
 
 export const GLASS_OPTIONS = {
-  "Laminado": {
+  "LAM": {
     grosores: ["3+3", "4+4", "5+5"],
-    colores: ["incoloro", "esmerilado"]
+    colores: ["INC", "esmerilado"]
   },
-  "Float": {
+  "FLO": {
     grosores: ["5mm"],
-    colores: ["incoloro", "gris", "bronce"]
+    colores: ["INC", "gris", "bronce"]
   },
-  "Cool lite": {
+  "COL": {
     grosores: ["4+4"],
-    colores: ["incoloro"]
+    colores: ["INC"]
   }
 };
+
+export const LOCATION_OPTIONS = [
+  "UMBRAL",
+  "DINTEL",
+  "JAMBA_I",
+  "JAMBA_D"
+];
 
 export function updateGlassSelects(container) {
   const typeSelect = container.querySelector('.glass-type-select');

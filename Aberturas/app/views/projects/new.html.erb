@@ -36,9 +36,9 @@
       <label>Tipo</label>
       <select name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1 glass-type-select">
         <option value="">Seleccionar</option>
-        <option value="Laminado">LAM</option>
-        <option value="Float">FLO</option>
-        <option value="Cool lite">Cool lite</option>
+        <option value="LAM">LAM</option>
+        <option value="FLO">FLO</option>
+        <option value="COL">COL</option>
       </select>
     </div>
     <div>
@@ -63,7 +63,13 @@
     </div>
     <div>
       <label>Ubicación</label>
-      <input name="project[glasscuttings_attributes][][location]" class="w-full border rounded px-2 py-1">
+      <select name="project[glasscuttings_attributes][][location]" class="w-full border rounded px-2 py-1 glass-location-select">
+        <option value="">Seleccionar</option>
+        <option value="UMBRAL">UMBRAL</option>
+        <option value="DINTEL">DINTEL</option>
+        <option value="JAMBA_I">JAMBA_I</option>
+        <option value="JAMBA_D">JAMBA_D</option>
+      </select>
     </div>
     <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
       <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
