@@ -1,4 +1,4 @@
-<% content_for :title, "Supplies" %>
+<% content_for :title, "Insumos" %>
 
 <div class="w-full">
   <% if notice.present? %>
@@ -6,8 +6,8 @@
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Supplies</h1>
-    <%= link_to "New supply", new_supply_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="font-bold text-4xl">Insumos</h1>
+    <%= link_to "Nuevo insumo", new_supply_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
 
   <div id="supplies" class="min-w-full">
@@ -19,7 +19,7 @@
         </p>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No supplies found.</p>
+      <p class="text-center my-10">No se encontraron insumos.</p>
     <% end %>
   </div>
 </div>

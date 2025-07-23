@@ -1,7 +1,7 @@
 <%= form_with(model: glass_price, class: "contents") do |form| %>
   <% if glass_price.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(glass_price.errors.count, "error") %> prevented saving this price:</h2>
+      <h2><%= pluralize(glass_price.errors.count, "error") %> no se pudo guardar el precio del vidrio:</h2>
       <ul class="list-disc ml-6">
         <% glass_price.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -11,12 +11,12 @@
   <% end %>
 
   <div class="my-5">
-    <label class="block font-medium mb-1">Type</label>
+    <label class="block font-medium mb-1">Tipo</label>
     <input type="text" value="<%= glass_price.glass_type %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
   <div class="my-5">
-    <label class="block font-medium mb-1">Thickness</label>
+    <label class="block font-medium mb-1">Grosor</label>
     <input type="text" value="<%= glass_price.thickness %>" readonly class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
   </div>
 
@@ -26,7 +26,7 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :price_m2, "Price per m²" %>
+    <%= form.label :price_m2, "Precio por m²" %>
     <%= form.text_field :price_m2, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": glass_price.errors[:price_m2].none?, "border-red-400 focus:outline-red-600": glass_price.errors[:price_m2].any?}] %>
   </div>
 
@@ -43,7 +43,7 @@
     </div>
     <div>
       <%= form.label :tape do %>
-        <%= form.check_box :tape %> Tape
+        <%= form.check_box :tape %> Cinta
       <% end %>
     </div>
   </div>
