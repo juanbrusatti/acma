@@ -69,7 +69,7 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
-      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location ],
+      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location, :price ],
       dvhs_attributes: [
         :innertube,
         :location,
