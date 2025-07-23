@@ -209,11 +209,11 @@ sample_prices = {
   { glass_type: "COL", thickness: "4+4", color: "-" } => 94080.59
 }
 
-# Crear todos los registros de GlassPrice con precios de ejemplo
+# Create all glassprice registers
 sample_prices.each do |combination, price_m2|
   glass_price = GlassPrice.find_or_initialize_by(combination)
   glass_price.price_m2 = price_m2
-  glass_price.price = (price_m2 * 1.0).round(2) # Precio base por unidad (1m²)
+  glass_price.price = (price_m2 * 1.0).round(2)
 
   if glass_price.save
     puts "✅ Precio creado: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]} - $#{price_m2}/m²"
@@ -231,11 +231,11 @@ sample_supply_prices = {
   {name: "Cinta"} => 3000
 }
 
-# Crear todos los registros de Supply con precios de ejemplo
+# Create all glassprice registers
 sample_supply_prices.each do |combination, price|
   supply = Supply.find_or_initialize_by(combination)
   supply.price = price
-  supply.price = (price * 1.0).round(2) # Precio base por unidad (1m²)
+  supply.price = (price * 1.0).round(2)
 
   if supply.save
     puts "✅ Precio creado: #{combination[:name]} - $#{price}/m²"
