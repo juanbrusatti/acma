@@ -59,6 +59,20 @@ class ProjectsController < ApplicationController
     redirect_to projects_path, notice: "Proyecto eliminado exitosamente."
   end
 
+  def pdf
+    @project = Project.find(params[:id])
+    respond_to do |format|
+      format.pdf do
+        response.headers['Content-Disposition'] = "attachment; filename=proyecto_#{@project.id}.pdf"
+        render pdf: "proyecto_#{@project.id}",
+               template: "projects/pdf",
+               layout: "pdf",
+               enable_local_file_access: true
+      end
+      format.html { redirect_to project_path(@project) }
+    end
+  end
+
   private
 
   def project_params

@@ -1,0 +1,58 @@
+
+<div style="margin-bottom: 10px;">
+  <img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
+</div>
+<h1 style="text-align:center; margin-bottom: 0;">PRESUPUESTO</h1>
+<hr>
+<table style="width:100%; margin-bottom: 10px;">
+  <tr>
+    <td><strong>Cliente:</strong> <%= @project.name %></td>
+    <td><strong>Telefono:</strong> <%= @project.phone %></td>
+  </tr>
+  <tr>
+    <td><strong>Domicilio:</strong> <%= @project.address %></td>
+    <td><strong>Estado:</strong> <%= @project.status %></td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong>Descripcion:</strong> <%= @project.description %></td>
+  </tr>
+</table>
+
+<h2 style="margin-bottom: 5px;">Vidrios asignados al proyecto</h2>
+<table border="1" cellspacing="0" cellpadding="4">
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Espesor</th>
+      <th>Color</th>
+      <th>Ubicacion</th>
+      <th>Alto</th>
+      <th>Ancho</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% total = 0 %>
+    <% @project.glasscuttings.each do |glass| %>
+      <% precio = glass.price.to_f %>
+      <% total += precio %>
+      <tr>
+        <td><%= human_glass_type(glass.glass_type) %></td>
+        <td><%= glass.thickness %></td>
+        <td><%= human_glass_color(glass.color) %></td>
+        <td><%= glass.location %></td>
+        <td><%= glass.height %></td>
+        <td><%= glass.width %></td>
+        <td><%= number_to_currency(precio, unit: "$", precision: 2) if glass.price.present? %></td>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="6" style="text-align:right;"><strong>Total:</strong></td>
+      <td><strong><%= number_to_currency(total, unit: "$", precision: 2) %></strong></td>
+    </tr>
+  </tfoot>
+</table>
+
+<p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 

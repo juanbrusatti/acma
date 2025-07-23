@@ -37,6 +37,7 @@
 
   <div class="mt-6 flex gap-2" id="project-actions-view">
     <%= link_to "Editar", edit_project_path(@project), id: "edit-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
+    <%= link_to "Descargar PDF", pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-gray-300 bg-white hover:bg-gray-100 h-9 px-3", download: "proyecto_#{@project.id}.pdf" %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
   </div>
   <div class="mt-6 flex gap-2" id="project-actions-edit" style="display:none;">
