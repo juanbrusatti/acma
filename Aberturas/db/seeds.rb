@@ -7,31 +7,36 @@ projects_data = [
     name: "Instalación de Aberturas - Casa López",
     description: "Instalación completa de ventanas y puertas en residencia familiar",
     status: "En Proceso",
-    delivery_date: Date.current + 15.days
+    delivery_date: Date.current + 15.days,
+    phone: "11-2345-6789"
   },
   {
     name: "Renovación Comercial - Local Centro",
     description: "Reemplazo de aberturas en local comercial del centro",
     status: "Terminado",
-    delivery_date: Date.current - 5.days
+    delivery_date: Date.current - 5.days,
+    phone: "11-3456-7890"
   },
   {
     name: "Proyecto Residencial - Edificio Norte",
     description: "Instalación de aberturas en edificio de 12 departamentos",
     status: "Pendiente",
-    delivery_date: Date.current + 30.days
+    delivery_date: Date.current + 30.days,
+    phone: "11-4567-8901"
   },
   {
     name: "Oficinas Corporativas - Torre Sur",
     description: "Aberturas para oficinas corporativas en torre de 20 pisos",
     status: "En Proceso",
-    delivery_date: Date.current + 10.days
+    delivery_date: Date.current + 10.days,
+    phone: "11-5678-9012"
   },
   {
     name: "Casa de Campo - Estancia Los Pinos",
     description: "Aberturas especiales para casa de campo con vista al lago",
     status: "Terminado",
-    delivery_date: Date.current - 10.days
+    delivery_date: Date.current - 10.days,
+    phone: "11-6789-0123"
   }
 ]
 
@@ -40,6 +45,7 @@ projects_data.each do |project_data|
     project.description = project_data[:description]
     project.status = project_data[:status]
     project.delivery_date = project_data[:delivery_date]
+    project.phone = project_data[:phone]
   end
 end
 
