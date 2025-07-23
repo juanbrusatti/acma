@@ -1,0 +1,40 @@
+<%# Table displaying all DVH records for the project %>
+<table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg border border-gray-200 shadow p-4 overflow-hidden">
+  <thead class="bg-gray-50">
+    <tr>
+      <%# Column headers: ID, Chamber, Location, Height, Width, Glass 1, Glass 2 %>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ID</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">UBICACIÓN</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 1</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 2</th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-100" id="dvhs-table-body">
+    <%# Iterate over each DVH in the project and display its attributes %>
+    <% project.dvhs.each_with_index do |dvh, idx| %>
+      <tr>
+        <%# Row number (ID) %>
+        <td class="text-center px-2 py-1"><%= idx + 1 %></td>
+        <%# Chamber (innertube) %>
+        <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
+        <%# Location %>
+        <td class="text-center px-2 py-1"><%= dvh.location %></td>
+        <%# Height %>
+        <td class="text-center px-2 py-1"><%= dvh.height %></td>
+        <%# Width %>
+        <td class="text-center px-2 py-1"><%= dvh.width %></td>
+        <%# Glass 1: type / thickness / color %>
+        <td class="text-center px-2 py-1">
+          <%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %>
+        </td>
+        <%# Glass 2: type / thickness / color %>
+        <td class="text-center px-2 py-1">
+          <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 
