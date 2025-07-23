@@ -1,5 +1,4 @@
 <%= turbo_stream.replace "glass_price_#{@glass_price.id}" do %>
-  <%= turbo_frame_tag "glass_price_#{@glass_price.id}" do %>
-    <%= render partial: "partials/glass_prices/price_display", locals: { glass_price: @glass_price } %>
-  <% end %>
+  <%= render partial: "partials/glass_prices/price_display", locals: { glass_price: @glass_price } %>
 <% end %>
+
