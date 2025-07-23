@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_22_220005) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
@@ -32,7 +32,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_220005) do
   create_table "glass_prices", force: :cascade do |t|
     t.string "color"
     t.string "glass_type"
-    t.decimal "thickness"
+    t.string "thickness"
     t.decimal "price"
     t.decimal "price_m2"
     t.datetime "created_at", null: false
