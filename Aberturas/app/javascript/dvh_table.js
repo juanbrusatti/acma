@@ -24,7 +24,7 @@ export function ensureDvhTable() {
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>CRISTAL 1</th>
           <th class='px-2 py-1 text-left'>CRISTAL 2</th>
-          <th class='px-2 py-1 text-left'></th>
+          <th class='px-2 py-1 text-left'>PRECIO</th>
         </tr>
       </thead>
     `;
@@ -49,12 +49,29 @@ export function handleDvhEvents(e) {
   // Confirmar
   if (e.target.classList.contains("confirm-dvh")) {
     const container = e.target.closest(".dvh-fields");
-    const inputs = container.querySelectorAll("input");
+    const fields = container.querySelectorAll("input, select");
     const values = {};
-    inputs.forEach(input => {
-      values[input.name.split("[").pop().replace("]", "")] = input.value;
+    fields.forEach(field => {
+      // Si el campo no tiene name, lo salteamos
+      if (!field.name) return;
+      // Extraemos el nombre del atributo (por ejemplo, glasscutting1_type)
+      const key = field.name.split("[").pop().replace("]", "");
+      values[key] = field.value;
     });
     ensureDvhTable();
+    const height = parseFloat(values.height) || 0;
+    const width = parseFloat(values.width) || 0;
+    const glass1 = {
+      type: values.glasscutting1_type,
+      thickness: values.glasscutting1_thickness,
+      color: values.glasscutting1_color
+    };
+    const glass2 = {
+      type: values.glasscutting2_type,
+      thickness: values.glasscutting2_thickness,
+      color: values.glasscutting2_color
+    };
+    const price = getDvhTotalGlassPrice(height, width, glass1, glass2);
     const tr = document.createElement("tr");
     tr.className = "divide-x divide-gray-200";
     tr.innerHTML = `
@@ -65,9 +82,11 @@ export function handleDvhEvents(e) {
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
       <td class='px-2 py-1'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
+      <td class='px-2 py-1'>${price.toFixed(2) || ''}</td>
       <td class='px-2 py-1 text-right'><button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
     dvhTbody.appendChild(tr);
+    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
     // Agregar inputs ocultos
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
@@ -95,6 +114,7 @@ export function handleDvhEvents(e) {
     if (tr) {
       tr.remove();
       removeDvhTableIfEmpty();
+      if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
       // Eliminar también el set de inputs ocultos correspondiente
       const hiddenRows = document.querySelectorAll("#dvhs-hidden .dvh-hidden-row");
       if (hiddenRows.length > 0) hiddenRows[hiddenRows.length - 1].remove();
@@ -115,4 +135,24 @@ export function resetDvhTableVars() {
   dvhIdCounter = 1;
   dvhTable = null;
   dvhTbody = null;
+}
+
+export function getDvhGlassPriceM2(type, thickness, color) {
+  if (!window.GLASS_PRICES) return 0;
+  const found = window.GLASS_PRICES.find(p =>
+    p.glass_type === type && p.thickness === thickness && p.color === color
+  );
+  return found ? found.price_m2 : 0;
+}
+
+export function getDvhTotalGlassPrice(height, width, glass1, glass2) {
+  // Área en m2
+  const area = (height * width) / 1000000;
+
+  // Precio por m2 de cada cristal
+  const price1 = getDvhGlassPriceM2(glass1.type, glass1.thickness, glass1.color);
+  const price2 = getDvhGlassPriceM2(glass2.type, glass2.thickness, glass2.color);
+
+  // Precio total para ambos cristales
+  return area * (price1 + price2);
 }

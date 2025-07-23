@@ -81,7 +81,7 @@ class ProjectsController < ApplicationController
         :glasscutting2_type,
         :glasscutting2_thickness,
         :glasscutting2_color,
-        :gas_type
+        :price
       ]
     )
   end

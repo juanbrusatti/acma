@@ -1,5 +1,6 @@
-// glasscutting_selects.js
+// dvh_selects.js
 
+// Glass options for DVH (reuse or adapt as needed)
 export const GLASS_OPTIONS = {
   "LAM": {
     grosores: ["3+3", "4+4", "5+5"],
@@ -15,10 +16,11 @@ export const GLASS_OPTIONS = {
   }
 };
 
-export function updateGlassSelects(container) {
-  const typeSelect = container.querySelector('.glass-type-select');
-  const thicknessSelect = container.querySelector('.glass-thickness-select');
-  const colorSelect = container.querySelector('.glass-color-select');
+export function updateDvhGlassSelects(container, prefix) {
+  // prefix: 'glasscutting1' or 'glasscutting2'
+  const typeSelect = container.querySelector(`.${prefix}-type-select`);
+  const thicknessSelect = container.querySelector(`.${prefix}-thickness-select`);
+  const colorSelect = container.querySelector(`.${prefix}-color-select`);
 
   if (!typeSelect || !thicknessSelect || !colorSelect) return;
 
@@ -42,13 +44,16 @@ export function updateGlassSelects(container) {
     }
   }
 
-  // Inicializar según valor actual
+  // Initialize based on current value
   fillOptions();
 
-  // Cuando cambia el tipo, actualizar grosores y colores
+  // Update thickness and color when type changes
   typeSelect.addEventListener('change', fillOptions);
 }
 
-export function setupAllGlassSelects() {
-  document.querySelectorAll('.glasscutting-fields').forEach(updateGlassSelects);
+export function setupAllDvhGlassSelects() {
+  document.querySelectorAll('.dvh-fields').forEach(container => {
+    updateDvhGlassSelects(container, 'glasscutting1');
+    updateDvhGlassSelects(container, 'glasscutting2');
+  });
 }
