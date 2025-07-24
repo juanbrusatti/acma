@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_24_000637) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
@@ -77,7 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
-    t.string "status"
+    t.string "status", default: "Pendiente"
     t.date "delivery_date"
     t.string "phone"
     t.string "address"
