@@ -56,3 +56,44 @@
 </table>
 
 <p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
+
+<% if @project.dvhs.any? %>
+  <h2 style="margin-top: 30px; margin-bottom: 5px;">DVH asignados al proyecto</h2>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Camara</th>
+        <th>Ubicacion</th>
+        <th>Alto</th>
+        <th>Ancho</th>
+        <th>Cristal 1</th>
+        <th>Cristal 2</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% dvh_total = 0 %>
+      <% @project.dvhs.each_with_index do |dvh, idx| %>
+        <% precio = dvh.respond_to?(:price) && dvh.price.present? ? dvh.price.to_f : 0 %>
+        <% dvh_total += precio %>
+        <tr>
+          <td><%= idx + 1 %></td>
+          <td><%= dvh.innertube %></td>
+          <td><%= dvh.location %></td>
+          <td><%= dvh.height %></td>
+          <td><%= dvh.width %></td>
+          <td><%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %></td>
+          <td><%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %></td>
+          <td><%= number_to_currency(precio, unit: "$", precision: 2) if precio > 0 %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="7" style="text-align:right;"><strong>Total:</strong></td>
+        <td><strong><%= number_to_currency(dvh_total, unit: "$", precision: 2) %></strong></td>
+      </tr>
+    </tfoot>
+  </table>
+<% end %> 
