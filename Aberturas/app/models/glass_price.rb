@@ -1,23 +1,24 @@
 class GlassPrice < ApplicationRecord
   TYPES = {
-    "LAM" => {
-      thicknesses: ["3+3", "4+4", "5+5"],
-      colors: ["INC", "esmerilado"]
-    },
-    "FLO" => {
-      thicknesses: ["5mm"],
-      colors: ["INC", "gris", "bronce"]
-    },
-    "COL" => {
-      thicknesses: ["4+4"],
-      colors: ["INC"]
-    }
+    "LAM" => [
+      { thickness: "3+3", colors: ["INC", "ESM"] },
+      { thickness: "4+4", colors: ["INC"] },
+      { thickness: "5+5", colors: ["INC"] }
+    ],
+    "FLO" => [
+      { thickness: "5mm", colors: ["GRS/BCE", "INC"] }
+    ],
+    "COL" => [
+      { thickness: "4+4", colors: ["-"] }
+    ]
   }
 
   def self.combinations_possible
-    TYPES.flat_map do |glass_type, options|
-      options[:thicknesses].product(options[:colors]).map do |thickness, color|
-        { glass_type: glass_type, thickness: thickness, color: color }
+    TYPES.flat_map do |glass_type, thickness_color_combinations|
+      thickness_color_combinations.flat_map do |combination|
+        combination[:colors].map do |color|
+          { glass_type: glass_type, thickness: combination[:thickness], color: color }
+        end
       end
     end
   end

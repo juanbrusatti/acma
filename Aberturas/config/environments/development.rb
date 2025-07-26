@@ -10,6 +10,7 @@ Rails.application.configure do
   config.eager_load = false
 
   # Show full error reports.
+  # This one is for 404 page Not found.
   config.consider_all_requests_local = true
 
   # Enable server timing.
