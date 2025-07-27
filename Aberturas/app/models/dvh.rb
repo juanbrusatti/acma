@@ -15,7 +15,7 @@ class Dvh < ApplicationRecord
   }
 
   validates :innertube, inclusion: {
-    in: ["6", "9", "12", "20"],
+    in: [6, 9, 12, 20],
     message: "debe ser uno de: 6, 9, 12, 20"
   }
 
