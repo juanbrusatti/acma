@@ -27,7 +27,6 @@ export function ensureGlasscuttingTable() {
           <th class='px-2 py-1 text-left'>ALTO</th>
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>PRECIO</th>
-          <th class='px-2 py-1 text-left'></th>
         </tr>
       </thead>
     `;
@@ -75,7 +74,7 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
     glasscuttingTbody.appendChild(tr);
-    updateSubtotalPrice();
+    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
     // Agregar inputs ocultos
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
@@ -98,8 +97,8 @@ export function handleGlasscuttingEvents(e) {
     const tr = e.target.closest("tr");
     if (tr) {
       tr.remove();
-      updateSubtotalPrice();
       removeGlasscuttingTableIfEmpty();
+      if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
       // Eliminar también el set de inputs ocultos correspondiente
       const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");
       if (hiddenRows.length > 0) hiddenRows[hiddenRows.length - 1].remove();
@@ -129,46 +128,4 @@ function getPriceM2(type, thickness, color) {
     p.glass_type === type && p.thickness === thickness && p.color === color
   );
   return found ? found.price_m2 : 0;
-}
-
-// Calculates the subtotal by summing the price of each confirmed glasscutting row
-// Then updates the subtotal, IVA, and total in the DOM
-function updateSubtotalPrice() {
-  let subtotal = 0;
-  // Iterate over each row in the glasscuttings table and sum the prices
-  document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(8)');
-    if (priceCell) {
-      const price = parseFloat(priceCell.textContent.replace(',', '.')) || 0;
-      subtotal += price;
-    }
-  });
-  // Update the subtotal in the DOM
-  const subtotalPriceElem = document.getElementById('subtotal-price');
-  if (subtotalPriceElem) {
-    subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
-  }
-  // Update IVA and total as well
-  updateTotalWithIVA(subtotal);
-}
-
-// Calculates and updates the IVA (21% of subtotal) in the DOM
-export function updateIVA(subtotal) {
-  const iva = subtotal * 0.21;
-  const ivaElem = document.getElementById('iva-value');
-  if (ivaElem) {
-    ivaElem.textContent = '$' + iva.toFixed(2);
-  }
-  return iva;
-}
-
-// Calculates and updates the total price (subtotal + IVA) in the DOM
-export function updateTotalWithIVA(subtotal) {
-  const iva = updateIVA(subtotal);
-  const total = subtotal + iva;
-  const totalElem = document.getElementById('price-total');
-  if (totalElem) {
-    totalElem.textContent = '$' + total.toFixed(2);
-  }
-  return total;
 }

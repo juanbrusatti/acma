@@ -10,6 +10,7 @@
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 1</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 2</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">PRECIO</th>
     </tr>
   </thead>
   <tbody class="divide-y divide-gray-100" id="dvhs-table-body">
@@ -34,7 +35,11 @@
         <td class="text-center px-2 py-1">
           <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %>
         </td>
+        <%# Price %>
+        <td class="text-center px-2 py-1">
+          <%= number_to_currency(dvh.price, unit: "$", precision: 2) if dvh.price.present? %>
+        </td>
       </tr>
     <% end %>
   </tbody>
-</table> 
+</table>
