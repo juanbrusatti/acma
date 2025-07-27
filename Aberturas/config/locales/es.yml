@@ -1,0 +1,48 @@
+es:
+  activerecord:
+    attributes:
+      project:
+        name: ""
+        phone: ""
+        status: ""
+        description: ""
+        delivery_date: ""
+      dvh:
+        innertube: ""
+        location: ""
+        height: ""
+        width: ""
+        glasscutting1_type: ""
+        glasscutting1_thickness: ""
+        glasscutting1_color: ""
+        glasscutting2_type: ""
+        glasscutting2_thickness: ""
+        glasscutting2_color: ""
+      glasscutting:
+        glass_type: ""
+        thickness: ""
+        height: ""
+        width: ""
+        color: ""
+        location: ""
+        price: ""
+      glasscuttings:
+        glass_type: ""
+        thickness: ""
+        height: ""
+        width: ""
+        color: ""
+        location: ""
+        price: ""
+    models:
+      glasscutting: ""
+      glasscuttings: ""
+      dvh: ""
+      project: ""
+    errors:
+      format: "%{message}"
+      messages:
+        blank: "no puede estar en blanco"
+        not_a_number: "no es un número"
+        greater_than: "debe ser mayor que %{count}"
+        inclusion: "no está incluido en la lista"
