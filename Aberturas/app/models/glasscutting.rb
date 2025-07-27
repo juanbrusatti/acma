@@ -6,6 +6,25 @@ class Glasscutting < ApplicationRecord
   validates :height, :width, presence: true, numericality: { greater_than: 0 } 
   # Validates that glass_type, thickness, color, and location are present
   validates :glass_type, :thickness, :color, :location, presence: true 
+  validates :color, inclusion: {
+    in: ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"],
+    message: "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+  }
+
+  validates :glass_type, inclusion: {
+    in: ["LAM", "FLO", "COL"],
+    message: "debe ser uno de: LAM, FLO, COL"
+  }
+
+  validates :thickness, inclusion: {
+    in: ["3+3", "4+4", "5+5", "5mm"],
+    message: "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+  }
+
+  validates :location, inclusion: {
+    in: ["DINTER", "JAMBA_I", "JAMBA_D", "UMBRAL"],
+    message: "debe ser uno de: DINTER, JAMBA_i, JAMBA_D, UMBRAL"
+  }
 
   before_save :set_price 
 

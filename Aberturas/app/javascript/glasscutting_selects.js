@@ -1,17 +1,16 @@
 // glasscutting_selects.js
 
 export const GLASS_OPTIONS = {
-  "LAM": {
-    grosores: ["3+3", "4+4", "5+5"],
-    colores: ["INC", "esmerilado"]
+  LAM: {
+    "3+3": ["INC", "BLS"],
+    "4+4": ["INC"],
+    "5+5": ["INC"]
   },
-  "FLO": {
-    grosores: ["5mm"],
-    colores: ["INC", "gris", "bronce"]
+  FLO: {
+    "5mm": ["GRS", "BRC", "INC"]
   },
-  "COL": {
-    grosores: ["4+4"],
-    colores: ["INC"]
+  COL: {
+    "4+4": ["STB", "STG", "NTR"]
   }
 };
 
@@ -22,31 +21,50 @@ export function updateGlassSelects(container) {
 
   if (!typeSelect || !thicknessSelect || !colorSelect) return;
 
-  function fillOptions() {
+  // Limpiar y llenar grosores según tipo seleccionado
+  function updateThicknessOptions() {
     const tipo = typeSelect.value;
     thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
     colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
     if (GLASS_OPTIONS[tipo]) {
-      GLASS_OPTIONS[tipo].grosores.forEach(g => {
+      const grosores = Object.keys(GLASS_OPTIONS[tipo]);
+      grosores.forEach(grosor => {
         const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
+        opt.value = grosor;
+        opt.textContent = grosor;
         thicknessSelect.appendChild(opt);
       });
-      GLASS_OPTIONS[tipo].colores.forEach(c => {
+    }
+  }
+
+  // Limpiar y llenar colores según tipo y grosor seleccionados
+  function updateColorOptions() {
+    const tipo = typeSelect.value;
+    const grosor = thicknessSelect.value;
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
+      GLASS_OPTIONS[tipo][grosor].forEach(color => {
         const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
+        opt.value = color;
+        opt.textContent = color;
         colorSelect.appendChild(opt);
       });
     }
   }
 
-  // Inicializar según valor actual
-  fillOptions();
+  // Inicializar en caso de tener valores preseleccionados
+  updateThicknessOptions();
+  updateColorOptions();
 
-  // Cuando cambia el tipo, actualizar grosores y colores
-  typeSelect.addEventListener('change', fillOptions);
+  // Listeners
+  typeSelect.addEventListener('change', () => {
+    updateThicknessOptions();
+    updateColorOptions(); // Opcional: si querés limpiar colores al cambiar tipo
+  });
+
+  thicknessSelect.addEventListener('change', updateColorOptions);
 }
 
 export function setupAllGlassSelects() {
