@@ -23,7 +23,7 @@ class Glasscutting < ApplicationRecord
 
   validates :location, inclusion: {
     in: ["DINTER", "JAMBA_I", "JAMBA_D", "UMBRAL"],
-    message: "debe ser uno de: DINTER, JAMBA_i, JAMBA_D, UMBRAL"
+    message: "debe ser uno de: DINTER, JAMBA_I, JAMBA_D, UMBRAL"
   }
 
   before_save :set_price 
