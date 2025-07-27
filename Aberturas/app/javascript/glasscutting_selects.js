@@ -14,13 +14,6 @@ export const GLASS_OPTIONS = {
   }
 };
 
-export const LOCATION_OPTIONS = [
-  "UMBRAL",
-  "DINTEL",
-  "JAMBA_I",
-  "JAMBA_D"
-];
-
 export function updateGlassSelects(container) {
   const typeSelect = container.querySelector('.glass-type-select');
   const thicknessSelect = container.querySelector('.glass-thickness-select');
