@@ -72,6 +72,46 @@ class ProjectsController < ApplicationController
       format.html { redirect_to project_path(@project) }
     end
   end
+  def preview_pdf
+    begin
+      # Construir un objeto Project en memoria con los datos recibidos (sin strong params, solo para preview)
+      data = params.to_unsafe_h[:project]
+      @project = Project.new(data)
+      # Calcular el precio manualmente para cada vidrio
+      @project.glasscuttings.each do |glass|
+        price_record = GlassPrice.find_by(glass_type: glass.glass_type, thickness: glass.thickness, color: glass.color)
+        if price_record && price_record.price_m2.present? && glass.height.present? && glass.width.present?
+          area_m2 = (glass.height.to_f / 1000) * (glass.width.to_f / 1000)
+          glass.price = (area_m2 * price_record.price_m2).round(2)
+        else
+          glass.price = nil
+        end
+      end
+      # Calcular el total y el IVA después de inicializar y calcular los precios
+      if @project && @project.respond_to?(:glasscuttings) && @project.respond_to?(:dvhs)
+        total = @project.glasscuttings.sum { |g| g.price.to_f } + @project.dvhs.sum { |d| d.price.to_f }
+        iva = (total * 0.21).round(2)
+        @project.define_singleton_method(:total) { total + iva }
+        @project.define_singleton_method(:iva) { iva }
+      end
+      respond_to do |format|
+        format.pdf do
+          response.headers['Content-Disposition'] = "attachment; filename=proyecto_preview.pdf"
+          render pdf: "proyecto_preview",
+                 template: "projects/pdf",
+                 layout: "pdf",
+                 enable_local_file_access: true
+        end
+      end
+    rescue => e
+      Rails.logger.error "Error generando PDF preview: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      respond_to do |format|
+        format.pdf { render plain: "Error generando PDF: #{e.message}", status: 500 }
+        format.html { render plain: "Error generando PDF: #{e.message}", status: 500 }
+      end
+    end
+  end
 
   private
 
@@ -100,3 +140,4 @@ class ProjectsController < ApplicationController
     )
   end
 end
+

@@ -14,6 +14,9 @@ Rails.application.routes.draw do
     member do
       get :pdf
     end
+    collection do
+      post :preview_pdf
+    end
     resources :dvhs, only: [ :create ]
     resources :glasscuttings, only: [ :create ]
   end
