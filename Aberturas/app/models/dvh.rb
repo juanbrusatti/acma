@@ -10,7 +10,7 @@ class Dvh < ApplicationRecord
   validates :height, :width, numericality: { greater_than: 0 }
 
   validates :location, inclusion: {
-    in: ["DINTER", "JAMBA_I", "JAMBA_D", "UMBRAL"],
+    in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
     message: "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
   }
 
