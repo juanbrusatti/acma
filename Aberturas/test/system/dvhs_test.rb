@@ -5,7 +5,7 @@ class DvhsTest < ApplicationSystemTestCase
     @project = projects(:one)
   end
 
-  test "debería crear dvh desde el formulario del proyecto" do
+  test "should create dvh from project form" do
     visit new_project_url
 
     # Ensure the form is visible
