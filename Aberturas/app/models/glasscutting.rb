@@ -7,27 +7,31 @@ class Glasscutting < ApplicationRecord
   after_destroy :update_project_typologies 
 
   # Validates that height and width are present and greater than 0
-  validates :height, :width, presence: true, numericality: { greater_than: 0 } 
+  validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El alto debe ser mayor que 0" } 
+  validates :width, presence: { message: "El ancho del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El ancho debe ser mayor que 0" } 
   # Validates that glass_type, thickness, color, and location are present
-  validates :glass_type, :thickness, :color, :location, presence: true 
+  validates :glass_type, presence: { message: "El tipo de vidrio no puede estar en blanco" } 
+  validates :thickness, presence: { message: "El espesor del vidrio no puede estar en blanco" } 
+  validates :color, presence: { message: "El color del vidrio no puede estar en blanco" } 
+  validates :location, presence: { message: "La ubicación del vidrio no puede estar en blanco" } 
   validates :color, inclusion: {
     in: ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"],
-    message: "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+    message: "Color de vidrio no valido"
   }
 
   validates :glass_type, inclusion: {
     in: ["LAM", "FLO", "COL"],
-    message: "debe ser uno de: LAM, FLO, COL"
+    message: "El tipo de vidrio no es valido"
   }
 
   validates :thickness, inclusion: {
     in: ["3+3", "4+4", "5+5", "5mm"],
-    message: "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+    message: "El grosor del vidrios no es valido"
   }
 
   validates :location, inclusion: {
-    in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
-    message: "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
+    in: ["DINTER", "JAMBA_I", "JAMBA_D", "UMBRAL"],
+    message: "La ubicación del vidrio no es valida"
   }
 
   before_save :set_price 
