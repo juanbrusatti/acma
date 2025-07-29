@@ -1,3 +1,16 @@
 <%= form_with(model: glass_price, url: glass_price_path(glass_price), method: :patch, local: false, data: { turbo_frame: "glass_price_#{glass_price.id}" }) do |f| %>
-  <%= f.text_field :price_m2, value: glass_price.price_m2, placeholder: "Precio m²", class: "w-24 rounded-md border px-2 py-1 text-green-700 font-semibold text-center" %>
+  <div class="grid grid-cols-4 items-center gap-2">
+    <div class="px-4 py-2 text-center">
+      <%= f.text_field :buying_price, value: glass_price.buying_price, placeholder: "Precio compra", class: "w-full rounded-md border px-2 py-1 text-sm text-center" %>
+    </div>
+    <div class="px-4 py-2 text-center">
+      <%= f.text_field :percentage, value: glass_price.percentage, placeholder: "%", class: "w-full rounded-md border px-2 py-1 text-sm text-center" %>
+    </div>
+    <div class="px-4 py-2 text-center">
+      <%= f.text_field :selling_price, value: glass_price.selling_price, placeholder: "Precio venta", class: "w-full rounded-md border px-2 py-1 text-green-700 font-semibold text-center", readonly: true %>
+    </div>
+    <div class="px-4 py-2 text-center">
+      <%= f.submit "✓", class: "w-8 h-8 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-sm transition-colors duration-150" %>
+    </div>
+  </div>
 <% end %> 
