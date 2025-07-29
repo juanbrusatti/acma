@@ -1,15 +1,15 @@
 class GlassPrice < ApplicationRecord
   TYPES = {
     "LAM" => [
-      { thickness: "3+3", colors: ["INC", "ESM"] },
+      { thickness: "3+3", colors: ["INC", "BLS"] },
       { thickness: "4+4", colors: ["INC"] },
       { thickness: "5+5", colors: ["INC"] }
     ],
     "FLO" => [
-      { thickness: "5mm", colors: ["GRS/BCE", "INC"] }
+      { thickness: "5mm", colors: ["GRS", "BRC", "INC"] }
     ],
     "COL" => [
-      { thickness: "4+4", colors: ["-"] }
+      { thickness: "4+4", colors: ["STB", "STG", "NTR"] }
     ]
   }
 
