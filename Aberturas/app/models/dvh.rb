@@ -17,8 +17,7 @@ class Dvh < ApplicationRecord
 
   validates :location, inclusion: {
     in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
-    message: "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
-    message: "La ubicación del vidrio no es valida"
+    message: "La ubicación del vidrio no es valida",
   }
 
   validates :innertube, inclusion: {
