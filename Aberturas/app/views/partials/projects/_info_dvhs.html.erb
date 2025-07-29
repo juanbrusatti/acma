@@ -20,7 +20,16 @@
             <option value="12">12</option>
             <option value="20">20</option>
           </select>          
-          <div><%= dvh.label :location, "Ubicación" %> <%= dvh.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
+          <div>
+            <%= dvh.label :location, "Ubicación" %>
+            <select name="project[dvhs_attributes][][location]" class="w-full border rounded px-2 py-1">
+              <option value="">Seleccionar</option>
+              <option value="DINTEL">DINTEL</option>
+              <option value="JAMBA_I">JAMBA_I</option>
+              <option value="JAMBA_D">JAMBA_D</option>
+              <option value="UMBRAL">UMBRAL</option>
+            </select>
+          </div>
           <div><%= dvh.label :height, "Alto (mm)" %> <%= dvh.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
           <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
           <div>

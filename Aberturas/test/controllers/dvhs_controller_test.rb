@@ -2,7 +2,7 @@ require "test_helper"
 
 class DvhsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @project = projects(:one)  # Asegurate de tener este fixture
+    @project = projects(:one) 
   end
 
   test "should create dvh with valid params" do
@@ -11,15 +11,14 @@ class DvhsControllerTest < ActionDispatch::IntegrationTest
         dvh: {
           height: 120,
           width: 100,
-          location: "Taller A",
-          innertube: "Camera 1",
-          glasscutting1_type: "Incoloro",
-          glasscutting1_thickness: "4mm",
-          glasscutting1_color: "Transparente",
-          glasscutting2_type: "Incoloro",
-          glasscutting2_thickness: "4mm",
-          glasscutting2_color: "Transparente"
-          # gas_type: "Argón"
+          location: "DINTEL",
+          innertube: "9",
+          glasscutting1_type: "LAM",
+          glasscutting1_thickness: "3+3",
+          glasscutting1_color: "INC",
+          glasscutting2_type: "LAM",
+          glasscutting2_thickness: "3+3",
+          glasscutting2_color: "INC"
         }
       }
     end
