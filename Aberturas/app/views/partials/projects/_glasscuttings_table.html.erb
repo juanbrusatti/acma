@@ -1,6 +1,7 @@
 <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg border border-gray-200 shadow p-4 overflow-hidden">
   <thead class="bg-gray-50">
     <tr>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipologia</th>
       <th class="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipo</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Espesor</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
@@ -13,6 +14,9 @@
   <tbody class="divide-y divide-gray-100" id="glasscuttings-table-body">
     <% project.glasscuttings.each_with_index do |glass, idx| %>
       <tr>
+        <td class="text-center px-4 py-2 font-semibold">
+          <%= glass.typology || "V#{idx + 1}" %>
+        </td>
         <td class="text-center px-4 py-2">
           <span class="glass-type-view"><%= glass.glass_type %></span>
           <input type="text" class="glass-type-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.glass_type %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />

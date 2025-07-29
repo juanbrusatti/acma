@@ -7,11 +7,17 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :glasscuttings, allow_destroy: true
   accepts_nested_attributes_for :dvhs, allow_destroy: true
 
+  # Callbacks
+  after_save :assign_typologies
+
   # Validations
-  validates :name, presence: true, length: { maximum: 100 }
-  validates :phone, presence: true # Podriamos agregar un limite minimo de caracteres, como un telefono
-  # validates :description, presence: true, length: { minimum: 0, maximum: 500 }
-  # validates :status, presence: true, inclusion: { in: %w[Pendiente En\ Proceso Terminado] }
+  validates :name, presence: { message: "El nombre del proyecto no puede estar en blanco", full_message: false }, length: { maximum: 100, message: "no puede tener más de %{count} caracteres", full_message: false }
+  validates :phone, presence: { message: "El teléfono no puede estar en blanco", full_message: false }
+   # validates :description, presence: true, length: { minimum: 0, maximum: 500 }
+  validates :status, presence: { message: "no puede estar en blanco", full_message: false }, inclusion: { 
+    in: %w[Pendiente En\ Proceso Terminado], 
+    message: "debe ser uno de: Pendiente, En Proceso, Terminado" 
+  }
   # validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, if: -> { status == "Pendiente" }
 
   # Scopes for filtering projects by status and dates
@@ -73,6 +79,25 @@ class Project < ApplicationRecord
       "yellow"
     else
       "gray"
+    end
+  end
+
+  private
+
+  # Assign sequential typologies to glasscuttings and DVHs
+  def assign_typologies
+    counter = 1
+    
+    # First, assign typologies to glasscuttings (reset all)
+    glasscuttings.order(:id).each do |glasscutting|
+      glasscutting.update_column(:typology, "V#{counter}")
+      counter += 1
+    end
+    
+    # Then, assign typologies to DVHs continuing the count (reset all)
+    dvhs.order(:id).each do |dvh|
+      dvh.update_column(:typology, "V#{counter}")
+      counter += 1
     end
   end
 end
