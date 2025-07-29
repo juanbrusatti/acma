@@ -2,6 +2,10 @@ class Dvh < ApplicationRecord
   belongs_to :project
   #has_many :glasscuttings, dependent: :nullify
 
+  # Callbacks to update typologies when DVHs change
+  after_create :update_project_typologies
+  after_destroy :update_project_typologies
+
   # Si usás glassplates como modelos separados, agregalos también
   # belongs_to :glassplate1, class_name: "Glassplate", optional: true
   # belongs_to :glassplate2, class_name: "Glassplate", optional: true
@@ -13,6 +17,7 @@ class Dvh < ApplicationRecord
 
   validates :location, inclusion: {
     in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
+    message: "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
     message: "La ubicación del vidrio no es valida"
   }
 
@@ -86,6 +91,13 @@ class Dvh < ApplicationRecord
 
     self.price = (area_m2 * (price1 + price2)).round(2)
     Rails.logger.debug "Seteando precio DVH: #{self.price} (area: #{area_m2}, price1: #{price1}, price2: #{price2})"
+  end
+
+  private
+
+  # Update project typologies when DVH changes
+  def update_project_typologies
+    project.send(:assign_typologies) if project
   end
 
 end

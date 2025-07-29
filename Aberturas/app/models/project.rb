@@ -7,6 +7,9 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :glasscuttings, allow_destroy: true
   accepts_nested_attributes_for :dvhs, allow_destroy: true
 
+  # Callbacks
+  after_save :assign_typologies
+
   # Validations
   validates :name, presence: { message: "El nombre del proyecto no puede estar en blanco", full_message: false }, length: { maximum: 100, message: "no puede tener más de %{count} caracteres", full_message: false }
   validates :phone, presence: { message: "El teléfono no puede estar en blanco", full_message: false }
@@ -64,6 +67,25 @@ class Project < ApplicationRecord
       "yellow"
     else
       "gray"
+    end
+  end
+
+  private
+
+  # Assign sequential typologies to glasscuttings and DVHs
+  def assign_typologies
+    counter = 1
+    
+    # First, assign typologies to glasscuttings (reset all)
+    glasscuttings.order(:id).each do |glasscutting|
+      glasscutting.update_column(:typology, "V#{counter}")
+      counter += 1
+    end
+    
+    # Then, assign typologies to DVHs continuing the count (reset all)
+    dvhs.order(:id).each do |dvh|
+      dvh.update_column(:typology, "V#{counter}")
+      counter += 1
     end
   end
 end
