@@ -36,7 +36,7 @@
   <% end %>
 
   <div class="mt-6 flex gap-2" id="project-actions-view">
-    <%= link_to "Editar", edit_project_path(@project), id: "edit-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
+    <a href="/projects/new?project_id=<%= @project.id %>" id="edit-btn" class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3">Editar</a>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
   </div>
   <div class="mt-6 flex gap-2" id="project-actions-edit" style="display:none;">

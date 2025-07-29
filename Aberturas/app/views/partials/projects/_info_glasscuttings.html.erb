@@ -10,26 +10,37 @@
     <!-- Formulario de creación de vidrio simple -->
     <div id="glasscuttings-wrapper">
       <%= f.fields_for :glasscuttings do |gc| %>
+<!-- GlassOptionsHelper is automatically available in views. Use GLASS_OPTIONS directly. -->
         <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
           <div>
             <%= gc.label :glass_type, "Tipo de vidrio" %>
             <select class="w-full border rounded px-2 py-1 glass-type-select" name="project[glasscuttings_attributes][][glass_type]">
               <option value="">Seleccionar</option>
-              <option value="LAM">LAM</option>
-              <option value="FLO">FLO</option>
-              <option value="COL">COL</option>
+              <option value="LAM" <%= 'selected' if gc.object.glass_type == 'LAM' %>>LAM</option>
+              <option value="FLO" <%= 'selected' if gc.object.glass_type == 'FLO' %>>FLO</option>
+              <option value="COL" <%= 'selected' if gc.object.glass_type == 'COL' %>>COL</option>
             </select>
           </div>
           <div>
             <%= gc.label :thickness, "Grosor" %>
             <select class="w-full border rounded px-2 py-1 glass-thickness-select" name="project[glasscuttings_attributes][][thickness]">
               <option value="">Seleccionar</option>
+<% if gc.object.glass_type && GlassOptionsHelper::GLASS_OPTIONS[gc.object.glass_type] %>
+<% GlassOptionsHelper::GLASS_OPTIONS[gc.object.glass_type].keys.each do |grosor| %>
+                  <option value="<%= grosor %>" <%= 'selected' if gc.object.thickness == grosor %>><%= grosor %></option>
+                <% end %>
+              <% end %>
             </select>
           </div>
           <div>
             <%= gc.label :color, "Color" %>
             <select class="w-full border rounded px-2 py-1 glass-color-select" name="project[glasscuttings_attributes][][color]">
               <option value="">Seleccionar</option>
+<% if gc.object.glass_type && gc.object.thickness && GlassOptionsHelper::GLASS_OPTIONS[gc.object.glass_type] && GlassOptionsHelper::GLASS_OPTIONS[gc.object.glass_type][gc.object.thickness] %>
+<% GlassOptionsHelper::GLASS_OPTIONS[gc.object.glass_type][gc.object.thickness].each do |color| %>
+                  <option value="<%= color %>" <%= 'selected' if gc.object.color == color %>><%= color %></option>
+                <% end %>
+              <% end %>
             </select>
           </div>
           <div>

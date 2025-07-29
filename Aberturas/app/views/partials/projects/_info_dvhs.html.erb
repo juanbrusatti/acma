@@ -10,16 +10,17 @@
     <!-- Formulario de creación de DVH -->
     <div id="dvhs-wrapper">
       <% f.fields_for :dvhs do |dvh| %>
+        <% include GlassOptionsHelper %>
         <!-- DVH form row with improved labels -->
         <div class="grid grid-cols-7 gap-4 mb-4 dvh-fields">
           <label>Cámara</label>
           <select name="project[dvhs_attributes][][innertube]" class="w-full border rounded px-2 py-1">
             <option value="">Seleccionar</option>
-            <option value="6">6</option>
-            <option value="9">9</option>
-            <option value="12">12</option>
-            <option value="20">20</option>
-          </select>          
+            <option value="6" <%= 'selected' if dvh.object.innertube == '6' %>>6</option>
+            <option value="9" <%= 'selected' if dvh.object.innertube == '9' %>>9</option>
+            <option value="12" <%= 'selected' if dvh.object.innertube == '12' %>>12</option>
+            <option value="20" <%= 'selected' if dvh.object.innertube == '20' %>>20</option>
+          </select>
           <div><%= dvh.label :location, "Ubicación" %> <%= dvh.text_field :location, class: "w-full border rounded px-2 py-1" %></div>
           <div><%= dvh.label :height, "Alto (mm)" %> <%= dvh.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
           <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
@@ -32,10 +33,20 @@
               <option value="COL" <%= 'selected' if dvh.object.glasscutting1_type == "COL" %>>COL</option>
             </select>
             <select class="glasscutting1-thickness-select w-full border rounded px-2 py-1 mb-1" name="glasscutting1_thickness">
-              <option value=""><%= dvh.object.glasscutting1_thickness.presence || 'Seleccionar espesor' %></option>
+              <option value="">Seleccionar</option>
+              <% if dvh.object.glasscutting1_type && GLASS_OPTIONS[dvh.object.glasscutting1_type] %>
+                <% GLASS_OPTIONS[dvh.object.glasscutting1_type].keys.each do |grosor| %>
+                  <option value="<%= grosor %>" <%= 'selected' if dvh.object.glasscutting1_thickness == grosor %>><%= grosor %></option>
+                <% end %>
+              <% end %>
             </select>
             <select class="glasscutting1-color-select w-full border rounded px-2 py-1" name="glasscutting1_color">
-              <option value=""><%= dvh.object.glasscutting1_color.presence || 'Seleccionar color' %></option>
+              <option value="">Seleccionar</option>
+              <% if dvh.object.glasscutting1_type && dvh.object.glasscutting1_thickness && GLASS_OPTIONS[dvh.object.glasscutting1_type] && GLASS_OPTIONS[dvh.object.glasscutting1_type][dvh.object.glasscutting1_thickness] %>
+                <% GLASS_OPTIONS[dvh.object.glasscutting1_type][dvh.object.glasscutting1_thickness].each do |color| %>
+                  <option value="<%= color %>" <%= 'selected' if dvh.object.glasscutting1_color == color %>><%= color %></option>
+                <% end %>
+              <% end %>
             </select>
           </div>
           <div>
@@ -47,10 +58,20 @@
               <option value="COL" <%= 'selected' if dvh.object.glasscutting2_type == "COL" %>>COL</option>
             </select>
             <select class="glasscutting2-thickness-select w-full border rounded px-2 py-1 mb-1" name="glasscutting2_thickness">
-              <option value=""><%= dvh.object.glasscutting2_thickness.presence || 'Seleccionar espesor' %></option>
+              <option value="">Seleccionar</option>
+              <% if dvh.object.glasscutting2_type && GLASS_OPTIONS[dvh.object.glasscutting2_type] %>
+                <% GLASS_OPTIONS[dvh.object.glasscutting2_type].keys.each do |grosor| %>
+                  <option value="<%= grosor %>" <%= 'selected' if dvh.object.glasscutting2_thickness == grosor %>><%= grosor %></option>
+                <% end %>
+              <% end %>
             </select>
             <select class="glasscutting2-color-select w-full border rounded px-2 py-1" name="glasscutting2_color">
-              <option value=""><%= dvh.object.glasscutting2_color.presence || 'Seleccionar color' %></option>
+              <option value="">Seleccionar</option>
+              <% if dvh.object.glasscutting2_type && dvh.object.glasscutting2_thickness && GLASS_OPTIONS[dvh.object.glasscutting2_type] && GLASS_OPTIONS[dvh.object.glasscutting2_type][dvh.object.glasscutting2_thickness] %>
+                <% GLASS_OPTIONS[dvh.object.glasscutting2_type][dvh.object.glasscutting2_thickness].each do |color| %>
+                  <option value="<%= color %>" <%= 'selected' if dvh.object.glasscutting2_color == color %>><%= color %></option>
+                <% end %>
+              <% end %>
             </select>
           </div>
           <div class="actions space-x-2 mt-2 flex gap-2">
