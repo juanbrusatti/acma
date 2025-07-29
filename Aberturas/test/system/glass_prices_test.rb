@@ -17,8 +17,8 @@ class GlassPricesTest < ApplicationSystemTestCase
     fill_in "Tipo", with: @glass_price.type
     fill_in "Grosor", with: @glass_price.thickness
     fill_in "Color", with: @glass_price.color
-    fill_in "Precio", with: @glass_price.price
-    fill_in "Precio por m²", with: @glass_price.price_m2
+    fill_in "Precio compra", with: @glass_price.buying_price
+    fill_in "% Ganancia", with: @glass_price.percentage
     click_on "Crear Precio vidrio"
 
     assert_text "Precio vidrio was successfully created"
@@ -32,8 +32,8 @@ class GlassPricesTest < ApplicationSystemTestCase
     fill_in "Tipo", with: @glass_price.type
     fill_in "Grosor", with: @glass_price.thickness
     fill_in "Color", with: @glass_price.color
-    fill_in "Precio", with: @glass_price.price
-    fill_in "Precio por m²", with: @glass_price.price_m2
+    fill_in "Precio compra", with: @glass_price.buying_price
+    fill_in "% Ganancia", with: @glass_price.percentage
     click_on "Actualizar Precio vidrio"
 
     assert_text "Precio vidrio was successfully updated"

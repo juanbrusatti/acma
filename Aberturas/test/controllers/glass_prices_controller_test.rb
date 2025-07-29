@@ -17,7 +17,7 @@ class GlassPricesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create glass_price" do
     assert_difference("GlassPrice.count") do
-      post glass_prices_url, params: { glass_price: { glass_type: @glass_price.glass_type, thickness: @glass_price.thickness, color: @glass_price.color, price: @glass_price.price, price_m2: @glass_price.price_m2 } }
+      post glass_prices_url, params: { glass_price: { glass_type: @glass_price.glass_type, thickness: @glass_price.thickness, color: @glass_price.color, buying_price: @glass_price.buying_price, selling_price: @glass_price.selling_price, percentage: @glass_price.percentage } }
     end
 
     assert_redirected_to glass_price_url(GlassPrice.last)
@@ -34,7 +34,7 @@ class GlassPricesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update glass_price" do
-    patch glass_price_url(@glass_price), params: { glass_price: { glass_type: @glass_price.glass_type, thickness: @glass_price.thickness, color: @glass_price.color, price: @glass_price.price, price_m2: @glass_price.price_m2 } }
+    patch glass_price_url(@glass_price), params: { glass_price: { glass_type: @glass_price.glass_type, thickness: @glass_price.thickness, color: @glass_price.color, buying_price: @glass_price.buying_price, selling_price: @glass_price.selling_price, percentage: @glass_price.percentage } }
     assert_redirected_to glass_prices_url
   end
 
