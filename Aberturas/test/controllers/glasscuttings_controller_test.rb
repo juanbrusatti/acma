@@ -9,12 +9,12 @@ class GlasscuttingsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Glasscutting.count") do
       post project_glasscuttings_url(@project), params: {
         glasscutting: {
-          glass_type: "Incoloro",
-          thickness: "4mm",
+          glass_type: "LAM",
+          thickness: "4+4",
           height: 120,
           width: 80,
-          color: "Transparente",
-          location: "Mesa 1"
+          color: "INC",
+          location: "JAMBA_I"
         }
       }
     end

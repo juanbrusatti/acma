@@ -36,6 +36,7 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
         format.json {
+          # Habria que guardar el precio 
           render json: {
             success: true,
             project: @project.as_json(only: [:id, :name, :description, :status, :delivery_date], include: { glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } }),
@@ -69,6 +70,8 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
+      :price,
+      :price_without_iva,
       glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location, :price ],
       dvhs_attributes: [
         :innertube,

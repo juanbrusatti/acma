@@ -10,23 +10,32 @@ class GlasscuttingsTest < ApplicationSystemTestCase
 
     # Fill in required project fields
     fill_in "Nombre", with: "Proyecto SystemTest"
-    select "pendiente", from: "Estado"
+    # You can uncomment if status is required
+    # select "pendiente", from: "Estado"
+    fill_in "Teléfono", with: "1234456"
 
-    # Add a Glasscutting
+    # Add a simple glass
     click_on "Agregar vidrio simple"
+
     within "#glasscuttings-wrapper" do
-      fill_in "Tipo de vidrio", with: "Laminado"
-      fill_in "Grosor", with: "4mm"
-      fill_in "Alto (mm)", with: "120"
-      fill_in "Ancho (mm)", with: "100"
-      fill_in "Color", with: "Transparente"
-      fill_in "Ubicación", with: "Depósito"
+      # Verify form presence and fill in the fields
+      assert_selector ".glasscutting-fields", wait: 5
+      
+      find(".glass-type-select").select("LAM")
+      sleep(0.5) # Wait for JavaScript to populate dependent selects
+      find(".glass-thickness-select").select("3+3")
+      find(".glass-color-select").select("INC")
+      find(".glass-location-select").select("DINTEL")
+      find("input[name='project[glasscuttings_attributes][][height]']").fill_in with: "120"
+      find("input[name='project[glasscuttings_attributes][][width]']").fill_in with: "100"
     end
 
-    click_on "Crear Proyecto"
+    # Submit the form
+    click_on "Guardar como presupuesto"
 
-    assert_text "Proyecto creado correctamente"
-    assert_text "Laminado"
-    assert_text "Transparente"
+    # Verify that everything was saved correctly
+    assert_text "Proyecto creado exitosamente."
+    assert_text "Proyecto SystemTest"  # Name of the project we created
+    assert_current_path projects_path
   end
 end

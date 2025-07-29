@@ -5,11 +5,10 @@ class GlassplateTest < ActiveSupport::TestCase
     @glassplate = Glassplate.new(
       width: 600,
       height: 400,
-      color: "transparente",
-      glass_type: "Incoloro",
-      thickness: "4mm",
+      color: "INC",
+      glass_type: "LAM",
+      thickness: "4+4",
       standard_measures: "600x400mm",
-      quantity: 5,
       location: "Estante A",
       status: "disponible",
       is_scrap: false
@@ -50,12 +49,6 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes @glassplate.errors[:thickness], "can't be blank"
   end
 
-  test "should require quantity" do
-    @glassplate.quantity = nil
-    assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:quantity], "can't be blank"
-  end
-
   test "should validate width is greater than 0" do
     @glassplate.width = 0
     assert_not @glassplate.valid?
@@ -68,22 +61,16 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes @glassplate.errors[:height], "must be greater than 0"
   end
 
-  test "should validate quantity is greater than or equal to 0" do
-    @glassplate.quantity = -1
-    assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:quantity], "must be greater than or equal to 0"
-  end
-
   test "should validate color inclusion" do
     @glassplate.color = "invalid_color"
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:color], "debe ser uno de: transparente, gris, azul, verde, negro, plata, N/A"
+    assert_includes @glassplate.errors[:color], "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
   end
 
   test "should validate glass_type inclusion" do
     @glassplate.glass_type = "Invalid Type"
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:glass_type], "debe ser uno de: Incoloro, Laminado 3+3, DVH 4/9/4, Espejo, Templado, Doble"
+    assert_includes @glassplate.errors[:glass_type], "debe ser uno de: LAM, FLO, COL"
   end
 
   test "should validate status inclusion" do
@@ -139,7 +126,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   test "full_description should return type thickness and color" do
-    assert_equal "Incoloro 4mm - transparente", @glassplate.full_description
+    assert_equal "LAM 4+4 - INC", @glassplate.full_description
   end
 
   test "available? should return true for disponible status" do

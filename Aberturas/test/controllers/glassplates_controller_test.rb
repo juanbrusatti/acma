@@ -23,11 +23,10 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
         glassplate: {
           width: 600,
           height: 400,
-          color: "transparente",
-          glass_type: "Incoloro",
-          thickness: "4mm",
+          color: "INC",
+          glass_type: "LAM",
+          thickness: "4+4",
           standard_measures: "600x400mm",
-          quantity: 5,
           location: "Estante A",
           status: "disponible",
           is_scrap: false
@@ -68,7 +67,6 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
   test "should update glassplate" do
     patch glassplate_url(@glassplate), params: {
       glassplate: {
-        quantity: 10,
         location: "Estante B",
         status: "reservado"
       }
@@ -78,7 +76,6 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Material actualizado exitosamente.", flash[:notice]
 
     @glassplate.reload
-    assert_equal 10, @glassplate.quantity
     assert_equal "Estante B", @glassplate.location
     assert_equal "reservado", @glassplate.status
   end

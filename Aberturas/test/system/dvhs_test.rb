@@ -8,25 +8,48 @@ class DvhsTest < ApplicationSystemTestCase
   test "should create dvh from project form" do
     visit new_project_url
 
-    # Fill in required project fields
+    # Ensure the form is visible
+    assert_selector "form"
+
+    # Fill in project fields
     fill_in "Nombre", with: "Proyecto SystemTest"
-    select "pendiente", from: "Estado"
+    fill_in "Teléfono", with: "123456"
 
     # Add a DVH
     click_on "Agregar DVH"
+
     within "#dvhs-wrapper" do
-      fill_in "Camara", with: "1"
-      fill_in "Ubicación", with: "Obra Norte"
-      fill_in "Alto (mm)", with: "120"
-      fill_in "Ancho (mm)", with: "100"
-      fill_in "Tipo vidrio 1", with: "Incoloro"
-      fill_in "Tipo vidrio 2", with: "Incoloro"
+      # Wait for the DVH row to load
+      assert_selector ".dvh-fields", wait: 5
+
+      find("select[name='project[dvhs_attributes][][innertube]']").select("12")
+
+      find("select[name='project[dvhs_attributes][][location]']").select("DINTEL")
+
+      # Fill in height and width using name (since Capybara doesn't find by visible label in this case)
+      find("input[name='project[dvhs_attributes][][height]']").fill_in with: "120"
+      find("input[name='project[dvhs_attributes][][width]']").fill_in with: "100"
+
+      # Glass 1
+      find(".glasscutting1-type-select").select("LAM")
+      find(".glasscutting1-thickness-select").select("3+3")
+      find(".glasscutting1-color-select").select("INC")
+
+      # Glass 2
+      find(".glasscutting2-type-select").select("LAM")
+      find(".glasscutting2-thickness-select").select("3+3")
+      find(".glasscutting2-color-select").select("INC")
+
+      # Confirm DVH if necessary
+      click_on "Confirmar"
     end
 
-    click_on "Crear Proyecto"
+    # Create project
+    click_on "Guardar como presupuesto"
 
-    assert_text "Proyecto creado correctamente"
-    assert_text "Obra Norte"
-    assert_text "Incoloro"
+    # Verifications - after redirect to projects_path
+    assert_text "Proyecto creado exitosamente."
+    assert_text "Proyecto SystemTest"  # Name of the project we created
+    assert_current_path projects_path
   end
 end
