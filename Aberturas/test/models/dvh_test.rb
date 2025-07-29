@@ -6,7 +6,7 @@ class DvhTest < ActiveSupport::TestCase
     @dvh = Dvh.new(
       project: @project,
       innertube: "6",
-      location: "DINTER",
+      location: "DINTEL",
       height: 1000,
       width: 800,
       glasscutting1_type: "LAM",
@@ -47,7 +47,7 @@ class DvhTest < ActiveSupport::TestCase
   test "should validate location inclusion" do
     @dvh.location = "INVALID"
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:location], "debe ser uno de: DINTER, JAMBA_I, JAMBA_D, UMBRAL"
+    assert_includes @dvh.errors[:location], "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
   end
 
   test "should validate innertube inclusion" do
