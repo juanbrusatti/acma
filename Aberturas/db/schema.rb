@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_24_000637) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_29_032005) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_000637) do
     t.string "glasscutting2_color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "typology"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
   end
 
@@ -52,6 +53,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_000637) do
     t.integer "glassplate_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sequential_id"
+    t.string "typology"
     t.index ["dvh_id"], name: "index_glasscuttings_on_dvh_id"
     t.index ["glassplate_id"], name: "index_glasscuttings_on_glassplate_id"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
@@ -83,6 +86,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_000637) do
     t.string "address"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.decimal "price"
+    t.decimal "priceWithoutIva"
+    t.decimal "price_without_iva"
   end
 
   create_table "supplies", force: :cascade do |t|
