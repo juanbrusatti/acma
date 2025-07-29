@@ -36,8 +36,8 @@ class Glasscutting < ApplicationRecord
       return
     end
     Rails.logger.debug "Registro encontrado: #{price_record.inspect}"
-    if !price_record.price_m2.present?
-      Rails.logger.debug "El registro no tiene price_m2"
+    if !price_record.selling_price.present?
+      Rails.logger.debug "El registro no tiene selling_price"
       return
     end
     if !height.present? || !width.present?
@@ -45,7 +45,7 @@ class Glasscutting < ApplicationRecord
       return
     end
     area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
-    self.price = (area_m2 * price_record.price_m2).round(2)
+    self.price = (area_m2 * price_record.selling_price).round(2)
     Rails.logger.debug "Seteando precio: #{self.price}"
   end
 
