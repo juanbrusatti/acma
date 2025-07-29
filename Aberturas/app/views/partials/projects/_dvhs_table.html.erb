@@ -3,7 +3,7 @@
   <thead class="bg-gray-50">
     <tr>
       <%# Column headers: ID, Chamber, Location, Height, Width, Glass 1, Glass 2 %>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ID</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">TIPOLOGIA</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">UBICACIÓN</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
@@ -17,8 +17,10 @@
     <%# Iterate over each DVH in the project and display its attributes %>
     <% project.dvhs.each_with_index do |dvh, idx| %>
       <tr>
-        <%# Row number (ID) %>
-        <td class="text-center px-2 py-1"><%= idx + 1 %></td>
+        <%# Typology (V1, V2, etc.) %>
+        <td class="text-center px-2 py-1 font-semibold">
+          <%= dvh.typology || "V#{project.glasscuttings.count + idx + 1}" %>
+        </td>
         <%# Chamber (innertube) %>
         <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
         <%# Location %>

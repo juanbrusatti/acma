@@ -2,6 +2,10 @@ class Glasscutting < ApplicationRecord
   belongs_to :project 
   belongs_to :glassplate, optional: true 
 
+  # Callbacks to update typologies when glasscuttings change
+  after_create :update_project_typologies
+  after_destroy :update_project_typologies 
+
   # Validates that height and width are present and greater than 0
   validates :height, :width, presence: true, numericality: { greater_than: 0 } 
   # Validates that glass_type, thickness, color, and location are present
@@ -47,6 +51,13 @@ class Glasscutting < ApplicationRecord
     area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
     self.price = (area_m2 * price_record.price_m2).round(2)
     Rails.logger.debug "Seteando precio: #{self.price}"
+  end
+
+  private
+
+  # Update project typologies when glasscutting changes
+  def update_project_typologies
+    project.send(:assign_typologies) if project
   end
 
 end
