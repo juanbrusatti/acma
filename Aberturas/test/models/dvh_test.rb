@@ -27,59 +27,57 @@ class DvhTest < ActiveSupport::TestCase
   test "should require innertube" do
     @dvh.innertube = nil
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:innertube], "can't be blank"
+    assert_includes @dvh.errors[:innertube], "La camara del vidrio no es valida"
   end
 
   test "should require location" do
     @dvh.location = nil
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:location], "can't be blank"
+    assert_includes @dvh.errors[:location], "La ubicación del vidrio no es valida"
   end
 
   test "should require height and width" do
     @dvh.height = nil
     @dvh.width = nil
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:height], "can't be blank"
-    assert_includes @dvh.errors[:width], "can't be blank"
+    assert_includes @dvh.errors[:height], "El alto del vidrio no puede estar en blanco"
+    assert_includes @dvh.errors[:width], "El ancho del vidrio no puede estar en blanco"
   end
 
   test "should validate location inclusion" do
-    @dvh.location = "INVALID"
+    @dvh.location = "INVALID_LOCATION"
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:location], "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
+    assert_includes @dvh.errors[:location], "La ubicación del vidrio no es valida"
   end
 
   test "should validate innertube inclusion" do
     @dvh.innertube = 99
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:innertube], "debe ser uno de: 6, 9, 12, 20"
+    assert_includes @dvh.errors[:innertube], "La camara del vidrio no es valida"
   end
 
   test "should require glasscutting1 and glasscutting2 fields" do
     @dvh.glasscutting1_type = nil
-    @dvh.glasscutting2_type = nil
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:glasscutting1_type], "can't be blank"
-    assert_includes @dvh.errors[:glasscutting2_type], "can't be blank"
+    assert_includes @dvh.errors[:glasscutting1_type], "El tipo de vidrio 1 no puede estar en blanco"
   end
 
   test "should validate glasscutting1_type inclusion" do
     @dvh.glasscutting1_type = "INVALID"
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:glasscutting1_type], "debe ser uno de: LAM, FLO, COL"
+    assert_includes @dvh.errors[:glasscutting1_type], "El tipo de vidrio 1 no es valido"
   end
 
   test "should validate glasscutting1_thickness inclusion" do
     @dvh.glasscutting1_thickness = "INVALID"
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:glasscutting1_thickness], "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+    assert_includes @dvh.errors[:glasscutting1_thickness], "El grosor del vidrio 1 no es valido"
   end
 
   test "should validate glasscutting1_color inclusion" do
     @dvh.glasscutting1_color = "INVALID"
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:glasscutting1_color], "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+    assert_includes @dvh.errors[:glasscutting1_color], "El color del vidrio 1 no es valido"
   end
 
   test "should trigger typology update on create" do

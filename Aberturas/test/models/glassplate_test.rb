@@ -22,43 +22,43 @@ class GlassplateTest < ActiveSupport::TestCase
   test "should require width" do
     @glassplate.width = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:width], "can't be blank"
+    assert_includes @glassplate.errors[:width], "no puede estar en blanco"
   end
 
   test "should require height" do
     @glassplate.height = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:height], "can't be blank"
+    assert_includes @glassplate.errors[:height], "no puede estar en blanco"
   end
 
   test "should require color" do
     @glassplate.color = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:color], "can't be blank"
+    assert_includes @glassplate.errors[:color], "no puede estar en blanco"
   end
 
   test "should require glass_type" do
     @glassplate.glass_type = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:glass_type], "can't be blank"
+    assert_includes @glassplate.errors[:glass_type], "no puede estar en blanco"
   end
 
   test "should require thickness" do
     @glassplate.thickness = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:thickness], "can't be blank"
+    assert_includes @glassplate.errors[:thickness], "no puede estar en blanco"
   end
 
   test "should validate width is greater than 0" do
     @glassplate.width = 0
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:width], "must be greater than 0"
+    assert_includes @glassplate.errors[:width], "debe ser mayor que 0"
   end
 
   test "should validate height is greater than 0" do
     @glassplate.height = -1
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:height], "must be greater than 0"
+    assert_includes @glassplate.errors[:height], "debe ser mayor que 0"
   end
 
   test "should validate color inclusion" do
@@ -76,13 +76,13 @@ class GlassplateTest < ActiveSupport::TestCase
   test "should validate status inclusion" do
     @glassplate.status = "invalid_status"
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:status], "is not included in the list"
+    assert_includes @glassplate.errors[:status], "no está incluido en la lista"
   end
 
   test "should validate is_scrap inclusion" do
     @glassplate.is_scrap = nil
     assert_not @glassplate.valid?
-    assert_includes @glassplate.errors[:is_scrap], "is not included in the list"
+    assert_includes @glassplate.errors[:is_scrap], "no está incluido en la lista"
   end
 
   # Scopes tests
