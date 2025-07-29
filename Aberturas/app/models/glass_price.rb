@@ -13,6 +13,9 @@ class GlassPrice < ApplicationRecord
     ]
   }
 
+  # Callbacks para calcular automáticamente el precio de venta
+  before_save :calculate_selling_price_from_percentage
+
   def self.combinations_possible
     TYPES.flat_map do |glass_type, thickness_color_combinations|
       thickness_color_combinations.flat_map do |combination|
@@ -25,5 +28,13 @@ class GlassPrice < ApplicationRecord
 
   def self.find_or_build_by_comb(glass_type:, thickness:, color:)
     find_or_initialize_by(glass_type: glass_type, thickness: thickness, color: color)
+  end
+
+  private
+
+  def calculate_selling_price_from_percentage
+    if buying_price.present? && percentage.present?
+      self.selling_price = buying_price * (1 + percentage / 100.0)
+    end
   end
 end

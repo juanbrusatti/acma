@@ -68,24 +68,24 @@ class Dvh < ApplicationRecord
     Rails.logger.debug "Buscando precio para DVH:"
     area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
 
-    # Cristal 1
+    # Glasscutting 1
     Rails.logger.debug "Cristal 1: tipo=#{glasscutting1_type.inspect}, espesor=#{glasscutting1_thickness.inspect}, color=#{glasscutting1_color.inspect}"
     price1_record = GlassPrice.find_by(glass_type: glasscutting1_type, thickness: glasscutting1_thickness, color: glasscutting1_color)
-    if price1_record.nil? || !price1_record.price_m2.present?
-      Rails.logger.debug "No se encontró GlassPrice para cristal 1 o falta price_m2"
+    if price1_record.nil? || !price1_record.selling_price.present?
+      Rails.logger.debug "No se encontró GlassPrice para cristal 1 o falta selling_price"
       price1 = 0
     else
-      price1 = price1_record.price_m2
+      price1 = price1_record.selling_price
     end
 
-    # Cristal 2
+    # Glasscutting 2
     Rails.logger.debug "Cristal 2: tipo=#{glasscutting2_type.inspect}, espesor=#{glasscutting2_thickness.inspect}, color=#{glasscutting2_color.inspect}"
     price2_record = GlassPrice.find_by(glass_type: glasscutting2_type, thickness: glasscutting2_thickness, color: glasscutting2_color)
-    if price2_record.nil? || !price2_record.price_m2.present?
-      Rails.logger.debug "No se encontró GlassPrice para cristal 2 o falta price_m2"
+    if price2_record.nil? || !price2_record.selling_price.present?
+      Rails.logger.debug "No se encontró GlassPrice para cristal 2 o falta selling_price"
       price2 = 0
     else
-      price2 = price2_record.price_m2
+      price2 = price2_record.selling_price
     end
 
     self.price = (area_m2 * (price1 + price2)).round(2)

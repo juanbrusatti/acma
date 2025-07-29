@@ -46,4 +46,5 @@ class GlassPricesTest < ApplicationSystemTestCase
 
    # assert_text "Precio vidrio was successfully destroyed"
   #end
+
 end

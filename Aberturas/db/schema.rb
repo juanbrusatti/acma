@@ -10,6 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema[8.0].define(version: 2025_07_29_032005) do
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -34,10 +35,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_032005) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.decimal "price"
-    t.decimal "price_m2"
+    t.decimal "buying_price"
+    t.decimal "selling_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "percentage", precision: 5, scale: 2
   end
 
   create_table "glasscuttings", force: :cascade do |t|
