@@ -10,7 +10,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       height: 1000,
       width: 800,
       color: "INC",
-      location: "DINTER"
+      location: "DINTEL"
     )
   end
 
@@ -71,6 +71,6 @@ class GlasscuttingTest < ActiveSupport::TestCase
   test "should validate location inclusion" do
     @glasscutting.location = "INVALID"
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:location], "debe ser uno de: DINTER, JAMBA_I, JAMBA_D, UMBRAL"
+    assert_includes @glasscutting.errors[:location], "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
   end
 end
