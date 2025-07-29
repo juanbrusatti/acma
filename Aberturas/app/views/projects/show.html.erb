@@ -1,4 +1,4 @@
-<div class="max-w-2xl mx-auto mt-10 bg-white rounded-lg shadow p-8" id="project-details">
+<div class="max-w-5xl mx-auto mt-10 bg-white rounded-lg shadow p-8" id="project-details">
   <h1 class="text-3xl font-bold mb-4" id="project-name-view"><%= @project.name %></h1>
   <input type="text" id="project-name-edit" value="<%= @project.name %>" style="display:none;" class="text-3xl font-bold mb-4 w-full border rounded px-2 py-1" />
 
@@ -16,9 +16,19 @@
   <% end %>
   <p class="mb-2 text-sm text-gray-400">ID: <%= @project.id %></p>
 
-  <div class="mb-4">
-    <label class="font-semibold">Precio:</label>
-    <span id="project-price-view"><%= @project.try(:precio) || @project.try(:price) || @project.try(:total) %></span>
+  <div class="mb-4 flex gap-8 items-center">
+    <div>
+      <span class="font-semibold">Precio sin IVA:</span>
+      <span id="project-price-view" class="ml-2">$<%= number_with_precision(@project.subtotal, precision: 2) %></span>
+    </div>
+    <div>
+      <span class="font-semibold">IVA (21%):</span>
+      <span id="project-iva-view" class="ml-2">$<%= number_with_precision(@project.iva, precision: 2) %></span>
+    </div>
+    <div>
+      <span class="font-semibold">Total:</span>
+      <span id="project-price-iva-view" class="ml-2 text-lg font-bold">$<%= number_with_precision(@project.total, precision: 2) %></span>
+    </div>
   </div>
 
   <% if @project.glasscuttings.any? %>

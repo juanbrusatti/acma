@@ -34,20 +34,32 @@ class Project < ApplicationRecord
     (delivery_date - Date.current).to_i
   end
 
-  # Calculate subtotal (currently returns 0, needs implementation)
+  # Calculate subtotal (use saved price_without_iva or fallback to calculation)
   def subtotal
-    # openings.sum { |o| (o.width.to_f * o.height.to_f * o.quantity.to_i * precio_unitario) }  # Example
-    0
+    # If we have a saved price without IVA, use it directly
+    return price_without_iva if price_without_iva.present?
+    
+    # Fallback calculation
+    glasscuttings.sum(&:price) + dvhs.sum(&:price)
   end
 
-  # Calculate VAT (21% of subtotal)
+  # Calculate IVA (21% of subtotal)
   def iva
     subtotal * 0.21
   end
 
-  # Calculate total including VAT
+  # Calculate total including IVA
   def total
     subtotal + iva
+  end
+
+  # Alias methods for clarity
+  def precio_sin_iva
+    subtotal
+  end
+
+  def precio_con_iva
+    total
   end
 
   # Return color class for status display in views
