@@ -72,6 +72,6 @@ class GlassPricesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def glass_price_params
-      params.require(:glass_price).permit(:glass_type, :thickness, :color, :price, :price_m2)
+      params.require(:glass_price).permit(:glass_type, :thickness, :color, :buying_price, :selling_price, :percentage)
     end
 end
