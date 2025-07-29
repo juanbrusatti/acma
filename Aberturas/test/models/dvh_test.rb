@@ -81,4 +81,88 @@ class DvhTest < ActiveSupport::TestCase
     assert_not @dvh.valid?
     assert_includes @dvh.errors[:glasscutting1_color], "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
   end
+
+  test "should trigger typology update on create" do
+    project = Project.create!(
+      name: "Test Project",
+      phone: "123456789",
+      description: "Test description"
+    )
+
+    # Create a glasscutting first
+    glasscutting = project.glasscuttings.create!(
+      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      height: 100, width: 50, price: 100.0
+    )
+
+    # Create DVH
+    dvh = project.dvhs.create!(
+      innertube: 9,
+      location: "DINTEL",
+      height: 150,
+      width: 100,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "4+4",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "FLO",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "GRS",
+      price: 300.0
+    )
+
+    project.save!
+
+    # DVH should get V2 (after glasscutting V1)
+    glasscutting.reload
+    dvh.reload
+    assert_equal "V1", glasscutting.typology
+    assert_equal "V2", dvh.typology
+  end
+
+  test "should trigger typology update on destroy" do
+    project = Project.create!(
+      name: "Test Project",
+      phone: "123456789",
+      description: "Test description"
+    )
+
+    # Create glasscutting and two DVHs
+    glasscutting = project.glasscuttings.create!(
+      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      height: 100, width: 50, price: 100.0
+    )
+
+    dvh1 = project.dvhs.create!(
+      innertube: 9, location: "DINTEL", height: 150, width: 100,
+      glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
+      glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
+      price: 300.0
+    )
+
+    dvh2 = project.dvhs.create!(
+      innertube: 12, location: "JAMBA_I", height: 200, width: 150,
+      glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
+      glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
+      price: 400.0
+    )
+
+    project.save!
+
+    # Verify initial typologies
+    glasscutting.reload
+    dvh1.reload
+    dvh2.reload
+    assert_equal "V1", glasscutting.typology
+    assert_equal "V2", dvh1.typology
+    assert_equal "V3", dvh2.typology
+
+    # Destroy first DVH
+    dvh1.destroy!
+
+    # Second DVH should become V2
+    glasscutting.reload
+    dvh2.reload
+    assert_equal "V1", glasscutting.typology
+    assert_equal "V2", dvh2.typology
+  end
 end
