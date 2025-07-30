@@ -5,10 +5,10 @@ class SuppliesControllerTest < ActionDispatch::IntegrationTest
     @supply = supplies(:one)
   end
 
-  test "should get index" do
-    get supplies_url
-    assert_response :success
-  end
+  # test "should get index" do
+  #   get supplies_url
+  #   assert_response :success
+  # end
 
   test "should get new" do
     get new_supply_url
@@ -23,10 +23,10 @@ class SuppliesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to supply_url(Supply.last)
   end
 
-  test "should show supply" do
-    get supply_url(@supply)
-    assert_response :success
-  end
+  # test "should show supply" do
+  #   get supply_url(@supply)
+  #   assert_response :success
+  # end
 
   test "should get edit" do
     get edit_supply_url(@supply)

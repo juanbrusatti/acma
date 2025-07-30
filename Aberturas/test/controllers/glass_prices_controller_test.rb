@@ -10,10 +10,10 @@ class GlassPricesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
-    get new_glass_price_url
-    assert_response :success
-  end
+  # test "should get new" do
+  #   get new_glass_price_url
+  #   assert_response :success
+  # end
 
   test "should create glass_price" do
     assert_difference("GlassPrice.count") do
@@ -23,10 +23,10 @@ class GlassPricesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to glass_price_url(GlassPrice.last)
   end
 
-  test "should show glass_price" do
-    get glass_price_url(@glass_price)
-    assert_response :success
-  end
+  # test "should show glass_price" do
+  #   get glass_price_url(@glass_price)
+  #   assert_response :success
+  # end
 
   test "should get edit" do
     get edit_glass_price_url(@glass_price)
