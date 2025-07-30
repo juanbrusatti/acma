@@ -3,13 +3,7 @@ class GlassPricesController < ApplicationController
 
   # GET /glass_prices or /glass_prices.json
   def index
-    @combinations = GlassPrice.combinations_possible.map do |comb|
-      record = GlassPrice.find_or_initialize_by(comb)
-      if record.new_record?
-        record.save(validate: false)
-      end
-      record
-    end
+    @combinations = helpers.build_glass_price_combinations
   end
 
   # GET /glass_prices/1 or /glass_prices/1.json

@@ -62,19 +62,10 @@ class GlassplatesController < ApplicationController
   def load_stock_data
     @complete_sheets = Glassplate.complete_sheets
     @scraps = Glassplate.scraps
-    @stock_summary = calculate_stock_summary
+    @stock_summary = helpers.calculate_stock_summary
   end
 
-  # Calculate stock summary
-  # This method aggregates the stock data for display in the dashboard.
-  def calculate_stock_summary
-    {
-      total_sheets: Glassplate.complete_sheets.count,
-      total_scraps: Glassplate.scraps.count,
-      available_scraps: Glassplate.scraps.available.count,
-      reserved_scraps: Glassplate.scraps.reserved.count
-    }
-  end
+  private
 
   def set_glassplate
     @glassplate = Glassplate.find(params[:id])

@@ -24,12 +24,4 @@ module DashboardHelper
   def stock_scraps_text(available_scraps)
     "+#{available_scraps} sobrantes disponibles"
   end
-
-  def projects_summary_text(active_projects)
-    "#{active_projects} Proyectos"
-  end
-
-  def projects_completed_text(completed_this_month)
-    "#{completed_this_month} proyectos finalizados este mes"
-  end
 end

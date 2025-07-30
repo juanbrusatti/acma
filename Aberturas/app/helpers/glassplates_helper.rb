@@ -19,6 +19,16 @@ module GlassplatesHelper
     is_scrap ? 'Sobrante/Recorte' : 'Plancha Completa'
   end
 
+  # Calculate stock summary statistics
+  def calculate_stock_summary
+    {
+      total_sheets: Glassplate.complete_sheets.count,
+      total_scraps: Glassplate.scraps.count,
+      available_scraps: Glassplate.scraps.available.count,
+      reserved_scraps: Glassplate.scraps.reserved.count
+    }
+  end
+
   # This method formats the measurements of the glassplate
   def format_measures(width, height)
     "#{width.to_i}x#{height.to_i}"
