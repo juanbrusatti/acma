@@ -21,57 +21,57 @@ class GlasscuttingTest < ActiveSupport::TestCase
   test "should require glass_type" do
     @glasscutting.glass_type = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:glass_type], "can't be blank"
+    assert_includes @glasscutting.errors[:glass_type], "El tipo de vidrio no puede estar en blanco"
   end
 
   test "should require thickness" do
     @glasscutting.thickness = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:thickness], "can't be blank"
+    assert_includes @glasscutting.errors[:thickness], "El espesor del vidrio no puede estar en blanco"
   end
 
   test "should require color" do
     @glasscutting.color = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:color], "can't be blank"
+    assert_includes @glasscutting.errors[:color], "El color del vidrio no puede estar en blanco"
   end
 
   test "should require location" do
     @glasscutting.location = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:location], "can't be blank"
+    assert_includes @glasscutting.errors[:location], "La ubicación del vidrio no puede estar en blanco"
   end
 
   test "should require height and width" do
     @glasscutting.height = nil
     @glasscutting.width = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:height], "can't be blank"
-    assert_includes @glasscutting.errors[:width], "can't be blank"
+    assert_includes @glasscutting.errors[:height], "El alto del vidrio no puede estar en blanco"
+    assert_includes @glasscutting.errors[:width], "El ancho del vidrio no puede estar en blanco"
   end
 
   test "should validate glass_type inclusion" do
     @glasscutting.glass_type = "INVALID"
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:glass_type], "debe ser uno de: LAM, FLO, COL"
+    assert_includes @glasscutting.errors[:glass_type], "El tipo de vidrio no es valido"
   end
 
   test "should validate thickness inclusion" do
     @glasscutting.thickness = "INVALID"
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:thickness], "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+    assert_includes @glasscutting.errors[:thickness], "El grosor del vidrios no es valido"
   end
 
   test "should validate color inclusion" do
     @glasscutting.color = "INVALID"
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:color], "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+    assert_includes @glasscutting.errors[:color], "Color de vidrio no valido"
   end
 
   test "should validate location inclusion" do
     @glasscutting.location = "INVALID"
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:location], "debe ser uno de: DINTEL, JAMBA_I, JAMBA_D, UMBRAL"
+    assert_includes @glasscutting.errors[:location], "La ubicación del vidrio no es valida"
 
   end
 

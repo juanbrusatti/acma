@@ -30,7 +30,7 @@ class Glasscutting < ApplicationRecord
   }
 
   validates :location, inclusion: {
-    in: ["DINTER", "JAMBA_I", "JAMBA_D", "UMBRAL"],
+    in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
     message: "La ubicación del vidrio no es valida"
   }
 
