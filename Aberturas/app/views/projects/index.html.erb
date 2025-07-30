@@ -27,7 +27,7 @@
         <tbody>
           <% if @projects.any? %>
             <% @projects.each_with_index do |project, idx| %>
-              <%= render partial: "partials/projects/project_row", locals: { project: project, odd: idx.odd? } %>
+              <%= render partial: "projects/partials/project_row", locals: { project: project, odd: idx.odd? } %>
             <% end %>
           <% else %>
             <tr>

@@ -1,0 +1,75 @@
+<!-- DVH table section -->
+<div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
+    <h2 class="text-base font-semibold mb-4">DVH</h2>
+
+    <div id="dvhs-table-container"></div>
+
+    <!-- Contenedor para los inputs ocultos de DVH confirmados -->
+    <div id="dvhs-hidden"></div>
+
+    <!-- Formulario de creación de DVH -->
+    <div id="dvhs-wrapper">
+      <% f.fields_for :dvhs do |dvh| %>
+        <!-- DVH form row with improved labels -->
+        <div class="grid grid-cols-7 gap-4 mb-4 dvh-fields">
+          <label>Cámara</label>
+          <select name="project[dvhs_attributes][][innertube]" class="w-full border rounded px-2 py-1">
+            <option value="">Seleccionar</option>
+            <option value="6">6</option>
+            <option value="9">9</option>
+            <option value="12">12</option>
+            <option value="20">20</option>
+          </select>          
+          <div>
+            <%= dvh.label :location, "Ubicación" %>
+            <select name="project[dvhs_attributes][][location]" class="w-full border rounded px-2 py-1">
+              <option value="">Seleccionar</option>
+              <option value="DINTEL">DINTEL</option>
+              <option value="JAMBA_I">JAMBA_I</option>
+              <option value="JAMBA_D">JAMBA_D</option>
+              <option value="UMBRAL">UMBRAL</option>
+            </select>
+          </div>
+          <div><%= dvh.label :height, "Alto (mm)" %> <%= dvh.number_field :height, class: "w-full border rounded px-2 py-1" %></div>
+          <div><%= dvh.label :width, "Ancho (mm)" %> <%= dvh.number_field :width, class: "w-full border rounded px-2 py-1" %></div>
+          <div>
+            <%= dvh.label :glasscutting1_type, "Tipo vidrio 1" %>
+            <select class="glasscutting1-type-select w-full border rounded px-2 py-1 mb-1" name="glasscutting1_type">
+              <option value="">Seleccionar</option>
+              <option value="LAM" <%= 'selected' if dvh.object.glasscutting1_type == "LAM" %>>LAM</option>
+              <option value="FLO" <%= 'selected' if dvh.object.glasscutting1_type == "FLO" %>>FLO</option>
+              <option value="COL" <%= 'selected' if dvh.object.glasscutting1_type == "COL" %>>COL</option>
+            </select>
+            <select class="glasscutting1-thickness-select w-full border rounded px-2 py-1 mb-1" name="glasscutting1_thickness">
+              <option value=""><%= dvh.object.glasscutting1_thickness.presence || 'Seleccionar espesor' %></option>
+            </select>
+            <select class="glasscutting1-color-select w-full border rounded px-2 py-1" name="glasscutting1_color">
+              <option value=""><%= dvh.object.glasscutting1_color.presence || 'Seleccionar color' %></option>
+            </select>
+          </div>
+          <div>
+            <%= dvh.label :glasscutting2_type, "Tipo vidrio 2" %>
+            <select class="glasscutting2-type-select w-full border rounded px-2 py-1 mb-1" name="glasscutting2_type">
+              <option value="">Seleccionar tipo</option>
+              <option value="LAM" <%= 'selected' if dvh.object.glasscutting2_type == "LAM" %>>LAM</option>
+              <option value="FLO" <%= 'selected' if dvh.object.glasscutting2_type == "FLO" %>>FLO</option>
+              <option value="COL" <%= 'selected' if dvh.object.glasscutting2_type == "COL" %>>COL</option>
+            </select>
+            <select class="glasscutting2-thickness-select w-full border rounded px-2 py-1 mb-1" name="glasscutting2_thickness">
+              <option value=""><%= dvh.object.glasscutting2_thickness.presence || 'Seleccionar espesor' %></option>
+            </select>
+            <select class="glasscutting2-color-select w-full border rounded px-2 py-1" name="glasscutting2_color">
+              <option value=""><%= dvh.object.glasscutting2_color.presence || 'Seleccionar color' %></option>
+            </select>
+          </div>
+          <div class="actions space-x-2 mt-2 flex gap-2">
+            <%= button_tag "Confirmar", type: "button", class: "confirm-dvh bg-black text-white px-3 py-1 rounded mt-4" %>
+            <%= button_tag "Cancelar", type: "button", class: "cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Botón para agregar nuevo DVH -->
+    <%= button_tag "Agregar DVH", type: "button", id: "add-dvh", class: "mt-4 bg-black text-white px-4 py-2 rounded" %>
+</div>

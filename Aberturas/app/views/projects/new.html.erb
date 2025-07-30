@@ -18,12 +18,12 @@
 
   <%= form_with(model: @project, local: true) do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%= render partial: "partials/projects/info_client", locals: { f: f } %>
-      <%= render partial: "partials/projects/info_project", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_client", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_project", locals: { f: f } %>
     </div>
 
-    <%= render partial: "partials/projects/info_glasscuttings", locals: { f: f } %>
-    <%= render partial: "partials/projects/info_dvhs", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
 
   <% end %>
 </div>
