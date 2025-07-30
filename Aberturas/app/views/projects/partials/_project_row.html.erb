@@ -4,7 +4,7 @@
     <div class="text-sm text-gray-400 leading-tight"><%= project.description %></div>
   </td>
   <td class="text-center hidden sm:table-cell py-5 px-6 align-middle">
-    <%= render partial: "partials/projects/status_badge", locals: { status: project.status } %>
+    <%= render partial: "projects/partials/status_badge", locals: { status: project.status } %>
   </td>
   <td class="hidden sm:table-cell text-center text-gray-700 font-medium py-5 px-6 align-middle">
     <%= project.delivery_date&.strftime('%d-%m-%Y') %>

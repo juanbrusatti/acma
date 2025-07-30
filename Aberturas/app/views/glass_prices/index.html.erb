@@ -30,7 +30,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               <% @combinations.each do |glass_price| %>
-                <%= render partial: "partials/glass_prices/glass_price_row", locals: { glass_price: glass_price } %>
+                <%= render "glass_price_row", glass_price: glass_price %>
               <% end %>
             </tbody>
           </table>
@@ -54,7 +54,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
           <% Supply.basics.each do |supply| %>
-            <%= render partial: "partials/supplies/fila_supply", locals: { supply: supply } %>
+            <%= render "supplies/partials/fila_supply", supply: supply %>
           <% end %>
         </tbody>
       </table>

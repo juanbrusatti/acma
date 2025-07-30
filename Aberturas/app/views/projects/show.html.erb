@@ -7,7 +7,7 @@
 
   <p class="mb-2">
     <strong>Estado:</strong>
-    <span id="project-status-view"><%= render partial: "partials/projects/status_badge", locals: { status: @project.status } %></span>
+    <span id="project-status-view"><%= render partial: "projects/partials/status_badge", locals: { status: @project.status } %></span>
     <input type="text" id="project-status-edit" value="<%= @project.status %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
   </p>
   <% if @project.delivery_date.present? %>
@@ -34,14 +34,14 @@
   <% if @project.glasscuttings.any? %>
     <div class="mt-8">
       <h2 class="text-2xl font-semibold mb-4 text-gray-800">Vidrios del Proyecto</h2>
-      <%= render partial: "partials/projects/glasscuttings_table", locals: { project: @project } %>
+      <%= render partial: "projects/partials/glasscuttings_table", locals: { project: @project } %>
     </div>
   <% end %>
 
   <% if @project.dvhs.any? %>
     <div class="mt-8">
       <h2 class="text-2xl font-semibold mb-4 text-gray-800">DVHs del Proyecto</h2>
-      <%= render partial: "partials/projects/dvhs_table", locals: { project: @project } %>
+      <%= render partial: "projects/partials/dvhs_table", locals: { project: @project } %>
     </div>
   <% end %>
 

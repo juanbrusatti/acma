@@ -1,6 +1,6 @@
 <tr id="supply_<%= supply.id %>">
   <td class="px-4 py-2"><%= supply.name %></td>
   <td class="px-4 py-2 font-semibold text-green-700">
-    <%= render partial: "partials/supplies/form_supply_inline", locals: { supply: supply } %>
+    <%= render "supplies/partials/form_supply_inline", supply: supply %>
   </td>
 </tr>
