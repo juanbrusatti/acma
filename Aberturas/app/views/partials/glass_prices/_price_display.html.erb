@@ -1,7 +1,0 @@
-<span class="font-semibold text-green-700">
-  <% if glass_price.selling_price.present? && glass_price.selling_price > 0 %>
-    $<%= number_with_precision(glass_price.selling_price, precision: 2) %>
-  <% else %>
-    N/A
-  <% end %>
-</span>
