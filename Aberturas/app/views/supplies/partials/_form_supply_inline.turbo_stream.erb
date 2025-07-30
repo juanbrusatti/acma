@@ -1,0 +1,6 @@
+<%= form_with(model: supply, url: supply_path(supply), method: :patch, local: false, data: { turbo_frame: "supply_#{supply.id}" }) do |f| %>
+  <div class="flex items-center gap-2">
+    <%= f.text_field :price, value: supply.price, placeholder: "Price", class: "w-24 rounded-md border px-2 py-1 text-green-700 font-semibold text-center" %>
+    <%= f.submit "Confirmar", class: "inline-flex items-center justify-center min-w-[110px] rounded-md text-sm font-medium bg-gray-200 text-gray-900 shadow transition-all duration-150 hover:bg-gray-700 hover:text-white active:translate-y-0.5 h-8 px-4" %>
+  </div>
+<% end %>
