@@ -32,7 +32,7 @@ RUN bundle install
 COPY ./Aberturas/ .
 
 # Precompile tailwindcss assets (only production)
-# RUN bundle exec rails tailwindcss:build
+RUN bundle exec rails tailwindcss:build
 
 # Entrypoint script to set up the environment
 COPY ./entrypoint.sh /usr/bin/

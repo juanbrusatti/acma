@@ -4,6 +4,7 @@
 
 ### 1. Modificar la aplicación Rails
 - Editar archivos en `/docker/Aberturas/`
+- Para cuando hayan cambios en la base de datos `sudo docker compose exec web rm /app/tmp/db_setup_done`
 - Probar cambios localmente con `docker compose up`
 
 ### 2. Actualizar versión

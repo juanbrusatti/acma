@@ -47,6 +47,9 @@ docker/Aberturas/.byebug_history
 electron-app/dist/
 electron-app/build/
 
+# Deliver files
+electron-app/DELIVER-FILES/ACMA - Sistema de Aberturas Setup*
+
 # Dependencies
 electron-app/node_modules/
 electron-app/package-lock.json
@@ -289,6 +292,3 @@ public
 # Temporary files
 temp/
 tmp/
-
-# Client delivery files (keep in separate folder)
-INSTALADORES/

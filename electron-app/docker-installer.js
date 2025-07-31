@@ -29,7 +29,7 @@ class DockerInstaller {
 
   // Descargar Docker Desktop Installer
   async downloadDockerInstaller() {
-    const fetch = require('node-fetch');
+    const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
     try {
       console.log('Descargando Docker Desktop Installer...');
@@ -91,7 +91,7 @@ class DockerInstaller {
   }
 
   // Esperar a que Docker esté listo
-  async waitForDocker(maxWaitTime = 120000) {
+  async waitForDocker(maxWaitTime = 240000) {
     const startTime = Date.now();
 
     return new Promise((resolve) => {

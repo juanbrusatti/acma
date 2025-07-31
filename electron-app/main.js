@@ -113,7 +113,9 @@ function showProgressWindow(title, message, canCancel = false) {
     </html>
   `;
 
-  progressWindow.loadData(htmlContent, 'text/html');
+  progressWindow.loadURL(
+    `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`
+  );
   progressWindow.show();
 
   if (canCancel) {
