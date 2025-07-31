@@ -1,5 +1,5 @@
 // glasscutting_table.js
-import { updateGlassSelects } from "glasscutting_selects";
+import { updateGlassSelects, GLASS_OPTIONS } from "glasscutting_selects";
 
 let glasscuttingIdCounter = 1;
 let glasscuttingTable = null;
@@ -71,7 +71,10 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${price || ''}</td>
-      <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-2 py-1 text-right'>
+        <button type="button" class="edit-glass bg-blue-500 text-white px-3 py-1 rounded mr-2">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </td>
     `;
     glasscuttingTbody.appendChild(tr);
     if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
@@ -90,6 +93,167 @@ export function handleGlasscuttingEvents(e) {
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     glasscuttingIdCounter++;
     container.remove();
+    return;
+  }
+  // Editar
+  if (e.target.classList.contains("edit-glass")) {
+    const tr = e.target.closest("tr");
+    if (!tr) return;
+    // Obtener valores actuales
+    const tds = tr.querySelectorAll("td");
+    const current = {
+      glass_type: tds[1].textContent.trim(),
+      thickness: tds[2].textContent.trim(),
+      color: tds[3].textContent.trim(),
+      location: tds[4].textContent.trim(),
+      height: tds[5].textContent.trim(),
+      width: tds[6].textContent.trim(),
+      price: tds[7].textContent.trim()
+    };
+    // Guardar HTML original para cancelar
+    tr._originalHTML = tr.innerHTML;
+    // Reemplazar por selects dependientes y inputs
+    // Opciones de tipo de vidrio
+    const glassOptions = window.GLASS_OPTIONS || GLASS_OPTIONS;
+    const glassTypes = Object.keys(glassOptions);
+    // Opciones de ubicación (puedes ajustar según tu lógica)
+    const locations = ["UMBRAL", "DINTEL", "JAMBA_I", "JAMBA_D"];
+    // Helper para options
+    function options(arr, selected) {
+      return arr.map(opt => `<option value='${opt}'${opt === selected ? " selected" : ""}>${opt}</option>`).join("");
+    }
+    tr.innerHTML = `
+      <td class='px-2 py-1'>${tds[0].textContent}</td>
+      <td class='px-2 py-1'>
+        <select class='edit-type w-full border rounded px-1'>
+          <option value=''>Seleccionar</option>
+          ${options(glassTypes, current.glass_type)}
+        </select>
+      </td>
+      <td class='px-2 py-1'>
+        <select class='edit-thickness w-full border rounded px-1'></select>
+      </td>
+      <td class='px-2 py-1'>
+        <select class='edit-color w-full border rounded px-1'></select>
+      </td>
+      <td class='px-2 py-1'>
+        <select class='edit-location w-full border rounded px-1'>
+          <option value=''>Seleccionar</option>
+          ${options(locations, current.location)}
+        </select>
+      </td>
+      <td class='px-2 py-1'><input type='number' class='edit-height w-full border rounded px-1' value='${current.height}'></td>
+      <td class='px-2 py-1'><input type='number' class='edit-width w-full border rounded px-1' value='${current.width}'></td>
+      <td class='px-2 py-1'>${current.price}</td>
+     <td class="px-2 py-1 text-right flex justify-end gap-2">
+         <button type="button" class="save-glass bg-green-500 text-white px-3 py-1 rounded">Guardar</button>
+         <button type="button" class="cancel-edit-glass bg-gray-300 text-black px-3 py-1 rounded">Cancelar</button>
+     </td>
+
+    `;
+    // Llenar selects dependientes
+    const typeSelect = tr.querySelector('.edit-type');
+    const thicknessSelect = tr.querySelector('.edit-thickness');
+    const colorSelect = tr.querySelector('.edit-color');
+    function fillThicknessAndColor(init = false) {
+      const tipo = typeSelect.value || current.glass_type;
+      // Guardar el valor seleccionado por el usuario antes de actualizar
+      const prevThickness = thicknessSelect.value;
+      const prevColor = colorSelect.value;
+      thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+      colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+      if (glassOptions[tipo]) {
+        const grosores = Object.keys(glassOptions[tipo]);
+        grosores.forEach(grosor => {
+          thicknessSelect.innerHTML += `<option value='${grosor}'>${grosor}</option>`;
+        });
+        // Selección inicial para edición o mantener selección del usuario
+        if (init && current.thickness) {
+          thicknessSelect.value = current.thickness;
+        } else if (prevThickness && grosores.includes(prevThickness)) {
+          thicknessSelect.value = prevThickness;
+        }
+        const selectedThickness = thicknessSelect.value || current.thickness;
+        const colores = glassOptions[tipo][selectedThickness] || [];
+        colores.forEach(color => {
+          colorSelect.innerHTML += `<option value='${color}'>${color}</option>`;
+        });
+        // Selección inicial para edición o mantener selección del usuario
+        if (init && current.color) {
+          colorSelect.value = current.color;
+        } else if (prevColor && colores.includes(prevColor)) {
+          colorSelect.value = prevColor;
+        }
+      }
+    }
+    typeSelect.addEventListener('change', () => {
+      fillThicknessAndColor();
+    });
+    thicknessSelect.addEventListener('change', () => {
+      fillThicknessAndColor();
+    });
+    fillThicknessAndColor(true);
+    return;
+  }
+
+  // Guardar edición
+  if (e.target.classList.contains("save-glass")) {
+    const tr = e.target.closest("tr");
+    if (!tr) return;
+    // Obtener nuevos valores correctamente de selects e inputs
+    const tds = tr.querySelectorAll("td");
+    const newValues = {
+      glass_type: tds[1].querySelector("select").value,
+      thickness: tds[2].querySelector("select").value,
+      color: tds[3].querySelector("select").value,
+      location: tds[4].querySelector("select").value,
+      height: tds[5].querySelector("input").value,
+      width: tds[6].querySelector("input").value
+    };
+    // Recalcular precio si es necesario
+    const price_m2 = getPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
+    const area_m2 = (parseFloat(newValues.height) / 1000) * (parseFloat(newValues.width) / 1000);
+    const price = Math.round(area_m2 * price_m2 * 100) / 100;
+    // Actualizar fila
+    tr.innerHTML = `
+      <td class='px-2 py-1'>${tds[0].textContent}</td>
+      <td class='px-2 py-1'>${newValues.glass_type}</td>
+      <td class='px-2 py-1'>${newValues.thickness}</td>
+      <td class='px-2 py-1'>${newValues.color}</td>
+      <td class='px-2 py-1'>${newValues.location}</td>
+      <td class='px-2 py-1'>${newValues.height}</td>
+      <td class='px-2 py-1'>${newValues.width}</td>
+      <td class='px-2 py-1'>${price}</td>
+      <td class='px-2 py-1 text-right'>
+        <button type="button" class="edit-glass bg-blue-500 text-white px-3 py-1 rounded mr-2">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </td>
+    `;
+    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+    // Actualizar el div oculto correspondiente
+    // Se asume que el índice de la fila en tbody corresponde al div oculto
+    const rowIndex = Array.from(tr.parentNode.children).indexOf(tr);
+    const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");
+    const hiddenDiv = hiddenRows[rowIndex];
+    if (hiddenDiv) {
+      const inputs = hiddenDiv.querySelectorAll("input");
+      inputs.forEach(input => {
+        if (input.name.includes("glass_type")) input.value = newValues.glass_type;
+        if (input.name.includes("thickness")) input.value = newValues.thickness;
+        if (input.name.includes("color")) input.value = newValues.color;
+        if (input.name.includes("location")) input.value = newValues.location;
+        if (input.name.includes("height")) input.value = newValues.height;
+        if (input.name.includes("width")) input.value = newValues.width;
+      });
+    }
+    return;
+  }
+
+  // Cancelar edición
+  if (e.target.classList.contains("cancel-edit-glass")) {
+    const tr = e.target.closest("tr");
+    if (!tr || !tr._originalHTML) return;
+    tr.innerHTML = tr._originalHTML;
     return;
   }
   // Eliminar
