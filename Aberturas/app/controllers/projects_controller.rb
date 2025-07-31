@@ -91,7 +91,7 @@ class ProjectsController < ApplicationController
       if @project && @project.respond_to?(:glasscuttings) && @project.respond_to?(:dvhs)
         total = @project.glasscuttings.sum { |g| g.price.to_f } + @project.dvhs.sum { |d| d.price.to_f }
         iva = (total * 0.21).round(2)
-        @project.define_singleton_method(:total) { total + iva }
+        @project.define_singleton_method(:total) { price_total }
         @project.define_singleton_method(:iva) { iva }
       end
       respond_to do |format|
@@ -123,6 +123,7 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
+      :price_total,
       glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location, :price ],
       dvhs_attributes: [
         :innertube,

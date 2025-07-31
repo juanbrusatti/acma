@@ -47,12 +47,20 @@
       </tr>
     <% end %>
   </tbody>
-  <tfoot>
-      <tr>
-        <td colspan="6" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total vidrios:</td>
-        <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(total, unit: "$", precision: 2) %></td>
-      </tr>
-  </tfoot>
+ <tfoot>
+  <tr>
+    <td colspan="6" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total sin IVA:</td>
+    <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(total, unit: "$", precision: 2) %></td>
+  </tr>
+  <tr>
+    <td colspan="6" style="text-align:right; padding: 8px; font-weight: bold; background: #e0e0e0;">Total con IVA:</td>
+    <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
+      <% total_con_iva = total * 1.21 %>
+      <%= number_to_currency(total_con_iva, unit: "$", precision: 2) %>
+    </td>
+  </tr>
+</tfoot>
+
 </table>
 
 
@@ -90,11 +98,34 @@
       <% end %>
     </tbody>
     <tfoot>
-      <tr>
-        <td colspan="7" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total:</td>
-        <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(dvh_total, unit: "$", precision: 2) %></td>
-      </tr>
-    </tfoot>
+  <tr>
+    <td colspan="7" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total sin IVA:</td>
+    <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(dvh_total, unit: "$", precision: 2) %></td>
+  </tr>
+  <tr>
+    <td colspan="7" style="text-align:right; padding: 8px; font-weight: bold; background: #e0e0e0;">Total con IVA:</td>
+    <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
+      <% dvh_total_con_iva = dvh_total * 1.21 %>
+      <%= number_to_currency(dvh_total_con_iva, unit: "$", precision: 2) %>
+    </td>
+  </tr>
+</tfoot>
+
   </table>
-  <p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
 <% end %> 
+<p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
+
+<% # Tabla resumen de totales %>
+<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">Resumen de Totales</h2>
+<table border="0" cellspacing="0" cellpadding="0" style="width:50%; margin-bottom: 20px; font-size: 16px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
+  <tbody>
+
+    <tr>
+      <td style="padding: 8px; font-weight: bold; background: #e0e0e0;">Total General con IVA</td>
+      <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
+        <% total_general_con_iva = total_con_iva + dvh_total_con_iva %>
+        <%= number_to_currency(total_general_con_iva, unit: "$", precision: 2) %>
+      </td>
+    </tr>
+  </tbody>
+</table>
