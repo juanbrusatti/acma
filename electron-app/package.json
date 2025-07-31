@@ -1,6 +1,6 @@
 {
   "name": "acma-electron",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Sistema de gestión de aberturas ACMA",
   "main": "main.js",
   "author": "Tu Empresa <contacto@tuempresa.com>",
@@ -50,21 +50,11 @@
       "**/*",
       "!dist/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "../docker/",
-        "to": "docker",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    "extraResources": []
   },
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.0.0"
   },
-  "dependencies": {
-    "node-fetch": "^3.3.0"
-  }
+  "dependencies": {}
 }

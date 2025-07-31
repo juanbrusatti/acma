@@ -60,10 +60,8 @@ if [ ! -f "icon.ico" ]; then
     warning "icon.ico no encontrado. Se usará un icono por defecto."
 fi
 
-# Verificar que docker-compose.yml existe
-if [ ! -f "../docker/docker-compose.yml" ]; then
-    error "docker-compose.yml no encontrado en ../docker/"
-fi
+# Ya no dependemos de Docker para ejecutar la aplicación
+# El servidor Rails debe estar corriendo en la IP y puerto configurados
 
 # Instalar dependencias de Node.js
 info "Instalando dependencias de Node.js..."
@@ -106,11 +104,11 @@ echo ""
 echo -e "${GREEN}🎯 Próximos pasos:${NC}"
 echo "1. Verifica que los archivos .exe se generaron en la carpeta 'dist/'"
 echo "2. Prueba el instalador en una máquina Windows limpia"
-echo "3. Asegúrate de que Docker Desktop se instale correctamente"
+echo "3. Asegúrate de que el servidor esté configurado correctamente en la IP ${BLUE}192.168.1.100${NC} puerto ${BLUE}3000${NC}"
 echo ""
 echo -e "${BLUE}📋 Notas importantes:${NC}"
 echo "• El instalador requerirá permisos de administrador"
-echo "• Docker Desktop se descargará automáticamente si no está instalado"
 echo "• Se recomienda probar en un entorno limpio antes de distribuir"
+echo "• La aplicación se conectará automáticamente al servidor configurado"
 echo ""
 echo -e "${GREEN}✨ ¡Instalador listo para distribuir!${NC}"
