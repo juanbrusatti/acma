@@ -64,10 +64,14 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.pdf do
         response.headers['Content-Disposition'] = "attachment; filename=proyecto_#{@project.id}.pdf"
-        render pdf: "proyecto_#{@project.id}",
+        render pdf: "proyecto_#{@project.id }_#{@project.name}",
                template: "projects/pdf",
                layout: "pdf",
-               enable_local_file_access: true
+               enable_local_file_access: true,
+               margin: { top: 10, bottom: 10, left: 10, right: 10 },
+               disable_smart_shrinking: true,
+               javascript_delay: 5000,
+               timeout: 120
       end
       format.html { redirect_to project_path(@project) }
     end
@@ -100,7 +104,11 @@ class ProjectsController < ApplicationController
           render pdf: "proyecto_preview",
                  template: "projects/pdf",
                  layout: "pdf",
-                 enable_local_file_access: true
+                 enable_local_file_access: true,
+                 margin: { top: 10, bottom: 10, left: 10, right: 10 },
+                 disable_smart_shrinking: true,
+                 javascript_delay: 5000,
+                 timeout: 120
         end
       end
     rescue => e
