@@ -45,4 +45,6 @@ es:
         blank: "no puede estar en blanco"
         not_a_number: "no es un número"
         greater_than: "debe ser mayor que %{count}"
+        greater_than_or_equal_to: "debe ser mayor o igual que %{count}"
+        taken: "ya ha sido tomado"
         inclusion: "no está incluido en la lista"

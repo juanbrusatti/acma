@@ -18,12 +18,15 @@ class Supply < ApplicationRecord
 
   # Instance methods
   def calculate_peso_price_from_usd(mep_rate)
-    return 0.0 if price_usd.nil? || mep_rate.nil? || mep_rate <= 0
+    return 0.0 if price_usd.nil? || price_usd <= 0 || mep_rate.nil? || mep_rate <= 0
     
     price_usd * mep_rate
   end
 
   def update_peso_price_from_usd!(mep_rate)
+    # Only update if we have a valid USD price
+    return if price_usd.nil? || price_usd <= 0
+    
     new_peso_price = calculate_peso_price_from_usd(mep_rate)
     update!(price_peso: new_peso_price)
   end

@@ -4,9 +4,9 @@ class SuppliesHelperTest < ActionView::TestCase
   include SuppliesHelper
 
   def setup
-    @supply_with_price = Supply.new(name: "Test Supply", price_usd: 25.50, price_peso: 30600.0)
-    @supply_without_price = Supply.new(name: "Test Supply", price_usd: nil, price_peso: nil)
-    @supply_zero_price = Supply.new(name: "Test Supply", price_usd: 0, price_peso: 0)
+    @supply_with_price = Supply.new(name: "Test Supply", price_usd: 25.50)
+    @supply_without_price = Supply.new(name: "Test Supply", price_usd: nil)
+    @supply_zero_price = Supply.new(name: "Test Supply", price_usd: 0)
   end
 
   test "format_supply_price should format valid price" do

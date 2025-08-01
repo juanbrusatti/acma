@@ -97,6 +97,42 @@ class GlassPricesController < ApplicationController
     end
   end
 
+  # PATCH /glass_prices/update_all_supplies_mep
+  def update_all_supplies_mep
+    mep_rate = params[:mep_rate].to_f
+    
+    if mep_rate > 0
+      # Set the MEP rate in app config
+      AppConfig.set_mep_rate(mep_rate)
+      
+      # Update all supplies with new peso prices
+      Supply.all.find_each do |supply|
+        supply.update_peso_price_from_usd!(mep_rate)
+      end
+      
+      respond_to do |format|
+        format.html { redirect_to glass_prices_path, notice: "Dólar MEP actualizado correctamente." }
+        format.json { render json: { success: true, message: "Dólar MEP actualizado correctamente." } }
+        format.turbo_stream { 
+          flash.now[:notice] = "Dólar MEP actualizado correctamente."
+          render turbo_stream: [
+            turbo_stream.replace("flash", partial: "shared/flash"),
+            turbo_stream.replace("supplies_table", partial: "supplies_table", locals: { supplies: Supply.all })
+          ]
+        }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to glass_prices_path, alert: "El valor del dólar MEP debe ser mayor a 0." }
+        format.json { render json: { success: false, message: "El valor del dólar MEP debe ser mayor a 0." } }
+        format.turbo_stream {
+          flash.now[:alert] = "El valor del dólar MEP debe ser mayor a 0."
+          render turbo_stream: turbo_stream.replace("flash", partial: "shared/flash")
+        }
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_glass_price
