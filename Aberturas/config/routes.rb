@@ -15,7 +15,11 @@ Rails.application.routes.draw do
     resources :glasscuttings, only: [ :create ]
   end
 
-  resources :glass_prices
+  resources :glass_prices do
+    collection do
+      patch :update_all_percentages
+    end
+  end
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

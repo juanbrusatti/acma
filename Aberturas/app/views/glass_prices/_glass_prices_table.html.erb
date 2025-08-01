@@ -1,0 +1,26 @@
+<div id="glass_prices_table">
+  <div class="overflow-x-auto mt-0">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Tipo</th>
+            <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Grosor</th>
+            <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Color</th>
+            <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase min-w-96">
+              <div class="grid grid-cols-4 gap-1 md:gap-2 text-center">
+                <div class="text-xs">Precio compra</div>
+                <div class="text-xs">% Ganancia</div>
+                <div class="text-xs">Precio venta</div>
+                <div class="text-xs">Acciones</div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% combinations.each do |glass_price| %>
+            <%= render "glass_price_row", glass_price: glass_price %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+</div>
