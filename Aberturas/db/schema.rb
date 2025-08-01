@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_29_032005) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_01_200409) do
+  create_table "app_configs", force: :cascade do |t|
+    t.string "key"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
@@ -94,9 +101,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_032005) do
 
   create_table "supplies", force: :cascade do |t|
     t.string "name"
-    t.decimal "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_usd", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "price_peso", precision: 10, scale: 2, default: "0.0", null: false
+    t.index ["price_peso"], name: "index_supplies_on_price_peso"
+    t.index ["price_usd"], name: "index_supplies_on_price_usd"
   end
 
   add_foreign_key "dvhs", "projects"
