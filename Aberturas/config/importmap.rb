@@ -38,3 +38,6 @@ pin "glasscutting_selects", to: "glasscutting_selects.js"
 pin "glasscutting_table", to: "glasscutting_table.js"
 pin "dvh_table", to: "dvh_table.js"
 pin "dvh_selects", to: "dvh_selects.js"
+=========
+pin "preview_pdf", to: "preview_pdf.js"
+>>>>>>>>> Temporary merge branch 2
