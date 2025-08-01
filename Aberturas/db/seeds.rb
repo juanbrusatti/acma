@@ -62,9 +62,9 @@ puts "Creando datos de ejemplo para glassplates..."
 
 # Example complete sheets
 Glassplate.create!(
-  glass_type: "Float",
+  glass_type: "FLO", # Changed from "Float" to "FLO"
   thickness: "5mm",
-  color: "Incoloro",
+  color: "INC", # Changed from "Incoloro" to "INC"
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
@@ -76,9 +76,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Laminado",
+  glass_type: "LAM", # Changed from "Laminado" to "LAM"
   thickness: "3+3",
-  color: "Incoloro",
+  color: "INC", # Changed from "Incoloro" to "INC"
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
@@ -90,9 +90,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Cool Lite",
+  glass_type: "COL", # Changed from "Cool Lite" to "COL"
   thickness: "5mm",
-  color: "Gris",
+  color: "GRS", # Changed from "Gris" to "GRS"
   width: 2500,
   height: 3600,
   standard_measures: "2500x3600",
@@ -104,9 +104,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Float",
+  glass_type: "FLO", # Changed from "Float" to "FLO"
   thickness: "4+4",
-  color: "Bronce",
+  color: "BRC", # Changed from "Bronce" to "BRC"
   width: 2440,
   height: 3660,
   standard_measures: "2440x3660",
@@ -119,9 +119,9 @@ Glassplate.create!(
 
 # Example scraps
 Glassplate.create!(
-  glass_type: "Float",
+  glass_type: "FLO", # Changed from "Float" to "FLO"
   thickness: "5mm",
-  color: "Incoloro",
+  color: "INC", # Changed from "Incoloro" to "INC"
   width: 800,
   height: 1200,
   standard_measures: "800x1200",
@@ -133,9 +133,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Laminado",
+  glass_type: "LAM", # Changed from "Laminado" to "LAM"
   thickness: "3+3",
-  color: "Esmerilado",
+  color: "STG", # Changed from "Esmerilado" to "STG" (satinado gris as closest match)
   width: 500,
   height: 950,
   standard_measures: "500x950",
@@ -147,9 +147,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Float",
+  glass_type: "FLO", # Changed from "Float" to "FLO"
   thickness: "4+4",
-  color: "Gris",
+  color: "GRS", # Changed from "Gris" to "GRS"
   width: 1500,
   height: 400,
   standard_measures: "1500x400",
@@ -161,9 +161,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Cool Lite",
+  glass_type: "COL", # Changed from "Cool Lite" to "COL"
   thickness: "5+5",
-  color: "Bronce",
+  color: "BRC", # Changed from "Bronce" to "BRC"
   width: 1200,
   height: 800,
   standard_measures: "1200x800",
@@ -175,9 +175,9 @@ Glassplate.create!(
 )
 
 Glassplate.create!(
-  glass_type: "Laminado",
+  glass_type: "LAM", # Changed from "Laminado" to "LAM"
   thickness: "4+4",
-  color: "Gris",
+  color: "GRS", # Changed from "Gris" to "GRS"
   width: 900,
   height: 600,
   standard_measures: "900x600",
@@ -197,23 +197,27 @@ puts "Creando precios de ejemplo para todas las combinaciones de vidrios..."
 sample_prices = {
   # LAM (Laminado) - precios por m²
   { glass_type: "LAM", thickness: "3+3", color: "INC" } => 32776.47,
-  { glass_type: "LAM", thickness: "3+3", color: "ESM" } => 60613.11,
+  { glass_type: "LAM", thickness: "3+3", color: "BLS" } => 60613.11, # Changed from "ESM" to "BLS"
   { glass_type: "LAM", thickness: "4+4", color: "INC" } => 40938.20,
   { glass_type: "LAM", thickness: "5+5", color: "INC" } => 49212.72,
 
   # FLO (Float) - precios por m²
   { glass_type: "FLO", thickness: "5mm", color: "INC" } => 13379.15,
-  { glass_type: "FLO", thickness: "5mm", color: "GRS/BCE" } => 20088.71,
+  { glass_type: "FLO", thickness: "5mm", color: "GRS" } => 20088.71, # Changed from "GRS/BCE" to "GRS"
+  { glass_type: "FLO", thickness: "5mm", color: "BRC" } => 20088.71, # Added BRC with the same price
 
   # COL (Cool Lite) - precios por m²
-  { glass_type: "COL", thickness: "4+4", color: "-" } => 94080.59
+  { glass_type: "COL", thickness: "4+4", color: "STB" } => 94080.59, # Changed from "-" to "STB"
+  { glass_type: "COL", thickness: "4+4", color: "STG" } => 94080.59, # Added STG variant
+  { glass_type: "COL", thickness: "4+4", color: "NTR" } => 94080.59  # Added NTR variant
 }
 
 # Create all glassprice registers
 sample_prices.each do |combination, price_m2|
   glass_price = GlassPrice.find_or_initialize_by(combination)
-  glass_price.price_m2 = price_m2
-  glass_price.price = (price_m2 * 1.0).round(2)
+  # Using buying_price and percentage to calculate selling_price based on the GlassPrice model
+  glass_price.buying_price = price_m2
+  glass_price.percentage = 20 # Setting a 20% markup
 
   if glass_price.save
     puts "✅ Precio creado: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]} - $#{price_m2}/m²"
@@ -225,22 +229,21 @@ end
 
 puts "✅ Precios de ejemplo para todas las combinaciones creados exitosamente!"
 
-sample_supply_prices = {
-  {name: "Tamiz"} => 1000,
-  {name: "Hotmelt"} => 2000,
-  {name: "Cinta"} => 3000
-}
+# Create supply prices using the BASICS constant from the Supply model
+puts "Creando precios de ejemplo para insumos..."
 
-# Create all glassprice registers
-sample_supply_prices.each do |combination, price|
-  supply = Supply.find_or_initialize_by(combination)
-  supply.price = price
-  supply.price = (price * 1.0).round(2)
+Supply::BASICS.each_with_index do |name, index|
+  price = 1000 * (index + 1) # 1000, 2000, 3000
+
+  supply = Supply.find_or_initialize_by(name: name)
+  supply.price = price.to_f.round(2)
 
   if supply.save
-    puts "✅ Precio creado: #{combination[:name]} - $#{price}/m²"
+    puts "✅ Precio creado: #{name} - $#{price}"
   else
-    puts "❌ Error creando precio para: #{combination[:name]}"
+    puts "❌ Error creando precio para: #{name}"
     puts "   Errores: #{supply.errors.full_messages.join(', ')}"
   end
 end
+
+puts "✅ Precios de insumos creados exitosamente!"
