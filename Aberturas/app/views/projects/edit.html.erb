@@ -16,8 +16,8 @@
 
   <%= form_with(model: @project, local: true) do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%= render partial: "partials/projects/info_client", locals: { f: f } %>
-      <%= render partial: "partials/projects/info_project", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_client", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_project", locals: { f: f } %>
     </div>
 
     <%# Campo precio solo lectura si existe en el modelo %>
@@ -28,10 +28,12 @@
       </div>
     <% end %>
 
-    <%= render partial: "partials/projects/info_glasscuttings", locals: { f: f } %>
-    <%= render partial: "partials/projects/info_dvhs", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
 
     <div class="mt-6 flex gap-2">
+      <%= f.hidden_field :price, id: "hidden-project-price" %>
+      <%= f.hidden_field :price_without_iva, id: "hidden-project-price-without-iva" %>
       <%= f.submit "Guardar cambios", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
       <%= link_to "Volver", project_path(@project), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
     </div>

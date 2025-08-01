@@ -1,6 +1,6 @@
 <% content_for :title, "Gestión de Proyectos" %>
 
-<div class="flex flex-1 flex-col gap-8 p-4 md:gap-12 md:p-12 max-w-4xl mx-auto">
+<div class="flex flex-1 flex-col gap-8 p-4 md:gap-12 md:p-12 max-w-7xl mx-auto">
   <div class="flex items-center mb-8">
     <h1 class="text-3xl font-bold tracking-tight text-gray-900">Gestión de Proyectos</h1>
     <%= link_to new_project_path, class: "ml-auto flex items-center gap-2 rounded-lg px-5 py-3 bg-black hover:bg-gray-800 text-white font-medium transition text-base shadow" do %>
@@ -17,16 +17,17 @@
       <table class="w-full rounded-2xl overflow-hidden text-base">
         <thead>
           <tr>
-            <th class="text-left font-semibold text-gray-400 py-4 px-6">Proyecto / Cliente</th>
-            <th class="text-left font-semibold text-gray-400 py-4 px-6 hidden sm:table-cell">Estado</th>
-            <th class="text-right font-semibold text-gray-400 py-4 px-6 hidden sm:table-cell">Fecha de Entrega</th>
-            <th class="text-right font-semibold text-gray-400 py-4 px-6">Acciones</th>
+            <th class="text-center font-semibold text-gray-400 py-4 px-6">Proyecto / Cliente</th>
+            <th class="text-center font-semibold text-gray-400 py-4 px-6 hidden sm:table-cell">Estado</th>
+            <th class="text-center font-semibold text-gray-400 py-4 px-6 hidden sm:table-cell">Fecha de Entrega</th>
+            <th class="text-center font-semibold text-gray-400 py-4 px-6 hidden md:table-cell">Precio final</th>
+            <th class="text-center font-semibold text-gray-400 py-4 px-6">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <% if @projects.any? %>
             <% @projects.each_with_index do |project, idx| %>
-              <%= render partial: "partials/projects/project_row", locals: { project: project, odd: idx.odd? } %>
+              <%= render partial: "projects/partials/project_row", locals: { project: project, odd: idx.odd? } %>
             <% end %>
           <% else %>
             <tr>

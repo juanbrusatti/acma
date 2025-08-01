@@ -3,22 +3,24 @@
     <h2 class="text-lg font-semibold text-gray-800">Resumen y acciones</h2>
 
     <div class="flex justify-between text-sm text-gray-600">
-      <span>Subtotal</span>
-      <span id="subtotal-price">$<%= number_with_precision(@project.try(:total) || 0, precision: 2) %></span>
+      <span>Subtotal (sin IVA)</span>
+      <span id="subtotal-price">$<%= number_with_precision(@project.try(:subtotal) || 0, precision: 2) %></span>
     </div>
 
     <div class="flex justify-between text-sm text-gray-600">
       <span>IVA (21%)</span>
-      <span id = "iva-value">$<%= number_with_precision(@project.try(:iva) || 0, precision: 2) %></span>
+      <span id="iva-value">$<%= number_with_precision(@project.try(:iva) || 0, precision: 2) %></span>
     </div>
 
     <div class="border-t border-gray-200 pt-4 flex justify-between text-base font-bold text-gray-900">
-      <span>Total estimado</span>
+      <span>Total con IVA</span>
       <span id="price-total">$<%= number_with_precision(@project.try(:total) || 0, precision: 2) %></span>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <%= f.hidden_field :price, id: "hidden-project-price" %>
+    <%= f.hidden_field :price_without_iva, id: "hidden-project-price-without-iva" %>
     <%= f.submit "Guardar como presupuesto", class: "w-full bg-black text-white font-medium rounded-lg py-2 text-sm hover:opacity-90 transition" %>
     <%= button_tag "Optimizar", type: "button", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>
     <%= button_tag "Guardar PDF", type: "button", id: "preview-pdf-btn", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>

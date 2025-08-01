@@ -1,5 +1,6 @@
-// glasscutting_selects.js
+// dvh_selects.js
 
+// Glass options for DVH (reuse or adapt as needed)
 export const GLASS_OPTIONS = {
   LAM: {
     "3+3": ["INC", "BLS"],
@@ -14,10 +15,11 @@ export const GLASS_OPTIONS = {
   }
 };
 
-export function updateGlassSelects(container) {
-  const typeSelect = container.querySelector('.glass-type-select');
-  const thicknessSelect = container.querySelector('.glass-thickness-select');
-  const colorSelect = container.querySelector('.glass-color-select');
+export function updateDvhGlassSelects(container, prefix) {
+  // prefix: 'glasscutting1' or 'glasscutting2'
+  const typeSelect = container.querySelector(`.${prefix}-type-select`);
+  const thicknessSelect = container.querySelector(`.${prefix}-thickness-select`);
+  const colorSelect = container.querySelector(`.${prefix}-color-select`);
 
   if (!typeSelect || !thicknessSelect || !colorSelect) return;
 
@@ -67,6 +69,9 @@ export function updateGlassSelects(container) {
   thicknessSelect.addEventListener('change', updateColorOptions);
 }
 
-export function setupAllGlassSelects() {
-  document.querySelectorAll('.glasscutting-fields').forEach(updateGlassSelects);
+export function setupAllDvhGlassSelects() {
+  document.querySelectorAll('.dvh-fields').forEach(container => {
+    updateDvhGlassSelects(container, 'glasscutting1');
+    updateDvhGlassSelects(container, 'glasscutting2');
+  });
 }

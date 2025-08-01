@@ -2,15 +2,15 @@ class Glassplate < ApplicationRecord
   # Color validation
   validates :color, presence: true
   validates :color, inclusion: {
-    in: [ "Incoloro", "Esmerilado", "Gris", "Bronce" ],
-    message: "debe ser uno de: Incoloro, Esmerilado, Gris, Bronce"
+    in: ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"],
+    message: "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
   }
 
   # Glass type validation
   validates :glass_type, presence: true
   validates :glass_type, inclusion: {
-    in: [ "Laminado", "Float", "Cool Lite" ],
-    message: "debe ser uno de: Laminado, Float, Cool Lite"
+    in: ["LAM", "FLO", "COL"],
+    message: "debe ser uno de: LAM, FLO, COL"
   }
 
   # Validations for width and height

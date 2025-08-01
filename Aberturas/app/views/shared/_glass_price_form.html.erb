@@ -1,0 +1,137 @@
+<%# 
+  Componente para formulario unificado de precios de vidrio
+  
+  Parámetros:
+  - glass_price: Objeto GlassPrice
+  - mode: 'inline' o 'full' (default: 'full')
+  - show_readonly_fields: Si mostrar campos readonly (default: false para inline, true para full)
+%>
+
+<%
+  mode ||= 'full'
+  show_readonly_fields = show_readonly_fields.nil? ? (mode == 'full') : show_readonly_fields
+  form_classes = mode == 'inline' ? 'contents' : ''
+  is_inline = mode == 'inline'
+%>
+
+<%= form_with(
+  model: glass_price, 
+  url: is_inline ? glass_price_path(glass_price) : nil,
+  method: is_inline ? :patch : nil,
+  local: !is_inline,
+  data: is_inline ? { turbo_frame: "glass_price_#{glass_price.id}" } : {},
+  class: form_classes
+) do |form| %>
+
+  <!-- Manejo de errores -->
+  <% if glass_price.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(glass_price.errors.count, "error") %> no se pudo guardar el precio del vidrio:</h2>
+      <ul class="list-disc ml-6">
+        <% glass_price.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if is_inline %>
+    <!-- Modo inline para tabla -->
+    <div class="grid grid-cols-4 items-center gap-1 md:gap-2">
+      <div class="px-1 md:px-2 py-1 text-center">
+        <%= form.text_field :buying_price, 
+            value: glass_price.buying_price, 
+            placeholder: "Precio compra", 
+            class: "w-full rounded-md border px-1 md:px-2 py-1 text-xs md:text-sm text-center" %>
+      </div>
+      <div class="px-1 md:px-2 py-1 text-center">
+        <%= form.text_field :percentage, 
+            value: glass_price.percentage, 
+            placeholder: "%", 
+            class: "w-full rounded-md border px-1 md:px-2 py-1 text-xs md:text-sm text-center" %>
+      </div>
+      <div class="px-1 md:px-2 py-1 text-center">
+        <%= form.text_field :selling_price, 
+            value: glass_price.selling_price, 
+            placeholder: "Precio venta", 
+            class: "w-full px-1 md:px-2 py-1 text-green-700 font-semibold text-xs md:text-sm text-center cursor-default focus:outline-none", 
+            readonly: true %>
+      </div>
+      <div class="px-1 md:px-2 py-1 text-center">
+        <%= form.submit "✓", 
+            class: "w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-xs md:text-sm transition-colors duration-150" %>
+      </div>
+    </div>
+    
+  <% else %>
+    <!-- Modo full para formularios completos -->
+    
+    <% if show_readonly_fields %>
+      <!-- Campos readonly para edición -->
+      <div class="my-5">
+        <label class="block font-medium mb-1">Tipo</label>
+        <input type="text" value="<%= glass_price.glass_type %>" readonly 
+               class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+      </div>
+
+      <div class="my-5">
+        <label class="block font-medium mb-1">Grosor</label>
+        <input type="text" value="<%= glass_price.thickness %>" readonly 
+               class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+      </div>
+
+      <div class="my-5">
+        <label class="block font-medium mb-1">Color</label>
+        <input type="text" value="<%= glass_price.color %>" readonly 
+               class="block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full bg-gray-100 text-gray-600" />
+      </div>
+    <% else %>
+      <!-- Campos editables para creación -->
+      <div class="my-5">
+        <%= form.label :glass_type, class: "block font-medium mb-1" %>
+        <%= form.select :glass_type, 
+            options_for_select(GlassPrice::TYPES.keys.map {|k| [k, k]}, glass_price.glass_type), 
+            {}, 
+            class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
+
+      <div class="my-5">
+        <%= form.label :thickness, class: "block font-medium mb-1" %>
+        <%= form.text_field :thickness, placeholder: "mm", 
+            class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
+
+      <div class="my-5">
+        <%= form.label :color, class: "block font-medium mb-1" %>
+        <%= form.text_field :color, placeholder: "Color", 
+            class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
+    <% end %>
+
+    <!-- Campos de precio comunes a ambos modos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="my-5">
+        <%= form.label :buying_price, "Precio de compra", class: "block font-medium mb-1" %>
+        <%= form.number_field :buying_price, step: :any, placeholder: "Precio compra", 
+            class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
+
+      <div class="my-5">
+        <%= form.label :percentage, "% Ganancia", class: "block font-medium mb-1" %>
+        <%= form.number_field :percentage, step: :any, placeholder: "Porcentaje", 
+            class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :selling_price, "Precio de venta", class: "block font-medium mb-1" %>
+      <%= form.number_field :selling_price, step: :any, placeholder: "Precio venta", 
+          class: "block w-full rounded-md border border-gray-300 px-3 py-2 bg-green-50 text-green-700 font-semibold", 
+          readonly: true %>
+    </div>
+
+    <div class="inline">
+      <%= form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+    </div>
+  <% end %>
+<% end %>

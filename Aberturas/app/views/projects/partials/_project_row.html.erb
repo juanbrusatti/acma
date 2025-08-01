@@ -1,15 +1,18 @@
 <tr class="border-b last:border-0 border-gray-100 <%= 'bg-gray-50' if odd %> transition">
-  <td class="py-5 px-6 align-middle">
+  <td class="text-center py-5 px-6 align-middle">
     <div class="font-semibold text-base text-gray-900 mb-1"><%= project.name %></div>
     <div class="text-sm text-gray-400 leading-tight"><%= project.description %></div>
   </td>
-  <td class="hidden sm:table-cell py-5 px-6 align-middle">
-    <%= render partial: "partials/projects/status_badge", locals: { status: project.status } %>
+  <td class="text-center hidden sm:table-cell py-5 px-6 align-middle">
+    <%= render partial: "projects/partials/status_badge", locals: { status: project.status } %>
   </td>
-  <td class="hidden sm:table-cell text-right text-gray-700 font-medium py-5 px-6 align-middle">
+  <td class="hidden sm:table-cell text-center text-gray-700 font-medium py-5 px-6 align-middle">
     <%= project.delivery_date&.strftime('%d-%m-%Y') %>
   </td>
-  <td class="text-right py-5 px-6 align-middle">
+  <td class="text-center py-5 px-6 align-middle">
+    <%= '$' + number_with_precision(project.precio_con_iva, precision: 2) %>
+  </td>
+  <td class="text-center py-5 px-6 align-middle">
     <%= link_to "Ver Detalles", project_path(project), class: "inline-flex items-center justify-center rounded-md px-3 py-1 bg-white border border-gray-200 shadow transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xs font-medium text-gray-900 whitespace-nowrap" %>
   </td>
 </tr>

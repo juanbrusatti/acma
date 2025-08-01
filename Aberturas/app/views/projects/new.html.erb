@@ -18,12 +18,12 @@
 
   <%= form_with(model: @project, local: true) do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%= render partial: "partials/projects/info_client", locals: { f: f } %>
-      <%= render partial: "partials/projects/info_project", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_client", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_project", locals: { f: f } %>
     </div>
 
-    <%= render partial: "partials/projects/info_glasscuttings", locals: { f: f } %>
-    <%= render partial: "partials/projects/info_dvhs", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
 
   <% end %>
 </div>
@@ -88,11 +88,23 @@
     <div class="grid grid-cols-5 gap-4">
       <div>
         <label>Cámara</label>
-        <input name="project[dvhs_attributes][][innertube]" class="w-full border rounded px-2 py-1" />
+        <select name="project[dvhs_attributes][][innertube]" class="w-full border rounded px-2 py-1">
+          <option value="">Seleccionar</option>
+          <option value="6">6</option>
+          <option value="9">9</option>
+          <option value="12">12</option>
+          <option value="20">20</option>
+        </select>
       </div>
       <div>
         <label>Ubicación</label>
-        <input name="project[dvhs_attributes][][location]" class="w-full border rounded px-2 py-1" />
+        <select name="project[dvhs_attributes][][location]" class="w-full border rounded px-2 py-1 glass-location-select">
+          <option value="">Seleccionar</option>
+          <option value="UMBRAL">UMBRAL</option>
+          <option value="DINTEL">DINTEL</option>
+          <option value="JAMBA_I">JAMBA_I</option>
+          <option value="JAMBA_D">JAMBA_D</option>
+        </select>
       </div>
       <div>
         <label>Ancho</label>
@@ -111,15 +123,24 @@
       <div class="grid grid-cols-5 gap-4">
         <div>
           <label>Tipo de vidrio</label>
-          <input name="project[dvhs_attributes][][glasscutting1_type]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting1_type]" class="w-full border rounded px-2 py-1 glasscutting1-type-select">
+            <option value="">Seleccionar</option>
+            <option value="LAM">LAM</option>
+            <option value="FLO">FLO</option>
+            <option value="COL">COL</option>
+          </select>
         </div>
         <div>
           <label>Grosor</label>
-          <input name="project[dvhs_attributes][][glasscutting1_thickness]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting1_thickness]" class="w-full border rounded px-2 py-1 glasscutting1-thickness-select">
+            <option value="">Seleccionar</option>
+          </select>
         </div>
         <div>
           <label>Color</label>
-          <input name="project[dvhs_attributes][][glasscutting1_color]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting1_color]" class="w-full border rounded px-2 py-1 glasscutting1-color-select">
+            <option value="">Seleccionar</option>
+          </select>
         </div>
       </div>
     </div>
@@ -131,15 +152,24 @@
       <div class="grid grid-cols-5 gap-4">
         <div>
           <label>Tipo de vidrio</label>
-          <input name="project[dvhs_attributes][][glasscutting2_type]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting2_type]" class="w-full border rounded px-2 py-1 glasscutting2-type-select">
+            <option value="">Seleccionar</option>
+            <option value="LAM">LAM</option>
+            <option value="FLO">FLO</option>
+            <option value="COL">COL</option>
+          </select>
         </div>
         <div>
           <label>Grosor</label>
-          <input name="project[dvhs_attributes][][glasscutting2_thickness]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting2_thickness]" class="w-full border rounded px-2 py-1 glasscutting2-thickness-select">
+            <option value="">Seleccionar</option>
+          </select>
         </div>
         <div>
           <label>Color</label>
-          <input name="project[dvhs_attributes][][glasscutting2_color]" class="w-full border rounded px-2 py-1" />
+          <select name="project[dvhs_attributes][][glasscutting2_color]" class="w-full border rounded px-2 py-1 glasscutting2-color-select">
+            <option value="">Seleccionar</option>
+          </select>
         </div>
       </div>
     </div>

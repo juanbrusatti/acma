@@ -1,3 +1,3 @@
 <%= turbo_frame_tag "supply_#{@supply.id}" do %>
-  <%= render partial: "partials/supplies/form_supply_inline", locals: { supply: @supply } %>
+  <%= render "supplies/partials/form_supply_inline", supply: @supply %>
 <% end %>

@@ -1,36 +1,47 @@
-// glasscutting_table.js
+// Glass Cutting Table Module
+// Manages dynamic table creation and manipulation for glass cutting entries in projects
 import { updateGlassSelects } from "glasscutting_selects";
 
+// Global variables to track table state and unique IDs
 let glasscuttingIdCounter = 1;
 let glasscuttingTable = null;
 let glasscuttingTbody = null;
 
+// Ensures the glass cutting table exists in the DOM
+// Creates the table structure if it doesn't exist, or references existing one
 export function ensureGlasscuttingTable() {
   const container = document.getElementById('glasscuttings-table-container');
   const existingTable = container.querySelector('table');
+  
+  // If table already exists, just reference it
   if (existingTable) {
     glasscuttingTable = existingTable;
     glasscuttingTbody = existingTable.querySelector('tbody');
     return;
   }
+  
+  // Create new table if it doesn't exist
   if (!glasscuttingTable) {
     glasscuttingTable = document.createElement('table');
     glasscuttingTable.className = 'min-w-full text-xs text-gray-700 border';
+    
+    // Create table header with column definitions
     glasscuttingTable.innerHTML = `
       <thead>
         <tr class='bg-gray-50 text-gray-500'>
           <th class='px-2 py-1 text-left'>ID</th>
           <th class='px-2 py-1 text-left'>TIPO</th>
-          <th class='px-2 py-1 text-left'>ESPESOR</th>
+          <th class='px-2 py-1 text-left'>GROSOR</th>
           <th class='px-2 py-1 text-left'>COLOR</th>
           <th class='px-2 py-1 text-left'>UBICACIÓN</th>
           <th class='px-2 py-1 text-left'>ALTO</th>
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>PRECIO</th>
-          <th class='px-2 py-1 text-left'></th>
         </tr>
       </thead>
     `;
+    
+    // Create and append table body
     glasscuttingTbody = document.createElement('tbody');
     glasscuttingTbody.id = 'glasscuttings-table-body';
     glasscuttingTable.appendChild(glasscuttingTbody);
@@ -38,31 +49,47 @@ export function ensureGlasscuttingTable() {
   }
 }
 
+// Removes the table from DOM if it's empty (no rows)
+// Helps keep the interface clean when no glass cutting entries exist
 export function removeGlasscuttingTableIfEmpty() {
   if (glasscuttingTbody && glasscuttingTbody.children.length === 0) {
     if (glasscuttingTable && glasscuttingTable.parentNode) {
       glasscuttingTable.parentNode.removeChild(glasscuttingTable);
     }
+    // Reset references to null
     glasscuttingTable = null;
     glasscuttingTbody = null;
   }
 }
 
+// Main event handler for glass cutting related actions
+// Handles confirm, delete, and cancel operations
 export function handleGlasscuttingEvents(e) {
-  // Confirm
+  // CONFIRM: Add new glass cutting entry to table
   if (e.target.classList.contains("confirm-glass")) {
     const container = e.target.closest(".glasscutting-fields");
     const inputs = container.querySelectorAll("input, select");
+    
+    // Extract values from form inputs
     const values = {};
     inputs.forEach(input => {
       values[input.name.split("[").pop().replace("]", "")] = input.value;
     });
+    
+    // Ensure table exists before adding row
     ensureGlasscuttingTable();
+    
+    // Create new table row
     const tr = document.createElement("tr");
+    
+    // Calculate price based on dimensions and glass type
     const price_m2 = getPriceM2(values.glass_type, values.thickness, values.color);
     const area_m2 = (parseFloat(values.height) / 1000) * (parseFloat(values.width) / 1000);
-    const price = Math.round(area_m2 * price_m2 * 100) / 100; // redondeamos a 2 decimales
+    const price = Math.round(area_m2 * price_m2 * 100) / 100; // Round to 2 decimals
+    
     tr.className = "divide-x divide-gray-200";
+    
+    // Populate row with data and delete button
     tr.innerHTML = `
       <td class='px-2 py-1'>${glasscuttingIdCounter}</td>
       <td class='px-2 py-1'>${values.glass_type || ''}</td>
@@ -74,9 +101,13 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1'>${price || ''}</td>
       <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
+    
     glasscuttingTbody.appendChild(tr);
-    updateSubtotalPrice();
-    // Agregar inputs ocultos
+    
+    // Update project totals if function exists
+    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+    
+    // Create hidden form inputs for Rails form submission
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "glasscutting-hidden-row";
@@ -89,26 +120,35 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
     `;
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
+    
+    // Increment counter and remove form container
     glasscuttingIdCounter++;
     container.remove();
     return;
   }
-  // Eliminar
+  
+  // DELETE: Remove glass cutting entry from table
   if (e.target.classList.contains("delete-glass")) {
     const tr = e.target.closest("tr");
     if (tr) {
       tr.remove();
-      updateSubtotalPrice();
       removeGlasscuttingTableIfEmpty();
-      // Eliminar también el set de inputs ocultos correspondiente
+      
+      // Update project totals after deletion
+      if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+      
+      // Remove corresponding hidden form inputs
       const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");
       if (hiddenRows.length > 0) hiddenRows[hiddenRows.length - 1].remove();
       return;
     }
+    
+    // Handle deletion from form containers
     const container = e.target.closest(".glasscutting-fields") || e.target.closest(".glasscutting-view");
     if (container) { container.remove(); return; }
   }
-  // Cancelar
+  
+  // CANCEL: Remove form without adding entry
   if (e.target.classList.contains("cancel-glass")) {
     const container = e.target.closest(".glasscutting-fields");
     container.remove();
@@ -116,59 +156,20 @@ export function handleGlasscuttingEvents(e) {
   }
 }
 
+// Resets all module variables to initial state
+// Used when starting fresh or clearing data
 export function resetGlasscuttingTableVars() {
   glasscuttingIdCounter = 1;
   glasscuttingTable = null;
   glasscuttingTbody = null;
 }
 
-// Returns the price per m2 for a given type, thickness, and color from the global GLASS_PRICES array
+// Utility function to get price per square meter for specific glass configuration
+// Searches the global GLASS_PRICES array populated from Rails backend
 function getPriceM2(type, thickness, color) {
   if (!window.GLASS_PRICES) return 0;
   const found = window.GLASS_PRICES.find(p =>
     p.glass_type === type && p.thickness === thickness && p.color === color
   );
-  return found ? found.price_m2 : 0;
-}
-
-// Calculates the subtotal by summing the price of each confirmed glasscutting row
-// Then updates the subtotal, IVA, and total in the DOM
-function updateSubtotalPrice() {
-  let subtotal = 0;
-  // Iterate over each row in the glasscuttings table and sum the prices
-  document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(8)');
-    if (priceCell) {
-      const price = parseFloat(priceCell.textContent.replace(',', '.')) || 0;
-      subtotal += price;
-    }
-  });
-  // Update the subtotal in the DOM
-  const subtotalPriceElem = document.getElementById('subtotal-price');
-  if (subtotalPriceElem) {
-    subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
-  }
-  // Update IVA and total as well
-  updateTotalWithIVA(subtotal);
-}
-
-// Calculates and updates the IVA (21% of subtotal) in the DOM
-export function updateIVA(subtotal) {
-  const iva = subtotal * 0.21;
-  const ivaElem = document.getElementById('iva-value');
-  if (ivaElem) {
-    ivaElem.textContent = '$' + iva.toFixed(2);
-  }
-  return iva;
-}
-
-// Calculates and updates the total price (subtotal + IVA) in the DOM
-export function updateTotalWithIVA(subtotal) {
-  const iva = updateIVA(subtotal);
-  const total = subtotal + iva;
-  const totalElem = document.getElementById('price-total');
-  if (totalElem) {
-    totalElem.textContent = '$' + total.toFixed(2);
-  }
-  return total;
+  return found ? found.selling_price : 0;
 }

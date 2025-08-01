@@ -60,4 +60,23 @@ module ProjectsHelper
       "text-green-600"
     end
   end
+
+  # Serialize project data for JSON responses
+  def project_json_data(project)
+    project.as_json(
+      only: [:id, :name, :description, :status, :delivery_date], 
+      include: { 
+        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } 
+      }
+    )
+  end
+
+  # Generate status badge HTML for AJAX responses
+  def project_status_badge_html(status)
+    render_to_string(
+      partial: "projects/partials/status_badge", 
+      locals: { status: status }, 
+      formats: [:html]
+    )
+  end
 end

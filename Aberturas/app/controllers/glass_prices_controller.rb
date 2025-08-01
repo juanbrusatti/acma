@@ -3,13 +3,7 @@ class GlassPricesController < ApplicationController
 
   # GET /glass_prices or /glass_prices.json
   def index
-    @combinations = GlassPrice.combinations_possible.map do |comb|
-      record = GlassPrice.find_or_initialize_by(comb)
-      if record.new_record?
-        record.save(validate: false)
-      end
-      record
-    end
+    @combinations = helpers.build_glass_price_combinations
   end
 
   # GET /glass_prices/1 or /glass_prices/1.json
@@ -72,6 +66,6 @@ class GlassPricesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def glass_price_params
-      params.require(:glass_price).permit(:glass_type, :thickness, :color, :price, :price_m2)
+      params.require(:glass_price).permit(:glass_type, :thickness, :color, :buying_price, :selling_price, :percentage)
     end
 end

@@ -36,10 +36,11 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
         format.json {
+          # Habria que guardar el precio
           render json: {
             success: true,
-            project: @project.as_json(only: [:id, :name, :description, :status, :delivery_date], include: { glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } }),
-            status_badge_html: render_to_string(partial: "partials/projects/status_badge", locals: { status: @project.status }, formats: [:html])
+            project: helpers.project_json_data(@project),
+            status_badge_html: helpers.project_status_badge_html(@project.status)
           }
         }
       end
@@ -131,7 +132,8 @@ class ProjectsController < ApplicationController
       :delivery_date,
       :description,
       :status,
-      :price_total,
+      :price,
+      :price_without_iva,
       glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location, :price ],
       dvhs_attributes: [
         :innertube,
@@ -144,9 +146,8 @@ class ProjectsController < ApplicationController
         :glasscutting2_type,
         :glasscutting2_thickness,
         :glasscutting2_color,
-        :gas_type
+        :price
       ]
     )
   end
 end
-
