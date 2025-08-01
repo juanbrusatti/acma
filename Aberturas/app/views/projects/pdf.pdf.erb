@@ -1,6 +1,9 @@
+<% # Inicializar variables para evitar errores de nil %>
+<% total_con_iva = 0 %>
+<% dvh_total_con_iva = 0 %>
 
 <div style="margin-bottom: 10px;">
-  <img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
+<img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
 </div>
 <h1 style="text-align:center; margin-bottom: 0;">PRESUPUESTO</h1>
 <hr>
@@ -123,7 +126,7 @@
     <tr>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0;">Total General con IVA</td>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
-        <% total_general_con_iva = total_con_iva + dvh_total_con_iva %>
+        <% total_general_con_iva = (total_con_iva || 0) + (dvh_total_con_iva || 0) %>
         <%= number_to_currency(total_general_con_iva, unit: "$", precision: 2) %>
       </td>
     </tr>
