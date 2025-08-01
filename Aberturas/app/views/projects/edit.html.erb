@@ -1,7 +1,7 @@
 <% content_for :title, "Editar proyecto" %>
 
 <div class="w-full p-4 md:p-8">
-  <h1 class="text-lg font-semibold mb-3">Editar proyecto</h1>
+  <h1 class="text-lg font-semibold mb-3">Generar proyecto</h1>
 
   <% if @project.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -38,4 +38,4 @@
       <%= link_to "Volver", project_path(@project), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
     </div>
   <% end %>
-</div> 
+</div>

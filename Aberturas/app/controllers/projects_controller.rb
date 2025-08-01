@@ -6,9 +6,20 @@ class ProjectsController < ApplicationController
   end
 
   def new
-    @project = Project.new
-    # @project.glasscuttings.build
-    # @project.dvhs.build
+    if params[:project_id]
+      original = Project.find_by(id: params[:project_id])
+      if original
+        # Clonar el proyecto y sus asociaciones para edición
+        @project = original.dup
+        @project.id = nil
+        @project.glasscuttings = original.glasscuttings.map(&:dup)
+        @project.dvhs = original.dvhs.map(&:dup)
+      else
+        @project = Project.new
+      end
+    else
+      @project = Project.new
+    end
   end
 
   def create
@@ -27,7 +38,7 @@ class ProjectsController < ApplicationController
   end
 
   def edit
-    @project = Project.find(params[:id])
+    redirect_to new_project_path(project_id: params[:id])
   end
 
   def update

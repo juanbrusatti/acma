@@ -2,5 +2,5 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "projects_form"
-import "projects_inline_edit"
+// import "projects_inline_edit"
 import "glass_prices_calculator"

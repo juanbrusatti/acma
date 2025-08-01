@@ -99,7 +99,10 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${price || ''}</td>
-      <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-2 py-1 text-right'>
+        <button type="button" class="edit-glass bg-blue-500 text-white px-3 py-1 rounded mr-2">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </td>
     `;
     
     glasscuttingTbody.appendChild(tr);
@@ -126,8 +129,7 @@ export function handleGlasscuttingEvents(e) {
     container.remove();
     return;
   }
-  
-  // DELETE: Remove glass cutting entry from table
+  // Eliminar
   if (e.target.classList.contains("delete-glass")) {
     const tr = e.target.closest("tr");
     if (tr) {
