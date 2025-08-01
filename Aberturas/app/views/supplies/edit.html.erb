@@ -1,3 +1,31 @@
-<%= turbo_frame_tag "supply_#{@supply.id}" do %>
-  <%= render "supplies/partials/form_supply_inline", supply: @supply %>
-<% end %>
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mt-8">
+  <h2 class="text-xl font-bold text-gray-800 mb-4">Editar Precio de Insumo</h2>
+  
+  <%= form_with(model: @supply, local: true, class: "space-y-4") do |form| %>
+    <% if @supply.errors.any? %>
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <h4 class="font-medium"><%= pluralize(@supply.errors.count, "error") %> prohibited this supply from being saved:</h4>
+        <ul class="mt-2 list-disc list-inside">
+          <% @supply.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :name, "Nombre del Insumo", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= form.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div>
+      <%= form.label :price_usd, "Precio USD", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= form.number_field :price_usd, step: 0.01, min: 0, placeholder: "0.00", class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div class="flex gap-2 pt-4">
+      <%= form.submit "Actualizar Precio", class: "flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors" %>
+      <%= link_to "Cancelar", glass_prices_path, class: "flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-center" %>
+    </div>
+  <% end %>
+</div>
