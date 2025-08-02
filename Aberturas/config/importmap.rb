@@ -10,6 +10,7 @@ pin "projects_inline_edit", to: "projects_inline_edit.js"
 pin "glasscutting_selects", to: "glasscutting_selects.js"
 pin "glasscutting_table", to: "glasscutting_table.js"
 pin "dvh_table", to: "dvh_table.js"
+pin "preview_pdf", to: "preview_pdf.js"
 pin "dvh_selects", to: "dvh_selects.js"
 pin "glass_prices_calculator", to: "glass_prices_calculator.js"
 
@@ -37,3 +38,6 @@ pin "glasscutting_selects", to: "glasscutting_selects.js"
 pin "glasscutting_table", to: "glasscutting_table.js"
 pin "dvh_table", to: "dvh_table.js"
 pin "dvh_selects", to: "dvh_selects.js"
+=========
+pin "preview_pdf", to: "preview_pdf.js"
+>>>>>>>>> Temporary merge branch 2

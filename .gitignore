@@ -115,3 +115,5 @@ pytestdebug.log
 
 node_modules/
 Aberturas/node_modules/
+
+Aberturas/app/assets/builds/

@@ -11,6 +11,12 @@ Rails.application.routes.draw do
 
   # Nested routes for projects, dvhs, and glasscuttings
   resources :projects do
+    member do
+      get :pdf
+    end
+    collection do
+      post :preview_pdf
+    end
     resources :dvhs, only: [ :create ]
     resources :glasscuttings, only: [ :create ]
   end
