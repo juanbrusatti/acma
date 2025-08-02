@@ -64,9 +64,9 @@ module ProjectsHelper
   # Serialize project data for JSON responses
   def project_json_data(project)
     project.as_json(
-      only: [:id, :name, :description, :status, :delivery_date], 
-      include: { 
-        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } 
+      only: [:id, :name, :description, :status, :delivery_date],
+      include: {
+        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] }
       }
     )
   end
@@ -74,9 +74,25 @@ module ProjectsHelper
   # Generate status badge HTML for AJAX responses
   def project_status_badge_html(status)
     render_to_string(
-      partial: "projects/partials/status_badge", 
-      locals: { status: status }, 
+      partial: "projects/partials/status_badge",
+      locals: { status: status },
       formats: [:html]
     )
+  end
+
+  # Helper para información sobre paginación
+  def pagination_info(collection)
+    return "" if collection.total_entries.zero?
+
+    from = collection.offset + 1
+    to = [collection.offset + collection.per_page, collection.total_entries].min
+    total = collection.total_entries
+
+    "Mostrando #{from} a #{to} de #{total} #{collection_name(collection)}"
+  end
+
+  def collection_name(collection)
+    return "proyectos" if collection.is_a?(WillPaginate::Collection) && collection.first.is_a?(Project)
+    "elementos"
   end
 end

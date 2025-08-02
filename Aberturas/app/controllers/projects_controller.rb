@@ -1,8 +1,6 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.all
-    @projects = @projects.where(status: params[:status]) if params[:status].present?
-    @projects = @projects.order(created_at: :desc)
+    @projects = Project.order(created_at: :desc).paginate(page: params[:page], per_page: 3)
   end
 
   def new
@@ -36,7 +34,7 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
         format.json {
-          # Habria que guardar el precio 
+          # Habria que guardar el precio
           render json: {
             success: true,
             project: helpers.project_json_data(@project),
