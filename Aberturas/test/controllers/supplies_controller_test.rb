@@ -2,7 +2,7 @@ require "test_helper"
 
 class SuppliesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @supply = supplies(:one)
+    @supply = supplies(:tamiz)
   end
 
   # test "should get index" do

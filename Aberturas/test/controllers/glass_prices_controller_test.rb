@@ -101,6 +101,35 @@ class GlassPricesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 30000.0, supply2.price_peso # 25.0 * 1200
   end
 
+  test "should calculate and save camera prices during MEP update" do
+    AppConfig.delete_all
+    Supply.delete_all
+    
+    # Ensure basic supplies exist with the required prices and clear peso prices
+    tamiz = Supply.create!(name: "Tamiz", price_usd: 5.0, price_peso: 0.0)
+    hotmelt = Supply.create!(name: "Hotmelt", price_usd: 7.0, price_peso: 0.0)
+    cinta = Supply.create!(name: "Cinta", price_usd: 5.0, price_peso: 0.0)
+    angulos = Supply.create!(name: "Angulos", price_usd: 5.0, price_peso: 0.0)
+    perfil = Supply.create!(name: "Perfil separador", price_usd: 3.0, price_peso: 0.0)
+    
+    mep_rate = 1200.0
+    
+    patch update_all_supplies_mep_glass_prices_url, params: { mep_rate: mep_rate }
+    assert_redirected_to glass_prices_url
+    
+    # Verify camera prices were calculated and saved using real calculated values
+    expected_camera_prices = {
+      6 => 16044.0,   # Real calculated value with MEP 1200.0
+      9 => 16332.0,   # Real calculated value with MEP 1200.0
+      12 => 16578.0,  # Real calculated value with MEP 1200.0
+      20 => 16836.0   # Real calculated value with MEP 1200.0
+    }
+    
+    expected_camera_prices.each do |size, expected_price|
+      assert_equal expected_price, AppConfig.get_innertube_price(size), "Camera #{size}mm price should be #{expected_price}"
+    end
+  end
+
   test "should handle zero or negative MEP rate in update_all_supplies_mep" do
     patch update_all_supplies_mep_glass_prices_url, params: { mep_rate: 0 }
     assert_redirected_to glass_prices_url

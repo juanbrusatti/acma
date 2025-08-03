@@ -163,4 +163,68 @@ class DvhTest < ActiveSupport::TestCase
     assert_equal "V1", glasscutting.typology
     assert_equal "V2", dvh2.typology
   end
+
+  # Tests for new pricing system
+  test "ensure_price_is_set uses frontend price when available" do
+    # Use fixtures for supplies and create glass prices for glasscuttings
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+    GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
+
+    # Set a frontend-calculated price
+    frontend_price = 500.75
+    @dvh.price = frontend_price
+
+    assert @dvh.save!
+    assert_equal frontend_price, @dvh.price
+  end
+
+  test "ensure_price_is_set calculates backend price when no frontend price" do
+    # Use fixtures for supplies and create glass prices for glasscuttings
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+    GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
+
+    # Don't set frontend price (should be nil)
+    @dvh.price = nil
+
+    assert @dvh.save!
+    
+    # Should calculate price based on innertube + glasscuttings
+    assert @dvh.price.present?
+    assert @dvh.price > 0
+  end
+
+  test "pricing system works end to end in project creation" do
+    # Use fixtures for supplies and create glass prices
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+    GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
+
+    # Create project with DVH (simulating form submission)
+    project = Project.create!(
+      name: "Test Project",
+      phone: "123456789", 
+      description: "Test"
+    )
+
+    # Create DVH without frontend price (backend should calculate)
+    dvh = project.dvhs.create!(
+      innertube: "6",
+      location: "DINTEL",
+      height: 1000,
+      width: 800,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "FLO",
+      glasscutting2_thickness: "4+4",
+      glasscutting2_color: "GRS"
+    )
+
+    # DVH should have a calculated price
+    assert dvh.price.present?
+    assert dvh.price > 0
+    
+    # Price should include both glass and innertube costs
+    expected_glass_cost = 0.8 * (100.0 + 150.0) # 200
+    assert dvh.price >= expected_glass_cost, "Price should at least include glass costs"
+  end
 end

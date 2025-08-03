@@ -1,26 +1,38 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: Aluminum Profile
-  price_usd: 15.50
-  price_peso: 18600.00
-
-two:
-  name: Glass Sealant
-  price_usd: 8.75
-  price_peso: 10500.00
-
+# Basic supplies for innertube pricing (BASICS supplies)
 tamiz:
-  name: Tamiz
-  price_usd: 5.00
-  price_peso: 6000.00
+  name: "Tamiz"
+  price_usd: 5.0
+  price_peso: 0.0
 
 hotmelt:
-  name: Hotmelt
-  price_usd: 12.30
-  price_peso: 14760.00
+  name: "Hotmelt"
+  price_usd: 3.0
+  price_peso: 0.0
 
 cinta:
-  name: Cinta
-  price_usd: 3.25
-  price_peso: 3900.00
+  name: "Cinta"
+  price_usd: 2.0
+  price_peso: 0.0
+
+angulos:
+  name: "Angulos"
+  price_usd: 1.5
+  price_peso: 0.0
+
+perfil_separador:
+  name: "Perfil separador"
+  price_usd: 4.0
+  price_peso: 0.0
+
+# Additional test supplies
+aluminum_profile:
+  name: "Aluminum Profile"
+  price_usd: 15.50
+  price_peso: 0.0
+
+glass_sealant:
+  name: "Glass Sealant"
+  price_usd: 8.75
+  price_peso: 0.0

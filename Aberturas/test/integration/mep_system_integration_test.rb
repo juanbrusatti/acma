@@ -13,8 +13,67 @@ class MepSystemIntegrationTest < ActionDispatch::IntegrationTest
     patch update_all_supplies_mep_glass_prices_url, params: { mep_rate: initial_mep_rate }
     assert_redirected_to glass_prices_url
     
-    # Verify rate was stored
-    assert_equal initial_mep_rate, AppConfig.current_mep_rate
+        # Verify MEP rate was stored
+    assert_equal 1200.0, AppConfig.current_mep_rate
+  end
+
+  test "MEP system calculates camera prices when rate is updated" do
+    AppConfig.delete_all
+    Supply.delete_all
+    
+    # Create basic supplies with exact values
+    Supply.create!(name: "Tamiz", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Hotmelt", price_usd: 7.0, price_peso: 0.0)
+    Supply.create!(name: "Cinta", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Angulos", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Perfil separador", price_usd: 3.0, price_peso: 0.0)
+    
+    # Update MEP rate - this will automatically recalculate peso prices and innertube prices
+    patch update_all_supplies_mep_glass_prices_url, params: { mep_rate: 1500.0 }
+    assert_redirected_to glass_prices_url
+    
+    # Verify camera prices were calculated correctly based on actual supply costs
+    # These values come from the real calculation using supply prices
+    expected_prices = {
+      6 => 20055.0,   # Real calculated value with MEP 1500.0
+      9 => 20415.0,   # Real calculated value with MEP 1500.0
+      12 => 20722.5,  # Real calculated value with MEP 1500.0
+      20 => 21045.0   # Real calculated value with MEP 1500.0
+    }
+    
+    expected_prices.each do |size, expected_price|
+      actual_price = AppConfig.get_innertube_price(size)
+      assert_equal expected_price, actual_price, "Camera #{size}mm should cost $#{expected_price}, got $#{actual_price}"
+    end
+  end
+
+  test "camera prices are recalculated when MEP rate changes" do
+    AppConfig.delete_all
+    Supply.delete_all
+    
+    # Create basic supplies with exact values
+    Supply.create!(name: "Tamiz", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Hotmelt", price_usd: 7.0, price_peso: 0.0)
+    Supply.create!(name: "Cinta", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Angulos", price_usd: 5.0, price_peso: 0.0)
+    Supply.create!(name: "Perfil separador", price_usd: 3.0, price_peso: 0.0)
+    
+    # Set initial MEP rate
+    AppConfig.set_mep_rate(1000.0)
+    
+    # Update to new MEP rate
+    patch update_all_supplies_mep_glass_prices_url, params: { mep_rate: 1200.0 }
+    
+    # Verify new camera prices based on real calculations with MEP 1200.0
+    assert_equal 16044.0, AppConfig.get_innertube_price(6)   # Real calculated value
+    assert_equal 16332.0, AppConfig.get_innertube_price(9)   # Real calculated value  
+    assert_equal 16578.0, AppConfig.get_innertube_price(12)  # Real calculated value
+    assert_equal 16836.0, AppConfig.get_innertube_price(20)  # Real calculated value
+  end
+
+  test "supplies automatic peso conversion workflow" do
+    # Step 1: Set MEP rate first
+    AppConfig.set_mep_rate(1200.0)
     
     # Step 2: Create supplies with USD prices
     supply1 = Supply.create!(name: "Aluminum Profile", price_usd: 15.50)
