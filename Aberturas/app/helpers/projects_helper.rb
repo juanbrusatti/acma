@@ -61,6 +61,10 @@ module ProjectsHelper
     end
   end
 
+  def project_status_badge_html(status)
+    render partial: "projects/partials/status_badge", locals: { status: status }, formats: [:html]
+  end
+
   # Serialize project data for JSON responses
   def project_json_data(project)
     project.as_json(
@@ -68,15 +72,6 @@ module ProjectsHelper
       include: { 
         glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } 
       }
-    )
-  end
-
-  # Generate status badge HTML for AJAX responses
-  def project_status_badge_html(status)
-    render_to_string(
-      partial: "projects/partials/status_badge", 
-      locals: { status: status }, 
-      formats: [:html]
     )
   end
 end

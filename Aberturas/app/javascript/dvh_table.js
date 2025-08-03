@@ -99,8 +99,8 @@ export function handleDvhEvents(e) {
       color: values.glasscutting2_color
     };
     
-    // Calculate total price for both glass panes
-    const price = getDvhTotalGlassPrice(height, width, glass1, glass2);
+    // Calculate total price for both glass panes plus innertube
+    const price = getDvhTotalGlassPrice(height, width, glass1, glass2, values.innertube);
     
     // Create new table row
     const tr = document.createElement("tr");
@@ -129,18 +129,23 @@ export function handleDvhEvents(e) {
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "dvh-hidden-row";
+    // Use DVH counter as unique index for nested attributes
+    const index = dvhIdCounter;
+    
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][location]" value="${values.location || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][innertube]" value="${values.innertube || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][location]" value="${values.location || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][price]" value="${price.toFixed(2)}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
     `;
+    
     document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
     
     // Increment counter and remove form container
@@ -196,16 +201,37 @@ export function getDvhGlassPriceM2(type, thickness, color) {
   return found ? found.selling_price : 0;
 }
 
-// Calculates total price for DVH unit with two glass panes
-// Takes dimensions and specifications for both glass layers
-export function getDvhTotalGlassPrice(height, width, glass1, glass2) {
-  // Calculate area in square meters
+// Calculate total innertube price including 4 fixed angles
+// This matches the Ruby calculation in AppConfig.calculate_innertube_total_price
+export function calculateInnertubeTotal(innertubeSize, perimeterM) {
+  // Get price per linear meter (without angles)
+  const pricePerMeter = window.INNERTUBE_PRICES ? (window.INNERTUBE_PRICES[innertubeSize] || 0) : 0;
+  const linearCost = perimeterM * pricePerMeter;
+  
+  // Add fixed cost of 4 angles per DVH
+  const anglePrice = window.SUPPLY_PRICES ? (window.SUPPLY_PRICES['Angulos'] || 0) : 0;
+  const anglesCost = anglePrice * 4;  // Always 4 angles per DVH
+  
+  return linearCost + anglesCost;
+}
+
+// Calculates total price for DVH unit with two glass panes plus innertube cost
+// Takes dimensions, specifications for both glass layers, and innertube size
+export function getDvhTotalGlassPrice(height, width, glass1, glass2, innertubeSize) {
+  // Calculate area in square meters for glass
   const area = (height * width) / 1000000;
+  
+  // Calculate perimeter in linear meters for innertube
+  const perimeter = 2 * ((height / 1000) + (width / 1000));
 
   // Get price per square meter for each glass pane
   const price1 = getDvhGlassPriceM2(glass1.type, glass1.thickness, glass1.color);
   const price2 = getDvhGlassPriceM2(glass2.type, glass2.thickness, glass2.color);
 
-  // Return total price for both glass panes combined
-  return area * (price1 + price2);
+  // Calculate total prices
+  const glassPrice = area * (price1 + price2);
+  const innertubePrice = calculateInnertubeTotal(innertubeSize, perimeter);
+
+  // Return total price for glass panes plus innertube (including 4 angles)
+  return glassPrice + innertubePrice;
 }

@@ -21,4 +21,18 @@ module GlassPricesHelper
     return 0 if buying_price.blank? || margin_percentage.blank?
     buying_price * (1 + margin_percentage / 100.0)
   end
+
+  # Format innertube price for display
+  def format_innertube_price(size)
+    price = AppConfig.get_innertube_price(size)
+    return "No establecido" if price.blank? || price.zero?
+    number_to_currency(price, unit: "$", precision: 2)
+  end
+
+  # Get all innertube prices formatted for display
+  def formatted_innertube_prices
+    AppConfig.get_all_innertube_prices.transform_values do |price|
+      price > 0 ? number_to_currency(price, unit: "$", precision: 2) : "No establecido"
+    end
+  end
 end

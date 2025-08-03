@@ -110,6 +110,9 @@ class GlassPricesController < ApplicationController
         supply.update_peso_price_from_usd!(mep_rate)
       end
       
+      # Calculate and save innertube prices based on current supply prices
+      AppConfig.update_all_innertube_prices
+      
       respond_to do |format|
         format.html { redirect_to glass_prices_path, notice: "Dólar MEP actualizado correctamente." }
         format.json { render json: { success: true, message: "Dólar MEP actualizado correctamente." } }

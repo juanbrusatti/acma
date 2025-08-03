@@ -111,13 +111,16 @@ export function handleGlasscuttingEvents(e) {
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "glasscutting-hidden-row";
+    // Use glasscutting counter as unique index for nested attributes
+    const index = glasscuttingIdCounter;
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][location]" value="${values.location || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][glass_type]" value="${values.glass_type || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][thickness]" value="${values.thickness || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][color]" value="${values.color || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][location]" value="${values.location || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${index}][price]" value="${price.toFixed(2)}">
     `;
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     

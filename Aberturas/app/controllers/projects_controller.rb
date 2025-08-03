@@ -14,6 +14,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(project_params)
     puts project_params.inspect
+    
     if @project.save
       redirect_to projects_path, notice: "Proyecto creado exitosamente."
     else
@@ -36,7 +37,6 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
         format.json {
-          # Habria que guardar el precio 
           render json: {
             success: true,
             project: helpers.project_json_data(@project),
