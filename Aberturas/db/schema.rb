@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_01_200409) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_004618) do
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
