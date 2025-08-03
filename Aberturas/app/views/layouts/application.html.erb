@@ -54,6 +54,10 @@
           percentage: gp.percentage.to_f
         }
       }.to_json.html_safe %>;
+      
+      window.INNERTUBE_PRICES = <%= AppConfig.get_all_innertube_prices.to_json.html_safe %>;
+      
+      window.SUPPLY_PRICES = <%= Supply.all.pluck(:name, :price_peso).to_h.to_json.html_safe %>;
     </script>
   </body>
 </html>

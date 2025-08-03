@@ -1,5 +1,5 @@
 class Supply < ApplicationRecord
-  BASICS = ["Tamiz", "Hotmelt", "Cinta"]
+  BASICS = ["Tamiz", "Hotmelt", "Cinta", "Angulos", "Perfil separador"]
 
   # Validations
   validates :name, presence: true, uniqueness: true

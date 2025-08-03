@@ -21,33 +21,3 @@
     </tbody>
   </table>
 </div>
-
-<script>
-  // Inline editing functions for supply prices
-  function startEdit(supplyId) {
-    // Hide price display and edit button
-    document.getElementById('price_display_' + supplyId).style.display = 'none';
-    document.getElementById('edit_btn_' + supplyId).style.display = 'none';
-    
-    // Show edit form
-    document.getElementById('edit_form_' + supplyId).classList.remove('hidden');
-    document.getElementById('edit_form_' + supplyId).classList.add('flex');
-    
-    // Focus on input field
-    const input = document.querySelector('#edit_form_' + supplyId + ' input[type="number"]');
-    if (input) {
-      input.focus();
-      input.select();
-    }
-  }
-  
-  function cancelEdit(supplyId) {
-    // Show price display and edit button
-    document.getElementById('price_display_' + supplyId).style.display = 'inline';
-    document.getElementById('edit_btn_' + supplyId).style.display = 'inline-flex';
-    
-    // Hide edit form
-    document.getElementById('edit_form_' + supplyId).classList.add('hidden');
-    document.getElementById('edit_form_' + supplyId).classList.remove('flex');
-  }
-</script>

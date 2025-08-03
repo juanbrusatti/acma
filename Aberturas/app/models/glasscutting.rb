@@ -34,9 +34,20 @@ class Glasscutting < ApplicationRecord
     message: "La ubicación del vidrio no es valida"
   }
 
-  before_save :set_price 
+  before_save :ensure_price_is_set
 
-  def set_price
+  private
+
+  # Ensure glasscutting has a price - either from frontend or calculated here
+  def ensure_price_is_set
+    Rails.logger.debug "Glasscutting ensure_price_is_set: precio = #{price.inspect}"
+    return if price.present? && price > 0  # Price already set by frontend
+    
+    # Fallback: calculate price if not provided by frontend
+    set_price_from_backend
+  end
+
+  def set_price_from_backend
     Rails.logger.debug "Buscando precio para: tipo=#{glass_type.inspect}, espesor=#{thickness.inspect}, color=#{color.inspect}"
     price_record = GlassPrice.find_by(glass_type: glass_type, thickness: thickness, color: color)
     if price_record.nil?
@@ -63,5 +74,4 @@ class Glasscutting < ApplicationRecord
   def update_project_typologies
     project.send(:assign_typologies) if project
   end
-
 end
