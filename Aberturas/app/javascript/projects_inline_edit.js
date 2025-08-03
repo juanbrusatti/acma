@@ -33,8 +33,8 @@ export function setupProjectEditInline() {
     document.querySelectorAll('.glass-thickness-edit').forEach(e => e.style.display = editing ? '' : 'none');
     document.querySelectorAll('.glass-color-view').forEach(e => e.style.display = editing ? 'none' : '');
     document.querySelectorAll('.glass-color-edit').forEach(e => e.style.display = editing ? '' : 'none');
-    document.querySelectorAll('.glass-location-view').forEach(e => e.style.display = editing ? 'none' : '');
-    document.querySelectorAll('.glass-location-edit').forEach(e => e.style.display = editing ? '' : 'none');
+    document.querySelectorAll('.glass-typology-view').forEach(e => e.style.display = editing ? 'none' : '');
+    document.querySelectorAll('.glass-typology-edit').forEach(e => e.style.display = editing ? '' : 'none');
     document.querySelectorAll('.glass-height-view').forEach(e => e.style.display = editing ? 'none' : '');
     document.querySelectorAll('.glass-height-edit').forEach(e => e.style.display = editing ? '' : 'none');
     document.querySelectorAll('.glass-width-view').forEach(e => e.style.display = editing ? 'none' : '');
@@ -74,7 +74,7 @@ export function setupProjectEditInline() {
         glass_type: row.querySelector('.glass-type-edit').value,
         thickness: row.querySelector('.glass-thickness-edit').value,
         color: row.querySelector('.glass-color-edit').value,
-        location: row.querySelector('.glass-location-edit').value,
+        typology: row.querySelector('.glass-typology-edit').value,
         height: row.querySelector('.glass-height-edit').value,
         width: row.querySelector('.glass-width-edit').value
       });
