@@ -29,11 +29,10 @@ export function ensureGlasscuttingTable() {
     glasscuttingTable.innerHTML = `
       <thead>
         <tr class='bg-gray-50 text-gray-500'>
-          <th class='px-2 py-1 text-left'>ID</th>
+          <th class='px-2 py-1 text-left'>TIPOLOGIA</th>
           <th class='px-2 py-1 text-left'>TIPO</th>
           <th class='px-2 py-1 text-left'>GROSOR</th>
           <th class='px-2 py-1 text-left'>COLOR</th>
-          <th class='px-2 py-1 text-left'>TIPOLOGIA</th>
           <th class='px-2 py-1 text-left'>ALTO</th>
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>PRECIO</th>
@@ -102,11 +101,10 @@ export function handleGlasscuttingEvents(e) {
     
     // Populate row with data and delete button
     tr.innerHTML = `
-      <td class='px-2 py-1'>${glasscuttingIdCounter}</td>
+      <td class='px-2 py-1'>${values.typology || ''}</td>
       <td class='px-2 py-1'>${values.glass_type || ''}</td>
       <td class='px-2 py-1'>${values.thickness || ''}</td>
       <td class='px-2 py-1'>${values.color || ''}</td>
-      <td class='px-2 py-1'>${values.typology || ''}</td>
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${price || ''}</td>
@@ -123,10 +121,10 @@ export function handleGlasscuttingEvents(e) {
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "glasscutting-hidden-row";
     hiddenDiv.innerHTML = `
+      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
     `;

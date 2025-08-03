@@ -33,6 +33,15 @@
 <template id="glasscutting-template">
   <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
     <div>
+      <label>Tipología</label>
+      <div class="flex items-center border rounded px-2 py-1">
+        <span class="text-gray-700 font-medium mr-1">V</span>
+        <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
+               oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
+        <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
+      </div>
+    </div>
+    <div>
       <label>Tipo</label>
       <select name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1 glass-type-select">
         <option value="">Seleccionar</option>
@@ -61,15 +70,6 @@
         <option value="">Seleccionar</option>
       </select>
     </div>
-    <div>
-      <label>Tipología</label>
-      <div class="flex items-center border rounded px-2 py-1">
-        <span class="text-gray-700 font-medium mr-1">V</span>
-        <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
-               oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
-        <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
-      </div>
-    </div>
     <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
       <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
       <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
@@ -86,6 +86,15 @@
     <!--  First row: basic DVH information (innertube, typology, width, height) -->
     <div class="grid grid-cols-5 gap-4">
       <div>
+        <label>Tipología</label>
+        <div class="flex items-center border rounded px-2 py-1">
+          <span class="text-gray-700 font-medium mr-1">V</span>
+          <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
+                 oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
+          <input type="hidden" name="project[dvhs_attributes][][typology]" class="typology-hidden-field" value="" />
+        </div>
+      </div>
+      <div>
         <label>Cámara</label>
         <select name="project[dvhs_attributes][][innertube]" class="w-full border rounded px-2 py-1">
           <option value="">Seleccionar</option>
@@ -94,15 +103,6 @@
           <option value="12">12</option>
           <option value="20">20</option>
         </select>
-      </div>
-      <div>
-        <label>Tipología</label>
-        <div class="flex items-center border rounded px-2 py-1">
-          <span class="text-gray-700 font-medium mr-1">V</span>
-          <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
-                 oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
-          <input type="hidden" name="project[dvhs_attributes][][typology]" class="typology-hidden-field" value="" />
-        </div>
       </div>
       <div>
         <label>Ancho</label>
