@@ -9,7 +9,7 @@ es:
         delivery_date: ""
       dvh:
         innertube: ""
-        location: ""
+        typology: ""
         height: ""
         width: ""
         glasscutting1_type: ""
@@ -24,7 +24,7 @@ es:
         height: ""
         width: ""
         color: ""
-        location: ""
+        typology: ""
         price: ""
       glasscuttings:
         glass_type: ""
@@ -32,7 +32,7 @@ es:
         height: ""
         width: ""
         color: ""
-        location: ""
+        typology: ""
         price: ""
     models:
       glasscutting: ""

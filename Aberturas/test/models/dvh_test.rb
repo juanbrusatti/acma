@@ -6,7 +6,7 @@ class DvhTest < ActiveSupport::TestCase
     @dvh = Dvh.new(
       project: @project,
       innertube: "6",
-      location: "DINTEL",
+      typology: "V1",
       height: 1000,
       width: 800,
       glasscutting1_type: "LAM",
@@ -30,10 +30,10 @@ class DvhTest < ActiveSupport::TestCase
     assert_includes @dvh.errors[:innertube], "La camara del vidrio no es valida"
   end
 
-  test "should require location" do
-    @dvh.location = nil
+  test "should require typology" do
+    @dvh.typology = nil
     assert_not @dvh.valid?
-    assert_includes @dvh.errors[:location], "La ubicación del vidrio no es valida"
+    assert_includes @dvh.errors[:typology], "La tipología del DVH no puede estar en blanco"
   end
 
   test "should require height and width" do
@@ -44,10 +44,14 @@ class DvhTest < ActiveSupport::TestCase
     assert_includes @dvh.errors[:width], "El ancho del vidrio no puede estar en blanco"
   end
 
-  test "should validate location inclusion" do
-    @dvh.location = "INVALID_LOCATION"
-    assert_not @dvh.valid?
-    assert_includes @dvh.errors[:location], "La ubicación del vidrio no es valida"
+  test "should allow any typology format" do
+    # Test various typology formats
+    valid_typologies = ["V1", "V10", "V123", "V5", "Custom1", "ABC123"]
+    
+    valid_typologies.each do |typology|
+      @dvh.typology = typology
+      assert @dvh.valid?, "Typology '#{typology}' should be valid"
+    end
   end
 
   test "should validate innertube inclusion" do
@@ -89,14 +93,14 @@ class DvhTest < ActiveSupport::TestCase
 
     # Create a glasscutting first
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
       height: 100, width: 50, price: 100.0
     )
 
     # Create DVH
     dvh = project.dvhs.create!(
       innertube: 9,
-      location: "DINTEL",
+      typology: "V2",
       height: 150,
       width: 100,
       glasscutting1_type: "LAM",
@@ -117,7 +121,7 @@ class DvhTest < ActiveSupport::TestCase
     assert_equal "V2", dvh.typology
   end
 
-  test "should trigger typology update on destroy" do
+  test "should maintain typology on destroy" do
     project = Project.create!(
       name: "Test Project",
       phone: "123456789",
@@ -126,19 +130,19 @@ class DvhTest < ActiveSupport::TestCase
 
     # Create glasscutting and two DVHs
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
       height: 100, width: 50, price: 100.0
     )
 
     dvh1 = project.dvhs.create!(
-      innertube: 9, location: "DINTEL", height: 150, width: 100,
+      innertube: 9, typology: "V2", height: 150, width: 100,
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
       price: 300.0
     )
 
     dvh2 = project.dvhs.create!(
-      innertube: 12, location: "JAMBA_I", height: 200, width: 150,
+      innertube: 12, typology: "V3", height: 200, width: 150,
       glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
       glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
       price: 400.0
@@ -157,11 +161,11 @@ class DvhTest < ActiveSupport::TestCase
     # Destroy first DVH
     dvh1.destroy!
 
-    # Second DVH should become V2
+    # Second DVH should keep its typology unchanged
     glasscutting.reload
     dvh2.reload
     assert_equal "V1", glasscutting.typology
-    assert_equal "V2", dvh2.typology
+    assert_equal "V3", dvh2.typology
   end
 
   # Tests for new pricing system

@@ -10,8 +10,49 @@
   </div>
   <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
     <div class="px-8 pt-8 pb-4 border-b border-gray-100 rounded-t-2xl">
-      <h2 class="text-3xl font-bold mb-1 text-gray-900">Listado de Proyectos</h2>
-      <p class="text-gray-400 text-base mb-2">Obras en curso, finalizadas y pendientes.</p>
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-3xl font-bold mb-1 text-gray-900">Listado de Proyectos</h2>
+          <p class="text-gray-400 text-base mb-2">Obras en curso, finalizadas y pendientes.</p>
+        </div>
+
+        <!-- Barra de búsqueda y filtro -->
+        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <%= form_tag projects_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full" do %>
+            <div class="relative w-full md:w-64">
+              <%= text_field_tag :search, params[:search], placeholder: "Buscar por nombre", class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="w-full md:w-auto">
+              <%= select_tag :status,
+                  options_for_select([
+                    ["Todos", "Todos"],
+                    ["Pendiente", "Pendiente"],
+                    ["En Proceso", "En Proceso"],
+                    ["Terminado", "Terminado"]
+                  ], selected: params[:status] || "Todos"),
+                  class: "border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
+                  onchange: "this.form.submit();"
+              %>
+            </div>
+
+            <div class="flex gap-2 w-full md:w-auto">
+              <!-- Botón oculto, solo visible en móvil o si hay búsqueda -->
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex-1">
+                Filtrar
+              </button>
+              <% if params[:search].present? || (params[:status].present? && params[:status] != "Todos") %>
+                <%= link_to "Limpiar", projects_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300 flex-1 text-center" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
     <div class="px-8 py-6 rounded-b-2xl">
       <table class="w-full rounded-2xl overflow-hidden text-base">
@@ -31,11 +72,31 @@
             <% end %>
           <% else %>
             <tr>
-              <td colspan="4" class="text-center py-10 text-gray-400">No hay proyectos cargados.</td>
+              <td colspan="5" class="text-center py-10 text-gray-400">
+                <% if params[:search].present? || params[:status].present? && params[:status] != "Todos" %>
+                  No se encontraron proyectos con los filtros aplicados.
+                <% else %>
+                  No hay proyectos cargados.
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>
       </table>
+      <div class="mt-10 flex flex-col items-center border-t border-gray-100 pt-6">
+        <div class="text-sm text-gray-500 mb-4">
+          <%= pagination_info(@projects) %>
+        </div>
+        <%= will_paginate @projects,
+          renderer: WillPaginate::ActionView::LinkRenderer,
+          class: "pagination",
+          previous_label: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
+          next_label: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>',
+          inner_window: 2,
+          outer_window: 1,
+          params: { search: params[:search], status: params[:status] }
+        %>
+      </div>
     </div>
   </div>
 </div>

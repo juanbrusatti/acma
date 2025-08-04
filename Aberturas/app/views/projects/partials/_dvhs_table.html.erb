@@ -1,43 +1,37 @@
-<%# Table displaying all DVH records for the project %>
+<%# Static table displaying all DVH (Double-glazed window) records for the project %>
 <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg border border-gray-200 shadow p-4 overflow-hidden">
   <thead class="bg-gray-50">
     <tr>
-      <%# Column headers: ID, Chamber, Location, Height, Width, Glass 1, Glass 2 %>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">TIPOLOGIA</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">UBICACIÓN</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
+      <%# Table headers: Typology, Chamber, Height, Width, Glass 1, Glass 2, Price %>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">TIPOLOGÍA</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 1</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 2</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">PRECIO</th>
     </tr>
   </thead>
   <tbody class="divide-y divide-gray-100" id="dvhs-table-body">
-    <%# Iterate over each DVH in the project and display its attributes %>
+    <%# Iterate through each DVH in the project and display its attributes %>
     <% project.dvhs.each_with_index do |dvh, idx| %>
       <tr>
-        <%# Typology (V1, V2, etc.) %>
-        <td class="text-center px-2 py-1 font-semibold">
-          <%= dvh.typology || "V#{project.glasscuttings.count + idx + 1}" %>
-        </td>
-        <%# Chamber (innertube) %>
-        <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
-        <%# Location %>
-        <td class="text-center px-2 py-1"><%= dvh.location %></td>
-        <%# Height %>
-        <td class="text-center px-2 py-1"><%= dvh.height %></td>
-        <%# Width %>
-        <td class="text-center px-2 py-1"><%= dvh.width %></td>
-        <%# Glass 1: type / thickness / color %>
+        <%# Typology - Free text field for custom window identification (V1, V2, V5, etc.) %>
+        <td class="text-center px-2 py-1"><%= dvh.typology %></td>
+        <%# Glass 1 specifications: combines type, thickness, and color with separators %>
         <td class="text-center px-2 py-1">
           <%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %>
         </td>
-        <%# Glass 2: type / thickness / color %>
+        <%# Glass 2 specifications: combines type, thickness, and color with separators %>
         <td class="text-center px-2 py-1">
           <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %>
         </td>
-        <%# Price %>
+        <%# Chamber size (innertube) in millimeters %>
+        <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
+        <%# Dimensions in millimeters %>
+        <td class="text-center px-2 py-1"><%= dvh.height %></td>
+        <td class="text-center px-2 py-1"><%= dvh.width %></td>
+        <%# Price formatted as currency if present %>
         <td class="text-center px-2 py-1">
           <%= number_to_currency(dvh.price, unit: "$", precision: 2) if dvh.price.present? %>
         </td>

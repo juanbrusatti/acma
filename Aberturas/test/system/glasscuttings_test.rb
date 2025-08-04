@@ -25,7 +25,7 @@ class GlasscuttingsTest < ApplicationSystemTestCase
       sleep(0.5) # Wait for JavaScript to populate dependent selects
       find(".glass-thickness-select").select("3+3")
       find(".glass-color-select").select("INC")
-      find(".glass-location-select").select("DINTEL")
+      find(".typology-number-input").fill_in with: "1"  # This will create "V1"
       find("input[name='project[glasscuttings_attributes][][height]']").fill_in with: "120"
       find("input[name='project[glasscuttings_attributes][][width]']").fill_in with: "100"
     end

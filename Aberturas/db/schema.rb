@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_004618) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
@@ -23,7 +23,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_004618) do
     t.integer "innertube"
     t.float "height"
     t.float "width"
-    t.string "location"
     t.decimal "price"
     t.string "glasscutting1_type"
     t.string "glasscutting1_thickness"
@@ -54,7 +53,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_004618) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.string "location"
     t.decimal "price"
     t.integer "project_id", null: false
     t.integer "dvh_id"

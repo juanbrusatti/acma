@@ -10,8 +10,22 @@ function handleAllEvents(e) {
   handleDvhEvents(e);
 }
 
+// Add input event listener for real-time typology updates
+function handleInputEvents(e) {
+  if (e.target.classList.contains('typology-number-input')) {
+    const container = e.target.closest('.glasscutting-fields, .dvh-fields');
+    if (container) {
+      const typologyHidden = container.querySelector('.typology-hidden-field');
+      if (typologyHidden) {
+        typologyHidden.value = e.target.value ? "V" + e.target.value : "";
+      }
+    }
+  }
+}
+
 if (!window._projectsFormEventRegistered) {
   document.addEventListener("click", handleAllEvents);
+  document.addEventListener("input", handleInputEvents);
   window._projectsFormEventRegistered = true;
 }
 
@@ -45,13 +59,21 @@ document.addEventListener('turbo:load', () => {
   }
 
   const newAddDvhBtn = document.getElementById('add-dvh');
+  console.log('DVH button found:', newAddDvhBtn);
   if (newAddDvhBtn) {
     newAddDvhBtn.addEventListener('click', () => {
-      const template = document.getElementById('dvh-template').content.cloneNode(true);
-      document.getElementById('dvhs-wrapper').appendChild(template);
+      console.log('DVH button clicked');
+      const template = document.getElementById('dvh-template');
+      console.log('DVH Template found:', template);
+      const templateContent = template.content.cloneNode(true);
+      console.log('DVH Template content:', templateContent);
+      const wrapper = document.getElementById('dvhs-wrapper');
+      console.log('DVH Wrapper found:', wrapper);
+      wrapper.appendChild(templateContent);
       setTimeout(() => {
         // Only the last added one
         const fields = document.querySelectorAll('.dvh-fields');
+        console.log('DVH Fields found:', fields.length);
         updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting1');
         updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting2');
       }, 0);

@@ -2,23 +2,11 @@ class Dvh < ApplicationRecord
   belongs_to :project
   #has_many :glasscuttings, dependent: :nullify
 
-  # Callbacks to update typologies when DVHs change
-  after_create :update_project_typologies
-  after_destroy :update_project_typologies
-
-  # Si usás glassplates como modelos separados, agregalos también
-  # belongs_to :glassplate1, class_name: "Glassplate", optional: true
-  # belongs_to :glassplate2, class_name: "Glassplate", optional: true
-
   validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }
   validates :width, presence: { message: "El ancho del vidrio no puede estar en blanco" }
   validates :height, numericality: { greater_than: 0, message: "El alto debe ser mayor que 0" }
   validates :width, numericality: { greater_than: 0, message: "El ancho debe ser mayor que 0" }
-
-  validates :location, inclusion: {
-    in: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"],
-    message: "La ubicación del vidrio no es valida",
-  }
+  validates :typology, presence: { message: "La tipología del DVH no puede estar en blanco" }
 
   validates :innertube, inclusion: {
     in: [6, 9, 12, 20],
