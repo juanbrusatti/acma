@@ -17,15 +17,15 @@ class StaticPagesController < ApplicationController
 
   def load_stock_data
     {
-      total_sheets: 1250,
-      available_scraps: 320
+      total_sheets: Glassplate.complete_sheets.count,
+      available_scraps: Glassplate.scraps.count,
     }
   end
 
   def load_projects_data
     {
-      active_projects: 12,
-      completed_this_month: 3
+      active_projects: Project.where(status: 'En Proceso').count,
+      completed_this_month: Project.where(status: 'Terminado', updated_at: Time.current.beginning_of_month..Time.current.end_of_month).count
     }
   end
 end
