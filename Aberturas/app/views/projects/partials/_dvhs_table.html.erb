@@ -4,11 +4,11 @@
     <tr>
       <%# Table headers: Typology, Chamber, Height, Width, Glass 1, Glass 2, Price %>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">TIPOLOGÍA</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 1</th>
+      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 2</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 1</th>
-      <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">CRISTAL 2</th>
       <th class="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase">PRECIO</th>
     </tr>
   </thead>
@@ -18,11 +18,6 @@
       <tr>
         <%# Typology - Free text field for custom window identification (V1, V2, V5, etc.) %>
         <td class="text-center px-2 py-1"><%= dvh.typology %></td>
-        <%# Chamber size (innertube) in millimeters %>
-        <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
-        <%# Dimensions in millimeters %>
-        <td class="text-center px-2 py-1"><%= dvh.height %></td>
-        <td class="text-center px-2 py-1"><%= dvh.width %></td>
         <%# Glass 1 specifications: combines type, thickness, and color with separators %>
         <td class="text-center px-2 py-1">
           <%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %>
@@ -31,6 +26,11 @@
         <td class="text-center px-2 py-1">
           <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %>
         </td>
+        <%# Chamber size (innertube) in millimeters %>
+        <td class="text-center px-2 py-1"><%= dvh.innertube %></td>
+        <%# Dimensions in millimeters %>
+        <td class="text-center px-2 py-1"><%= dvh.height %></td>
+        <td class="text-center px-2 py-1"><%= dvh.width %></td>
         <%# Price formatted as currency if present %>
         <td class="text-center px-2 py-1">
           <%= number_to_currency(dvh.price, unit: "$", precision: 2) if dvh.price.present? %>

@@ -29,9 +29,8 @@ export function ensureDvhTable() {
     dvhTable.innerHTML = `
       <thead>
         <tr class='bg-gray-50 text-gray-500'>
-          <th class='px-2 py-1 text-left'>ID</th>
-          <th class='px-2 py-1 text-left'>CÁMARA</th>
           <th class='px-2 py-1 text-left'>TIPOLOGÍA</th>
+          <th class='px-2 py-1 text-left'>CÁMARA</th>
           <th class='px-2 py-1 text-left'>ALTO</th>
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>CRISTAL 1</th>
@@ -116,9 +115,8 @@ export function handleDvhEvents(e) {
     
     // Populate row with DVH data and delete button
     tr.innerHTML = `
-      <td class='px-2 py-1'>${dvhIdCounter}</td>
-      <td class='px-2 py-1'>${values.innertube || ''}</td>
       <td class='px-2 py-1'>${values.typology || ''}</td>
+      <td class='px-2 py-1'>${values.innertube || ''}</td>
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
@@ -138,8 +136,8 @@ export function handleDvhEvents(e) {
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "dvh-hidden-row";
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
       <input type="hidden" name="project[dvhs_attributes][][typology]" value="${values.typology || ''}">
+      <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
       <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
       <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
       <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
