@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-3xl font-bold" id="project-name-view"><%= @project.name %></h1>
     <%= link_to pdf_project_path(@project, format: :pdf), class: "ml-auto inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-9 w-9 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
-      <%= image_tag "download.svg", class: "w-6 h-6", alt: "Descargar PDF" %>
+      <%= image_tag "/download.svg", class: "w-6 h-6", alt: "Descargar PDF" %>
     <% end %>
   </div>
   <input type="text" id="project-name-edit" value="<%= @project.name %>" style="display:none;" class="text-3xl font-bold mb-4 w-full border rounded px-2 py-1" />
