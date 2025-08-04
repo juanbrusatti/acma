@@ -3,9 +3,10 @@
 one:
   height: 1.5
   width: 1.5
-  color: MyString
-  glass_type: MyString
-  location: MyString
+  color: INC
+  glass_type: LAM
+  thickness: 3+3
+  typology: V1
   price: 9.99
   project: one
   #glassplate: one
@@ -13,9 +14,10 @@ one:
 two:
   height: 1.5
   width: 1.5
-  color: MyString
-  glass_type: MyString
-  location: MyString
+  color: GRS
+  glass_type: FLO
+  thickness: 4+4
+  typology: V2
   price: 9.99
   project: two
   #glassplate: two

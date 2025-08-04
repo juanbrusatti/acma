@@ -10,7 +10,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       height: 1000,
       width: 800,
       color: "INC",
-      location: "DINTEL"
+      typology: "V1"
     )
   end
 
@@ -36,10 +36,10 @@ class GlasscuttingTest < ActiveSupport::TestCase
     assert_includes @glasscutting.errors[:color], "El color del vidrio no puede estar en blanco"
   end
 
-  test "should require location" do
-    @glasscutting.location = nil
+  test "should require typology" do
+    @glasscutting.typology = nil
     assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:location], "La ubicación del vidrio no puede estar en blanco"
+    assert_includes @glasscutting.errors[:typology], "La tipología del vidrio no puede estar en blanco"
   end
 
   test "should require height and width" do
@@ -68,11 +68,14 @@ class GlasscuttingTest < ActiveSupport::TestCase
     assert_includes @glasscutting.errors[:color], "Color de vidrio no valido"
   end
 
-  test "should validate location inclusion" do
-    @glasscutting.location = "INVALID"
-    assert_not @glasscutting.valid?
-    assert_includes @glasscutting.errors[:location], "La ubicación del vidrio no es valida"
-
+  test "should allow any typology format" do
+    # Test various typology formats
+    valid_typologies = ["V1", "V10", "V123", "V5", "Custom1", "ABC123"]
+    
+    valid_typologies.each do |typology|
+      @glasscutting.typology = typology
+      assert @glasscutting.valid?, "Typology '#{typology}' should be valid"
+    end
   end
 
   test "should trigger typology update on create" do
@@ -87,7 +90,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       glass_type: "LAM",
       thickness: "4+4",
       color: "INC",
-      location: "DINTEL",
+      typology: "V1",
       height: 100,
       width: 50,
       price: 100.0
@@ -102,7 +105,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       glass_type: "FLO",
       thickness: "3+3",
       color: "GRS",
-      location: "JAMBA_I",
+      typology: "V2",
       height: 200,
       width: 75,
       price: 200.0
@@ -115,7 +118,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
     assert_equal "V2", glasscutting2.typology
   end
 
-  test "should trigger typology update on destroy" do
+  test "should maintain typology on destroy" do
     project = Project.create!(
       name: "Test Project",
       phone: "123456789",
@@ -124,12 +127,12 @@ class GlasscuttingTest < ActiveSupport::TestCase
 
     # Create two glasscuttings
     glasscutting1 = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
       height: 100, width: 50, price: 100.0
     )
     
     glasscutting2 = project.glasscuttings.create!(
-      glass_type: "FLO", thickness: "3+3", color: "GRS", location: "JAMBA_I",
+      glass_type: "FLO", thickness: "3+3", color: "GRS", typology: "V2",
       height: 200, width: 75, price: 200.0
     )
 
@@ -144,8 +147,8 @@ class GlasscuttingTest < ActiveSupport::TestCase
     # Destroy first glasscutting
     glasscutting1.destroy!
 
-    # Second glasscutting should become V1
+    # Second glasscutting should keep its typology unchanged
     glasscutting2.reload
-    assert_equal "V1", glasscutting2.typology
+    assert_equal "V2", glasscutting2.typology
   end
 end

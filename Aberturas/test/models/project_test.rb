@@ -17,7 +17,7 @@ class ProjectTest < ActiveSupport::TestCase
       glass_type: "LAM",
       thickness: "4+4",
       color: "INC",
-      location: "DINTEL",
+      typology: "V1",
       height: 100,
       width: 50,
       price: 100.0
@@ -27,7 +27,7 @@ class ProjectTest < ActiveSupport::TestCase
       glass_type: "FLO",
       thickness: "3+3",
       color: "GRS",
-      location: "JAMBA_I",
+      typology: "V2",
       height: 200,
       width: 75,
       price: 200.0
@@ -36,7 +36,7 @@ class ProjectTest < ActiveSupport::TestCase
     # Create DVH
     dvh = project.dvhs.create!(
       innertube: 9,
-      location: "DINTEL",
+      typology: "V3",
       height: 150,
       width: 100,
       glasscutting1_type: "LAM",
@@ -62,7 +62,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal "V3", dvh.typology
   end
 
-  test "should reassign typologies when glasscutting is deleted" do
+  test "should maintain typologies when glasscutting is deleted" do
     project = Project.create!(
       name: "Test Project",
       phone: "123456789",
@@ -71,17 +71,17 @@ class ProjectTest < ActiveSupport::TestCase
 
     # Create glasscuttings
     glasscutting1 = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
       height: 100, width: 50, price: 100.0
     )
     
     glasscutting2 = project.glasscuttings.create!(
-      glass_type: "FLO", thickness: "3+3", color: "GRS", location: "JAMBA_I",
+      glass_type: "FLO", thickness: "3+3", color: "GRS", typology: "V2",
       height: 200, width: 75, price: 200.0
     )
 
     dvh = project.dvhs.create!(
-      innertube: 9, location: "DINTEL", height: 150, width: 100,
+      innertube: 9, typology: "V3", height: 150, width: 100,
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
       price: 300.0
@@ -105,12 +105,12 @@ class ProjectTest < ActiveSupport::TestCase
     glasscutting2.reload
     dvh.reload
 
-    # Assert typologies are reassigned
-    assert_equal "V1", glasscutting2.typology
-    assert_equal "V2", dvh.typology
+    # Assert typologies remain unchanged
+    assert_equal "V2", glasscutting2.typology
+    assert_equal "V3", dvh.typology
   end
 
-  test "should reassign typologies when dvh is deleted" do
+  test "should maintain typologies when dvh is deleted" do
     project = Project.create!(
       name: "Test Project",
       phone: "123456789",
@@ -118,19 +118,19 @@ class ProjectTest < ActiveSupport::TestCase
     )
 
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
       height: 100, width: 50, price: 100.0
     )
 
     dvh1 = project.dvhs.create!(
-      innertube: 9, location: "DINTEL", height: 150, width: 100,
+      innertube: 9, typology: "V2", height: 150, width: 100,
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
       price: 300.0
     )
 
     dvh2 = project.dvhs.create!(
-      innertube: 12, location: "JAMBA_I", height: 200, width: 150,
+      innertube: 12, typology: "V3", height: 200, width: 150,
       glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
       glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
       price: 400.0
@@ -154,8 +154,8 @@ class ProjectTest < ActiveSupport::TestCase
     glasscutting.reload
     dvh2.reload
 
-    # Assert typologies are reassigned
+    # Assert typologies remain unchanged
     assert_equal "V1", glasscutting.typology
-    assert_equal "V2", dvh2.typology
+    assert_equal "V3", dvh2.typology
   end
 end

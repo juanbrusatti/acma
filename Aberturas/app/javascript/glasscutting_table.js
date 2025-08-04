@@ -33,7 +33,7 @@ export function ensureGlasscuttingTable() {
           <th class='px-2 py-1 text-left'>TIPO</th>
           <th class='px-2 py-1 text-left'>GROSOR</th>
           <th class='px-2 py-1 text-left'>COLOR</th>
-          <th class='px-2 py-1 text-left'>UBICACIÓN</th>
+          <th class='px-2 py-1 text-left'>TIPOLOGIA</th>
           <th class='px-2 py-1 text-left'>ALTO</th>
           <th class='px-2 py-1 text-left'>ANCHO</th>
           <th class='px-2 py-1 text-left'>PRECIO</th>
@@ -68,12 +68,23 @@ export function handleGlasscuttingEvents(e) {
   // CONFIRM: Add new glass cutting entry to table
   if (e.target.classList.contains("confirm-glass")) {
     const container = e.target.closest(".glasscutting-fields");
+    
+    // Before processing, ensure typology hidden field is updated
+    const typologyNumberInput = container.querySelector('.typology-number-input');
+    const typologyHidden = container.querySelector('.typology-hidden-field');
+    if (typologyNumberInput && typologyHidden && typologyNumberInput.value) {
+      typologyHidden.value = "V" + typologyNumberInput.value;
+    }
+    
     const inputs = container.querySelectorAll("input, select");
     
     // Extract values from form inputs
     const values = {};
     inputs.forEach(input => {
-      values[input.name.split("[").pop().replace("]", "")] = input.value;
+      if (input.name) {
+        const fieldName = input.name.split("[").pop().replace("]", "");
+        values[fieldName] = input.value;
+      }
     });
     
     // Ensure table exists before adding row
@@ -95,7 +106,7 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-2 py-1'>${values.glass_type || ''}</td>
       <td class='px-2 py-1'>${values.thickness || ''}</td>
       <td class='px-2 py-1'>${values.color || ''}</td>
-      <td class='px-2 py-1'>${values.location || ''}</td>
+      <td class='px-2 py-1'>${values.typology || ''}</td>
       <td class='px-2 py-1'>${values.height || ''}</td>
       <td class='px-2 py-1'>${values.width || ''}</td>
       <td class='px-2 py-1'>${price || ''}</td>
@@ -115,7 +126,7 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][location]" value="${values.location || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
     `;

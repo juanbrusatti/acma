@@ -147,10 +147,10 @@ class ProjectsController < ApplicationController
       :status,
       :price,
       :price_without_iva,
-      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :location, :price ],
+      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :typology, :price ],
       dvhs_attributes: [
         :innertube,
-        :location,
+        :typology,
         :height,
         :width,
         :glasscutting1_type,
