@@ -45,8 +45,11 @@ class Project < ApplicationRecord
     # If we have a saved price without IVA, use it directly
     return price_without_iva if price_without_iva.present?
     
-    # Fallback calculation
-    glasscuttings.sum(&:price) + dvhs.sum(&:price)
+    # If we don't have a saved price without IVA, calculate it
+    # Handle nil prices by filtering them out before summing
+    glasscuttings_total = glasscuttings.map(&:price).compact.sum
+    dvhs_total = dvhs.map(&:price).compact.sum
+    glasscuttings_total + dvhs_total
   end
 
   # Calculate IVA (21% of subtotal)
