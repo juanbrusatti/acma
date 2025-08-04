@@ -10,11 +10,26 @@
   <p class="text-lg text-gray-700 mb-2"><strong>Descripción:</strong> <span id="project-desc-view"><%= @project.description %></span></p>
   <textarea id="project-desc-edit" style="display:none;" class="w-full border rounded px-2 py-1 mb-2"><%= @project.description %></textarea>
 
-  <p class="mb-2">
+  <div class="mb-4 flex items-center gap-2">
     <strong>Estado:</strong>
-    <span id="project-status-view"><%= render partial: "projects/partials/status_badge", locals: { status: @project.status } %></span>
-    <input type="text" id="project-status-edit" value="<%= @project.status %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
-  </p>
+    <% badge_class =
+      case @project.status
+      when 'Terminado'
+        'bg-green-100 text-green-700'
+      when 'En Proceso'
+        'bg-blue-100 text-blue-700'
+      when 'Pendiente'
+        'bg-yellow-100 text-yellow-700'
+      else
+        'bg-gray-100 text-gray-500'
+      end
+    %>
+    <select id="status-selector-direct" class="inline-block rounded-full px-3 py-1 text-xs font-semibold <%= badge_class %> shadow-sm border border-transparent whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer" data-project-id="<%= @project.id %>">
+      <option value="Pendiente" <%= 'selected' if @project.status == 'Pendiente' %>>Pendiente</option>
+      <option value="En Proceso" <%= 'selected' if @project.status == 'En Proceso' %>>En Proceso</option>
+      <option value="Terminado" <%= 'selected' if @project.status == 'Terminado' %>>Terminado</option>
+    </select>
+  </div>
   <% if @project.delivery_date.present? %>
     <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%Y-%m-%d') %></span></p>
     <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
