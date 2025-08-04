@@ -86,13 +86,8 @@ module ProjectsHelper
 
     from = collection.offset + 1
     to = [collection.offset + collection.per_page, collection.total_entries].min
-    total = collection.total_entries
 
-    "Mostrando #{from} a #{to} de #{total} #{collection_name(collection)}"
+    "Mostrando proyectos del #{from} al #{to}"
   end
 
-  def collection_name(collection)
-    return "proyectos" if collection.is_a?(WillPaginate::Collection) && collection.first.is_a?(Project)
-    "elementos"
-  end
 end
