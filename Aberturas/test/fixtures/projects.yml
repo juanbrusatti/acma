@@ -2,8 +2,14 @@
 
 one:
   name: Proyecto Test
-  status: pendiente
+  phone: "123456789"
+  address: "Dirección de prueba"
+  description: "Descripción de prueba"
+  status: "Pendiente"
 
 two:
-  name: MyString
-  description: MyText
+  name: Proyecto Test 2
+  phone: "987654321"
+  address: "Otra dirección"
+  description: "Otra descripción"
+  status: "En Proceso"
