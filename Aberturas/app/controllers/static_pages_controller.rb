@@ -10,43 +10,22 @@ class StaticPagesController < ApplicationController
   def load_dashboard_data
     @stock_data = load_stock_data
     @projects_data = load_projects_data
-    @recent_projects = load_recent_projects
+    @recent_projects = Project.all.order(created_at: :desc).limit(3).map do |project|
+      project
+    end
   end
 
   def load_stock_data
     {
-      total_sheets: 1250,
-      available_scraps: 320
+      total_sheets: Glassplate.complete_sheets.count,
+      available_scraps: Glassplate.scraps.count,
     }
   end
 
   def load_projects_data
     {
-      active_projects: 12,
-      completed_this_month: 3
+      active_projects: Project.where(status: 'En Proceso').count,
+      completed_this_month: Project.where(status: 'Terminado', updated_at: Time.current.beginning_of_month..Time.current.end_of_month).count
     }
-  end
-
-  def load_recent_projects
-    [
-      OpenStruct.new(
-        client_name: "Constructora del Sol",
-        description: "Edificio \"Amanecer\"",
-        status: "En Proceso",
-        delivery_date: Date.parse("2025-07-15")
-      ),
-      OpenStruct.new(
-        client_name: "Familia Pérez",
-        description: "Cerramiento de balcón",
-        status: "Terminado",
-        delivery_date: Date.parse("2025-06-28")
-      ),
-      OpenStruct.new(
-        client_name: "Oficinas Central",
-        description: "Divisiones internas",
-        status: "En Proceso",
-        delivery_date: Date.parse("2025-07-05")
-      )
-    ]
   end
 end

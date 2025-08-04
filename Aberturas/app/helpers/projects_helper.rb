@@ -1,4 +1,15 @@
 module ProjectsHelper
+  # Método para mostrar la información de paginación
+  def pagination_info(collection)
+    if collection.total_pages > 0
+      start_num = (collection.current_page - 1) * collection.per_page + 1
+      end_num = [start_num + collection.per_page - 1, collection.total_entries].min
+      "Mostrando #{start_num} - #{end_num} de #{collection.total_entries} proyectos"
+    else
+      "No se encontraron proyectos"
+    end
+  end
+
   def project_status_color(status)
     case status
     when "Terminado"
