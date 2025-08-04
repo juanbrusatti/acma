@@ -1,12 +1,30 @@
 <%= turbo_frame_tag dom_id(supply) do %>
-  <div class="flex items-center gap-2">
-    <span class="font-semibold text-green-700">
-      <% if supply.price.present? && supply.price > 0 %>
-        $<%= number_with_precision(supply.price, precision: 2) %>
-      <% else %>
-        N/A
-      <% end %>
-    </span>
+  <div class="flex items-center gap-4">
+    <!-- USD Price Display -->
+    <div class="flex flex-col">
+      <span class="text-xs text-gray-500 uppercase">USD</span>
+      <span class="font-semibold text-blue-700">
+        <% if supply.price_usd.present? && supply.price_usd > 0 %>
+          US$<%= number_with_precision(supply.price_usd, precision: 2) %>
+        <% else %>
+          N/A
+        <% end %>
+      </span>
+    </div>
+    
+    <!-- Peso Price Display -->
+    <div class="flex flex-col">
+      <span class="text-xs text-gray-500 uppercase">Pesos</span>
+      <span class="font-semibold text-green-700">
+        <% if supply.price_peso.present? && supply.price_peso > 0 %>
+          $<%= number_with_precision(supply.price_peso, precision: 2) %>
+        <% else %>
+          N/A
+        <% end %>
+      </span>
+    </div>
+    
+    <!-- Edit Button -->
     <%= link_to edit_supply_path(supply),
         data: { turbo_frame: dom_id(supply) },
         class: "inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150" do %>

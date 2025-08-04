@@ -18,7 +18,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
       height: 1000,
       width: 800,
       color: "INC",
-      location: "DINTEL",
+      typology: "V001",
       price: 150.00
     )
   end
@@ -102,7 +102,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
             height: "1200",
             width: "800",
             color: "INC",
-            location: "DINTEL"
+            typology: "V001"
           }
         }
       }
@@ -138,7 +138,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
       height: 1000,
       width: 800,
       color: "INC",
-      location: "DINTEL",
+      typology: "V001",
       price: 150.00
     )
 
@@ -160,7 +160,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
       height: 1500,
       width: 1200,
       color: "GRS",
-      location: "JAMBA_I",
+      typology: "V002",
       price: 200.00
     )
 
@@ -170,7 +170,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
       height: 800,
       width: 600,
       color: "STB",
-      location: "UMBRAL",
+      typology: "V003",
       price: 100.00
     )
 
@@ -232,7 +232,7 @@ class PdfGenerationOnlyTest < ActionDispatch::IntegrationTest
         height: rand(800..2000),
         width: rand(600..1500),
         color: ["INC", "STB", "GRS", "BRC"].sample,
-        location: ["DINTEL", "JAMBA_I", "JAMBA_D", "UMBRAL"].sample,
+        typology: ["V001", "V002", "V003", "V004"].sample,
         price: rand(100.0..500.0).round(2)
       )
     end

@@ -1,0 +1,23 @@
+<!-- Table structure for displaying supply items -->
+<div id="supplies_table">
+  <table class="min-w-full divide-y divide-gray-200 text-sm">
+    <!-- Table Header with column definitions -->
+    <thead>
+      <tr>
+        <!-- Supply Name Column Header -->
+        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase">Insumo</th>
+        <!-- USD Price Column Header -->
+        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase">Precio USD</th>
+        <!-- Peso Price Column Header -->
+        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase">Precio Pesos</th>
+      </tr>
+    </thead>
+    <!-- Table Body containing supply rows -->
+    <tbody class="divide-y divide-gray-100">
+      <!-- Loop through basic supplies and render each row -->
+      <% Supply.basics.each do |supply| %>
+        <%= render "supplies/partials/row_supply", supply: supply %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

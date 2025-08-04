@@ -1,6 +1,6 @@
 class Project < ApplicationRecord
   # Associations
-  has_many :dvhs
+  has_many :dvhs, dependent: :destroy
   has_many :glasscuttings, dependent: :destroy
 
   # Nested attributes for form handling
@@ -42,11 +42,10 @@ class Project < ApplicationRecord
     # If we have a saved price without IVA, use it directly
     return price_without_iva if price_without_iva.present?
     
-    # If we don't have a saved price without IVA, calculate it
-    # Handle nil prices by filtering them out before summing
-    glasscuttings_total = glasscuttings.map(&:price).compact.sum
-    dvhs_total = dvhs.map(&:price).compact.sum
-    glasscuttings_total + dvhs_total
+    # Fallback calculation - handle nil prices gracefully
+    glasscutting_total = glasscuttings.sum { |g| g.price || 0 }
+    dvh_total = dvhs.sum { |d| d.price || 0 }
+    glasscutting_total + dvh_total
   end
 
   # Calculate IVA (21% of subtotal)

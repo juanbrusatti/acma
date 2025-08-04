@@ -1,63 +1,126 @@
 <% content_for :title, "Precios" %>
 
+<%= render "shared/flash" %>
+
 <div class="px-2 md:px-4 lg:px-16 pb-12">
-  <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg mt-8 px-3 md:px-6 lg:px-10 w-full">
-    <div class="flex flex-col space-y-1.5 p-3 md:p-6">
-      <div class="flex justify-between items-start">
+  <!-- Glass Prices Container - Main section for managing glass pricing -->
+  <div class="mt-8 w-full rounded-xl border border-gray-200 bg-white shadow-md">
+    <div class="flex flex-col space-y-1.5 p-4 md:p-6">
+      <div class="flex justify-between items-start flex-wrap gap-4">
+        <!-- Page Title and Description Section -->
         <div>
-          <h1 class="text-xl md:text-2xl font-semibold leading-none tracking-tight">Gestionar precios</h1>
-          <p class="text-xs md:text-sm text-muted-foreground">Actualice la lista de precios por tipo, color y grosor del vidrio.</p>
+          <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-gray-900">Gestionar precios</h1>
+          <p class="text-sm text-gray-500">Actualice la lista de precios por tipo, color y grosor del vidrio.</p>
         </div>
+
+        <!-- Global Percentage Update Form - Floating form positioned on the right side -->
+        <%= form_with url: update_all_percentages_glass_prices_path, method: :patch, local: false,
+                      class: "flex items-center gap-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-40",
+                      data: {
+                        turbo: true,
+                        turbo_method: "patch",
+                        controller: "percentage-form",
+                        action: "submit->percentage-form#submit"
+                      } do |form| %>
+
+          <!-- Form Label Section with Icon and Text -->
+          <div class="flex items-center gap-2">
+            <!-- Dollar/Percentage Icon for visual clarity -->
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+            <label for="percentage_input" class="text-sm font-medium text-blue-900 whitespace-nowrap">
+              Actualizar porcentaje de ganancia general:
+            </label>
+          </div>
+
+          <!-- Input Field Section with Percentage Symbol -->
+          <div class="flex items-center gap-2">
+            <!-- Number input for percentage value -->
+            <%= form.number_field :percentage,
+                                  id: "percentage_input",
+                                  step: 0.1,
+                                  min: 0,
+                                  placeholder: "0.0",
+                                  class: "w-24 px-3 py-2 text-sm font-medium text-center border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200",
+                                  data: { "percentage-form-target": "input" } %>
+            <!-- Percentage symbol for visual reference -->
+            <span class="text-sm font-medium text-blue-700">%</span>
+          </div>
+
+          <!-- Submit Button with Gradient and Hover Effects -->
+          <%= form.submit "Aplicar",
+                          class: "px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
+                          data: { "percentage-form-target": "submit" } %>
+
+        <% end %>
       </div>
     </div>
-    <div class="p-3 md:p-6 pt-0">
-      <div class="overflow-x-auto mt-0">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Tipo</th>
-                <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Grosor</th>
-                <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Color</th>
-                <th class="px-2 md:px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase min-w-96">
-                  <div class="grid grid-cols-4 gap-1 md:gap-2 text-center">
-                    <div class="text-xs">Precio compra</div>
-                    <div class="text-xs">% Ganancia</div>
-                    <div class="text-xs">Precio venta</div>
-                    <div class="text-xs">Acciones</div>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <% @combinations.each do |glass_price| %>
-                <%= render "glass_price_row", glass_price: glass_price %>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+
+    <!-- Glass Prices Table Section - Displays all glass price combinations -->
+    <div class="p-4 md:p-6 pt-0">
+      <%= render "glass_prices_table", combinations: @combinations %>
     </div>
   </div>
 
-  <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg mt-8 px-6 md:px-10 w-full">
+  <!-- Supplies Container - Section for managing additional supply prices -->
+  <div class="mt-8 w-full rounded-xl border border-gray-200 bg-white shadow-md px-6 md:px-10">
+    <!-- Supplies Header Section -->
     <div class="flex flex-col space-y-1.5 p-6">
-      <h2 class="text-xl font-semibold leading-none tracking-tight">Precios de insumos</h2>
-      <p class="text-sm text-muted-foreground">Edite el precio de cada insumo adicional.</p>
+      <div class="flex justify-between items-start flex-wrap gap-4">
+        <!-- Supplies Title and Description -->
+        <div>
+          <h2 class="text-xl font-semibold tracking-tight text-gray-900">Precios de insumos</h2>
+          <p class="text-sm text-gray-500">Edite el precio de cada insumo adicional.</p>
+        </div>
+
+        <!-- MEP Dollar Update Form - Similar to percentage form -->
+        <%= form_with url: update_all_supplies_mep_glass_prices_path, method: :patch, local: false,
+                      class: "flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200",
+                      data: {
+                        turbo: true,
+                        turbo_method: "patch",
+                        controller: "mep-form",
+                        action: "submit->mep-form#submit"
+                      } do |form| %>
+
+          <!-- Form Label Section with Icon and Text -->
+          <div class="flex items-center gap-2">
+            <!-- Dollar Icon for visual clarity -->
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+            <label for="mep_rate_input" class="text-sm font-medium text-green-900 whitespace-nowrap">
+              Dólar MEP:
+            </label>
+          </div>
+
+          <!-- Input Field Section with Dollar Symbol -->
+          <div class="flex items-center gap-2">
+            <!-- Number input for MEP rate value -->
+            <%= form.number_field :mep_rate,
+                                  id: "mep_rate_input",
+                                  step: 0.01,
+                                  min: 0,
+                                  value: AppConfig.current_mep_rate > 0 ? AppConfig.current_mep_rate : nil,
+                                  placeholder: "0.00",
+                                  class: "w-28 px-3 py-2 text-sm font-medium text-center border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm transition-all duration-200",
+                                  data: { "mep-form-target": "input" } %>
+            <!-- Dollar symbol for visual reference -->
+            <span class="text-sm font-medium text-green-700">ARS</span>
+          </div>
+
+          <!-- Submit Button with Gradient and Hover Effects -->
+          <%= form.submit "Actualizar",
+                          class: "px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
+                          data: { "mep-form-target": "submit" } %>
+
+        <% end %>
+      </div>
     </div>
+    <!-- Supplies Table Section -->
     <div class="p-6 pt-0">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Insumo</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Precio M</th>
-            <th class="px-4 py-2"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <% Supply.basics.each do |supply| %>
-            <%= render "supplies/partials/fila_supply", supply: supply %>
-          <% end %>
-        </tbody>
-      </table>
+      <%= render "supplies_table" %>
     </div>
   </div>
 </div>

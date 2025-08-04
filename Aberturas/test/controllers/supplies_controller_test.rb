@@ -2,7 +2,7 @@ require "test_helper"
 
 class SuppliesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @supply = supplies(:one)
+    @supply = supplies(:tamiz)
   end
 
   # test "should get index" do
@@ -17,7 +17,7 @@ class SuppliesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create supply" do
     assert_difference("Supply.count") do
-      post supplies_url, params: { supply: { name: @supply.name, price: @supply.price } }
+      post supplies_url, params: { supply: { name: "New Supply", price_usd: 25.0 } }
     end
 
     assert_redirected_to supply_url(Supply.last)
@@ -34,8 +34,8 @@ class SuppliesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update supply" do
-    patch supply_url(@supply), params: { supply: { name: @supply.name, price: @supply.price } }
-    assert_redirected_to supplies_url
+    patch supply_url(@supply), params: { supply: { name: @supply.name, price_usd: @supply.price_usd } }
+    assert_redirected_to glass_prices_path
   end
 
   test "should destroy supply" do

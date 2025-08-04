@@ -1,9 +1,38 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  price: 9.99
+# Basic supplies for innertube pricing (BASICS supplies)
+tamiz:
+  name: "Tamiz"
+  price_usd: 5.0
+  price_peso: 0.0
 
-two:
-  name: MyString
-  price: 9.99
+hotmelt:
+  name: "Hotmelt"
+  price_usd: 3.0
+  price_peso: 0.0
+
+cinta:
+  name: "Cinta"
+  price_usd: 2.0
+  price_peso: 0.0
+
+angulos:
+  name: "Angulos"
+  price_usd: 1.5
+  price_peso: 0.0
+
+perfil_separador:
+  name: "Perfil separador"
+  price_usd: 4.0
+  price_peso: 0.0
+
+# Additional test supplies
+aluminum_profile:
+  name: "Aluminum Profile"
+  price_usd: 15.50
+  price_peso: 0.0
+
+glass_sealant:
+  name: "Glass Sealant"
+  price_usd: 8.75
+  price_peso: 0.0

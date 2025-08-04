@@ -11,7 +11,7 @@ class DvhsControllerTest < ActionDispatch::IntegrationTest
         dvh: {
           height: 120,
           width: 100,
-          location: "DINTEL",
+          typology: "V001",
           innertube: "9",
           glasscutting1_type: "LAM",
           glasscutting1_thickness: "3+3",

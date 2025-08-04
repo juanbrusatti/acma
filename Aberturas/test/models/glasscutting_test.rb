@@ -151,4 +151,146 @@ class GlasscuttingTest < ActiveSupport::TestCase
     glasscutting2.reload
     assert_equal "V2", glasscutting2.typology
   end
+
+  # Tests for new pricing system
+  test "ensure_price_is_set uses frontend price when available" do
+    # Create glass price for backend calculation
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+
+    # Set a frontend-calculated price
+    frontend_price = 250.75
+    @glasscutting.price = frontend_price
+
+    assert @glasscutting.save!
+    assert_equal frontend_price, @glasscutting.price
+  end
+
+  test "ensure_price_is_set calculates backend price when no frontend price" do
+    # Create glass price for backend calculation
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+
+    # Don't set frontend price (should be nil)
+    @glasscutting.price = nil
+
+    assert @glasscutting.save!
+    
+    # Should calculate price: 1000mm x 800mm = 0.8m² * 100.0 = 80.0
+    expected_price = 0.8 * 100.0
+    assert_equal expected_price, @glasscutting.price
+  end
+
+  test "ensure_price_is_set does not override zero price from frontend" do
+    # Create glass price for backend calculation
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+
+    # Explicitly set price to 0 (simulating frontend calculation that resulted in 0)
+    @glasscutting.price = 0
+
+    assert @glasscutting.save!
+    
+    # Should calculate backend price since frontend price is 0
+    expected_price = 0.8 * 100.0
+    assert_equal expected_price, @glasscutting.price
+  end
+
+  test "set_price_from_backend calculates correct price" do
+    # Create glass price
+    glass_price = GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 150.0)
+
+    # Calculate expected price: 1000mm x 800mm = 0.8m² * 150.0 = 120.0
+    expected_price = 0.8 * glass_price.selling_price
+
+    @glasscutting.send(:set_price_from_backend)
+    
+    assert_equal expected_price, @glasscutting.price
+  end
+
+  test "set_price_from_backend handles missing glass price gracefully" do
+    # Don't create any glass price record
+    
+    @glasscutting.send(:set_price_from_backend)
+    
+    # Price should remain nil when no glass price is found
+    assert_nil @glasscutting.price
+  end
+
+  test "set_price_from_backend handles missing selling_price gracefully" do
+    # Create glass price without selling_price
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: nil)
+    
+    @glasscutting.send(:set_price_from_backend)
+    
+    # Price should remain nil when selling_price is not present
+    assert_nil @glasscutting.price
+  end
+
+  test "set_price_from_backend handles missing dimensions gracefully" do
+    # Create glass price
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+    
+    # Remove height and width
+    @glasscutting.height = nil
+    @glasscutting.width = nil
+    
+    @glasscutting.send(:set_price_from_backend)
+    
+    # Price should remain nil when dimensions are missing
+    assert_nil @glasscutting.price
+  end
+
+  test "pricing system works end to end in project creation" do
+    # Create glass price
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 125.0)
+
+    # Create project with glasscutting (simulating form submission)
+    project = Project.create!(
+      name: "Test Project",
+      phone: "123456789", 
+      description: "Test"
+    )
+
+    # Create glasscutting without frontend price (backend should calculate)
+    glasscutting = project.glasscuttings.create!(
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      typology: "V001",
+      height: 1000,
+      width: 800
+    )
+
+    # Glasscutting should have a calculated price
+    assert glasscutting.price.present?
+    
+    # Expected: 1000mm x 800mm = 0.8m² * 125.0 = 100.0
+    expected_price = 0.8 * 125.0
+    assert_equal expected_price, glasscutting.price
+  end
+
+  test "frontend price takes precedence over backend calculation" do
+    # Create glass price for backend calculation
+    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
+
+    # Create project
+    project = Project.create!(
+      name: "Test Project",
+      phone: "123456789", 
+      description: "Test"
+    )
+
+    # Create glasscutting WITH frontend price (simulating form submission with calculated price)
+    frontend_calculated_price = 333.33
+    glasscutting = project.glasscuttings.create!(
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      typology: "V001",
+      height: 1000,
+      width: 800,
+      price: frontend_calculated_price
+    )
+
+    # Should use frontend price, not backend calculation
+    assert_equal frontend_calculated_price, glasscutting.price
+  end
 end

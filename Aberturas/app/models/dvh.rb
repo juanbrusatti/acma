@@ -50,34 +50,39 @@ class Dvh < ApplicationRecord
     message: "El color del vidrio 2 no es valido"
   }
 
-  before_save :set_price_dvh
+  # Set price if not provided by frontend
+  before_save :ensure_price_is_set
 
-  def set_price_dvh
-    Rails.logger.debug "Buscando precio para DVH:"
+  private
+
+  # Ensure DVH has a price - either from frontend or calculated here
+  def ensure_price_is_set
+    return if price.present? && price > 0  # Price already set by frontend
+    
+    # Fallback: calculate price if not provided by frontend
     area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
+    perimeter_m = 2 * ((height.to_f / 1000) + (width.to_f / 1000))
 
-    # Glasscutting 1
-    Rails.logger.debug "Cristal 1: tipo=#{glasscutting1_type.inspect}, espesor=#{glasscutting1_thickness.inspect}, color=#{glasscutting1_color.inspect}"
-    price1_record = GlassPrice.find_by(glass_type: glasscutting1_type, thickness: glasscutting1_thickness, color: glasscutting1_color)
-    if price1_record.nil? || !price1_record.selling_price.present?
-      Rails.logger.debug "No se encontró GlassPrice para cristal 1 o falta selling_price"
-      price1 = 0
-    else
-      price1 = price1_record.selling_price
-    end
+    # Get glass prices
+    price1 = get_glass_price(glasscutting1_type, glasscutting1_thickness, glasscutting1_color)
+    price2 = get_glass_price(glasscutting2_type, glasscutting2_thickness, glasscutting2_color)
 
-    # Glasscutting 2
-    Rails.logger.debug "Cristal 2: tipo=#{glasscutting2_type.inspect}, espesor=#{glasscutting2_thickness.inspect}, color=#{glasscutting2_color.inspect}"
-    price2_record = GlassPrice.find_by(glass_type: glasscutting2_type, thickness: glasscutting2_thickness, color: glasscutting2_color)
-    if price2_record.nil? || !price2_record.selling_price.present?
-      Rails.logger.debug "No se encontró GlassPrice para cristal 2 o falta selling_price"
-      price2 = 0
-    else
-      price2 = price2_record.selling_price
-    end
+    # Calculate total price: glass area + innertube total
+    glass_price = area_m2 * (price1 + price2)
+    innertube_total_price = AppConfig.calculate_innertube_total_price(innertube, perimeter_m)
+    
+    self.price = (glass_price + innertube_total_price).round(2)
+  end
 
-    self.price = (area_m2 * (price1 + price2)).round(2)
-    Rails.logger.debug "Seteando precio DVH: #{self.price} (area: #{area_m2}, price1: #{price1}, price2: #{price2})"
+  # Helper method to get glass price
+  def get_glass_price(type, thickness, color)
+    price_record = GlassPrice.find_by(glass_type: type, thickness: thickness, color: color)
+    price_record&.selling_price || 0.0
+  end
+
+  # Update project typologies when DVH changes
+  def update_project_typologies
+    project.send(:assign_typologies) if project
   end
 
 end

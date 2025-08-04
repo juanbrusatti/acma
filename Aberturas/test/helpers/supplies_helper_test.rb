@@ -4,14 +4,14 @@ class SuppliesHelperTest < ActionView::TestCase
   include SuppliesHelper
 
   def setup
-    @supply_with_price = Supply.new(name: "Test Supply", price: 25.50)
-    @supply_without_price = Supply.new(name: "Test Supply", price: nil)
-    @supply_zero_price = Supply.new(name: "Test Supply", price: 0)
+    @supply_with_price = Supply.new(name: "Test Supply", price_usd: 25.50)
+    @supply_without_price = Supply.new(name: "Test Supply", price_usd: nil)
+    @supply_zero_price = Supply.new(name: "Test Supply", price_usd: 0)
   end
 
   test "format_supply_price should format valid price" do
     result = format_supply_price(@supply_with_price)
-    assert_equal "$25.50", result
+    assert_equal "US$25.50", result
   end
 
   test "format_supply_price should handle nil price" do

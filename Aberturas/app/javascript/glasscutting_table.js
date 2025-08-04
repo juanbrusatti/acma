@@ -120,6 +120,8 @@ export function handleGlasscuttingEvents(e) {
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "glasscutting-hidden-row";
+    // Use glasscutting counter as unique index for nested attributes
+    const index = glasscuttingIdCounter;
     hiddenDiv.innerHTML = `
       <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">

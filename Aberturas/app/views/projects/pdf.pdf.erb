@@ -25,10 +25,10 @@
 <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
   <thead>
     <tr style="background: #f3f3f3; color: #222; font-weight: bold;">
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipología</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipo</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Espesor</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Color</th>
-      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ubicacion</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Alto</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ancho</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Precio</th>
@@ -40,10 +40,10 @@
       <% precio = glass.price.to_f %>
       <% total += precio %>
       <tr style="background: <%= idx.even? ? '#fff' : '#f9f9f9' %>;">
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.typology %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= human_glass_type(glass.glass_type) %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.thickness %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= human_glass_color(glass.color) %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.location %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.height %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.width %></td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= number_to_currency(precio, unit: "$", precision: 2) if glass.price.present? %></td>
@@ -89,9 +89,9 @@
         <% precio = dvh.respond_to?(:price) && dvh.price.present? ? dvh.price.to_f : 0 %>
         <% dvh_total += precio %>
         <tr style="background: <%= idx.even? ? '#fff' : '#f9f9f9' %>;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.typology %></td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= idx + 1 %></td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.innertube %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.location %></td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.height %></td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.width %></td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %></td>
