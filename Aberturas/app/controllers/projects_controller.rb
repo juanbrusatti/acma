@@ -4,7 +4,8 @@ class ProjectsController < ApplicationController
 
     # Filtrar por búsqueda de nombre
     if params[:search].present?
-      @projects = @projects.where("name LIKE ?", "%#{params[:search]}%")
+      search_pattern = "%#{params[:search]}%"
+      @projects = @projects.where("name LIKE ?", search_pattern)
     end
 
     # Filtrar por estado
