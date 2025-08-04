@@ -64,12 +64,10 @@ module ProjectsHelper
   # Serialize project data for JSON responses
   def project_json_data(project)
     project.as_json(
-      only: [:id, :name, :description, :status, :delivery_date], 
-      include: { 
-        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] } 
+      only: [:id, :name, :description, :status, :delivery_date],
+      include: {
+        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :location, :height, :width] }
       }
     )
   end
-
-
 end
