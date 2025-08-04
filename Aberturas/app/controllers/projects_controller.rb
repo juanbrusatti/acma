@@ -40,7 +40,7 @@ class ProjectsController < ApplicationController
           render json: {
             success: true,
             project: helpers.project_json_data(@project),
-            status_badge_html: helpers.project_status_badge_html(@project.status)
+            status: @project.status
           }
         }
       end
