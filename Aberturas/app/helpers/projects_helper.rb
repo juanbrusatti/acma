@@ -70,13 +70,4 @@ module ProjectsHelper
       }
     )
   end
-
-  # Generate status badge HTML for AJAX responses
-  def project_status_badge_html(status)
-    render_to_string(
-      partial: "projects/partials/status_badge", 
-      locals: { status: status }, 
-      formats: [:html]
-    )
-  end
 end
