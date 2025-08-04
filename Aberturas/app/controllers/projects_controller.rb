@@ -1,7 +1,21 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
+    @projects = Project.all
+
+    # Filtrar por búsqueda de nombre
+    if params[:search].present?
+      @projects = @projects.where("name LIKE ?", "%#{params[:search]}%")
+    end
+
+    # Filtrar por estado
+    if params[:status].present? && params[:status] != "Todos"
+      @projects = @projects.where(status: params[:status])
+    end
+
+    @projects = @projects.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
   end
+
+
 
   def new
     @project = Project.new
