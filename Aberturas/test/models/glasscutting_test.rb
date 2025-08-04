@@ -254,7 +254,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       glass_type: "LAM",
       thickness: "3+3",
       color: "INC",
-      location: "DINTEL",
+      typology: "V001",
       height: 1000,
       width: 800
     )
@@ -284,7 +284,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       glass_type: "LAM",
       thickness: "3+3",
       color: "INC",
-      location: "DINTEL",
+      typology: "V001",
       height: 1000,
       width: 800,
       price: frontend_calculated_price

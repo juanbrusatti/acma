@@ -22,7 +22,7 @@ class PricingIntegrationTest < ActionDispatch::IntegrationTest
             glass_type: "LAM",
             thickness: "3+3",
             color: "INC",
-            location: "DINTEL",
+            typology: "V001",
             height: 1000,
             width: 800
             # No price - should trigger backend calculation
@@ -31,7 +31,7 @@ class PricingIntegrationTest < ActionDispatch::IntegrationTest
         dvhs_attributes: {
           "0" => {
             innertube: "6",
-            location: "DINTEL",
+            typology: "V002",
             height: 1000,
             width: 800,
             glasscutting1_type: "LAM",
@@ -113,7 +113,7 @@ class PricingIntegrationTest < ActionDispatch::IntegrationTest
       glass_type: "LAM",
       thickness: "3+3",
       color: "INC",
-      location: "DINTEL",
+      typology: "V001",
       height: 1000,
       width: 800
     )
@@ -131,7 +131,7 @@ class PricingIntegrationTest < ActionDispatch::IntegrationTest
       glass_type: "LAM",
       thickness: "3+3",
       color: "INC",
-      location: "JAMBA_I",
+      typology: "V002",
       height: 1000,
       width: 800
     )

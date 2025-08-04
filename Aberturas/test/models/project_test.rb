@@ -180,13 +180,13 @@ class ProjectTest < ActiveSupport::TestCase
     
     # Force glasscutting to use our price by updating after creation
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
       height: 1000, width: 800
     )
     glasscutting.update_column(:price, 100.0)
     
     dvh = project.dvhs.create!(
-      innertube: "6", location: "DINTEL", height: 1000, width: 800,
+      innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
     )
@@ -242,12 +242,12 @@ class ProjectTest < ActiveSupport::TestCase
 
     # Create components with frontend-calculated prices
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
       height: 1000, width: 800, price: 400.0 # Frontend calculated
     )
     
     dvh = project.dvhs.create!(
-      innertube: "6", location: "DINTEL", height: 1000, width: 800,
+      innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
       price: 600.0 # Frontend calculated
@@ -274,12 +274,12 @@ class ProjectTest < ActiveSupport::TestCase
 
     # Components with frontend prices
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
       height: 1000, width: 800, price: 300.0
     )
     
     dvh = project.dvhs.create!(
-      innertube: "6", location: "DINTEL", height: 1000, width: 800,
+      innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
       price: 500.0
@@ -308,13 +308,13 @@ class ProjectTest < ActiveSupport::TestCase
 
     # Glasscutting with frontend price
     glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", location: "DINTEL",
+      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
       height: 1000, width: 800, price: 333.33 # Frontend calculated
     )
     
     # DVH without frontend price (should be calculated by backend)
     dvh = project.dvhs.create!(
-      innertube: "6", location: "DINTEL", height: 1000, width: 800,
+      innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
       # No price set - should trigger backend calculation

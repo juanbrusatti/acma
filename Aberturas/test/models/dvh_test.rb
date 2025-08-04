@@ -212,7 +212,7 @@ class DvhTest < ActiveSupport::TestCase
     # Create DVH without frontend price (backend should calculate)
     dvh = project.dvhs.create!(
       innertube: "6",
-      location: "DINTEL",
+      typology: "V001",
       height: 1000,
       width: 800,
       glasscutting1_type: "LAM",

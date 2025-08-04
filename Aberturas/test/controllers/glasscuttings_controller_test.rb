@@ -14,7 +14,7 @@ class GlasscuttingsControllerTest < ActionDispatch::IntegrationTest
           height: 120,
           width: 80,
           color: "INC",
-          location: "JAMBA_I"
+          typology: "V001"
         }
       }
     end

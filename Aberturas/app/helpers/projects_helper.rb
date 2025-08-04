@@ -74,4 +74,13 @@ module ProjectsHelper
       }
     )
   end
+
+  def pagination_info(collection)
+    return "" unless collection.respond_to?(:current_page)
+    
+    start_item = (collection.current_page - 1) * collection.per_page + 1
+    end_item = [start_item + collection.per_page - 1, collection.total_entries].min
+    
+    "Mostrando #{start_item} - #{end_item} de #{collection.total_entries} resultados"
+  end
 end
