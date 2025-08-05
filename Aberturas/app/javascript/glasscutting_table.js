@@ -133,6 +133,7 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
     `;
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     

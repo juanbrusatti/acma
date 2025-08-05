@@ -153,6 +153,7 @@ export function handleDvhEvents(e) {
       <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
       <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
       <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+      <input type="hidden" name="project[dvhs_attributes][][price]" value="${price.toFixed(2)}">
     `;
     
     document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
