@@ -29,13 +29,13 @@ export function ensureGlasscuttingTable() {
     glasscuttingTable.innerHTML = `
       <thead>
         <tr class='bg-gray-50 text-gray-500'>
-          <th class='px-2 py-1 text-left'>TIPOLOGIA</th>
-          <th class='px-2 py-1 text-left'>TIPO</th>
-          <th class='px-2 py-1 text-left'>GROSOR</th>
-          <th class='px-2 py-1 text-left'>COLOR</th>
-          <th class='px-2 py-1 text-left'>ALTO</th>
-          <th class='px-2 py-1 text-left'>ANCHO</th>
-          <th class='px-2 py-1 text-left'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>TIPOLOGIA</th>
+          <th class='px-6 py-2 text-center'>TIPO</th>
+          <th class='px-4 py-2 text-center'>GROSOR</th>
+          <th class='px-4 py-2 text-center'>COLOR</th>
+          <th class='px-4 py-2 text-center'>ALTO</th>
+          <th class='px-4 py-2 text-center'>ANCHO</th>
+          <th class='px-4 py-2 text-center'>PRECIO</th>
         </tr>
       </thead>
     `;
@@ -101,20 +101,24 @@ export function handleGlasscuttingEvents(e) {
     
     // Populate row with data and delete button
     tr.innerHTML = `
-      <td class='px-2 py-1'>${values.typology || ''}</td>
-      <td class='px-2 py-1'>${values.glass_type || ''}</td>
-      <td class='px-2 py-1'>${values.thickness || ''}</td>
-      <td class='px-2 py-1'>${values.color || ''}</td>
-      <td class='px-2 py-1'>${values.height || ''}</td>
-      <td class='px-2 py-1'>${values.width || ''}</td>
-      <td class='px-2 py-1'>${price || ''}</td>
-      <td class='px-2 py-1 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.glass_type || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.thickness || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.color || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+      <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
+      <td class='px-4 py-2 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
     
     glasscuttingTbody.appendChild(tr);
     
     // Update project totals if function exists
-    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     
     // Create hidden form inputs for Rails form submission
     const hiddenDiv = document.createElement("div");
@@ -129,6 +133,7 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
     `;
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     
@@ -146,7 +151,11 @@ export function handleGlasscuttingEvents(e) {
       removeGlasscuttingTableIfEmpty();
       
       // Update project totals after deletion
-      if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+      setTimeout(() => {
+        if (typeof window.updateProjectTotals === 'function') {
+          window.updateProjectTotals();
+        }
+      }, 100);
       
       // Remove corresponding hidden form inputs
       const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");

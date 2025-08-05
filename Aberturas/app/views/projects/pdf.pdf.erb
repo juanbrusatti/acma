@@ -9,23 +9,77 @@
 <hr>
 <table style="width:100%; margin-bottom: 10px;">
   <tr>
-    <td><strong>Cliente:</strong> <%= @project.name %></td>
-    <td><strong>Telefono:</strong> <%= @project.phone %></td>
+    <td><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
+    <td><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
   </tr>
   <tr>
-    <td><strong>Domicilio:</strong> <%= @project.address %></td>
-    <td><strong>Estado:</strong> <%= @project.status %></td>
+    <td><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
+    <td><strong>Estado:</strong> <%= @project.status.present? ? @project.status : 'Pendiente' %></td>
   </tr>
   <tr>
-    <td colspan="2"><strong>Descripcion:</strong> <%= @project.description %></td>
+    <td colspan="2"><strong>Descripcion:</strong> <%= @project.description.present? ? @project.description : 'Sin descripcion' %></td>
   </tr>
 </table>
 
-<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios asignados al proyecto</h2>
+<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados al proyecto</h2>
+
+<% if @project.dvhs.present? && @project.dvhs.any? %>
 <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
   <thead>
     <tr style="background: #f3f3f3; color: #222; font-weight: bold;">
-      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipología</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipologia</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Cristal 1</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Cristal 2</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Camara</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Alto</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ancho</th>
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% dvh_total = 0 %>
+    <% @project.dvhs.each_with_index do |dvh, idx| %>
+      <% precio = dvh.respond_to?(:price) && dvh.price.present? ? dvh.price.to_f : 0 %>
+      <% dvh_total += precio %>
+      <tr style="background: <%= idx.even? ? '#fff' : '#f9f9f9' %>;">
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.typology.present? ? dvh.typology : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ').presence || '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ').presence || '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.innertube.present? ? dvh.innertube : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.height.present? ? dvh.height : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.width.present? ? dvh.width : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= precio > 0 ? number_to_currency(precio, unit: "$", precision: 2) : '-' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+<tr>
+  <td colspan="6" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total sin IVA:</td>
+  <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(dvh_total, unit: "$", precision: 2) %></td>
+</tr>
+<tr>
+  <td colspan="6" style="text-align:right; padding: 8px; font-weight: bold; background: #e0e0e0;">Total con IVA:</td>
+  <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
+    <% dvh_total_con_iva = dvh_total * 1.21 %>
+    <%= number_to_currency(dvh_total_con_iva, unit: "$", precision: 2) %>
+  </td>
+</tr>
+</tfoot>
+</table>
+<% else %>
+<p style="padding: 20px; text-align: center; color: #666; font-style: italic; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+  No se han agregado DVH a este proyecto.
+</p>
+<% dvh_total_con_iva = 0 %>
+<% end %> 
+
+<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados al proyecto</h2>
+
+<% if @project.glasscuttings.present? && @project.glasscuttings.any? %>
+<table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
+  <thead>
+    <tr style="background: #f3f3f3; color: #222; font-weight: bold;">
+      <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipologia</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Tipo</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Espesor</th>
       <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Color</th>
@@ -40,13 +94,13 @@
       <% precio = glass.price.to_f %>
       <% total += precio %>
       <tr style="background: <%= idx.even? ? '#fff' : '#f9f9f9' %>;">
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.typology %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= human_glass_type(glass.glass_type) %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.thickness %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= human_glass_color(glass.color) %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.height %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.width %></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= number_to_currency(precio, unit: "$", precision: 2) if glass.price.present? %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.typology.present? ? glass.typology : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.glass_type.present? ? human_glass_type(glass.glass_type) : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.thickness.present? ? glass.thickness : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.color.present? ? human_glass_color(glass.color) : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.height.present? ? glass.height : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= glass.width.present? ? glass.width : '-' %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= precio > 0 ? number_to_currency(precio, unit: "$", precision: 2) : '-' %></td>
       </tr>
     <% end %>
   </tbody>
@@ -63,59 +117,17 @@
     </td>
   </tr>
 </tfoot>
-
 </table>
+<% else %>
+<p style="padding: 20px; text-align: center; color: #666; font-style: italic; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+  No se han agregado vidrios simples a este proyecto.
+</p>
+<% total_con_iva = 0 %>
+<% end %>
 
 
 
-<% if @project.dvhs.any? %>
-  <h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados al proyecto</h2>
-  <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
-    <thead>
-      <tr style="background: #f3f3f3; color: #222; font-weight: bold;">
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">ID</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Camara</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ubicacion</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Alto</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ancho</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Cristal 1</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Cristal 2</th>
-        <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Precio</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% dvh_total = 0 %>
-      <% @project.dvhs.each_with_index do |dvh, idx| %>
-        <% precio = dvh.respond_to?(:price) && dvh.price.present? ? dvh.price.to_f : 0 %>
-        <% dvh_total += precio %>
-        <tr style="background: <%= idx.even? ? '#fff' : '#f9f9f9' %>;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.typology %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= idx + 1 %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.innertube %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.height %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= dvh.width %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' / ') %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' / ') %></td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;"><%= number_to_currency(precio, unit: "$", precision: 2) if precio > 0 %></td>
-        </tr>
-      <% end %>
-    </tbody>
-    <tfoot>
-  <tr>
-    <td colspan="7" style="text-align:right; padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd;">Total sin IVA:</td>
-    <td style="padding: 8px; font-weight: bold; background: #f3f3f3; border-top: 2px solid #ddd; text-align: right;"><%= number_to_currency(dvh_total, unit: "$", precision: 2) %></td>
-  </tr>
-  <tr>
-    <td colspan="7" style="text-align:right; padding: 8px; font-weight: bold; background: #e0e0e0;">Total con IVA:</td>
-    <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
-      <% dvh_total_con_iva = dvh_total * 1.21 %>
-      <%= number_to_currency(dvh_total_con_iva, unit: "$", precision: 2) %>
-    </td>
-  </tr>
-</tfoot>
 
-  </table>
-<% end %> 
 <p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
 
 <% # Tabla resumen de totales %>

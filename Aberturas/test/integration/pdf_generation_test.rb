@@ -34,7 +34,7 @@ class PdfGenerationTest < ActionDispatch::IntegrationTest
     assert_response :success
     
     # Verificar que el link de PDF esté presente
-    assert_select "a[href=?]", pdf_project_path(@project)
+    assert_select "a[href=?]", pdf_project_path(@project, format: :pdf)
     
     # Generar el PDF
     get pdf_project_path(@project), headers: { "Accept" => "application/pdf" }
@@ -42,7 +42,7 @@ class PdfGenerationTest < ActionDispatch::IntegrationTest
     assert_equal "application/pdf", response.content_type
     
     # Verificar headers de descarga
-    assert_match /filename.*proyecto_#{@project.id}.*\.pdf/, response.headers['Content-Disposition']
+    assert_match(/filename.*proyecto_#{@project.id}.*\.pdf/, response.headers['Content-Disposition'])
   end
 
   test "PDF template rendering with wicked_pdf configuration" do

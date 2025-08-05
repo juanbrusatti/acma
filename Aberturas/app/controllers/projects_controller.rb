@@ -92,26 +92,53 @@ class ProjectsController < ApplicationController
   end
   def preview_pdf
     begin
-      # Construir un objeto Project en memoria con los datos recibidos (sin strong params, solo para preview)
-      data = params.to_unsafe_h[:project]
+      Rails.logger.info "=== Preview PDF - Usando precios del frontend ==="
+      
+      # Construir un objeto Project en memoria con los datos recibidos
+      data = params.to_unsafe_h[:project] || {}
+      Rails.logger.info "Datos recibidos: glasscuttings=#{data['glasscuttings_attributes']&.count || 0}, dvhs=#{data['dvhs_attributes']&.count || 0}"
+      
+      # Asegurar valores por defecto para campos obligatorios
+      data['name'] ||= 'Proyecto Sin Nombre'
+      data['description'] ||= ''
+      data['phone'] ||= ''
+      data['address'] ||= ''
+      data['status'] ||= 'Pendiente'
+      
       @project = Project.new(data)
-      # Calcular el precio manualmente para cada vidrio
-      @project.glasscuttings.each do |glass|
-        price_record = GlassPrice.find_by(glass_type: glass.glass_type, thickness: glass.thickness, color: glass.color)
-        if price_record && price_record.price_m2.present? && glass.height.present? && glass.width.present?
-          area_m2 = (glass.height.to_f / 1000) * (glass.width.to_f / 1000)
-          glass.price = (area_m2 * price_record.price_m2).round(2)
-        else
-          glass.price = nil
+      
+      # NO recalcular precios - usar los enviados desde el frontend
+      glasscuttings_total = 0.0
+      dvhs_total = 0.0
+      
+      if @project.glasscuttings.present?
+        @project.glasscuttings.each_with_index do |glass, index|
+          # Usar el precio enviado desde el frontend, o 0 si no existe
+          glass.price = glass.price.present? ? glass.price.to_f : 0.0
+          glasscuttings_total += glass.price
+          Rails.logger.info "Glasscutting #{index}: precio recibido #{glass.price}"
         end
       end
-      # Calcular el total y el IVA después de inicializar y calcular los precios
-      if @project && @project.respond_to?(:glasscuttings) && @project.respond_to?(:dvhs)
-        total = @project.glasscuttings.sum { |g| g.price.to_f } + @project.dvhs.sum { |d| d.price.to_f }
-        iva = (total * 0.21).round(2)
-        @project.define_singleton_method(:total) { price_total }
-        @project.define_singleton_method(:iva) { iva }
+      
+      if @project.dvhs.present?
+        @project.dvhs.each_with_index do |dvh, index|
+          # Usar el precio enviado desde el frontend, o 0 si no existe
+          dvh.price = dvh.price.present? ? dvh.price.to_f : 0.0
+          dvhs_total += dvh.price
+          Rails.logger.info "DVH #{index}: precio recibido #{dvh.price}"
+        end
       end
+      
+      # Calcular totales usando los precios enviados
+      total = glasscuttings_total + dvhs_total
+      iva = (total * 0.21).round(2)
+      
+      @project.define_singleton_method(:subtotal) { total }
+      @project.define_singleton_method(:iva) { iva }
+      @project.define_singleton_method(:total) { total + iva }
+      
+      Rails.logger.info "Totales: Glasscuttings=#{glasscuttings_total}, DVHs=#{dvhs_total}, Total=#{total}, IVA=#{iva}"
+      
       respond_to do |format|
         format.pdf do
           response.headers['Content-Disposition'] = "attachment; filename=proyecto_preview.pdf"
@@ -121,8 +148,8 @@ class ProjectsController < ApplicationController
                  enable_local_file_access: true,
                  margin: { top: 10, bottom: 10, left: 10, right: 10 },
                  disable_smart_shrinking: true,
-                 javascript_delay: 5000,
-                 timeout: 120
+                 javascript_delay: 1000,
+                 timeout: 30
         end
       end
     rescue => e
