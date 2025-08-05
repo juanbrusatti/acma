@@ -78,18 +78,7 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.pdf do
         response.headers['Content-Disposition'] = "attachment; filename=proyecto_#{@project.id}.pdf"
-        render pdf: "proyecto_#{@project.id }_#{@project.name}",
-               template: "projects/pdf",
-               layout: "pdf",
-               enable_local_file_access: true,
-               margin: { top: 10, bottom: 10, left: 10, right: 10 },
-               disable_smart_shrinking: true,
-               javascript_delay: 300,
-               timeout: 30,
-               page_size: 'A4',
-               print_media_type: true,
-               disable_external_links: true,
-               disable_forms: true
+        render({ pdf: "proyecto_#{@project.id }_#{@project.name}", template: "projects/pdf" }.merge(helpers.pdf_main_options))
       end
       format.html { redirect_to project_path(@project) }
     end
@@ -146,18 +135,7 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.pdf do
           response.headers['Content-Disposition'] = "attachment; filename=proyecto_preview.pdf"
-          render pdf: "proyecto_preview",
-                 template: "projects/pdf",
-                 layout: "pdf",
-                 enable_local_file_access: true,
-                 margin: { top: 10, bottom: 10, left: 10, right: 10 },
-                 disable_smart_shrinking: true,
-                 javascript_delay: 200,
-                 timeout: 15,
-                 page_size: 'A4',
-                 print_media_type: true,
-                 disable_external_links: true,
-                 disable_forms: true
+          render({ pdf: "proyecto_preview", template: "projects/pdf" }.merge(helpers.pdf_preview_options))
         end
       end
     rescue => e
