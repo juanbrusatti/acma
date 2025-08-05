@@ -1,82 +1,3 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "dashboard";
-
-@layer base {
-  :root {
-    --background: 0 0% 88%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 85%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  /* Scoped border application */
-  .bordered-elements {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-}
-
 /* === DASHBOARD MODERN STYLES === */
 
 /* === GLASSMORPHISM BASE === */
@@ -115,6 +36,7 @@
   transform: translateY(-3px) translateZ(0) scale(1.02);
   background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12));
 }
+
 
 .glass-card::after {
   content: "";
@@ -190,16 +112,13 @@
 }
 
 /* === BOTONES MODERNOS === */
-.modern-button {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-  border: none;
-  color: white;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  box-shadow: 0 4px 15px rgba(55, 65, 81, 0.4);
-}
+.modern-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(55, 65, 81, 0.6);
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: white; 
+  }
+  
 
 .modern-button:hover {
   transform: translateY(-2px);
@@ -236,6 +155,46 @@
 .glass-card .text-2xl,
 .glass-card p {
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* === RESPONSIVE === */
+@media (hover: none), (pointer: coarse) {
+  .glass-card:hover {
+    transform: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .glass-card::before { opacity: 0.3; }
+  .icon-hover-rotate { transform: none; }
+}
+
+/* === ANIMACIÓN DE ENTRADA === */
+.glass-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === OPTIMIZACIONES DE RENDIMIENTO === */
+.glass-card,
+.modern-button,
+.icon-hover-rotate {
+  will-change: transform;
+}
+
+/* Reducir repaints en animaciones */
+.animated-number,
+.pulse-text {
+  will-change: opacity, transform;
 }
 
 /* === DASHBOARD LAYOUT OPTIMIZATIONS === */
@@ -283,32 +242,5 @@
 @media (min-width: 1280px) {
   .dashboard-projects-section {
     grid-column: span 2;
-  }
-}
-
-/* === RESPONSIVE === */
-@media (hover: none), (pointer: coarse) {
-  .glass-card:hover {
-    transform: none;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  }
-  .glass-card::before { opacity: 0.3; }
-  .icon-hover-rotate { transform: none; }
-}
-
-/* === ANIMACIÓN DE ENTRADA === */
-.glass-card {
-  animation: slideInUp 0.6s ease-out;
-}
-
-@keyframes slideInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

@@ -166,6 +166,7 @@ class ProjectsController < ApplicationController
       respond_to do |format|
         format.pdf { render plain: "Error generando PDF: #{e.message}", status: 500 }
         format.html { render plain: "Error generando PDF: #{e.message}", status: 500 }
+
       end
     end
   end
