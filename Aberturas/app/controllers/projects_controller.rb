@@ -84,8 +84,12 @@ class ProjectsController < ApplicationController
                enable_local_file_access: true,
                margin: { top: 10, bottom: 10, left: 10, right: 10 },
                disable_smart_shrinking: true,
-               javascript_delay: 5000,
-               timeout: 120
+               javascript_delay: 300,
+               timeout: 30,
+               page_size: 'A4',
+               print_media_type: true,
+               disable_external_links: true,
+               disable_forms: true
       end
       format.html { redirect_to project_path(@project) }
     end
@@ -148,8 +152,12 @@ class ProjectsController < ApplicationController
                  enable_local_file_access: true,
                  margin: { top: 10, bottom: 10, left: 10, right: 10 },
                  disable_smart_shrinking: true,
-                 javascript_delay: 1000,
-                 timeout: 30
+                 javascript_delay: 200,
+                 timeout: 15,
+                 page_size: 'A4',
+                 print_media_type: true,
+                 disable_external_links: true,
+                 disable_forms: true
         end
       end
     rescue => e
