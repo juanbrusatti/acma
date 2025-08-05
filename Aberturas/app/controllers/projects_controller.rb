@@ -93,25 +93,91 @@ class ProjectsController < ApplicationController
   def preview_pdf
     begin
       # Construir un objeto Project en memoria con los datos recibidos (sin strong params, solo para preview)
-      data = params.to_unsafe_h[:project]
+      data = params.to_unsafe_h[:project] || {}
+      
+      # Asegurar valores por defecto para campos obligatorios
+      data['name'] ||= 'Proyecto Sin Nombre'
+      data['description'] ||= ''
+      data['phone'] ||= ''
+      data['address'] ||= ''
+      data['status'] ||= 'Pendiente'
+      
       @project = Project.new(data)
-      # Calcular el precio manualmente para cada vidrio
-      @project.glasscuttings.each do |glass|
-        price_record = GlassPrice.find_by(glass_type: glass.glass_type, thickness: glass.thickness, color: glass.color)
-        if price_record && price_record.price_m2.present? && glass.height.present? && glass.width.present?
-          area_m2 = (glass.height.to_f / 1000) * (glass.width.to_f / 1000)
-          glass.price = (area_m2 * price_record.price_m2).round(2)
-        else
-          glass.price = nil
+      
+      # Calcular el precio manualmente para cada vidrio (solo si tiene datos válidos)
+      if @project.glasscuttings.present?
+        @project.glasscuttings.each do |glass|
+          # Solo calcular precio si tenemos todos los datos necesarios
+          if glass.glass_type.present? && glass.thickness.present? && glass.color.present? && 
+             glass.height.present? && glass.width.present? && 
+             glass.height.to_f > 0 && glass.width.to_f > 0
+            
+            price_record = GlassPrice.find_by(glass_type: glass.glass_type, thickness: glass.thickness, color: glass.color)
+            if price_record && price_record.selling_price.present?
+              area_m2 = (glass.height.to_f / 1000) * (glass.width.to_f / 1000)
+              glass.price = (area_m2 * price_record.selling_price).round(2)
+            else
+              glass.price = 0.0
+              Rails.logger.warn "No se encontró precio para vidrio: #{glass.glass_type}/#{glass.thickness}/#{glass.color}"
+            end
+          else
+            glass.price = 0.0
+            Rails.logger.warn "Datos incompletos para vidrio: #{glass.inspect}"
+          end
         end
       end
-      # Calcular el total y el IVA después de inicializar y calcular los precios
-      if @project && @project.respond_to?(:glasscuttings) && @project.respond_to?(:dvhs)
-        total = @project.glasscuttings.sum { |g| g.price.to_f } + @project.dvhs.sum { |d| d.price.to_f }
-        iva = (total * 0.21).round(2)
-        @project.define_singleton_method(:total) { price_total }
-        @project.define_singleton_method(:iva) { iva }
+      
+      # Calcular el precio manualmente para cada DVH (solo si tiene datos válidos)
+      if @project.dvhs.present?
+        @project.dvhs.each do |dvh|
+          # Solo calcular precio si tenemos todos los datos necesarios
+          if dvh.height.present? && dvh.width.present? && 
+             dvh.height.to_f > 0 && dvh.width.to_f > 0 &&
+             dvh.glasscutting1_type.present? && dvh.glasscutting1_thickness.present? && dvh.glasscutting1_color.present? &&
+             dvh.glasscutting2_type.present? && dvh.glasscutting2_thickness.present? && dvh.glasscutting2_color.present? &&
+             dvh.innertube.present?
+            
+            # Calcular área y perímetro
+            area_m2 = (dvh.height.to_f / 1000) * (dvh.width.to_f / 1000)
+            perimeter_m = 2 * ((dvh.height.to_f / 1000) + (dvh.width.to_f / 1000))
+            
+            # Obtener precios de los cristales
+            price1_record = GlassPrice.find_by(glass_type: dvh.glasscutting1_type, thickness: dvh.glasscutting1_thickness, color: dvh.glasscutting1_color)
+            price2_record = GlassPrice.find_by(glass_type: dvh.glasscutting2_type, thickness: dvh.glasscutting2_thickness, color: dvh.glasscutting2_color)
+            
+            price1 = price1_record&.selling_price || 0.0
+            price2 = price2_record&.selling_price || 0.0
+            
+            # Calcular precio del vidrio
+            glass_price = area_m2 * (price1 + price2)
+            
+            # Calcular precio del innertube (cámara) + ángulos usando AppConfig
+            begin
+              innertube_total = AppConfig.calculate_innertube_total_price(dvh.innertube, perimeter_m)
+            rescue => e
+              Rails.logger.warn "Error calculando innertube para DVH: #{e.message}"
+              innertube_total = 0.0
+            end
+            
+            dvh.price = (glass_price + innertube_total).round(2)
+          else
+            dvh.price = 0.0
+            Rails.logger.warn "Datos incompletos para DVH: #{dvh.inspect}"
+          end
+        end
       end
+      
+      # Calcular el total y el IVA después de inicializar y calcular los precios
+      glasscuttings_total = @project.glasscuttings.present? ? @project.glasscuttings.sum { |g| g.price.to_f } : 0.0
+      dvhs_total = @project.dvhs.present? ? @project.dvhs.sum { |d| d.price.to_f } : 0.0
+      total = glasscuttings_total + dvhs_total
+      iva = (total * 0.21).round(2)
+      
+      @project.define_singleton_method(:subtotal) { total }
+      @project.define_singleton_method(:iva) { iva }
+      @project.define_singleton_method(:total) { total + iva }
+      
+      Rails.logger.info "PDF Preview - Total: #{total}, IVA: #{iva}, Glasscuttings: #{glasscuttings_total}, DVHs: #{dvhs_total}"
       respond_to do |format|
         format.pdf do
           response.headers['Content-Disposition'] = "attachment; filename=proyecto_preview.pdf"

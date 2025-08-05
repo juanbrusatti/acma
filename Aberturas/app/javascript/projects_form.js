@@ -92,43 +92,64 @@ document.addEventListener('turbo:load', () => {
 
 function updateProjectTotals() {
   let subtotal = 0;
+  
+  console.log('=== updateProjectTotals called ===');
 
-  // Sum all simple glass prices
+  // Sum all simple glass prices (column 7, not 8)
   document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(8)');
+    const priceCell = tr.querySelector('td:nth-child(7)');
     if (priceCell) {
-      const price = parseFloat(priceCell.textContent.replace(',', '.')) || 0;
+      // Clean the text: remove $, commas, and handle decimal points
+      let priceText = priceCell.textContent.trim();
+      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      const price = parseFloat(priceText) || 0;
+      console.log('Glasscutting price:', priceText, '->', price);
       subtotal += price;
     }
   });
 
-  // Sum all DVH prices
+  // Sum all DVH prices (column 7, not 8)
   document.querySelectorAll('#dvhs-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(8)');
+    const priceCell = tr.querySelector('td:nth-child(7)');
     if (priceCell) {
-      const price = parseFloat(priceCell.textContent.replace(',', '.')) || 0;
+      // Clean the text: remove $, commas, and handle decimal points
+      let priceText = priceCell.textContent.trim();
+      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      const price = parseFloat(priceText) || 0;
+      console.log('DVH price:', priceText, '->', price);
       subtotal += price;
     }
   });
+  
+  console.log('Total subtotal:', subtotal);
 
-  // Update subtotal
-  const subtotalPriceElem = document.getElementById('subtotal-price');
+  // Try to update both possible element IDs for subtotal
+  const subtotalPriceElem = document.getElementById('subtotal-price') || document.getElementById('project-price-view');
   if (subtotalPriceElem) {
     subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
+    console.log('Updated subtotal element:', subtotalPriceElem.id, 'to:', '$' + subtotal.toFixed(2));
+  } else {
+    console.log('No subtotal element found');
   }
 
   // Calculate and update VAT (21%)
   const iva = subtotal * 0.21;
-  const ivaElem = document.getElementById('iva-value');
+  const ivaElem = document.getElementById('iva-value') || document.getElementById('project-iva-view');
   if (ivaElem) {
     ivaElem.textContent = '$' + iva.toFixed(2);
+    console.log('Updated IVA element:', ivaElem.id, 'to:', '$' + iva.toFixed(2));
+  } else {
+    console.log('No IVA element found');
   }
 
   // Calculate and update total
   const total = subtotal + iva;
-  const totalElem = document.getElementById('price-total');
+  const totalElem = document.getElementById('price-total') || document.getElementById('project-price-iva-view');
   if (totalElem) {
     totalElem.textContent = '$' + total.toFixed(2);
+    console.log('Updated total element:', totalElem.id, 'to:', '$' + total.toFixed(2));
+  } else {
+    console.log('No total element found');
   }
 
   // Update hidden fields with the calculated prices

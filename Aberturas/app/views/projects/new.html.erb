@@ -22,60 +22,11 @@
       <%= render partial: "projects/partials/info_project", locals: { f: f } %>
     </div>
 
-    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
     <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
+    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
 
   <% end %>
 </div>
-
-<!-- Hidden template for cloning glasscutting fields -->
-<!--  Template for dynamically adding new glasscutting rows -->
-<template id="glasscutting-template">
-  <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
-    <div>
-      <label>Tipología</label>
-      <div class="flex items-center border rounded px-2 py-1">
-        <span class="text-gray-700 font-medium mr-1">V</span>
-        <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
-               oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
-        <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
-      </div>
-    </div>
-    <div>
-      <label>Tipo</label>
-      <select name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1 glass-type-select">
-        <option value="">Seleccionar</option>
-        <option value="LAM">LAM</option>
-        <option value="FLO">FLO</option>
-        <option value="COL">COL</option>
-      </select>
-    </div>
-    <div>
-      <label>Grosor</label>
-      <select name="project[glasscuttings_attributes][][thickness]" class="w-full border rounded px-2 py-1 glass-thickness-select">
-        <option value="">Seleccionar</option>
-      </select>
-    </div>
-    <div>
-      <label>Alto</label>
-      <input type="number" name="project[glasscuttings_attributes][][height]" class="w-full border rounded px-2 py-1">
-    </div>
-    <div>
-      <label>Ancho</label>
-      <input type="number" name="project[glasscuttings_attributes][][width]" class="w-full border rounded px-2 py-1">
-    </div>
-    <div>
-      <label>Color</label>
-      <select name="project[glasscuttings_attributes][][color]" class="w-full border rounded px-2 py-1 glass-color-select">
-        <option value="">Seleccionar</option>
-      </select>
-    </div>
-    <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
-      <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
-      <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
-    </div>
-  </div>
-</template>
 
 <!-- Hidden template for cloning DVH fields -->
 <!--  Template for dynamically adding new DVH rows -->
@@ -87,9 +38,9 @@
     <div class="grid grid-cols-5 gap-4">
       <div>
         <label>Tipología</label>
-        <div class="flex items-center border rounded px-2 py-1">
+        <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
           <span class="text-gray-700 font-medium mr-1">V</span>
-          <input type="number" class="flex-1 border-0 outline-none typology-number-input" placeholder="1" min="1" 
+          <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1" 
                  oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
           <input type="hidden" name="project[dvhs_attributes][][typology]" class="typology-hidden-field" value="" />
         </div>
@@ -179,5 +130,54 @@
       <button type="button" class="cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded ml-2">Cancelar</button>
     </div>
 
+  </div>
+</template>
+
+<!-- Hidden template for cloning glasscutting fields -->
+<!--  Template for dynamically adding new glasscutting rows -->
+<template id="glasscutting-template">
+  <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
+    <div>
+      <label>Tipología</label>
+      <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
+        <span class="text-gray-700 font-medium mr-1">V</span>
+        <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1" 
+               oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
+        <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
+      </div>
+    </div>
+    <div>
+      <label>Tipo</label>
+      <select name="project[glasscuttings_attributes][][glass_type]" class="w-full border rounded px-2 py-1 glass-type-select">
+        <option value="">Seleccionar</option>
+        <option value="LAM">LAM</option>
+        <option value="FLO">FLO</option>
+        <option value="COL">COL</option>
+      </select>
+    </div>
+    <div>
+      <label>Grosor</label>
+      <select name="project[glasscuttings_attributes][][thickness]" class="w-full border rounded px-2 py-1 glass-thickness-select">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+    <div>
+      <label>Alto</label>
+      <input type="number" name="project[glasscuttings_attributes][][height]" class="w-full border rounded px-2 py-1">
+    </div>
+    <div>
+      <label>Ancho</label>
+      <input type="number" name="project[glasscuttings_attributes][][width]" class="w-full border rounded px-2 py-1">
+    </div>
+    <div>
+      <label>Color</label>
+      <select name="project[glasscuttings_attributes][][color]" class="w-full border rounded px-2 py-1 glass-color-select">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+    <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
+      <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
+      <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
+    </div>
   </div>
 </template>

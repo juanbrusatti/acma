@@ -1,11 +1,11 @@
-<div class="max-w-2xl mx-auto mt-10 bg-white rounded-lg shadow p-8" id="project-details">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-3xl font-bold" id="project-name-view"><%= @project.name %></h1>
-    <%= link_to pdf_project_path(@project, format: :pdf), class: "ml-auto inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-9 w-9 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
-      <%= image_tag "/download.svg", class: "w-6 h-6", alt: "Descargar PDF" %>
+<div class="container mx-auto mt-10 bg-white rounded-lg shadow p-6 sm:p-8 max-w-7xl" id="project-details">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+    <h1 class="text-4xl lg:text-5xl font-bold" id="project-name-view"><%= @project.name %></h1>
+    <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
+      <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
     <% end %>
   </div>
-  <input type="text" id="project-name-edit" value="<%= @project.name %>" style="display:none;" class="text-3xl font-bold mb-4 w-full border rounded px-2 py-1" />
+  <input type="text" id="project-name-edit" value="<%= @project.name %>" style="display:none;" class="text-4xl lg:text-5xl font-bold mb-4 w-full border rounded px-3 py-2" />
 
   <p class="text-lg text-gray-700 mb-2"><strong>Descripción:</strong> <span id="project-desc-view"><%= @project.description %></span></p>
   <textarea id="project-desc-edit" style="display:none;" class="w-full border rounded px-2 py-1 mb-2"><%= @project.description %></textarea>
@@ -51,13 +51,6 @@
     </div>
   </div>
 
-  <% if @project.glasscuttings.any? %>
-    <div class="mt-8">
-      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Vidrios del Proyecto</h2>
-      <%= render partial: "projects/partials/glasscuttings_table", locals: { project: @project } %>
-    </div>
-  <% end %>
-
   <% if @project.dvhs.any? %>
     <div class="mt-8">
       <h2 class="text-2xl font-semibold mb-4 text-gray-800">DVHs del Proyecto</h2>
@@ -65,12 +58,19 @@
     </div>
   <% end %>
 
-  <div class="mt-6 flex gap-2" id="project-actions-view">
-    <%= link_to "Editar", edit_project_path(@project), id: "edit-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" %>
-    <%= link_to "Volver", projects_path, class: "ml-auto inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
+  <% if @project.glasscuttings.any? %>
+    <div class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Vidrios del Proyecto</h2>
+      <%= render partial: "projects/partials/glasscuttings_table", locals: { project: @project } %>
+    </div>
+  <% end %>
+
+  <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-between" id="project-actions-view">
+    <%= link_to "Editar", edit_project_path(@project), id: "edit-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
+    <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
-  <div class="mt-6 flex gap-2" id="project-actions-edit" style="display:none;">
-    <%= button_tag "Confirmar", id: "confirm-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-green-600 text-white h-9 px-3" %>
-    <%= button_tag "Cancelar", id: "cancel-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
+  <div class="mt-8 flex flex-col sm:flex-row gap-4" id="project-actions-edit" style="display:none;">
+    <%= button_tag "Confirmar", id: "confirm-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-green-600 text-white h-10 px-6" %>
+    <%= button_tag "Cancelar", id: "cancel-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
 </div>

@@ -29,13 +29,13 @@ export function ensureDvhTable() {
     dvhTable.innerHTML = `
       <thead>
         <tr class='bg-gray-50 text-gray-500'>
-          <th class='px-2 py-1 text-left'>TIPOLOGÍA</th>
-          <th class='px-2 py-1 text-left'>CÁMARA</th>
-          <th class='px-2 py-1 text-left'>ALTO</th>
-          <th class='px-2 py-1 text-left'>ANCHO</th>
-          <th class='px-2 py-1 text-left'>CRISTAL 1</th>
-          <th class='px-2 py-1 text-left'>CRISTAL 2</th>
-          <th class='px-2 py-1 text-left'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>TIPOLOGÍA</th>
+          <th class='px-6 py-2 text-center'>CÁMARA</th>
+          <th class='px-4 py-2 text-center'>ALTO</th>
+          <th class='px-4 py-2 text-center'>ANCHO</th>
+          <th class='px-4 py-2 text-center'>CRISTAL 1</th>
+          <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+          <th class='px-4 py-2 text-center'>PRECIO</th>
         </tr>
       </thead>
     `;
@@ -115,20 +115,24 @@ export function handleDvhEvents(e) {
     
     // Populate row with DVH data and delete button
     tr.innerHTML = `
-      <td class='px-2 py-1'>${values.typology || ''}</td>
-      <td class='px-2 py-1'>${values.innertube || ''}</td>
-      <td class='px-2 py-1'>${values.height || ''}</td>
-      <td class='px-2 py-1'>${values.width || ''}</td>
-      <td class='px-2 py-1'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
-      <td class='px-2 py-1'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
-      <td class='px-2 py-1'>${price.toFixed(2) || ''}</td>
-      <td class='px-2 py-1 text-right'><button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.innertube || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
+      <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
+      <td class='px-4 py-2 text-right'><button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
     `;
     
     dvhTbody.appendChild(tr);
     
     // Update project totals if function exists
-    if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     
     // Create hidden form inputs for Rails form submission
     // DVH requires more fields due to dual glass configuration
@@ -167,7 +171,11 @@ export function handleDvhEvents(e) {
       removeDvhTableIfEmpty();
       
       // Update project totals after deletion
-      if (typeof window.updateProjectTotals === 'function') window.updateProjectTotals();
+      setTimeout(() => {
+        if (typeof window.updateProjectTotals === 'function') {
+          window.updateProjectTotals();
+        }
+      }, 100);
       
       // Remove corresponding hidden form inputs
       const hiddenRows = document.querySelectorAll("#dvhs-hidden .dvh-hidden-row");
