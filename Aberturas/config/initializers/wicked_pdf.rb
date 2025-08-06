@@ -25,6 +25,12 @@ WickedPdf.configure do |c|
     left: 10,
     right: 10
   }
-  c.javascript_delay = 2000
-  c.timeout = 120
+  c.javascript_delay = 100
+  c.timeout = 10
+  c.page_size = 'A4'
+  c.print_media_type = true
+  c.disable_external_links = true
+  c.disable_forms = true
+  c.lowquality = false
+  c.dpi = 96
 end

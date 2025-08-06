@@ -1,63 +1,25 @@
 <div class="flex min-h-screen w-full flex-col">
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <!-- Dashboard Header -->
     <div class="flex items-center gap-4">
-      <h1 class="text-2xl font-semibold">Dashboard</h1>
+      <h1 class="text-2xl font-semibold gradient-text">Dashboard</h1>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+    <!-- Main Dashboard Cards -->
+    <div class="dashboard-grid">
       <%= render 'dashboard/stock_card' %>
       <%= render 'dashboard/projects_card' %>
       <%= render 'dashboard/budget_card' %>
     </div>
 
-    <div class="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg xl:col-span-2">
-        <div class="flex flex-row items-center p-6">
-          <div class="grid gap-2">
-            <h3 class="text-2xl font-semibold leading-none tracking-tight">Proyectos Recientes</h3>
-            <p class="text-sm text-muted-foreground">Un vistazo a los últimos trabajos en proceso y finalizados.</p>
-          </div>
-          <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3 ml-auto">
-            Ver Todos
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-              <path d="M7 7L17 17"></path>
-              <path d="M17 7V17H7"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="relative w-full overflow-auto">
-          <table class="w-full caption-bottom text-sm">
-            <thead class="[&_tr]:border-b">
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Cliente</th>
-                <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 hidden sm:table-cell">Estado</th>
-                <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 hidden sm:table-cell">Fecha de Entrega</th>
-                <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="[&_tr:last-child]:border-0">
-              <% @recent_projects.each do |project| %>
-                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                    <div class="font-medium"><%= project.name %></div>
-                    <div class="hidden text-sm text-muted-foreground md:inline"><%= project.description %></div>
-                  </td>
-                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell">
-                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= project_status_badge_class(project.status) %>">
-                      <%= project.status %>
-                    </span>
-                  </td>
-                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 hidden text-right sm:table-cell"><%= project.delivery_date&.strftime('%d-%m-%Y') %></td>
-                  <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                    <%= link_to "Ver", project_path(project), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+    <!-- Secondary Dashboard Section -->
+    <div class="dashboard-section">
+      <!-- Recent Projects Section -->
+      <div class="dashboard-projects-section">
+        <%= render 'dashboard/recent_projects' %>
       </div>
 
+      <!-- Side Cards -->
       <div class="grid auto-rows-max items-start gap-4 lg:gap-8">
         <%= render 'dashboard/optimizer_card' %>
         <%= render 'dashboard/prices_card' %>

@@ -1,21 +1,41 @@
-<div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
-  <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-    <h3 class="text-sm font-medium">Gestión de Stock</h3>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+<div class="glass-card rounded-3xl border border-gray-200 bg-card 
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] text-card-foreground 
+            transition-all duration-500 ease-out 
+            hover:shadow-[0_20px_48px_rgba(0,0,0,0.25)] hover:-translate-y-0.5">
+  
+  <div class="flex flex-row items-center justify-between pb-2 p-6">
+    <h3 class="text-sm font-medium gradient-text">Gestión de Stock</h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+         stroke-linecap="round" stroke-linejoin="round" 
+         class="h-4 w-4 text-muted-foreground icon-hover-rotate">
       <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
       <path d="M2 17l10 5l10-5"></path>
       <path d="M2 12l10 5l10-5"></path>
     </svg>
   </div>
+
   <div class="p-6 pt-0">
-    <div class="text-2xl font-bold"><%= stock_summary_text(@stock_data[:total_sheets], @stock_data[:available_scraps]) %></div>
-    <p class="text-xs text-muted-foreground"><%= stock_scraps_text(@stock_data[:available_scraps]) %></p>
-         <%= link_to "glassplates", class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-black hover:text-white h-9 px-3 mt-4" do %>
+    <div class="text-2xl font-bold gradient-text-primary animated-number">
+      <%= stock_summary_text(@stock_data[:total_sheets], @stock_data[:available_scraps]) %>
+    </div>
+    <p class="text-xs text-muted-foreground pulse-text">
+      <%= stock_scraps_text(@stock_data[:available_scraps]) %>
+    </p>
+
+    <%= link_to "glassplates", class: "modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium 
+       border border-input bg-background hover:bg-accent transition-all duration-300 
+       h-9 px-3 mt-4 ripple-effect" do %>
       Ir a Stock
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+           stroke-linecap="round" stroke-linejoin="round" 
+           class="h-4 w-4">
         <path d="M7 7L17 17"></path>
         <path d="M17 7V17H7"></path>
       </svg>
     <% end %>
   </div>
 </div>
+
+<!-- Estilos movidos a app/assets/stylesheets/dashboard.css para mejor rendimiento -->

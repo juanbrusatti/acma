@@ -4,11 +4,63 @@
   <meta charset="utf-8">
   <title>PDF Proyecto</title>
   <style>
-    body { font-family: Arial, sans-serif; font-size: 12px; }
-    h1, h2 { color: #222; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    th { background: #eee; }
+    body { font-family: Arial, sans-serif; font-size: 12px; margin: 0; padding: 10px; }
+    h1, h2 { color: #222; margin: 10px 0 5px 0; }
+    h1 { font-size: 20px; text-align: center; }
+    h2 { font-size: 18px; margin-top: 30px; }
+    hr { border: 1px solid #ddd; margin: 10px 0; }
+    .banner { width: 100%; margin-bottom: 10px; }
+    .info-table { width: 100%; margin-bottom: 10px; font-size: 14px; }
+    .info-table td { padding: 4px 8px; }
+    .data-table { 
+      width: 100%; 
+      border-collapse: separate; 
+      border-spacing: 0; 
+      margin-bottom: 20px; 
+      font-size: 14px; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      box-shadow: 0 2px 8px #eee; 
+    }
+    .data-table th { 
+      padding: 8px; 
+      border-bottom: 2px solid #ddd; 
+      text-align: center; 
+      background: #f3f3f3; 
+      color: #222; 
+      font-weight: bold; 
+    }
+    .data-table td { 
+      padding: 8px; 
+      border-bottom: 1px solid #eee; 
+      text-align: center; 
+    }
+    .row-even { background: #fff; }
+    .row-odd { background: #f9f9f9; }
+    .total-row { 
+      background: #f3f3f3; 
+      border-top: 2px solid #ddd; 
+      font-weight: bold; 
+      text-align: right; 
+    }
+    .final-total { background: #e0e0e0; }
+    .empty-message { 
+      padding: 20px; 
+      text-align: center; 
+      color: #666; 
+      font-style: italic; 
+      border: 1px solid #ddd; 
+      border-radius: 8px; 
+      background: #f9f9f9; 
+    }
+    .summary-table { 
+      width: 50%; 
+      margin-bottom: 20px; 
+      font-size: 16px; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      box-shadow: 0 2px 8px #eee; 
+    }
   </style>
 </head>
 <body>
