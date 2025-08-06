@@ -1,9 +1,11 @@
 <%# Title for the page #%>
 <%#  Sets the page title %>
-<% content_for :title, "Crear proyecto" %>
+<% content_for :title, @project.persisted? ? "Agregar elementos al proyecto" : "Crear proyecto" %>
 
 <div class="w-full p-4 md:p-8">
-  <h1 class="text-lg font-semibold mb-3">Generar proyecto</h1>
+  <h1 class="text-lg font-semibold mb-3">
+    <%= @project.persisted? ? "Agregar elementos al proyecto" : "Generar proyecto" %>
+  </h1>
 
   <% if @project.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -16,15 +18,21 @@
     </div>
   <% end %>
 
-  <%= form_with(model: @project, local: true) do |f| %>
+  <%= form_with(model: @project, url: @project.persisted? ? projects_path : nil, method: @project.persisted? ? :post : nil, local: true) do |f| %>
+    <% if @project.persisted? %>
+      <%= hidden_field_tag :id, @project.id %>
+    <% end %>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%= render partial: "projects/partials/info_client", locals: { f: f } %>
-      <%= render partial: "projects/partials/info_project", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_client", locals: { f: f, readonly: @project.persisted? } %>
+      <%= render partial: "projects/partials/info_project", locals: { f: f, readonly: @project.persisted? } %>
     </div>
 
-    <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
-    <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
-
+    <% if @project.persisted? %>
+      <!-- Solo mostrar formularios de DVH y glasscutting después de crear el proyecto base -->
+      <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
+    <% end %>
   <% end %>
 </div>
 
@@ -40,7 +48,7 @@
         <label>Tipología</label>
         <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
           <span class="text-gray-700 font-medium mr-1">V</span>
-          <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1" 
+          <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1"
                  oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
           <input type="hidden" name="project[dvhs_attributes][][typology]" class="typology-hidden-field" value="" />
         </div>
@@ -141,7 +149,7 @@
       <label>Tipología</label>
       <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
         <span class="text-gray-700 font-medium mr-1">V</span>
-        <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1" 
+        <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1"
                oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
         <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
       </div>

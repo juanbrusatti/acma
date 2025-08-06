@@ -16,23 +16,33 @@ class ProjectsController < ApplicationController
     @projects = @projects.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
   end
 
-
-
   def new
-    @project = Project.new
-    # @project.glasscuttings.build
-    # @project.dvhs.build
+    if params[:project_id].present?
+      @project = Project.find(params[:project_id])
+    else
+      @project = Project.new
+    end
   end
 
   def create
-    @project = Project.new(project_params)
-    puts project_params.inspect
-    
-    if @project.save
-      redirect_to projects_path, notice: "Proyecto creado exitosamente."
+    # Si el proyecto ya existe, actualizar con DVHs y glasscuttings (botón "Guardar como presupuesto")
+    if params[:id].present?
+      @project = Project.find(params[:id])
+      if @project.update(project_params)
+        redirect_to projects_path, notice: "Proyecto guardado como presupuesto exitosamente."
+      else
+        render :new, status: :unprocessable_entity
+      end
     else
-      puts @project.errors.full_messages
-      render :new, status: :unprocessable_entity
+      # Crear nuevo proyecto básico (botón "Crear proyecto y continuar")
+      @project = Project.new(project_basic_params)
+
+      if @project.save
+        # Redirigir a la misma vista pero con el proyecto creado
+        redirect_to new_project_path(project_id: @project.id), notice: "Proyecto creado exitosamente. Ahora puedes agregar DVHs y vidrios."
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 
@@ -83,27 +93,28 @@ class ProjectsController < ApplicationController
       format.html { redirect_to project_path(@project) }
     end
   end
+
   def preview_pdf
     begin
       Rails.logger.info "=== Preview PDF - Usando precios del frontend ==="
-      
+
       # Construir un objeto Project en memoria con los datos recibidos
       data = params.to_unsafe_h[:project] || {}
       Rails.logger.info "Datos recibidos: glasscuttings=#{data['glasscuttings_attributes']&.count || 0}, dvhs=#{data['dvhs_attributes']&.count || 0}"
-      
+
       # Asegurar valores por defecto para campos obligatorios
       data['name'] ||= 'Proyecto Sin Nombre'
       data['description'] ||= ''
       data['phone'] ||= ''
       data['address'] ||= ''
       data['status'] ||= 'Pendiente'
-      
+
       @project = Project.new(data)
-      
+
       # NO recalcular precios - usar los enviados desde el frontend
       glasscuttings_total = 0.0
       dvhs_total = 0.0
-      
+
       if @project.glasscuttings.present?
         @project.glasscuttings.each_with_index do |glass, index|
           # Usar el precio enviado desde el frontend, o 0 si no existe
@@ -112,7 +123,7 @@ class ProjectsController < ApplicationController
           Rails.logger.info "Glasscutting #{index}: precio recibido #{glass.price}"
         end
       end
-      
+
       if @project.dvhs.present?
         @project.dvhs.each_with_index do |dvh, index|
           # Usar el precio enviado desde el frontend, o 0 si no existe
@@ -121,17 +132,17 @@ class ProjectsController < ApplicationController
           Rails.logger.info "DVH #{index}: precio recibido #{dvh.price}"
         end
       end
-      
+
       # Calcular totales usando los precios enviados
       total = glasscuttings_total + dvhs_total
       iva = (total * 0.21).round(2)
-      
+
       @project.define_singleton_method(:subtotal) { total }
       @project.define_singleton_method(:iva) { iva }
       @project.define_singleton_method(:total) { total + iva }
-      
+
       Rails.logger.info "Totales: Glasscuttings=#{glasscuttings_total}, DVHs=#{dvhs_total}, Total=#{total}, IVA=#{iva}"
-      
+
       respond_to do |format|
         format.pdf do
           response.headers['Content-Disposition'] = "attachment; filename=proyecto_preview.pdf"
@@ -150,6 +161,10 @@ class ProjectsController < ApplicationController
   end
 
   private
+
+  def project_basic_params
+    params.require(:project).permit(:name, :phone, :address, :delivery_date, :description, :status)
+  end
 
   def project_params
     params.require(:project).permit(
