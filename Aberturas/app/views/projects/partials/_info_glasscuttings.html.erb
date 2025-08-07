@@ -24,10 +24,10 @@
               <tr class="divide-x divide-gray-200" data-id="<%= glasscutting.id %>">
                 <td class="px-4 py-2 text-center"><%= glasscutting.typology %></td>
                 <td class="px-6 py-2 text-center"><%= glasscutting.glass_type %></td>
-                <td class="px-4 py-2 text-center"><%= glasscutting.thickness %> mm</td>
+                <td class="px-4 py-2 text-center"><%= glasscutting.thickness %></td>
                 <td class="px-4 py-2 text-center"><%= glasscutting.color %></td>
-                <td class="px-4 py-2 text-center"><%= glasscutting.height %> mm</td>
-                <td class="px-4 py-2 text-center"><%= glasscutting.width %> mm</td>
+                <td class="px-4 py-2 text-center"><%= glasscutting.height %></td>
+                <td class="px-4 py-2 text-center"><%= glasscutting.width %></td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(glasscutting.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
                   <button type="button" class="text-red-600 hover:text-red-800" 
@@ -36,15 +36,27 @@
                   </button>
                 </td>
               </tr>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][id]", glasscutting.id, id: "glasscuttings_#{glasscutting.id}" %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][glass_type]", glasscutting.glass_type %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][thickness]", glasscutting.thickness %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][height]", glasscutting.height %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][width]", glasscutting.width %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][color]", glasscutting.color %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][typology]", glasscutting.typology %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][price]", glasscutting.price %>
-              <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][_destroy]", "0" %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][id]", glasscutting.id, id: "glasscuttings_#{glasscutting.id}" %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][glass_type]", glasscutting.glass_type %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][thickness]", glasscutting.thickness %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][height]", glasscutting.height %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][width]", glasscutting.width %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][color]", glasscutting.color %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][typology]", glasscutting.typology %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][price]", glasscutting.price %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][_destroy]", "0", id: "glasscuttings_destroy_#{glasscutting.id}" %>
+              <script>
+                // Add event listener for delete button
+                document.addEventListener('click', function(e) {
+                  if (e.target.closest('button[onclick*="<%= glasscutting.id %>"]')) {
+                    const destroyField = document.getElementById('glasscuttings_destroy_<%= glasscutting.id %>');
+                    if (destroyField) {
+                      destroyField.value = '1';
+                      e.target.closest('tr').style.display = 'none';
+                    }
+                  }
+                });
+              </script>
             <% end %>
           </tbody>
         </table>

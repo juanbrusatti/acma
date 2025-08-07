@@ -21,14 +21,14 @@
             <% @project.dvhs.each_with_index do |dvh, index| %>
               <tr class="divide-x divide-gray-200" data-id="<%= dvh.id %>">
                 <td class="px-4 py-2 text-center"><%= dvh.typology %></td>
-                <td class="px-6 py-2 text-center"><%= dvh.innertube %> mm</td>
-                <td class="px-4 py-2 text-center"><%= dvh.width %> mm</td>
-                <td class="px-4 py-2 text-center"><%= dvh.height %> mm</td>
+                <td class="px-6 py-2 text-center"><%= dvh.innertube %></td>
+                <td class="px-4 py-2 text-center"><%= dvh.width %></td>
+                <td class="px-4 py-2 text-center"><%= dvh.height %></td>
                 <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting1_type %> <%= dvh.glasscutting1_thickness %>mm <%= dvh.glasscutting1_color %>
+                  <%= dvh.glasscutting1_type %> <%= dvh.glasscutting1_thickness %> <%= dvh.glasscutting1_color %>
                 </td>
                 <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting2_type.present? ? "#{dvh.glasscutting2_type} #{dvh.glasscutting2_thickness}mm #{dvh.glasscutting2_color}" : 'N/A' %>
+                  <%= dvh.glasscutting2_type.present? ? "#{dvh.glasscutting2_type} #{dvh.glasscutting2_thickness} #{dvh.glasscutting2_color}" : 'N/A' %>
                 </td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">

@@ -124,17 +124,39 @@ export function handleGlasscuttingEvents(e) {
     const hiddenDiv = document.createElement("div");
     hiddenDiv.style.display = "none";
     hiddenDiv.className = "glasscutting-hidden-row";
-    // Use glasscutting counter as unique index for nested attributes
-    const index = glasscuttingIdCounter;
+    
+    // Generate a unique ID for the new glasscutting
+    const newId = `new_${Date.now()}`;
+    
+    // Create the hidden inputs for the form
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
     `;
+    
+    // Add a data attribute to the row to identify it for deletion
+    tr.setAttribute('data-temp-id', newId);
+    
+    // Add delete functionality for the new row
+    const deleteButton = tr.querySelector('.delete-glass');
+    if (deleteButton) {
+      deleteButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tempId = tr.getAttribute('data-temp-id');
+        const destroyInput = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][_destroy]"]`);
+        if (destroyInput) {
+          destroyInput.value = '1';
+        }
+        tr.remove();
+        removeGlasscuttingTableIfEmpty();
+      });
+    }
     document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     
     // Increment counter and remove form container
