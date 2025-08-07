@@ -18,7 +18,7 @@ class ProjectsController < ApplicationController
 
   def new
     if params[:project_id].present?
-      @project = Project.find(params[:project_id])
+      @project = Project.includes(:glasscuttings, :dvhs).find(params[:project_id])
     else
       @project = Project.new
     end
