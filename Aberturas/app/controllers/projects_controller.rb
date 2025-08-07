@@ -56,22 +56,37 @@ class ProjectsController < ApplicationController
 
   def update
     @project = Project.find(params[:id])
-    if @project.update(project_params)
+    
+    # Actualizar solo los parámetros básicos del proyecto (datos del cliente)
+    if @project.update(project_basic_params)
       respond_to do |format|
-        format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
+        format.html { 
+          redirect_to @project.persisted? ? new_project_path(project_id: @project.id) : projects_path, 
+          notice: "Proyecto actualizado exitosamente." 
+        }
         format.json {
           render json: {
             success: true,
             project: helpers.project_json_data(@project),
-            status: @project.status
+            status: @project.status,
+            notice: 'Los cambios se guardaron correctamente.'
           }
         }
       end
     else
       respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { 
+          if @project.persisted?
+            render :new, status: :unprocessable_entity 
+          else
+            render :edit, status: :unprocessable_entity
+          end
+        }
         format.json {
-          render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
+          render json: { 
+            success: false, 
+            errors: @project.errors.full_messages 
+          }, status: :unprocessable_entity
         }
       end
     end

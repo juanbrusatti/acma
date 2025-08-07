@@ -1,6 +1,18 @@
-<div class="bg-white rounded-md border border-gray-200 shadow-sm p-4">
-  <h2 class="text-base font-semibold mb-2">Datos del cliente</h2>
-  <div class="space-y-2">
+<div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 relative" 
+     data-controller="client-info"
+     data-client-info-url-value="<%= @project.persisted? ? project_path(@project) : '#' %>"
+     data-client-info-project-id-value="<%= @project.id if @project.persisted? %>"
+     data-client-info-editing-value="<%= !@project.persisted? %>">
+  <div class="flex justify-between items-start mb-2">
+    <h2 class="text-base font-semibold">Datos del cliente</h2>
+    <button type="button" 
+            data-client-info-target="editButton" 
+            data-action="click->client-info#toggleEdit"
+            class="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+      Editar
+    </button>
+  </div>
+  <div class="space-y-2" data-client-info-target="fields">
     <div>
       <%= f.label :name, "Nombre del cliente" %>
       <%= f.text_field :name, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
