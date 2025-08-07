@@ -232,14 +232,17 @@ puts "✅ Precios de ejemplo para todas las combinaciones creados exitosamente!"
 # Create supply prices using the BASICS constant from the Supply model
 puts "Creando precios de ejemplo para insumos..."
 
+# Set MEP rate first for peso price calculation
+AppConfig.set_mep_rate(1200.0) # Using 1200 as example MEP rate
+
 Supply::BASICS.each_with_index do |name, index|
-  price = 1000 * (index + 1) # 1000, 2000, 3000
+  price_usd = (5.0 + index * 2).round(2) # 5.00, 7.00, 9.00, 11.00, 13.00 USD
 
   supply = Supply.find_or_initialize_by(name: name)
-  supply.price = price.to_f.round(2)
+  supply.price_usd = price_usd
 
   if supply.save
-    puts "✅ Precio creado: #{name} - $#{price}"
+    puts "✅ Precio creado: #{name} - US$#{price_usd} (AR$#{supply.price_peso})"
   else
     puts "❌ Error creando precio para: #{name}"
     puts "   Errores: #{supply.errors.full_messages.join(', ')}"

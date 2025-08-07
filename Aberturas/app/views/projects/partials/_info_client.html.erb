@@ -3,25 +3,25 @@
   <div class="space-y-2">
     <div>
       <%= f.label :name, "Nombre del cliente" %>
-      <%= f.text_field :name, class: "w-full border rounded px-2 py-1 text-sm" %>
+      <%= f.text_field :name, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
       <div>
         <%= f.label :phone, "Teléfono" %>
-        <%= f.telephone_field :phone, class: "w-full border rounded px-2 py-1 text-sm" %>
+        <%= f.telephone_field :phone, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
       </div>
       <div>
         <%= f.label :address, "Domicilio" %>
-        <%= f.text_field :address, class: "w-full border rounded px-2 py-1 text-sm" %>
+        <%= f.text_field :address, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
       </div>
     </div>
     <div>
       <%= f.label :description, "Descripción del proyecto" %>
-      <%= f.text_area :description, rows: 3, class: "w-full border rounded px-2 py-1 text-sm" %>
+      <%= f.text_area :description, rows: 3, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
     </div>
     <div>
       <%= f.label :delivery_date, "Fecha de entrega estimada" %>
-      <%= f.date_field :delivery_date, class: "w-full border rounded px-2 py-1 text-sm" %>
+      <%= f.date_field :delivery_date, class: "w-full border rounded px-2 py-1 text-sm #{'bg-gray-100 cursor-not-allowed' if local_assigns[:readonly]}", readonly: local_assigns[:readonly] %>
     </div>
   </div>
 </div>
