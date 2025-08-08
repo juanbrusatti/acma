@@ -45,7 +45,7 @@ class ProjectsController < ApplicationController
   end
 
   def edit
-    @project = Project.find(params[:id])
+    @project = Project.includes(:glasscuttings, :dvhs).find(params[:id])
   end
 
   def update

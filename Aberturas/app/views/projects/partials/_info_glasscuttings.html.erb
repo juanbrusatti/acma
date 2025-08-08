@@ -30,9 +30,9 @@
                 <td class="px-4 py-2 text-center"><%= glasscutting.width %></td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(glasscutting.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
-                  <button type="button" class="text-red-600 hover:text-red-800" 
-                          onclick="this.closest('tr').remove(); document.getElementById('glasscuttings-hidden').querySelector('input[value=&quot;<%= glasscutting.id %>&quot;]').parentNode.remove();">
-                    <i class="fas fa-trash"></i>
+                  <button type="button" class="delete-glasscutting bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" 
+                          data-id="<%= glasscutting.id %>">
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -45,18 +45,7 @@
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][typology]", glasscutting.typology %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][price]", glasscutting.price %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][_destroy]", "0", id: "glasscuttings_destroy_#{glasscutting.id}" %>
-              <script>
-                // Add event listener for delete button
-                document.addEventListener('click', function(e) {
-                  if (e.target.closest('button[onclick*="<%= glasscutting.id %>"]')) {
-                    const destroyField = document.getElementById('glasscuttings_destroy_<%= glasscutting.id %>');
-                    if (destroyField) {
-                      destroyField.value = '1';
-                      e.target.closest('tr').style.display = 'none';
-                    }
-                  }
-                });
-              </script>
+
             <% end %>
           </tbody>
         </table>
@@ -103,35 +92,5 @@
     }
   });
   
-  // Function to delete a glasscutting
-  function deleteGlasscutting(button) {
-    const row = button.closest('tr');
-    const id = row.dataset.id;
-    const hiddenInput = document.getElementById(`glasscuttings_${id}`);
-    
-    if (hiddenInput) {
-      // Mark for destruction instead of removing, in case it's an existing record
-      hiddenInput.value = '';
-      const destroyInput = document.createElement('input');
-      destroyInput.type = 'hidden';
-      destroyInput.name = `project[glasscuttings_attributes][${id}][_destroy]`;
-      destroyInput.value = '1';
-      hiddenInput.parentNode.appendChild(destroyInput);
-    }
-    
-    row.remove();
-    
-    // If no more glasscuttings, show the empty state
-    const tableBody = document.getElementById('glasscuttings-table-body');
-    if (tableBody && tableBody.children.length === 0) {
-      const container = document.getElementById('glasscuttings-table-container');
-      if (container) {
-        container.innerHTML = `
-          <div class="text-center py-4 text-gray-500">
-            No hay vidrios simples cargados. Agrega uno para comenzar.
-          </div>
-        ` + container.innerHTML;
-      }
-    }
-  }
+
 </script>

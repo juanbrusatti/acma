@@ -64,6 +64,47 @@ export function removeDvhTableIfEmpty() {
 // Main event handler for DVH related actions
 // Handles confirm, delete, and cancel operations for double-glazed windows
 export function handleDvhEvents(e) {
+  // DELETE: Handle delete buttons for existing DVHs
+  if (e.target.closest('.delete-dvh')) {
+    const button = e.target.closest('.delete-dvh');
+    const id = button.getAttribute('data-id');
+    const row = button.closest('tr');
+    
+    if (id) {
+      // Mark for destruction instead of removing, in case it's an existing record
+      const destroyField = document.querySelector(`input[name="project[dvhs_attributes][${id}][_destroy]"]`);
+      if (destroyField) {
+        destroyField.value = '1';
+        row.style.display = 'none';
+      }
+    } else {
+      // For new entries without ID, just remove the row
+      row.remove();
+    }
+    
+    // If no more DVHs, show the empty state
+    const tableBody = document.getElementById('dvhs-table-body');
+    if (tableBody) {
+      const visibleRows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
+      if (visibleRows.length === 0) {
+        const container = document.getElementById('dvhs-table-container');
+        if (container) {
+          // Remove existing table
+          const existingTable = container.querySelector('table');
+          if (existingTable) {
+            existingTable.remove();
+          }
+          // Add empty state message
+          container.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+              No hay DVHs cargados. Agrega uno para comenzar.
+            </div>
+          `;
+        }
+      }
+    }
+    return;
+  }
   // CONFIRM: Add new DVH entry to table
   if (e.target.classList.contains("confirm-dvh")) {
     const container = e.target.closest(".dvh-fields");
