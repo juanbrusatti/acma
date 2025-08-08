@@ -147,4 +147,43 @@ class ProjectEditFunctionalityTest < ApplicationSystemTestCase
     assert_selector "#glasscuttings-table-body td", text: "3+3"
     assert_selector "#glasscuttings-table-body td", text: "INC"
   end
+
+  test "puede eliminar DVHs existentes en la edición" do
+    # Crear un proyecto con DVH
+    project = Project.create!(
+      name: "Proyecto Test Eliminar DVH",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    dvh = project.dvhs.create!(
+      typology: "V1",
+      innertube: 12,
+      width: 1500,
+      height: 1000,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "FLO",
+      glasscutting2_thickness: "4+4",
+      glasscutting2_color: "STB",
+      price: 350.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el DVH esté presente
+    assert_selector "#dvhs-table-body tr", count: 1
+    
+    # Hacer clic en el botón de eliminar
+    find(".delete-dvh").click
+    
+    # Verificar que el DVH se haya ocultado (marcado para destrucción)
+    assert_selector "#dvhs-table-body tr", count: 0, visible: true
+  end
+
+
 end

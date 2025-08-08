@@ -38,19 +38,19 @@
                   </button>
                 </td>
               </tr>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][innertube]", dvh.innertube %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][width]", dvh.width %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][height]", dvh.height %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][typology]", dvh.typology %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting1_type]", dvh.glasscutting1_type %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting1_thickness]", dvh.glasscutting1_thickness %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting1_color]", dvh.glasscutting1_color %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting2_type]", dvh.glasscutting2_type %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting2_thickness]", dvh.glasscutting2_thickness %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][glasscutting2_color]", dvh.glasscutting2_color %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][price]", dvh.price %>
-              <%= hidden_field_tag "project[dvhs_attributes][#{index}][_destroy]", "0" %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][innertube]", dvh.innertube %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][width]", dvh.width %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][height]", dvh.height %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][typology]", dvh.typology %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_type]", dvh.glasscutting1_type %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_thickness]", dvh.glasscutting1_thickness %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_color]", dvh.glasscutting1_color %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_type]", dvh.glasscutting2_type %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_thickness]", dvh.glasscutting2_thickness %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_color]", dvh.glasscutting2_color %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][price]", dvh.price %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][_destroy]", "0", id: "dvhs_destroy_#{dvh.id}" %>
             <% end %>
           </tbody>
         </table>

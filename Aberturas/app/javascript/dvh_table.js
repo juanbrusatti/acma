@@ -72,7 +72,7 @@ export function handleDvhEvents(e) {
     
     if (id) {
       // Mark for destruction instead of removing, in case it's an existing record
-      const destroyField = document.querySelector(`input[name="project[dvhs_attributes][${id}][_destroy]"]`);
+      const destroyField = document.getElementById(`dvhs_destroy_${id}`);
       if (destroyField) {
         destroyField.value = '1';
         row.style.display = 'none';
