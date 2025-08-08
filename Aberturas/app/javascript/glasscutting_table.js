@@ -64,6 +64,111 @@ export function removeGlasscuttingTableIfEmpty() {
 // Main event handler for glass cutting related actions
 // Handles confirm, delete, and cancel operations
 export function handleGlasscuttingEvents(e) {
+  // EDIT: Handle edit buttons for existing glasscuttings
+  if (e.target.closest('.edit-glasscutting')) {
+    const button = e.target.closest('.edit-glasscutting');
+    const id = button.getAttribute('data-id');
+    const row = button.closest('tr');
+    
+    if (id) {
+      // Create edit form with current values
+      const typology = row.querySelector('td:nth-child(1)').textContent.trim();
+      const glassType = row.querySelector('td:nth-child(2)').textContent.trim();
+      const thickness = row.querySelector('td:nth-child(3)').textContent.trim();
+      const color = row.querySelector('td:nth-child(4)').textContent.trim();
+      const height = row.querySelector('td:nth-child(5)').textContent.trim();
+      const width = row.querySelector('td:nth-child(6)').textContent.trim();
+      
+      // Hide the row and show edit form
+      row.style.display = 'none';
+      
+      // Create edit form container
+      const editContainer = document.createElement('div');
+      editContainer.className = 'glasscutting-edit-form bg-gray-50 p-4 rounded border mb-4';
+      editContainer.innerHTML = `
+        <h3 class="text-sm font-semibold mb-3">Editar vidrio simple</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Tipología</label>
+            <input type="text" class="typology-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${typology}">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Tipo de vidrio</label>
+            <select class="glass-type-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
+              <option value="LAM" ${glassType === 'LAM' ? 'selected' : ''}>LAM</option>
+              <option value="FLO" ${glassType === 'FLO' ? 'selected' : ''}>FLO</option>
+              <option value="MON" ${glassType === 'MON' ? 'selected' : ''}>MON</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Grosor</label>
+            <select class="thickness-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
+              <option value="3+3" ${thickness === '3+3' ? 'selected' : ''}>3+3</option>
+              <option value="4+4" ${thickness === '4+4' ? 'selected' : ''}>4+4</option>
+              <option value="6+6" ${thickness === '6+6' ? 'selected' : ''}>6+6</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Color</label>
+            <select class="color-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
+              <option value="INC" ${color === 'INC' ? 'selected' : ''}>INC</option>
+              <option value="STB" ${color === 'STB' ? 'selected' : ''}>STB</option>
+              <option value="BRZ" ${color === 'BRZ' ? 'selected' : ''}>BRZ</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Alto (mm)</label>
+            <input type="number" class="height-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${height}">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Ancho (mm)</label>
+            <input type="number" class="width-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${width}">
+          </div>
+        </div>
+        <div class="flex space-x-2 mt-4">
+          <button type="button" class="save-glasscutting-edit bg-green-500 text-white px-4 py-2 rounded text-xs hover:bg-green-600" data-id="${id}">
+            Guardar
+          </button>
+          <button type="button" class="cancel-glasscutting-edit bg-gray-500 text-white px-4 py-2 rounded text-xs hover:bg-gray-600">
+            Cancelar
+          </button>
+        </div>
+      `;
+      
+      // Insert the edit form before the row
+      row.parentNode.insertBefore(editContainer, row);
+    }
+    return;
+  }
+  
+  // SAVE: Handle save button for glasscutting edit
+  if (e.target.closest('.save-glasscutting-edit')) {
+    const editContainer = e.target.closest('.glasscutting-edit-form');
+    const row = editContainer.nextElementSibling;
+    
+    // Show the row again
+    row.style.display = '';
+    
+    // Remove edit form
+    editContainer.remove();
+    
+    return;
+  }
+  
+  // CANCEL: Handle cancel button for glasscutting edit
+  if (e.target.closest('.cancel-glasscutting-edit')) {
+    const editContainer = e.target.closest('.glasscutting-edit-form');
+    const row = editContainer.nextElementSibling;
+    
+    // Show the row again
+    row.style.display = '';
+    
+    // Remove edit form
+    editContainer.remove();
+    
+    return;
+  }
+  
   // DELETE: Handle delete buttons for existing glasscuttings
   if (e.target.closest('.delete-glasscutting')) {
     const button = e.target.closest('.delete-glasscutting');

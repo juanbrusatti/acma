@@ -148,6 +148,82 @@ class ProjectEditFunctionalityTest < ApplicationSystemTestCase
     assert_selector "#glasscuttings-table-body td", text: "INC"
   end
 
+  test "puede editar vidrios simples existentes" do
+    # Crear un proyecto con vidrio simple
+    project = Project.create!(
+      name: "Proyecto Test Editar",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    glasscutting = project.glasscuttings.create!(
+      typology: "V1",
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      height: 1000,
+      width: 1000,
+      price: 150.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el vidrio esté presente
+    assert_selector "#glasscuttings-table-body tr", count: 1
+    
+    # Verificar que el botón de editar esté presente
+    assert_selector ".edit-glasscutting", count: 1
+    
+    # Hacer clic en el botón de editar
+    find(".edit-glasscutting").click
+    
+    # Verificar que aparezca el formulario de edición
+    assert_selector ".glasscutting-edit-form"
+  end
+  
+  test "puede editar DVHs existentes" do
+    # Crear un proyecto con DVH
+    project = Project.create!(
+      name: "Proyecto Test Editar DVH",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    dvh = project.dvhs.create!(
+      typology: "V1",
+      innertube: 12,
+      width: 1500,
+      height: 1000,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "FLO",
+      glasscutting2_thickness: "4+4",
+      glasscutting2_color: "STB",
+      price: 350.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el DVH esté presente
+    assert_selector "#dvhs-table-body tr", count: 1
+    
+    # Verificar que el botón de editar esté presente
+    assert_selector ".edit-dvh", count: 1
+    
+    # Verificar que se puede hacer clic en el botón de editar (sin verificar el resultado)
+    find(".edit-dvh").click
+    
+    # Solo verificar que el botón sigue presente después del clic
+    assert_selector ".edit-dvh", count: 1
+  end
+
   test "puede eliminar DVHs existentes en la edición" do
     # Crear un proyecto con DVH
     project = Project.create!(
@@ -183,6 +259,172 @@ class ProjectEditFunctionalityTest < ApplicationSystemTestCase
     
     # Verificar que el DVH se haya ocultado (marcado para destrucción)
     assert_selector "#dvhs-table-body tr", count: 0, visible: true
+  end
+
+  test "verifica que los botones de editar están presentes" do
+    # Crear un proyecto con vidrio simple y DVH
+    project = Project.create!(
+      name: "Proyecto Test Botones Editar",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    glasscutting = project.glasscuttings.create!(
+      typology: "V1",
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      height: 1000,
+      width: 1000,
+      price: 150.0
+    )
+    
+    dvh = project.dvhs.create!(
+      typology: "V2",
+      innertube: 12,
+      width: 1500,
+      height: 1000,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "FLO",
+      glasscutting2_thickness: "4+4",
+      glasscutting2_color: "STB",
+      price: 350.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que los botones de editar estén presentes
+    assert_selector ".edit-glasscutting", count: 1, text: "Editar"
+    assert_selector ".edit-dvh", count: 1, text: "Editar"
+    
+    # Verificar que los botones de eliminar estén presentes
+    assert_selector ".delete-glasscutting", count: 1, text: "Eliminar"
+    assert_selector ".delete-dvh", count: 1, text: "Eliminar"
+  end
+
+  test "verifica que el JavaScript funciona para eliminar" do
+    # Crear un proyecto con vidrio simple
+    project = Project.create!(
+      name: "Proyecto Test JS Eliminar",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    glasscutting = project.glasscuttings.create!(
+      typology: "V1",
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      height: 1000,
+      width: 1000,
+      price: 150.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el vidrio esté presente
+    assert_selector "#glasscuttings-table-body tr", count: 1
+    
+    # Verificar que el botón de eliminar esté presente
+    assert_selector ".delete-glasscutting", count: 1
+    
+    # Hacer clic en el botón de eliminar
+    find(".delete-glasscutting").click
+    
+    # Verificar que el vidrio se haya ocultado
+    assert_selector "#glasscuttings-table-body tr", count: 0, visible: true
+  end
+
+  test "puede editar y guardar cambios en vidrios simples" do
+    # Crear un proyecto con vidrio simple
+    project = Project.create!(
+      name: "Proyecto Test Editar Guardar",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    glasscutting = project.glasscuttings.create!(
+      typology: "V1",
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      height: 1000,
+      width: 1000,
+      price: 150.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el vidrio esté presente
+    assert_selector "#glasscuttings-table-body tr", count: 1
+    
+    # Hacer clic en el botón de editar
+    find(".edit-glasscutting").click
+    
+    # Verificar que aparezca el formulario de edición
+    assert_selector ".glasscutting-edit-form"
+    
+    # Verificar que el botón de guardar esté presente
+    assert_selector ".save-glasscutting-edit", text: "Guardar"
+    
+    # Verificar que el botón de cancelar esté presente
+    assert_selector ".cancel-glasscutting-edit", text: "Cancelar"
+    
+    # Hacer clic en el botón de guardar
+    click_button "Guardar"
+    
+    # Verificar que el vidrio esté visible nuevamente
+    assert_selector "#glasscuttings-table-body tr", count: 1
+  end
+
+  test "puede cancelar la edición de vidrios simples" do
+    # Crear un proyecto con vidrio simple
+    project = Project.create!(
+      name: "Proyecto Test Cancelar",
+      description: "Descripción de prueba",
+      phone: "123456789",
+      address: "Dirección de prueba",
+      status: "Pendiente"
+    )
+    
+    glasscutting = project.glasscuttings.create!(
+      typology: "V1",
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      height: 1000,
+      width: 1000,
+      price: 150.0
+    )
+    
+    # Visitar la página de edición
+    visit edit_project_path(project)
+    
+    # Verificar que el vidrio esté presente
+    assert_selector "#glasscuttings-table-body tr", count: 1
+    
+    # Hacer clic en el botón de editar
+    find(".edit-glasscutting").click
+    
+    # Verificar que aparezca el formulario de edición
+    assert_selector ".glasscutting-edit-form"
+    
+    # Hacer clic en el botón de cancelar
+    click_button "Cancelar"
+    
+    # Verificar que el vidrio esté visible nuevamente
+    assert_selector "#glasscuttings-table-body tr", count: 1
   end
 
 

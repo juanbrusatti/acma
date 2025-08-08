@@ -32,10 +32,16 @@
                 </td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
-                  <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" 
-                          data-id="<%= dvh.id %>">
-                    Eliminar
-                  </button>
+                  <div class="flex space-x-1 justify-center">
+                    <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" 
+                            data-id="<%= dvh.id %>">
+                      Editar
+                    </button>
+                    <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" 
+                            data-id="<%= dvh.id %>">
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
