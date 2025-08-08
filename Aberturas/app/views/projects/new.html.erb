@@ -18,7 +18,7 @@
     </div>
   <% end %>
 
-  <%= form_with(model: @project, url: @project.persisted? ? projects_path : nil, method: @project.persisted? ? :post : nil, local: true) do |f| %>
+  <%= form_with(model: @project, url: @project.persisted? ? projects_path : nil, method: @project.persisted? ? :post : nil, local: true, html: { id: "project-form" }) do |f| %>
     <% if @project.persisted? %>
       <%= hidden_field_tag :id, @project.id %>
     <% end %>
