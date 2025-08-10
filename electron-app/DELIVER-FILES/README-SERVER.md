@@ -12,7 +12,7 @@ Este documento explica cómo configurar el servidor que alojará la aplicación 
 
 El servidor debe estar configurado en la misma red local que los clientes:
 
-- IP predeterminada: `192.168.1.100`
+- IP predeterminada: `192.168.68.69`
 - Puerto predeterminado: `3000`
 
 > **Importante**: Si necesita cambiar la IP o el puerto del servidor, deberá modificar el archivo `main.js` de la aplicación Electron y recompilar el instalador.

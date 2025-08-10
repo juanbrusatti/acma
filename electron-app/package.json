@@ -1,0 +1,60 @@
+{
+  "name": "acma-electron",
+  "version": "1.1.0",
+  "description": "Sistema de gestión de aberturas ACMA",
+  "main": "main.js",
+  "author": "Tu Empresa <contacto@tuempresa.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-linux": "electron-builder --linux",
+    "build-mac": "electron-builder --mac",
+    "dist": "npm run build",
+    "clean": "rm -rf dist node_modules/.cache",
+    "rebuild": "npm run clean && npm install && npm run build",
+    "test-installer": "npm run build-win && echo 'Instalador generado en dist/'",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.tuempresa.acma",
+    "productName": "ACMA - Sistema de Aberturas",
+    "copyright": "Copyright © 2025 Tu Empresa",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      "icon": "icon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ACMA - Sistema de Aberturas"
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*"
+    ],
+    "extraResources": []
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {}
+}
