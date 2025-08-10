@@ -69,8 +69,9 @@ export function handleGlasscuttingEvents(e) {
     const button = e.target.closest('.edit-glasscutting');
     const id = button.getAttribute('data-id');
     const row = button.closest('tr');
+    const tempId = button.getAttribute('data-temp-id') || (row && row.getAttribute('data-temp-id'));
     
-    if (id) {
+    if (id || tempId) {
       // Read current values from row
       const typology = row.querySelector('td:nth-child(1)').textContent.trim();
       const glassType = row.querySelector('td:nth-child(2)').textContent.trim();
@@ -129,7 +130,8 @@ export function handleGlasscuttingEvents(e) {
         confirmBtn.classList.remove('confirm-glass');
         confirmBtn.classList.add('save-glasscutting-edit');
         confirmBtn.textContent = 'Guardar';
-        confirmBtn.setAttribute('data-id', id);
+        if (id) confirmBtn.setAttribute('data-id', id);
+        if (tempId) confirmBtn.setAttribute('data-temp-id', tempId);
       }
       if (cancelBtn) {
         cancelBtn.classList.remove('cancel-glass');
@@ -189,11 +191,24 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
     row.querySelector('td:nth-child(7)').textContent = price.toFixed(2);
 
-    // Update hidden inputs for existing record
+    // Update hidden inputs for existing or temp record
     const id = e.target.getAttribute('data-id');
+    const tempId = e.target.getAttribute('data-temp-id') || (row && row.getAttribute('data-temp-id'));
     if (id) {
       const setByName = (field, value) => {
         const input = document.querySelector(`input[name="project[glasscuttings_attributes][${id}][${field}]"]`);
+        if (input) input.value = value;
+      };
+      setByName('typology', newValues.typology);
+      setByName('glass_type', newValues.glass_type);
+      setByName('thickness', newValues.thickness);
+      setByName('color', newValues.color);
+      setByName('height', newValues.height);
+      setByName('width', newValues.width);
+      setByName('price', price.toFixed(2));
+    } else if (tempId) {
+      const setByName = (field, value) => {
+        const input = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][${field}]"]`);
         if (input) input.value = value;
       };
       setByName('typology', newValues.typology);
@@ -314,7 +329,10 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-4 py-2 text-center'>${values.height || ''}</td>
       <td class='px-4 py-2 text-center'>${values.width || ''}</td>
       <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-      <td class='px-4 py-2 text-right'><button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-4 py-2 text-right space-x-2'>
+        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </td>
     `;
     
     glasscuttingTbody.appendChild(tr);
@@ -346,8 +364,11 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
     `;
     
-    // Add a data attribute to the row to identify it for deletion
+    // Add a data attribute to the row to identify it for deletion and editing
     tr.setAttribute('data-temp-id', newId);
+    // Set data-temp-id on the edit button
+    const editBtn = tr.querySelector('.edit-glasscutting');
+    if (editBtn) { editBtn.setAttribute('data-temp-id', newId); }
     
     // Add delete functionality for the new row
     const deleteButton = tr.querySelector('.delete-glass');

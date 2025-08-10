@@ -70,8 +70,9 @@ export function handleDvhEvents(e) {
     const button = e.target.closest('.edit-dvh');
     const id = button.getAttribute('data-id');
     const row = button.closest('tr');
+    const tempId = button.getAttribute('data-temp-id') || (row && row.getAttribute('data-temp-id'));
     
-    if (id) {
+    if (id || tempId) {
       // Read current values from row
       const typology = row.querySelector('td:nth-child(1)').textContent.trim();
       const innertube = row.querySelector('td:nth-child(2)').textContent.trim();
@@ -119,7 +120,8 @@ export function handleDvhEvents(e) {
       if (confirmBtn) {
         confirmBtn.classList.remove('confirm-dvh');
         confirmBtn.classList.add('save-dvh-edit');
-        confirmBtn.setAttribute('data-id', id);
+        if (id) confirmBtn.setAttribute('data-id', id);
+        if (tempId) confirmBtn.setAttribute('data-temp-id', tempId);
         confirmBtn.textContent = 'Guardar';
       }
       if (cancelBtn) {
@@ -196,6 +198,7 @@ export function handleDvhEvents(e) {
   if (e.target.closest('.save-dvh-edit')) {
     const button = e.target.closest('.save-dvh-edit');
     const id = button.getAttribute('data-id');
+    const tempId = button.getAttribute('data-temp-id');
     const editContainer = button.closest('.dvh-edit-form');
     const editRow = editContainer.closest('tr');
     const row = editRow.nextElementSibling; // original hidden row
@@ -240,38 +243,39 @@ export function handleDvhEvents(e) {
     // Remove edit row
     editRow.remove();
 
-    // Update hidden fields
-    const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][typology]"]`);
+    // Update hidden fields (use id or tempId)
+    const key = id || tempId;
+    const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][typology]"]`);
     if (typologyFields.length > 0) typologyFields[0].value = typology;
     
-    const innertubeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][innertube]"]`);
+    const innertubeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][innertube]"]`);
     if (innertubeFields.length > 0) innertubeFields[0].value = innertube;
     
-    const widthFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][width]"]`);
+    const widthFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][width]"]`);
     if (widthFields.length > 0) widthFields[0].value = width;
     
-    const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][height]"]`);
+    const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][height]"]`);
     if (heightFields.length > 0) heightFields[0].value = height;
     
-    const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting1_type]"]`);
+    const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_type]"]`);
     if (glass1TypeFields.length > 0) glass1TypeFields[0].value = glass1Type;
     
-    const glass1ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting1_thickness]"]`);
+    const glass1ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_thickness]"]`);
     if (glass1ThicknessFields.length > 0) glass1ThicknessFields[0].value = glass1Thickness;
     
-    const glass1ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting1_color]"]`);
+    const glass1ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_color]"]`);
     if (glass1ColorFields.length > 0) glass1ColorFields[0].value = glass1Color;
     
-    const glass2TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting2_type]"]`);
+    const glass2TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_type]"]`);
     if (glass2TypeFields.length > 0) glass2TypeFields[0].value = glass2Type;
     
-    const glass2ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting2_thickness]"]`);
+    const glass2ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_thickness]"]`);
     if (glass2ThicknessFields.length > 0) glass2ThicknessFields[0].value = glass2Thickness;
     
-    const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][glasscutting2_color]"]`);
+    const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_color]"]`);
     if (glass2ColorFields.length > 0) glass2ColorFields[0].value = glass2Color;
     
-    const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][price]"]`);
+    const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][price]"]`);
     if (priceFields.length > 0) priceFields[0].value = price.toFixed(2);
     
     // Update project totals
@@ -398,7 +402,10 @@ export function handleDvhEvents(e) {
       <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
       <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
       <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-      <td class='px-4 py-2 text-right'><button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button></td>
+      <td class='px-4 py-2 text-right space-x-2'>
+        <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+        <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </td>
     `;
     
     dvhTbody.appendChild(tr);
@@ -440,6 +447,10 @@ export function handleDvhEvents(e) {
     `;
     
     document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
+    // Tag table row and edit button with temp id for inline editing
+    tr.setAttribute('data-temp-id', index);
+    const editBtn = tr.querySelector('.edit-dvh');
+    if (editBtn) { editBtn.setAttribute('data-temp-id', index); }
     
     // Increment counter and remove form container
     dvhIdCounter++;
