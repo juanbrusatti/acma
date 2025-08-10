@@ -71,72 +71,82 @@ export function handleGlasscuttingEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Create edit form with current values
+      // Read current values from row
       const typology = row.querySelector('td:nth-child(1)').textContent.trim();
       const glassType = row.querySelector('td:nth-child(2)').textContent.trim();
       const thickness = row.querySelector('td:nth-child(3)').textContent.trim();
       const color = row.querySelector('td:nth-child(4)').textContent.trim();
       const height = row.querySelector('td:nth-child(5)').textContent.trim();
       const width = row.querySelector('td:nth-child(6)').textContent.trim();
-      
-      // Hide the row and show edit form
+
+      // Hide the row and show edit form using the same template as add
       row.style.display = 'none';
-      
-      // Create edit form container
-      const editContainer = document.createElement('div');
-      editContainer.className = 'glasscutting-edit-form bg-gray-50 p-4 rounded border mb-4';
-      editContainer.innerHTML = `
-        <h3 class="text-sm font-semibold mb-3">Editar vidrio simple</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Tipología</label>
-            <input type="text" class="typology-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${typology}">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Tipo de vidrio</label>
-            <select class="glass-type-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-              <option value="LAM" ${glassType === 'LAM' ? 'selected' : ''}>LAM</option>
-              <option value="FLO" ${glassType === 'FLO' ? 'selected' : ''}>FLO</option>
-              <option value="MON" ${glassType === 'MON' ? 'selected' : ''}>MON</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Grosor</label>
-            <select class="thickness-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-              <option value="3+3" ${thickness === '3+3' ? 'selected' : ''}>3+3</option>
-              <option value="4+4" ${thickness === '4+4' ? 'selected' : ''}>4+4</option>
-              <option value="6+6" ${thickness === '6+6' ? 'selected' : ''}>6+6</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Color</label>
-            <select class="color-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-              <option value="INC" ${color === 'INC' ? 'selected' : ''}>INC</option>
-              <option value="STB" ${color === 'STB' ? 'selected' : ''}>STB</option>
-              <option value="BRZ" ${color === 'BRZ' ? 'selected' : ''}>BRZ</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Alto (mm)</label>
-            <input type="number" class="height-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${height}">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Ancho (mm)</label>
-            <input type="number" class="width-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${width}">
-          </div>
-        </div>
-        <div class="flex space-x-2 mt-4">
-          <button type="button" class="save-glasscutting-edit bg-green-500 text-white px-4 py-2 rounded text-xs hover:bg-green-600" data-id="${id}">
-            Guardar
-          </button>
-          <button type="button" class="cancel-glasscutting-edit bg-gray-500 text-white px-4 py-2 rounded text-xs hover:bg-gray-600">
-            Cancelar
-          </button>
-        </div>
-      `;
-      
-      // Insert the edit form before the row
-      row.parentNode.insertBefore(editContainer, row);
+
+      const tpl = document.getElementById('glasscutting-template');
+      if (!tpl) { return; }
+      const fragment = tpl.content.cloneNode(true);
+      const editContainer = fragment.querySelector('.glasscutting-fields');
+      editContainer.classList.add('glasscutting-edit-form');
+
+      // Prefill fields
+      const typologyNumberInput = editContainer.querySelector('.typology-number-input');
+      const typologyHidden = editContainer.querySelector('.typology-hidden-field');
+      const numberOnly = typology.replace(/^V/i, '');
+      if (typologyNumberInput) typologyNumberInput.value = numberOnly;
+      if (typologyHidden) typologyHidden.value = typology;
+
+      const typeSelect = editContainer.querySelector('.glass-type-select');
+      const thicknessSelect = editContainer.querySelector('.glass-thickness-select');
+      const colorSelect = editContainer.querySelector('.glass-color-select');
+      const heightInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][height]"]');
+      const widthInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][width]"]');
+
+      if (typeSelect) typeSelect.value = glassType;
+      // Populate dependent selects then set values in correct order
+      if (editContainer) { updateGlassSelects(editContainer); }
+      if (thicknessSelect) {
+        thicknessSelect.value = thickness;
+        // Trigger change to refresh color options for selected thickness
+        thicknessSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      if (colorSelect) {
+        // If the desired color option isn't present yet, add it so it stays selected
+        if (color && !Array.from(colorSelect.options).some(o => o.value === color)) {
+          const opt = document.createElement('option');
+          opt.value = color;
+          opt.textContent = color;
+          colorSelect.appendChild(opt);
+        }
+        colorSelect.value = color;
+      }
+      if (heightInput) heightInput.value = height;
+      if (widthInput) widthInput.value = width;
+
+      // Change action buttons to save/cancel edit
+      const confirmBtn = editContainer.querySelector('.confirm-glass');
+      const cancelBtn = editContainer.querySelector('.cancel-glass');
+      if (confirmBtn) {
+        confirmBtn.classList.remove('confirm-glass');
+        confirmBtn.classList.add('save-glasscutting-edit');
+        confirmBtn.textContent = 'Guardar';
+        confirmBtn.setAttribute('data-id', id);
+      }
+      if (cancelBtn) {
+        cancelBtn.classList.remove('cancel-glass');
+        cancelBtn.classList.add('cancel-glasscutting-edit');
+        cancelBtn.textContent = 'Cancelar';
+      }
+
+      // Insert the edit form before the row inside a full-width table row
+      const editTr = document.createElement('tr');
+      editTr.className = 'glasscutting-edit-row';
+      const editTd = document.createElement('td');
+      // Span all columns in the table
+      editTd.colSpan = row.children.length;
+      editTd.style.padding = '12px';
+      editTd.appendChild(editContainer);
+      editTr.appendChild(editTd);
+      row.parentNode.insertBefore(editTr, row);
     }
     return;
   }
@@ -144,28 +154,78 @@ export function handleGlasscuttingEvents(e) {
   // SAVE: Handle save button for glasscutting edit
   if (e.target.closest('.save-glasscutting-edit')) {
     const editContainer = e.target.closest('.glasscutting-edit-form');
-    const row = editContainer.nextElementSibling;
-    
-    // Show the row again
+    const editRow = editContainer.closest('tr.glasscutting-edit-row');
+    const row = editRow ? editRow.nextElementSibling : null;
+    if (!row) { return; }
+
+    // Get values from form
+    const typologyHidden = editContainer.querySelector('.typology-hidden-field');
+    const typeSelect = editContainer.querySelector('.glass-type-select');
+    const thicknessSelect = editContainer.querySelector('.glass-thickness-select');
+    const colorSelect = editContainer.querySelector('.glass-color-select');
+    const heightInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][height]"]');
+    const widthInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][width]"]');
+
+    const newValues = {
+      typology: typologyHidden ? typologyHidden.value : '',
+      glass_type: typeSelect ? typeSelect.value : '',
+      thickness: thicknessSelect ? thicknessSelect.value : '',
+      color: colorSelect ? colorSelect.value : '',
+      height: heightInput ? heightInput.value : '',
+      width: widthInput ? widthInput.value : ''
+    };
+
+    // Recalculate price
+    const price_m2 = getPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
+    const area_m2 = (parseFloat(newValues.height) / 1000) * (parseFloat(newValues.width) / 1000);
+    const price = Math.round(area_m2 * price_m2 * 100) / 100;
+
+    // Update table cells
+    row.querySelector('td:nth-child(1)').textContent = newValues.typology || '';
+    row.querySelector('td:nth-child(2)').textContent = newValues.glass_type || '';
+    row.querySelector('td:nth-child(3)').textContent = newValues.thickness || '';
+    row.querySelector('td:nth-child(4)').textContent = newValues.color || '';
+    row.querySelector('td:nth-child(5)').textContent = newValues.height || '';
+    row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
+    row.querySelector('td:nth-child(7)').textContent = price.toFixed(2);
+
+    // Update hidden inputs for existing record
+    const id = e.target.getAttribute('data-id');
+    if (id) {
+      const setByName = (field, value) => {
+        const input = document.querySelector(`input[name="project[glasscuttings_attributes][${id}][${field}]"]`);
+        if (input) input.value = value;
+      };
+      setByName('typology', newValues.typology);
+      setByName('glass_type', newValues.glass_type);
+      setByName('thickness', newValues.thickness);
+      setByName('color', newValues.color);
+      setByName('height', newValues.height);
+      setByName('width', newValues.width);
+      setByName('price', price.toFixed(2));
+    }
+
+    // Show the row again and remove form
     row.style.display = '';
-    
-    // Remove edit form
-    editContainer.remove();
-    
+    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+
+    // Update totals
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 50);
+
     return;
   }
   
   // CANCEL: Handle cancel button for glasscutting edit
   if (e.target.closest('.cancel-glasscutting-edit')) {
     const editContainer = e.target.closest('.glasscutting-edit-form');
-    const row = editContainer.nextElementSibling;
-    
-    // Show the row again
-    row.style.display = '';
-    
-    // Remove edit form
-    editContainer.remove();
-    
+    const editRow = editContainer.closest('tr.glasscutting-edit-row');
+    const row = editRow ? editRow.nextElementSibling : null;
+    if (row) { row.style.display = ''; }
+    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
     return;
   }
   
