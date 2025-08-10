@@ -166,3 +166,17 @@ function updateProjectTotals() {
 }
 
 window.updateProjectTotals = updateProjectTotals;
+
+document.addEventListener('turbo:load', () => {
+  const projectForm = document.getElementById('project-form');
+  if (projectForm) {
+    projectForm.addEventListener('submit', function(event) {
+      const openGlasscuttingForms = document.querySelectorAll('.glasscutting-fields:not(.hidden) input:not([disabled])');
+      const openDvhForms = document.querySelectorAll('.dvh-fields:not(.hidden) input:not([disabled])');
+      if (openGlasscuttingForms.length > 0 || openDvhForms.length > 0) {
+        alert('Faltan vidrios por confirmar');
+        event.preventDefault();
+      }
+    });
+  }
+});

@@ -366,6 +366,25 @@ export function handleDvhEvents(e) {
       const key = field.name.split("[").pop().replace("]", "");
       values[key] = field.value;
     });
+
+    // requires input validation
+    const requiredFields = [
+      { key: 'typology', label: 'Tipología' },
+      { key: 'innertube', label: 'Cámara' },
+      { key: 'height', label: 'Alto' },
+      { key: 'width', label: 'Ancho' },
+      { key: 'glasscutting1_type', label: 'Tipo del cristal 1' },
+      { key: 'glasscutting1_thickness', label: 'Grosor del cristal 1' },
+      { key: 'glasscutting1_color', label: 'Color del cristal 1' },
+      { key: 'glasscutting2_type', label: 'Tipo del cristal 2' },
+      { key: 'glasscutting2_thickness', label: 'Grosor del cristal 2' },
+      { key: 'glasscutting2_color', label: 'Color del cristal 2' }
+    ];
+    const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
+    if (missingField) {
+      alert('Falta rellenar la siguiente columna: ' + missingField.label);
+      return;
+    }
     
     // Ensure table exists before adding row
     ensureDvhTable();

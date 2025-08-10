@@ -23,6 +23,7 @@
                 url: @project.persisted? ? project_path(@project) : projects_path, 
                 method: @project.persisted? ? :patch : :post, 
                 local: true) do |f| %>
+
     <% if @project.persisted? %>
       <%= hidden_field_tag :project_id, @project.id %>
     <% end %>

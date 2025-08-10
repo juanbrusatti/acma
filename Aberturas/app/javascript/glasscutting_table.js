@@ -307,6 +307,21 @@ export function handleGlasscuttingEvents(e) {
       }
     });
     
+    // requires input validation
+    const requiredFields = [
+      { key: 'typology', label: 'Tipología' },
+      { key: 'glass_type', label: 'Tipo' },
+      { key: 'thickness', label: 'Grosor' },
+      { key: 'color', label: 'Color' },
+      { key: 'height', label: 'Alto' },
+      { key: 'width', label: 'Ancho' }
+    ];
+    const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
+    if (missingField) {
+      alert('Falta rellenar la siguiente columna: ' + missingField.label);
+      return;
+    }
+
     // Ensure table exists before adding row
     ensureGlasscuttingTable();
     
