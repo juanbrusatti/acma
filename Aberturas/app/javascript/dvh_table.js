@@ -1,6 +1,7 @@
 // DVH (Double Glazing) Table Module
 // Manages dynamic table creation and manipulation for double-glazed window entries in projects
 // DVH stands for "Doble Vidriado Hermético" (Hermetic Double Glazing)
+import { updateDvhGlassSelects } from "dvh_selects";
 
 // Global variables to track table state and unique IDs
 let dvhIdCounter = 1;
@@ -71,126 +72,122 @@ export function handleDvhEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Create edit form with current values
+      // Read current values from row
       const typology = row.querySelector('td:nth-child(1)').textContent.trim();
       const innertube = row.querySelector('td:nth-child(2)').textContent.trim();
       const width = row.querySelector('td:nth-child(3)').textContent.trim();
       const height = row.querySelector('td:nth-child(4)').textContent.trim();
-      
-      // Parse glass specifications
+
       const glass1Text = row.querySelector('td:nth-child(5)').textContent.trim();
       const glass2Text = row.querySelector('td:nth-child(6)').textContent.trim();
-      
-      const glass1Parts = glass1Text.split(' / ');
-      const glass2Parts = glass2Text.split(' / ');
-      
-      const glass1Type = glass1Parts[0] || '';
-      const glass1Thickness = glass1Parts[1] || '';
-      const glass1Color = glass1Parts[2] || '';
-      
-      const glass2Type = glass2Parts[0] || '';
-      const glass2Thickness = glass2Parts[1] || '';
-      const glass2Color = glass2Parts[2] || '';
-      
-      // Hide the row and show edit form
+      function parseSpecs(t) {
+        if (!t || t === 'N/A') return { type: '', thickness: '', color: '' };
+        if (t.includes('/')) {
+          const a = t.split('/').map(s => s.trim());
+          return { type: a[0] || '', thickness: a[1] || '', color: a[2] || '' };
+        }
+        const a = t.split(/\s+/).filter(Boolean);
+        return { type: a[0] || '', thickness: a[1] || '', color: a[2] || '' };
+      }
+      const g1 = parseSpecs(glass1Text);
+      const g2 = parseSpecs(glass2Text);
+      const glass1Type = g1.type;
+      const glass1Thickness = g1.thickness;
+      const glass1Color = g1.color;
+      const glass2Type = g2.type;
+      const glass2Thickness = g2.thickness;
+      const glass2Color = g2.color;
+
+      // Hide original row
       row.style.display = 'none';
-      
-      // Create edit form container
-      const editContainer = document.createElement('div');
-      editContainer.className = 'dvh-edit-form bg-gray-50 p-4 rounded border mb-4';
-      editContainer.innerHTML = `
-        <h3 class="text-sm font-semibold mb-3">Editar DVH</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Tipología</label>
-            <input type="text" class="typology-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${typology}">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Cámara (mm)</label>
-            <input type="number" class="innertube-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${innertube}">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Ancho (mm)</label>
-            <input type="number" class="width-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${width}">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Alto (mm)</label>
-            <input type="number" class="height-input w-full px-3 py-2 border border-gray-300 rounded text-xs" value="${height}">
-          </div>
-        </div>
-        
-        <div class="mt-4">
-          <h4 class="text-xs font-semibold mb-2">Cristal 1</h4>
-          <div class="grid grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Tipo</label>
-              <select class="glass1-type-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="LAM" ${glass1Type === 'LAM' ? 'selected' : ''}>LAM</option>
-                <option value="FLO" ${glass1Type === 'FLO' ? 'selected' : ''}>FLO</option>
-                <option value="MON" ${glass1Type === 'MON' ? 'selected' : ''}>MON</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Grosor</label>
-              <select class="glass1-thickness-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="3+3" ${glass1Thickness === '3+3' ? 'selected' : ''}>3+3</option>
-                <option value="4+4" ${glass1Thickness === '4+4' ? 'selected' : ''}>4+4</option>
-                <option value="6+6" ${glass1Thickness === '6+6' ? 'selected' : ''}>6+6</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Color</label>
-              <select class="glass1-color-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="INC" ${glass1Color === 'INC' ? 'selected' : ''}>INC</option>
-                <option value="STB" ${glass1Color === 'STB' ? 'selected' : ''}>STB</option>
-                <option value="BRZ" ${glass1Color === 'BRZ' ? 'selected' : ''}>BRZ</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        <div class="mt-4">
-          <h4 class="text-xs font-semibold mb-2">Cristal 2</h4>
-          <div class="grid grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Tipo</label>
-              <select class="glass2-type-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="LAM" ${glass2Type === 'LAM' ? 'selected' : ''}>LAM</option>
-                <option value="FLO" ${glass2Type === 'FLO' ? 'selected' : ''}>FLO</option>
-                <option value="MON" ${glass2Type === 'MON' ? 'selected' : ''}>MON</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Grosor</label>
-              <select class="glass2-thickness-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="3+3" ${glass2Thickness === '3+3' ? 'selected' : ''}>3+3</option>
-                <option value="4+4" ${glass2Thickness === '4+4' ? 'selected' : ''}>4+4</option>
-                <option value="6+6" ${glass2Thickness === '6+6' ? 'selected' : ''}>6+6</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Color</label>
-              <select class="glass2-color-select w-full px-3 py-2 border border-gray-300 rounded text-xs">
-                <option value="INC" ${glass2Color === 'INC' ? 'selected' : ''}>INC</option>
-                <option value="STB" ${glass2Color === 'STB' ? 'selected' : ''}>STB</option>
-                <option value="BRZ" ${glass2Color === 'BRZ' ? 'selected' : ''}>BRZ</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        <div class="flex space-x-2 mt-4">
-          <button type="button" class="save-dvh-edit bg-green-500 text-white px-4 py-2 rounded text-xs hover:bg-green-600" data-id="${id}">
-            Guardar
-          </button>
-          <button type="button" class="cancel-dvh-edit bg-gray-500 text-white px-4 py-2 rounded text-xs hover:bg-gray-600">
-            Cancelar
-          </button>
-        </div>
-      `;
-      
-      // Insert the edit form before the row
-      row.parentNode.insertBefore(editContainer, row);
+
+      // Create full-width table row to host the edit form
+      const editRow = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = row.children.length; // span all columns
+      editRow.appendChild(td);
+
+      // Clone DVH template
+      const template = document.getElementById('dvh-template');
+      const editContainer = template.content.cloneNode(true).querySelector('.dvh-fields');
+      // Mark as edit form for existing save/cancel handlers
+      editContainer.classList.add('dvh-edit-form');
+
+      // Convert template buttons into Save/Cancel for edit
+      const confirmBtn = editContainer.querySelector('.confirm-dvh');
+      const cancelBtn = editContainer.querySelector('.cancel-dvh');
+      if (confirmBtn) {
+        confirmBtn.classList.remove('confirm-dvh');
+        confirmBtn.classList.add('save-dvh-edit');
+        confirmBtn.setAttribute('data-id', id);
+        confirmBtn.textContent = 'Guardar';
+      }
+      if (cancelBtn) {
+        cancelBtn.classList.remove('cancel-dvh');
+        cancelBtn.classList.add('cancel-dvh-edit');
+        cancelBtn.textContent = 'Cancelar';
+      }
+
+      // Append container into td and insert before the row
+      td.appendChild(editContainer);
+      row.parentNode.insertBefore(editRow, row);
+
+      // Prefill values
+      // Typology: template uses number + hidden Vx
+      const typologyInput = editContainer.querySelector('.typology-number-input');
+      const typologyHidden = editContainer.querySelector('.typology-hidden-field');
+      const typologyNumber = typology.replace(/^V/i, '');
+      if (typologyInput) typologyInput.value = typologyNumber;
+      if (typologyHidden) typologyHidden.value = typology;
+
+      const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
+      const widthInput = editContainer.querySelector('input[name="project[dvhs_attributes][][width]"]');
+      const heightInput = editContainer.querySelector('input[name="project[dvhs_attributes][][height]"]');
+      if (innertubeSelect) innertubeSelect.value = innertube;
+      if (widthInput) widthInput.value = width;
+      if (heightInput) heightInput.value = height;
+
+      // Initialize dependent selects and set values in order for Glass 1
+      updateDvhGlassSelects(editContainer, 'glasscutting1');
+      const g1Type = editContainer.querySelector('.glasscutting1-type-select');
+      const g1Thk = editContainer.querySelector('.glasscutting1-thickness-select');
+      const g1Color = editContainer.querySelector('.glasscutting1-color-select');
+      if (g1Type) g1Type.value = glass1Type;
+      updateDvhGlassSelects(editContainer, 'glasscutting1');
+      if (g1Thk) {
+        g1Thk.value = glass1Thickness;
+        g1Thk.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      if (g1Color) {
+        if (glass1Color && !Array.from(g1Color.options).some(o => o.value === glass1Color)) {
+          const opt = document.createElement('option');
+          opt.value = glass1Color;
+          opt.textContent = glass1Color;
+          g1Color.appendChild(opt);
+        }
+        g1Color.value = glass1Color;
+      }
+
+      // Initialize dependent selects and set values in order for Glass 2
+      updateDvhGlassSelects(editContainer, 'glasscutting2');
+      const g2Type = editContainer.querySelector('.glasscutting2-type-select');
+      const g2Thk = editContainer.querySelector('.glasscutting2-thickness-select');
+      const g2Color = editContainer.querySelector('.glasscutting2-color-select');
+      if (g2Type) g2Type.value = glass2Type;
+      updateDvhGlassSelects(editContainer, 'glasscutting2');
+      if (g2Thk) {
+        g2Thk.value = glass2Thickness;
+        g2Thk.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      if (g2Color) {
+        if (glass2Color && !Array.from(g2Color.options).some(o => o.value === glass2Color)) {
+          const opt = document.createElement('option');
+          opt.value = glass2Color;
+          opt.textContent = glass2Color;
+          g2Color.appendChild(opt);
+        }
+        g2Color.value = glass2Color;
+      }
     }
     return;
   }
@@ -200,27 +197,34 @@ export function handleDvhEvents(e) {
     const button = e.target.closest('.save-dvh-edit');
     const id = button.getAttribute('data-id');
     const editContainer = button.closest('.dvh-edit-form');
-    const row = editContainer.nextElementSibling;
-    
-    // Get values from edit form
-    const typology = editContainer.querySelector('.typology-input').value;
-    const innertube = editContainer.querySelector('.innertube-input').value;
-    const width = editContainer.querySelector('.width-input').value;
-    const height = editContainer.querySelector('.height-input').value;
-    
-    const glass1Type = editContainer.querySelector('.glass1-type-select').value;
-    const glass1Thickness = editContainer.querySelector('.glass1-thickness-select').value;
-    const glass1Color = editContainer.querySelector('.glass1-color-select').value;
-    
-    const glass2Type = editContainer.querySelector('.glass2-type-select').value;
-    const glass2Thickness = editContainer.querySelector('.glass2-thickness-select').value;
-    const glass2Color = editContainer.querySelector('.glass2-color-select').value;
-    
+    const editRow = editContainer.closest('tr');
+    const row = editRow.nextElementSibling; // original hidden row
+
+    // Get values from template-based edit form
+    const typologyHidden = editContainer.querySelector('.typology-hidden-field');
+    const typologyNumberInput = editContainer.querySelector('.typology-number-input');
+    const typology = (typologyHidden && typologyHidden.value) || (typologyNumberInput && typologyNumberInput.value ? 'V' + typologyNumberInput.value : '');
+
+    const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
+    const widthInput = editContainer.querySelector('input[name="project[dvhs_attributes][][width]"]');
+    const heightInput = editContainer.querySelector('input[name="project[dvhs_attributes][][height]"]');
+    const innertube = innertubeSelect ? innertubeSelect.value : '';
+    const width = widthInput ? widthInput.value : '';
+    const height = heightInput ? heightInput.value : '';
+
+    const glass1Type = (editContainer.querySelector('.glasscutting1-type-select') || {}).value || '';
+    const glass1Thickness = (editContainer.querySelector('.glasscutting1-thickness-select') || {}).value || '';
+    const glass1Color = (editContainer.querySelector('.glasscutting1-color-select') || {}).value || '';
+
+    const glass2Type = (editContainer.querySelector('.glasscutting2-type-select') || {}).value || '';
+    const glass2Thickness = (editContainer.querySelector('.glasscutting2-thickness-select') || {}).value || '';
+    const glass2Color = (editContainer.querySelector('.glasscutting2-color-select') || {}).value || '';
+
     // Calculate new price
     const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
     const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
     const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
-    
+
     // Update row content
     row.querySelector('td:nth-child(1)').textContent = typology;
     row.querySelector('td:nth-child(2)').textContent = innertube;
@@ -229,13 +233,13 @@ export function handleDvhEvents(e) {
     row.querySelector('td:nth-child(5)').textContent = `${glass1Type} ${glass1Thickness} ${glass1Color}`;
     row.querySelector('td:nth-child(6)').textContent = `${glass2Type} ${glass2Thickness} ${glass2Color}`;
     row.querySelector('td:nth-child(7)').textContent = `$${price.toFixed(2)}`;
-    
+
     // Show the row again
     row.style.display = '';
-    
-    // Remove edit form
-    editContainer.remove();
-    
+
+    // Remove edit row
+    editRow.remove();
+
     // Update hidden fields
     const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${id}][typology]"]`);
     if (typologyFields.length > 0) typologyFields[0].value = typology;
@@ -283,13 +287,14 @@ export function handleDvhEvents(e) {
   // CANCEL: Handle cancel button for DVH edit
   if (e.target.closest('.cancel-dvh-edit')) {
     const editContainer = e.target.closest('.dvh-edit-form');
-    const row = editContainer.nextElementSibling;
+    const editRow = editContainer.closest('tr');
+    const row = editRow.nextElementSibling;
     
     // Show the row again
-    row.style.display = '';
+    if (row) row.style.display = '';
     
-    // Remove edit form
-    editContainer.remove();
+    // Remove edit row
+    editRow.remove();
     
     return;
   }
