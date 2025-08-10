@@ -18,9 +18,14 @@
     </div>
   <% end %>
 
-  <%= form_with(model: @project, url: @project.persisted? ? projects_path : nil, method: @project.persisted? ? :post : nil, local: true, html: { id: "project-form" }) do |f| %>
+  <%# Use the correct URL and method for new or existing projects %>
+  <%= form_with(model: @project, 
+                url: @project.persisted? ? project_path(@project) : projects_path, 
+                method: @project.persisted? ? :patch : :post, 
+                local: true) do |f| %>
+
     <% if @project.persisted? %>
-      <%= hidden_field_tag :id, @project.id %>
+      <%= hidden_field_tag :project_id, @project.id %>
     <% end %>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

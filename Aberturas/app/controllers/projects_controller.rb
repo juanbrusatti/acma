@@ -18,27 +18,21 @@ class ProjectsController < ApplicationController
 
   def new
     if params[:project_id].present?
-      @project = Project.find(params[:project_id])
+      @project = Project.includes(:glasscuttings, :dvhs).find(params[:project_id])
     else
       @project = Project.new
     end
   end
 
   def create
-    # Si el proyecto ya existe, actualizar con DVHs y glasscuttings (botón "Guardar como presupuesto")
-    if params[:id].present?
-      @project = Project.find(params[:id])
-      if @project.update(project_params)
-        redirect_to projects_path, notice: "Proyecto guardado como presupuesto exitosamente."
-      else
-        render :new, status: :unprocessable_entity
-      end
+    if params[:project_id].present? || params[:id].present?
+      # Si estamos actualizando un proyecto existente
+      update
     else
-      # Crear nuevo proyecto básico (botón "Crear proyecto y continuar")
+      # Crear nuevo proyecto
       @project = Project.new(project_basic_params)
 
       if @project.save
-        # Redirigir a la misma vista pero con el proyecto creado
         redirect_to new_project_path(project_id: @project.id), notice: "Proyecto creado exitosamente. Ahora puedes agregar DVHs y vidrios."
       else
         render :new, status: :unprocessable_entity
@@ -51,27 +45,51 @@ class ProjectsController < ApplicationController
   end
 
   def edit
-    @project = Project.find(params[:id])
+    @project = Project.includes(:glasscuttings, :dvhs).find(params[:id])
   end
 
   def update
-    @project = Project.find(params[:id])
-    if @project.update(project_params)
+    @project = Project.find(params[:id] || params[:project_id])
+    
+    # Debug: Mostrar los parámetros recibidos
+    Rails.logger.info "=== Parámetros recibidos en update ==="
+    Rails.logger.info "project_params: #{project_params.inspect}"
+    Rails.logger.info "project_basic_params: #{project_basic_params.inspect}"
+    
+    # Actualizar los parámetros del proyecto, incluyendo vidrios y DVHs
+    if @project.update(project_params.merge(project_basic_params))
+      # Debug: Mostrar el estado después de la actualización
+      Rails.logger.info "=== Proyecto actualizado exitosamente ==="
+      Rails.logger.info "Glasscuttings: #{@project.glasscuttings.count}"
+      
       respond_to do |format|
-        format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
+        format.html { 
+          redirect_to projects_path, 
+          notice: "Proyecto actualizado exitosamente." 
+        }
         format.json {
           render json: {
             success: true,
             project: helpers.project_json_data(@project),
-            status: @project.status
+            status: @project.status,
+            notice: 'Los cambios se guardaron correctamente.'
           }
         }
       end
     else
       respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { 
+          if @project.persisted?
+            render :new, status: :unprocessable_entity 
+          else
+            render :edit, status: :unprocessable_entity
+          end
+        }
         format.json {
-          render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
+          render json: { 
+            success: false, 
+            errors: @project.errors.full_messages 
+          }, status: :unprocessable_entity
         }
       end
     end
@@ -163,11 +181,16 @@ class ProjectsController < ApplicationController
   private
 
   def project_basic_params
-    params.require(:project).permit(:name, :phone, :address, :delivery_date, :description, :status)
+    params.require(:project).permit(:name, :phone, :address, :delivery_date, :description, :status, :price, :price_without_iva)
   end
 
   def project_params
-    params.require(:project).permit(
+    # Debug: Mostrar los parámetros recibidos
+    Rails.logger.info "=== Parámetros recibidos en project_params ==="
+    Rails.logger.info "Parámetros crudos: #{params[:project].inspect}"
+    
+    # Definir los parámetros permitidos
+    permitted_params = params.require(:project).permit(
       :name,
       :phone,
       :address,
@@ -176,8 +199,19 @@ class ProjectsController < ApplicationController
       :status,
       :price,
       :price_without_iva,
-      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :typology, :price ],
+      glasscuttings_attributes: [
+        :id,
+        :glass_type,
+        :thickness,
+        :height,
+        :width,
+        :color,
+        :typology,
+        :price,
+        :_destroy
+      ],
       dvhs_attributes: [
+        :id,
         :innertube,
         :typology,
         :height,
@@ -188,8 +222,21 @@ class ProjectsController < ApplicationController
         :glasscutting2_type,
         :glasscutting2_thickness,
         :glasscutting2_color,
-        :price
+        :price,
+        :_destroy
       ]
     )
+    
+    # Procesar manualmente los parámetros anidados para asegurarnos de que se incluyan
+    if params[:project][:glasscuttings_attributes].present?
+      permitted_params[:glasscuttings_attributes] = params[:project][:glasscuttings_attributes].permit!
+    end
+    
+    if params[:project][:dvhs_attributes].present?
+      permitted_params[:dvhs_attributes] = params[:project][:dvhs_attributes].permit!
+    end
+    
+    Rails.logger.info "Parámetros permitidos: #{permitted_params.inspect}"
+    permitted_params
   end
 end

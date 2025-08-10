@@ -2,15 +2,106 @@
 <div class="bg-white rounded-md border border-gray-200 shadow-sm p-4 mt-7">
     <h2 class="text-base font-semibold mb-4">DVH</h2>
 
-    <div id="dvhs-table-container"></div>
+    <div id="dvhs-table-container">
+      <% if @project.persisted? && @project.dvhs.any? %>
+        <table class="min-w-full text-xs text-gray-700 border">
+          <thead>
+            <tr class='bg-gray-50 text-gray-500'>
+              <th class='px-4 py-2 text-center'>TIPOLOGIA</th>
+              <th class='px-6 py-2 text-center'>CÁMARA</th>
+              <th class='px-4 py-2 text-center'>ANCHO</th>
+              <th class='px-4 py-2 text-center'>ALTO</th>
+              <th class='px-4 py-2 text-center'>CRISTAL 1</th>
+              <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+              <th class='px-4 py-2 text-center'>PRECIO</th>
+              <th class='px-4 py-2 text-center'>ACCIÓN</th>
+            </tr>
+          </thead>
+          <tbody id="dvhs-table-body">
+            <% @project.dvhs.each_with_index do |dvh, index| %>
+              <tr class="divide-x divide-gray-200" data-id="<%= dvh.id %>">
+                <td class="px-4 py-2 text-center"><%= dvh.typology %></td>
+                <td class="px-6 py-2 text-center"><%= dvh.innertube %></td>
+                <td class="px-4 py-2 text-center"><%= dvh.width %></td>
+                <td class="px-4 py-2 text-center"><%= dvh.height %></td>
+                <td class="px-4 py-2 text-center">
+                  <%= dvh.glasscutting1_type %> <%= dvh.glasscutting1_thickness %> <%= dvh.glasscutting1_color %>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <%= dvh.glasscutting2_type.present? ? "#{dvh.glasscutting2_type} #{dvh.glasscutting2_thickness} #{dvh.glasscutting2_color}" : 'N/A' %>
+                </td>
+                <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
+                <td class="px-4 py-2 text-center">
+                  <div class="flex space-x-1 justify-center">
+                    <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" 
+                            data-id="<%= dvh.id %>">
+                      Editar
+                    </button>
+                    <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" 
+                            data-id="<%= dvh.id %>">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][innertube]", dvh.innertube %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][width]", dvh.width %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][height]", dvh.height %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][typology]", dvh.typology %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_type]", dvh.glasscutting1_type %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_thickness]", dvh.glasscutting1_thickness %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting1_color]", dvh.glasscutting1_color %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_type]", dvh.glasscutting2_type %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_thickness]", dvh.glasscutting2_thickness %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_color]", dvh.glasscutting2_color %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][price]", dvh.price %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][_destroy]", "0", id: "dvhs_destroy_#{dvh.id}" %>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
 
-    <!-- Contenedor para los inputs ocultos de DVH confirmados -->
-    <div id="dvhs-hidden"></div>
+    <!-- Container for hidden form inputs of confirmed DVH entries -->
+    <div id="dvhs-hidden">
+      <% if @project.persisted? %>
+        <% @project.dvhs.each_with_index do |dvh, index| %>
+          <%= hidden_field_tag "project[dvhs_attributes][#{index}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
+        <% end %>
+      <% end %>
+    </div>
 
-    <!-- Formulario de creación de DVH -->
+    <!-- Container for dynamically generated DVH entry forms -->
     <div id="dvhs-wrapper">
     </div>
 
-    <!-- Botón para agregar nuevo DVH -->
-    <%= button_tag "Agregar DVH", type: "button", id: "add-dvh", class: "mt-4 bg-black text-white px-4 py-2 rounded" %>
+    <!-- Button to trigger creation of new DVH entry form -->
+    <div class="mt-4">
+      <%= button_tag "Agregar DVH", type: "button", id: "add-dvh", class: "bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors" %>
+    </div>
 </div>
+
+<script>
+  // This script will run when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // If there are existing DVHs, hide the empty state
+    const dvhsTable = document.querySelector('#dvhs-table-container table');
+    if (dvhsTable) {
+      // Table is already rendered with server-side data
+      return;
+    }
+    
+    // If no DVHs, show the empty state
+    const container = document.getElementById('dvhs-table-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="text-center py-4 text-gray-500">
+          No hay DVHs cargados. Agrega uno para comenzar.
+        </div>
+      ` + container.innerHTML;
+    }
+  });
+  
+
+</script>

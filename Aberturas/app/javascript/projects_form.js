@@ -24,6 +24,7 @@ function handleInputEvents(e) {
 }
 
 if (!window._projectsFormEventRegistered) {
+  console.log('Registering project form events');
   document.addEventListener("click", handleAllEvents);
   document.addEventListener("input", handleInputEvents);
   window._projectsFormEventRegistered = true;
