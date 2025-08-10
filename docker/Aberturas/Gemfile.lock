@@ -366,6 +366,12 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    will_paginate (4.0.1)
+    wicked_pdf (2.8.2)
+      activesupport
+      ostruct
+    will_paginate (4.0.1)
+    wkhtmltopdf-binary (0.12.6.9)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.3)
@@ -406,6 +412,9 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  wicked_pdf
+  will_paginate (~> 4.0)
+  wkhtmltopdf-binary
 
 BUNDLED WITH
    2.6.9

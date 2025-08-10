@@ -10,13 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
+  create_table "app_configs", force: :cascade do |t|
+    t.string "key"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "dvhs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "innertube"
     t.float "height"
     t.float "width"
-    t.string "location"
     t.decimal "price"
     t.string "glasscutting1_type"
     t.string "glasscutting1_thickness"
@@ -26,6 +32,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
     t.string "glasscutting2_color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "typology"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
   end
 
@@ -33,10 +40,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.decimal "price"
-    t.decimal "price_m2"
+    t.decimal "buying_price"
+    t.decimal "selling_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "percentage", precision: 5, scale: 2
   end
 
   create_table "glasscuttings", force: :cascade do |t|
@@ -45,13 +53,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.string "location"
     t.decimal "price"
     t.integer "project_id", null: false
     t.integer "dvh_id"
     t.integer "glassplate_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sequential_id"
+    t.string "typology"
     t.index ["dvh_id"], name: "index_glasscuttings_on_dvh_id"
     t.index ["glassplate_id"], name: "index_glasscuttings_on_glassplate_id"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
@@ -77,19 +86,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_124309) do
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
-    t.string "status"
+    t.string "status", default: "Pendiente"
     t.date "delivery_date"
     t.string "phone"
     t.string "address"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.decimal "price"
+    t.decimal "priceWithoutIva"
+    t.decimal "price_without_iva"
   end
 
   create_table "supplies", force: :cascade do |t|
     t.string "name"
-    t.decimal "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_usd", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "price_peso", precision: 10, scale: 2, default: "0.0", null: false
+    t.index ["price_peso"], name: "index_supplies_on_price_peso"
+    t.index ["price_usd"], name: "index_supplies_on_price_usd"
   end
 
   add_foreign_key "dvhs", "projects"

@@ -1,6 +1,6 @@
 class Project < ApplicationRecord
   # Associations
-  has_many :dvhs
+  has_many :dvhs, dependent: :destroy
   has_many :glasscuttings, dependent: :destroy
 
   # Nested attributes for form handling
@@ -8,10 +8,13 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :dvhs, allow_destroy: true
 
   # Validations
-  validates :name, presence: true, length: { maximum: 100 }
-  validates :phone, presence: true # Podriamos agregar un limite minimo de caracteres, como un telefono
-  # validates :description, presence: true, length: { minimum: 0, maximum: 500 }
-  # validates :status, presence: true, inclusion: { in: %w[Pendiente En\ Proceso Terminado] }
+  validates :name, presence: { message: "El nombre del proyecto no puede estar en blanco", full_message: false }, length: { maximum: 100, message: "no puede tener más de %{count} caracteres", full_message: false }
+  validates :phone, presence: { message: "El teléfono no puede estar en blanco", full_message: false }
+   # validates :description, presence: true, length: { minimum: 0, maximum: 500 }
+  validates :status, presence: { message: "no puede estar en blanco", full_message: false }, inclusion: { 
+    in: %w[Pendiente En\ Proceso Terminado], 
+    message: "debe ser uno de: Pendiente, En Proceso, Terminado" 
+  }
   # validates :delivery_date, presence: true, comparison: { greater_than: -> { Date.current } }, if: -> { status == "Pendiente" }
 
   # Scopes for filtering projects by status and dates
@@ -34,20 +37,34 @@ class Project < ApplicationRecord
     (delivery_date - Date.current).to_i
   end
 
-  # Calculate subtotal (currently returns 0, needs implementation)
+  # Calculate subtotal (use saved price_without_iva or fallback to calculation)
   def subtotal
-    # openings.sum { |o| (o.width.to_f * o.height.to_f * o.quantity.to_i * precio_unitario) }  # Example
-    0
+    # If we have a saved price without IVA, use it directly
+    return price_without_iva if price_without_iva.present?
+    
+    # Fallback calculation - handle nil prices gracefully
+    glasscutting_total = glasscuttings.sum { |g| g.price || 0 }
+    dvh_total = dvhs.sum { |d| d.price || 0 }
+    glasscutting_total + dvh_total
   end
 
-  # Calculate VAT (21% of subtotal)
+  # Calculate IVA (21% of subtotal)
   def iva
     subtotal * 0.21
   end
 
-  # Calculate total including VAT
+  # Calculate total including IVA
   def total
     subtotal + iva
+  end
+
+  # Alias methods for clarity
+  def precio_sin_iva
+    subtotal
+  end
+
+  def precio_con_iva
+    total
   end
 
   # Return color class for status display in views
@@ -63,4 +80,5 @@ class Project < ApplicationRecord
       "gray"
     end
   end
+
 end

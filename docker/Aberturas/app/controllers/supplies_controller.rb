@@ -38,12 +38,19 @@ class SuppliesController < ApplicationController
   def update
     respond_to do |format|
       if @supply.update(supply_params)
-        format.html { redirect_to supplies_path, notice: "Precio de insumo actualizado correctamente." }
+        format.html { redirect_to glass_prices_path }
         format.json { render :show, status: :ok, location: @supply }
-        format.turbo_stream
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace("supply_row_#{@supply.id}", 
+                                partial: "supplies/partials/row_supply", locals: { supply: @supply })
+        }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @supply.errors, status: :unprocessable_entity }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace("supply_row_#{@supply.id}", 
+                                partial: "supplies/partials/row_supply", locals: { supply: @supply })
+        }
       end
     end
   end
@@ -66,6 +73,6 @@ class SuppliesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def supply_params
-      params.require(:supply).permit(:name, :price)
+      params.require(:supply).permit(:name, :price_usd)
     end
 end

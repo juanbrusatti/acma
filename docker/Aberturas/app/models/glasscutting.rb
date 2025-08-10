@@ -3,13 +3,43 @@ class Glasscutting < ApplicationRecord
   belongs_to :glassplate, optional: true 
 
   # Validates that height and width are present and greater than 0
-  validates :height, :width, presence: true, numericality: { greater_than: 0 } 
-  # Validates that glass_type, thickness, color, and location are present
-  validates :glass_type, :thickness, :color, :location, presence: true 
+  validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El alto debe ser mayor que 0" } 
+  validates :width, presence: { message: "El ancho del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El ancho debe ser mayor que 0" } 
+  # Validates that glass_type, thickness, color, and typology are present
+  validates :glass_type, presence: { message: "El tipo de vidrio no puede estar en blanco" } 
+  validates :thickness, presence: { message: "El espesor del vidrio no puede estar en blanco" } 
+  validates :color, presence: { message: "El color del vidrio no puede estar en blanco" } 
+  validates :typology, presence: { message: "La tipología del vidrio no puede estar en blanco" }
 
-  before_save :set_price 
+  validates :color, inclusion: {
+    in: ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"],
+    message: "Color de vidrio no valido"
+  }
 
-  def set_price
+  validates :glass_type, inclusion: {
+    in: ["LAM", "FLO", "COL"],
+    message: "El tipo de vidrio no es valido"
+  }
+
+  validates :thickness, inclusion: {
+    in: ["3+3", "4+4", "5+5", "5mm"],
+    message: "El grosor del vidrios no es valido"
+  }
+
+  before_save :ensure_price_is_set
+
+  private
+
+  # Ensure glasscutting has a price - either from frontend or calculated here
+  def ensure_price_is_set
+    Rails.logger.debug "Glasscutting ensure_price_is_set: precio = #{price.inspect}"
+    return if price.present? && price > 0  # Price already set by frontend
+    
+    # Fallback: calculate price if not provided by frontend
+    set_price_from_backend
+  end
+
+  def set_price_from_backend
     Rails.logger.debug "Buscando precio para: tipo=#{glass_type.inspect}, espesor=#{thickness.inspect}, color=#{color.inspect}"
     price_record = GlassPrice.find_by(glass_type: glass_type, thickness: thickness, color: color)
     if price_record.nil?
@@ -17,8 +47,8 @@ class Glasscutting < ApplicationRecord
       return
     end
     Rails.logger.debug "Registro encontrado: #{price_record.inspect}"
-    if !price_record.price_m2.present?
-      Rails.logger.debug "El registro no tiene price_m2"
+    if !price_record.selling_price.present?
+      Rails.logger.debug "El registro no tiene selling_price"
       return
     end
     if !height.present? || !width.present?
@@ -26,8 +56,7 @@ class Glasscutting < ApplicationRecord
       return
     end
     area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
-    self.price = (area_m2 * price_record.price_m2).round(2)
+    self.price = (area_m2 * price_record.selling_price).round(2)
     Rails.logger.debug "Seteando precio: #{self.price}"
   end
-
 end

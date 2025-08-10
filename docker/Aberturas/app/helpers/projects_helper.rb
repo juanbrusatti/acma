@@ -1,4 +1,15 @@
 module ProjectsHelper
+  # Método para mostrar la información de paginación
+  def pagination_info(collection)
+    if collection.total_pages > 0
+      start_num = (collection.current_page - 1) * collection.per_page + 1
+      end_num = [start_num + collection.per_page - 1, collection.total_entries].min
+      "Mostrando #{start_num} - #{end_num} de #{collection.total_entries} proyectos"
+    else
+      "No se encontraron proyectos"
+    end
+  end
+
   def project_status_color(status)
     case status
     when "Terminado"
@@ -59,5 +70,28 @@ module ProjectsHelper
     else
       "text-green-600"
     end
+  end
+
+  def project_status_badge_html(status)
+    render partial: "projects/partials/status_badge", locals: { status: status }, formats: [:html]
+  end
+
+  # Serialize project data for JSON responses
+  def project_json_data(project)
+    project.as_json(
+      only: [:id, :name, :description, :status, :delivery_date], 
+      include: { 
+        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :typology, :height, :width] } 
+      }
+    )
+  end
+
+  def pagination_info(collection)
+    return "" unless collection.respond_to?(:current_page)
+    
+    start_item = (collection.current_page - 1) * collection.per_page + 1
+    end_item = [start_item + collection.per_page - 1, collection.total_entries].min
+    
+    "Mostrando #{start_item} - #{end_item} de #{collection.total_entries} resultados"
   end
 end

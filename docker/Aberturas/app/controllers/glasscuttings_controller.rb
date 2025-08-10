@@ -24,6 +24,6 @@ class GlasscuttingsController < ApplicationController
     end
 
     def glasscutting_params
-      params.require(:glasscutting).permit(:glass_type, :thickness, :height, :width, :color, :location, :price)
+      params.require(:glasscutting).permit(:glass_type, :thickness, :height, :width, :color, :typology, :price)
     end
 end

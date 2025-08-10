@@ -1,17 +1,29 @@
 <% content_for :title, "Showing supply" %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+<!-- Check if this is a turbo frame request -->
+<% if turbo_frame_request? %>
+  <!-- Use the existing price_display partial for turbo frame requests -->
+  <%= turbo_frame_tag dom_id(@supply) do %>
+    <%= render "supplies/partials/price_display", supply: @supply %>
   <% end %>
+<% else %>
+  <!-- Regular show page -->
+  <div class="md:w-2/3 w-full">
+    <% if notice.present? %>
+      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <% end %>
 
-  <h1 class="font-bold text-4xl">Showing supply</h1>
+    <h1 class="font-bold text-4xl">Showing supply</h1>
 
-  <%= render @supply %>
+    <div class="my-5">
+      <p class="font-medium text-lg"><%= @supply.name %></p>
+      <%= render "supplies/partials/price_display", supply: @supply %>
+    </div>
 
-  <%= link_to "Edit this supply", edit_supply_path(@supply), class: "mt-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to supplies", supplies_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <div class="inline-block ml-2">
-    <%= button_to "Destroy this supply", @supply, method: :delete, class: "mt-2 rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium" %>
+    <%= link_to "Edit this supply", edit_supply_path(@supply), class: "mt-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+    <%= link_to "Back to supplies", supplies_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+    <div class="inline-block ml-2">
+      <%= button_to "Destroy this supply", @supply, method: :delete, class: "mt-2 rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium" %>
+    </div>
   </div>
-</div>
+<% end %>

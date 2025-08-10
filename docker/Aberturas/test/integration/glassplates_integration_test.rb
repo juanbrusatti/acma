@@ -19,12 +19,11 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
       glassplate: {
         width: 800,
         height: 600,
-        color: "transparente",
-        glass_type: "Incoloro",
-        thickness: "6mm",
+        color: "INC",
+        glass_type: "LAM",
+        thickness: "3+3",
         standard_measures: "800x600mm",
-        quantity: 3,
-        location: "Estante C",
+        location: "DINTEL",
         status: "disponible",
         is_scrap: false
       }
@@ -36,8 +35,8 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
     # 3. Verify it appears in the list
     get glassplates_url
     assert_response :success
-    assert_select "td", "Incoloro"
-    assert_select "td", "6mm"
+    assert_select "td", "LAM"
+    assert_select "td", "3+3"
 
     # 4. Edit the glassplate
     new_glassplate = Glassplate.last
@@ -46,7 +45,6 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
 
     patch glassplate_url(new_glassplate), params: {
       glassplate: {
-        quantity: 5,
         status: "reservado"
       }
     }
@@ -56,7 +54,6 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
 
     # 5. Verify the update
     new_glassplate.reload
-    assert_equal 5, new_glassplate.quantity
     assert_equal "reservado", new_glassplate.status
 
     # 6. Delete the glassplate
@@ -74,11 +71,10 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
       glassplate: {
         width: 300,
         height: 200,
-        color: "azul",
-        glass_type: "Templado",
-        thickness: "4mm",
+        color: "GRS",
+        glass_type: "FLO",
+        thickness: "5mm",
         standard_measures: "300x200mm",
-        quantity: 1,
         location: "Rack de sobrantes",
         status: "disponible",
         is_scrap: true
@@ -94,15 +90,14 @@ class GlassplatesIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "stock summary calculation" do
-    # We have fixtures: complete_sheet (qty: 10), scrap, available, reserved, one (qty: 5), two (qty: 3)
     get glassplates_url
     assert_response :success
 
     stock_summary = assigns(:stock_summary)
 
     # Should calculate correctly from fixtures
-    # complete_sheet: 10, one: 5, two: 3 = 18 total sheets
-    assert_equal 18, stock_summary[:total_sheets]
+    # complete_sheet, one, two = 3 total sheets
+    assert_equal 3, stock_summary[:total_sheets]
     assert_equal 3, stock_summary[:total_scraps]  # scrap, available, reserved fixtures
     assert_equal 2, stock_summary[:available_scraps] # scrap and available fixtures
     assert_equal 1, stock_summary[:reserved_scraps]  # reserved fixture

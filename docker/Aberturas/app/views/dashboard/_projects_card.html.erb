@@ -1,15 +1,18 @@
-<div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+<div class="glass-card rounded-3xl border border-gray-200 bg-card 
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] text-card-foreground 
+            transition-all duration-500 ease-out 
+            hover:shadow-[0_20px_48px_rgba(0,0,0,0.25)] hover:-translate-y-0.5">
   <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-    <h3 class="text-sm font-medium">Proyectos en Curso</h3>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+    <h3 class="text-sm font-medium gradient-text">Proyectos en Curso</h3>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground icon-hover-rotate">
       <path d="M9 11H1l8-9v6.5a1.5 1.5 0 0 0 3 0V2l8 9h-8"></path>
       <path d="M9 11v4a1.5 1.5 0 0 0 3 0v-4"></path>
     </svg>
   </div>
   <div class="p-6 pt-0">
-    <div class="text-2xl font-bold"><%= projects_summary_text(@projects_data[:active_projects]) %></div>
-    <p class="text-xs text-muted-foreground"><%= projects_completed_text(@projects_data[:completed_this_month]) %></p>
-    <%= link_to "projects", class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 mt-4" do %>
+    <div class="text-2xl font-bold gradient-text-primary animated-number"><%= projects_summary_text(@projects_data[:active_projects]) %></div>
+    <p class="text-xs text-muted-foreground pulse-text"><%= projects_completed_text(@projects_data[:completed_this_month]) %></p>
+    <%= link_to "projects", class: "modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-300 h-9 px-3 mt-4 ripple-effect" do %>
       Ver Proyectos
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
         <path d="M7 7L17 17"></path>

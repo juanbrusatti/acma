@@ -1,0 +1,10 @@
+<table class="min-w-full divide-y divide-gray-200 <%= classes %>">
+  <thead class="bg-gray-50">
+    <tr>
+      <%= yield :headers %>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-100" id="<%= table_id %>">
+    <%= yield :body %>
+  </tbody>
+</table>

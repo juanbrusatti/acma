@@ -2,8 +2,28 @@
 
 one:
   project: one
-  innertube: 1
+  innertube: 6
+  typology: V1
+  height: 1000
+  width: 800
+  glasscutting1_type: LAM
+  glasscutting1_thickness: 3+3
+  glasscutting1_color: INC
+  glasscutting2_type: FLO
+  glasscutting2_thickness: 4+4
+  glasscutting2_color: GRS
+  price: 299.99
 
 two:
   project: two
-  innertube: 1
+  innertube: 9
+  typology: V2
+  height: 1200
+  width: 600
+  glasscutting1_type: COL
+  glasscutting1_thickness: 5+5
+  glasscutting1_color: BRC
+  glasscutting2_type: LAM
+  glasscutting2_thickness: 3+3
+  glasscutting2_color: STB
+  price: 399.99

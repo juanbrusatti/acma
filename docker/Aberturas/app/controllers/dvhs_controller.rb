@@ -19,10 +19,10 @@ class DvhsController < ApplicationController
 
     def dvh_params
       params.require(:dvh).permit(
-        :innertube, :location, :height, :width,
+        :innertube, :typology, :height, :width,
         :glasscutting1_type, :glasscutting1_thickness, :glasscutting1_color,
         :glasscutting2_type, :glasscutting2_thickness, :glasscutting2_color,
-        # :gas_type
+        :price
       )
     end
 end

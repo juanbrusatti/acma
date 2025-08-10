@@ -1,0 +1,246 @@
+/* === DASHBOARD MODERN STYLES === */
+
+/* === GLASSMORPHISM BASE === */
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(24px) saturate(120%);
+  transform: translateZ(0);
+  will-change: transform, box-shadow, border-color;
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.1) 0%, 
+    rgba(255,255,255,0.05) 100%);
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, 
+              rgba(255,255,255,0.15) 0%, 
+              rgba(255,255,255,0.08) 50%, 
+              rgba(255,255,255,0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px) translateZ(0) scale(1.02);
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12));
+}
+
+
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, 
+              rgba(255,255,255,0.15) 0%, 
+              rgba(255,255,255,0.05) 100%);
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+}
+
+/* === GRADIENTES DE TEXTO === */
+.gradient-text {
+  background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+.gradient-text-primary {
+  background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* === ANIMACIONES DE ICONOS === */
+.icon-hover-rotate {
+  transition: transform 0.3s ease-in-out;
+}
+
+.glass-card:hover .icon-hover-rotate {
+  transform: rotate(180deg);
+}
+
+/* === NÚMEROS ANIMADOS === */
+.animated-number {
+  animation: countUp 0.8s ease-out;
+  transform-origin: center;
+}
+
+@keyframes countUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* === TEXTO CON PULSO === */
+.pulse-text {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* === BOTONES MODERNOS === */
+.modern-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(55, 65, 81, 0.6);
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: white; 
+  }
+  
+
+.modern-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(55, 65, 81, 0.6);
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+}
+
+/* === EFECTO RIPPLE === */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple-effect:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* === SOMBRAS MEJORADAS === */
+.glass-card h3,
+.glass-card .text-2xl,
+.glass-card p {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* === RESPONSIVE === */
+@media (hover: none), (pointer: coarse) {
+  .glass-card:hover {
+    transform: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .glass-card::before { opacity: 0.3; }
+  .icon-hover-rotate { transform: none; }
+}
+
+/* === ANIMACIÓN DE ENTRADA === */
+.glass-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === OPTIMIZACIONES DE RENDIMIENTO === */
+.glass-card,
+.modern-button,
+.icon-hover-rotate {
+  will-change: transform;
+}
+
+/* Reducir repaints en animaciones */
+.animated-number,
+.pulse-text {
+  will-change: opacity, transform;
+}
+
+/* === DASHBOARD LAYOUT OPTIMIZATIONS === */
+.dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dashboard-section {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-section {
+    gap: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .dashboard-section {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dashboard-projects-section {
+  grid-column: span 2;
+}
+
+@media (min-width: 1280px) {
+  .dashboard-projects-section {
+    grid-column: span 2;
+  }
+}
