@@ -1,9 +1,21 @@
 <div class="container mx-auto mt-10 bg-white rounded-lg shadow p-6 sm:p-8 max-w-7xl" id="project-details">
   <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <h1 class="text-4xl lg:text-5xl font-bold" id="project-name-view"><%= @project.name %></h1>
-    <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
-      <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
-    <% end %>
+    <div class="flex gap-2">
+      <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
+        <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
+      <% end %>
+      <%= button_to project_path(@project), 
+                  method: :delete, 
+                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2", 
+                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.", 
+                          turbo_method: :delete },
+                  title: "Eliminar proyecto" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      <% end %>
+    </div>
   </div>
   <input type="text" id="project-name-edit" value="<%= @project.name %>" style="display:none;" class="text-4xl lg:text-5xl font-bold mb-4 w-full border rounded px-3 py-2" />
 
