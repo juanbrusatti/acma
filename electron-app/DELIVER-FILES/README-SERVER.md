@@ -24,22 +24,13 @@ El servidor debe estar configurado en la misma red local que los clientes:
 3. Ejecute los siguientes comandos:
 
 ```bash
-bundle install
-rails db:setup
-rails server -b 0.0.0.0 -p 3000
+docker compose build
+docker compose up
 ```
 
 ## Verificación
 
 Para verificar que el servidor está funcionando correctamente, abra un navegador y navegue a `http://192.168.1.100:3000`
-
-## Configuración para Producción
-
-Para un entorno de producción, considere:
-
-1. Configurar un servicio systemd para mantener el servidor activo
-2. Usar un servidor web como Nginx como proxy inverso
-3. Configurar SSL para una conexión segura
 
 ## Solución de Problemas
 
