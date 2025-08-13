@@ -1,30 +1,39 @@
----
 name: "🧪 Tests"
-about: "Agregar o mejorar pruebas en el proyecto"
-title: "[TEST] Título claro del test a realizar"
+about: "Add or improve tests in the project"
+title: "[TEST] Clear title of the test to be performed"
 labels: test
 assignees: ""
----
 
-## 🧪 ¿Qué se va a testear?
-Describí brevemente qué parte del código se va a cubrir con tests.
+🧪 What will be tested?
 
-## 🎯 Objetivo del test
-¿Por qué es importante testear esto? ¿Qué casos se quieren validar?
+Briefly describe which part of the code will be covered with tests.
 
-## ✅ Criterios de aceptación
-- [ ] El test cubre casos normales
-- [ ] El test cubre casos borde
-- [ ] El test falla si algo importante cambia
+🎯 Test Objective
 
-## 🧰 Tipo de test
-- [ ] Unitario
-- [ ] De integración
-- [ ] End-to-End
-- [ ] Otro: (especificar)
+Why is it important to test this? What cases should be validated?
 
-## 📎 Referencias
-Links al código afectado, PRs relacionados o ejemplos.
+✅ Acceptance Criteria
 
-## 🧠 Notas adicionales
-Todo lo que pueda ayudar al que toma esta issue.
+ The test covers normal cases
+
+ The test covers edge cases
+
+ The test fails if something important changes
+
+🧰 Type of test
+
+ Unit
+
+ Integration
+
+ End-to-End
+
+ Other: (specify)
+
+📎 References
+
+Links to affected code, related PRs, or examples.
+
+🧠 Additional Notes
+
+Anything that might help the person taking this issue.
