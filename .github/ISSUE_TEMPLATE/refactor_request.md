@@ -1,25 +1,29 @@
----
 name: "🛠 Refactor"
-about: "Proponé una mejora interna del código sin cambiar la funcionalidad"
-title: "[REFACTOR] Título claro"
+about: "Propose an internal code improvement without changing functionality"
+title: "[REFACTOR] Clear title"
 labels: refactor
 assignees: ""
----
 
-## 🧼 Descripción
-Describí qué parte del código necesita refactor y por qué.
+🧼 Description
 
-## 🤔 Problema actual
-¿Cuál es la dificultad o deuda técnica que tiene esa parte?
+Describe which part of the code needs refactoring and why.
 
-## 🛠 Propuesta de solución
-¿Cómo se podría mejorar el código? ¿Hay alguna estrategia o patrón que te gustaría aplicar?
+🤔 Current Problem
 
-## 🚫 Qué no se debe cambiar
-Aclará si hay algo que *no* debe ser modificado.
+What is the difficulty or technical debt in that part?
 
-## 📎 Referencias / contexto
-Links al archivo, PRs previos, capturas, etc.
+🛠 Proposed Solution
 
-## 🧠 Notas adicionales
-Observaciones útiles o cosas a tener en cuenta.
+How could the code be improved? Is there any strategy or pattern you would like to apply?
+
+🚫 What should not be changed
+
+Specify if there is anything that should not be modified.
+
+📎 References / Context
+
+Links to the file, previous PRs, screenshots, etc.
+
+🧠 Additional Notes
+
+Useful observations or things to keep in mind.
