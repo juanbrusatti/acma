@@ -1,4 +1,7 @@
 import { Application } from "@hotwired/stimulus"
+import Swal from "sweetalert2"
+
+window.Swal = Swal
 
 const application = Application.start()
 

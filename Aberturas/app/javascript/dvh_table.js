@@ -102,7 +102,17 @@ export function handleDvhEvents(e) {
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
-      alert('Falta rellenar la siguiente columna: ' + missingField.label);
+      if (window.Swal) {
+        window.Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'warning',
+          title: 'Falta rellenar: ' + missingField.label,
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true
+        });
+      }
       return;
     }
     
