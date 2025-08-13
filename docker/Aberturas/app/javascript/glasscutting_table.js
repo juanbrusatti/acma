@@ -318,7 +318,17 @@ export function handleGlasscuttingEvents(e) {
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
-      alert('Falta rellenar la siguiente columna: ' + missingField.label);
+       if (window.Swal) {
+        window.Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'warning',
+          title: 'Falta rellenar: ' + missingField.label,
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true
+        });
+      }
       return;
     }
 
@@ -368,15 +378,15 @@ export function handleGlasscuttingEvents(e) {
     const newId = `new_${Date.now()}`;
     
     // Create the hidden inputs for the form
+    const index = glasscuttingIdCounter;
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
+      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
     `;
     
     // Add a data attribute to the row to identify it for deletion and editing
