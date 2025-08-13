@@ -380,13 +380,13 @@ export function handleGlasscuttingEvents(e) {
     // Create the hidden inputs for the form
     const index = glasscuttingIdCounter;
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${index}][price]" value="${price.toFixed(2)}">
+      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
     `;
     
     // Add a data attribute to the row to identify it for deletion and editing
