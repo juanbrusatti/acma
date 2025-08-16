@@ -3,7 +3,8 @@ class GlassplatesController < ApplicationController
 
   # GET /glassplates or /glassplates.json
   def index
-    load_stock_data
+    @glassplates = Glassplate.all
+    @scraps = Scrap.all
   end
 
   # GET /glassplates/1 or /glassplates/1.json
@@ -59,20 +60,12 @@ class GlassplatesController < ApplicationController
 
   private
 
-  def load_stock_data
-    @complete_sheets = Glassplate.complete_sheets
-    @scraps = Glassplate.scraps
-    @stock_summary = helpers.calculate_stock_summary
-  end
-
-  private
-
   def set_glassplate
     @glassplate = Glassplate.find(params[:id])
   end
 
   def glassplate_params
-    params.require(:glassplate).permit(:width, :height, :color, :glass_type, :thickness,
-                                      :standard_measures, :location, :work, :origin, :status, :is_scrap)
+    params.require(:glassplate).permit(:width, :height, :color, :glass_type, :thickness, :quantity)
   end
+
 end

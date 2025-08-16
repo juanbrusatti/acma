@@ -1,6 +1,7 @@
 class Dvh < ApplicationRecord
   belongs_to :project
-  #has_many :glasscuttings, dependent: :nullify
+  belongs_to :scrap1, class_name: "Scrap", optional: true
+  belongs_to :scrap2, class_name: "Scrap", optional: true
 
   validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }
   validates :width, presence: { message: "El ancho del vidrio no puede estar en blanco" }
