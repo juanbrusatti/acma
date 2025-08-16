@@ -16,3 +16,4 @@ pin "glass_prices_calculator", to: "glass_prices_calculator.js"
 pin "supply_editing", to: "supply_editing.js"
 pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.12
 pin "glassplate_selects", to: "glassplate_selects.js"
+pin "scrap_selects", to: "scrap_selects.js"
