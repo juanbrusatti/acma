@@ -10,9 +10,7 @@ class StaticPagesController < ApplicationController
   def load_dashboard_data
     @stock_data = load_stock_data
     @projects_data = load_projects_data
-    @recent_projects = Project.all.order(created_at: :desc).limit(3).map do |project|
-      project
-    end
+    @recent_projects = Project.order(created_at: :desc).limit(3)
   end
 
   def load_stock_data
