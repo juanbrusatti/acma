@@ -65,6 +65,6 @@ class ScrapsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.expect(scrap: [ :ref_number, :scrap_type, :thickness, :width, :height, :output_work, :status ])
+      params.expect(scrap: [ :ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status ])
     end
 end

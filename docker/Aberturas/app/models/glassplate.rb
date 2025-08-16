@@ -30,8 +30,3 @@ class Glassplate < ApplicationRecord
     "#{glass_type} #{thickness} - #{color}"
   end
 end
-
-  # Devuelve todas las planchas (no eliminadas)
-  def self.plates
-    where(deleted: false)
-  end

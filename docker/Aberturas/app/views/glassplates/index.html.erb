@@ -2,14 +2,24 @@
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
       <h1 class="text-2xl font-semibold">Gestión de Stock</h1>
-      <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3 ml-auto" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M8 12h8"></path>
-          <path d="M12 8v8"></path>
-        </svg>
-        Agregar plancha
-      <% end %>
+      <div class="flex gap-2 ml-auto">
+        <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar plancha
+        <% end %>
+        <%= link_to new_scrap_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar retazo
+        <% end %>
+      </div>
     </div>
 
     <!-- Stock Summary Cards -->
@@ -24,7 +34,7 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= 0 %></div>
+          <div class="text-2xl font-bold"><%= @glassplates.sum(&:quantity).to_i %></div>
           <p class="text-xs text-muted-foreground">Planchas en stock</p>
         </div>
       </div>
@@ -40,8 +50,8 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= %></div>
-          <p class="text-xs text-muted-foreground">Recortes disponibles</p>
+          <div class="text-2xl font-bold"><%= @scraps.count() %></div>
+          <p class="text-xs text-muted-foreground">Cantidad de retazos</p>
         </div>
       </div>
 
@@ -55,8 +65,8 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%=  %></div>
-          <p class="text-xs text-muted-foreground">Sobrantes libres</p>
+          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Disponible" }.count %></div>
+          <p class="text-xs text-muted-foreground">Retazos disponibles</p>
         </div>
       </div>
 
@@ -68,8 +78,8 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%=  %></div>
-          <p class="text-xs text-muted-foreground">Sobrantes reservados</p>
+          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Reservado" }.count %></div>
+          <p class="text-xs text-muted-foreground">Retazos reservados</p>
         </div>
       </div>
     </div>
@@ -99,28 +109,75 @@
             <table class="w-full caption-bottom text-sm">
               <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Grosor</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Color</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ancho (mm)</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Alto (mm)</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cantidad</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Grosor</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Cantidad</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
                 <% @glassplates&.each do |glassplate| %>
                   <tr class="border-b transition-colors hover:bg-muted/50">
-                    <td class="px-4 py-2"><%= glassplate.glass_type %></td>
-                    <td class="px-4 py-2"><%= glassplate.thickness %></td>
-                    <td class="px-4 py-2"><%= glassplate.color %></td>
-                    <td class="px-4 py-2"><%= glassplate.width %></td>
-                    <td class="px-4 py-2"><%= glassplate.height %></td>
-                    <td class="px-4 py-2"><%= glassplate.quantity %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.glass_type %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.thickness %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.color %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.width %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.height %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.quantity.to_i %></td>
                     <td class="px-4 py-2 text-center">
                       <%= link_to 'Ver', glassplate_path(glassplate), class: 'btn btn-sm btn-info' %>
                       <%= link_to 'Editar', edit_glassplate_path(glassplate), class: 'btn btn-sm btn-warning' %>
                       <%= link_to 'Eliminar', glassplate_path(glassplate), method: :delete, data: { confirm: '¿Estás seguro?' }, class: 'btn btn-sm btn-danger' %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retazos Tab -->
+      <div id="sobrantes-tab" class="tab-content hidden">
+        <div class="p-6">
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold">Retazos</h3>
+            <p class="text-sm text-muted-foreground">Listado de retazos.</p>
+          </div>
+
+          <div class="relative w-full overflow-auto">
+            <table class="w-full caption-bottom text-sm">
+              <thead class="[&_tr]:border-b">
+                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Referencia</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Grosor</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Estado</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Obra</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="[&_tr:last-child]:border-0">
+                <% @scraps&.each do |scrap| %>
+                  <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="px-4 py-2 text-center"><%= scrap.ref_number %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.scrap_type %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.thickness %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.color %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.width %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.height %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.status %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.output_work %></td>
+                    <td class="px-4 py-2 text-center">
+                      <%= link_to 'Ver', scrap_path(scrap), class: 'btn btn-sm btn-info' %>
+                      <%= link_to 'Editar', edit_scrap_path(scrap), class: 'btn btn-sm btn-warning' %>
+                      <%= link_to 'Eliminar', scrap_path(scrap), method: :delete, data: { confirm: '¿Estás seguro?' }, class: 'btn btn-sm btn-danger' %>
                     </td>
                   </tr>
                 <% end %>
