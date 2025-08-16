@@ -1,26 +1,26 @@
-<div class="flex min-h-screen w-full flex-col">
-  <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+<div class="flex w-full flex-col h-[calc(100vh-2rem)]">
+  <main class="flex flex-col gap-2 p-4 md:gap-3 md:p-4 h-full">
     <!-- Dashboard Header -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 mb-2">
       <h1 class="text-2xl font-semibold gradient-text">Dashboard</h1>
     </div>
 
     <!-- Main Dashboard Cards -->
-    <div class="dashboard-grid">
+    <div class="dashboard-grid gap-2">
       <%= render 'dashboard/stock_card' %>
       <%= render 'dashboard/projects_card' %>
       <%= render 'dashboard/budget_card' %>
     </div>
 
     <!-- Secondary Dashboard Section -->
-    <div class="dashboard-section">
+    <div class="dashboard-section mt-1 flex-1 min-h-0">
       <!-- Recent Projects Section -->
-      <div class="dashboard-projects-section">
+      <div class="dashboard-projects-section h-full">
         <%= render 'dashboard/recent_projects' %>
       </div>
 
       <!-- Side Cards -->
-      <div class="grid auto-rows-max items-start gap-4 lg:gap-8">
+      <div class="grid auto-rows-max items-start gap-2">
         <%= render 'dashboard/optimizer_card' %>
         <%= render 'dashboard/prices_card' %>
       </div>
