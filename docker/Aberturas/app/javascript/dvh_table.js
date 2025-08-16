@@ -36,6 +36,7 @@ export function ensureDvhTable() {
           <th class='px-4 py-2 text-center'>ANCHO</th>
           <th class='px-4 py-2 text-center'>CRISTAL 1</th>
           <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+          <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
         </tr>
       </thead>
@@ -235,7 +236,8 @@ export function handleDvhEvents(e) {
     row.querySelector('td:nth-child(4)').textContent = height;
     row.querySelector('td:nth-child(5)').textContent = `${glass1Type} ${glass1Thickness} ${glass1Color}`;
     row.querySelector('td:nth-child(6)').textContent = `${glass2Type} ${glass2Thickness} ${glass2Color}`;
-    row.querySelector('td:nth-child(7)').textContent = `$${price.toFixed(2)}`;
+    row.querySelector('td:nth-child(7)').textContent = `${glass1.type_opening}`;
+    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Show the row again
     row.style.display = '';
@@ -274,7 +276,10 @@ export function handleDvhEvents(e) {
     
     const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_color]"]`);
     if (glass2ColorFields.length > 0) glass2ColorFields[0].value = glass2Color;
-    
+
+    const typeOpeningFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][type_opening]"]`);
+    if (typeOpeningFields.length > 0) typeOpeningFields[0].value = glass1.type_opening;
+
     const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][price]"]`);
     if (priceFields.length > 0) priceFields[0].value = price.toFixed(2);
     
@@ -378,7 +383,8 @@ export function handleDvhEvents(e) {
       { key: 'glasscutting1_color', label: 'Color del cristal 1' },
       { key: 'glasscutting2_type', label: 'Tipo del cristal 2' },
       { key: 'glasscutting2_thickness', label: 'Grosor del cristal 2' },
-      { key: 'glasscutting2_color', label: 'Color del cristal 2' }
+      { key: 'glasscutting2_color', label: 'Color del cristal 2' },
+      { key: 'type_opening', label: 'Tipo de apertura' }
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
@@ -420,6 +426,7 @@ export function handleDvhEvents(e) {
       <td class='px-4 py-2 text-center'>${values.width || ''}</td>
       <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
       <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
       <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
       <td class='px-4 py-2 text-right space-x-2'>
         <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
@@ -461,6 +468,7 @@ export function handleDvhEvents(e) {
       <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
       <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
       <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+      <input type="hidden" name="project[dvhs_attributes][${index}][type_opening]" value="${values.type_opening || ''}">
       <input type="hidden" name="project[dvhs_attributes][${index}][price]" value="${price.toFixed(2)}">
       <input type="hidden" name="project[dvhs_attributes][${index}][_destroy]" value="0">
     `;

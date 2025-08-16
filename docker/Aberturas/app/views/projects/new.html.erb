@@ -46,9 +46,8 @@
 <template id="dvh-template">
   <div class="border border-gray-300 rounded p-4 mb-4 dvh-fields space-y-4">
 
-    <!-- Row 1: Basic DVH information -->
-    <!--  First row: basic DVH information (innertube, typology, width, height) -->
-    <div class="grid grid-cols-5 gap-4">
+    <!-- Fila 1: Tipología, Cámara, Ancho, Alto, Abertura -->
+    <div class="grid grid-cols-5 gap-6 mb-4">
       <div>
         <label>Tipología</label>
         <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
@@ -76,13 +75,20 @@
         <label>Alto</label>
         <input type="number" name="project[dvhs_attributes][][height]" class="w-full border rounded px-2 py-1" />
       </div>
+      <div>
+        <label>Abertura</label>
+        <select name="project[dvhs_attributes][][type_opening]" class="w-full border rounded px-2 py-1">
+          <option value="">Seleccionar</option>
+          <option value="PVC">PVC</option>
+          <option value="Aluminio">Aluminio</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Row 2: Glass 1 specifications -->
-    <!--  Second row: specifications for Glass 1 -->
-    <div>
+    <!-- Fila 2: Cristal 1 -->
+    <div class="mb-4">
       <h3 class="font-semibold text-sm mb-2">Cristal 1</h3>
-      <div class="grid grid-cols-5 gap-4">
+      <div class="grid grid-cols-5 gap-6">
         <div>
           <label>Tipo de vidrio</label>
           <select name="project[dvhs_attributes][][glasscutting1_type]" class="w-full border rounded px-2 py-1 glasscutting1-type-select">
@@ -107,11 +113,10 @@
       </div>
     </div>
 
-    <!-- Row 3: Glass 2 specifications -->
-    <!--  Third row: specifications for Glass 2 -->
+    <!-- Fila 3: Cristal 2 -->
     <div>
       <h3 class="font-semibold text-sm mb-2">Cristal 2</h3>
-      <div class="grid grid-cols-5 gap-4">
+      <div class="grid grid-cols-5 gap-6">
         <div>
           <label>Tipo de vidrio</label>
           <select name="project[dvhs_attributes][][glasscutting2_type]" class="w-full border rounded px-2 py-1 glasscutting2-type-select">
@@ -137,7 +142,6 @@
     </div>
 
     <!-- Confirm button -->
-    <!--  Button to confirm the DVH row -->
     <div class="mt-4">
       <button type="button" class="confirm-dvh bg-black text-white px-3 py-1 rounded">Confirmar</button>
       <button type="button" class="cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded ml-2">Cancelar</button>
@@ -188,9 +192,19 @@
         <option value="">Seleccionar</option>
       </select>
     </div>
+
+    <div>
+      <label>Abertura</label>
+      <select name="project[dvhs_attributes][][type_opening]" class="w-full border rounded px-2 py-1">
+        <option value="">Seleccionar</option>
+        <option value="PVC">PVC</option>
+        <option value="Aluminio">Aluminio</option>
+      </select>
+    </div>
     <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
       <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
       <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
     </div>
+  </div>
   </div>
 </template>

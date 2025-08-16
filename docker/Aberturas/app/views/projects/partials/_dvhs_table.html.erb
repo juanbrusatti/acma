@@ -9,6 +9,7 @@
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">CÁMARA</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">ALTO</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">ANCHO</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">ABERTURA</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">PRECIO</th>
     </tr>
   </thead>
@@ -31,6 +32,7 @@
         <%# Dimensions in millimeters %>
         <td class="text-center px-4 py-2"><%= dvh.height %></td>
         <td class="text-center px-4 py-2"><%= dvh.width %></td>
+        <td class="text-center px-4 py-2"> <%= dvh.type_opening %></td>
         <%# Price formatted as currency if present %>
         <td class="text-center px-4 py-2">
           <%= number_to_currency(dvh.price, unit: "$", precision: 2) if dvh.price.present? %>

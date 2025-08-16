@@ -13,6 +13,7 @@
               <th class='px-4 py-2 text-center'>ALTO</th>
               <th class='px-4 py-2 text-center'>CRISTAL 1</th>
               <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+              <th class='px-4 py-2 text-center'>ABERTURA</th>
               <th class='px-4 py-2 text-center'>PRECIO</th>
               <th class='px-4 py-2 text-center'>ACCIÓN</th>
             </tr>
@@ -30,6 +31,7 @@
                 <td class="px-4 py-2 text-center">
                   <%= dvh.glasscutting2_type.present? ? "#{dvh.glasscutting2_type} #{dvh.glasscutting2_thickness} #{dvh.glasscutting2_color}" : 'N/A' %>
                 </td>
+                <td class="px-4 py-2 text-center"><%= dvh.type_opening %></td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
                   <div class="flex space-x-1 justify-center">
@@ -55,6 +57,7 @@
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_type]", dvh.glasscutting2_type %>
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_thickness]", dvh.glasscutting2_thickness %>
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][glasscutting2_color]", dvh.glasscutting2_color %>
+              <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][type_opening]", dvh.type_opening %>
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][price]", dvh.price %>
               <%= hidden_field_tag "project[dvhs_attributes][#{dvh.id}][_destroy]", "0", id: "dvhs_destroy_#{dvh.id}" %>
             <% end %>

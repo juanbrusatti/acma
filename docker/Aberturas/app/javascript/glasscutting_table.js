@@ -35,6 +35,7 @@ export function ensureGlasscuttingTable() {
           <th class='px-4 py-2 text-center'>COLOR</th>
           <th class='px-4 py-2 text-center'>ALTO</th>
           <th class='px-4 py-2 text-center'>ANCHO</th>
+          <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
         </tr>
       </thead>
@@ -174,7 +175,7 @@ export function handleGlasscuttingEvents(e) {
       thickness: thicknessSelect ? thicknessSelect.value : '',
       color: colorSelect ? colorSelect.value : '',
       height: heightInput ? heightInput.value : '',
-      width: widthInput ? widthInput.value : ''
+      width: widthInput ? widthInput.value : '',
     };
 
     // Recalculate price
@@ -189,7 +190,8 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(4)').textContent = newValues.color || '';
     row.querySelector('td:nth-child(5)').textContent = newValues.height || '';
     row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
-    row.querySelector('td:nth-child(7)').textContent = price.toFixed(2);
+    row.querySelector('td:nth-child(7)').textContent = newValues.type_opening || '';
+    row.querySelector('td:nth-child(8)').textContent = price.toFixed(2);
 
     // Update hidden inputs for existing or temp record
     const id = e.target.getAttribute('data-id');
@@ -205,6 +207,7 @@ export function handleGlasscuttingEvents(e) {
       setByName('color', newValues.color);
       setByName('height', newValues.height);
       setByName('width', newValues.width);
+      setByName('type_opening', newValues.type_opening);
       setByName('price', price.toFixed(2));
     } else if (tempId) {
       const setByName = (field, value) => {
@@ -217,6 +220,7 @@ export function handleGlasscuttingEvents(e) {
       setByName('color', newValues.color);
       setByName('height', newValues.height);
       setByName('width', newValues.width);
+      setByName('type_opening', newValues.type_opening);
       setByName('price', price.toFixed(2));
     }
 
@@ -314,7 +318,8 @@ export function handleGlasscuttingEvents(e) {
       { key: 'thickness', label: 'Grosor' },
       { key: 'color', label: 'Color' },
       { key: 'height', label: 'Alto' },
-      { key: 'width', label: 'Ancho' }
+      { key: 'width', label: 'Ancho' },
+      { key: 'type_opening', label: 'Tipo de apertura' }
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
@@ -343,6 +348,7 @@ export function handleGlasscuttingEvents(e) {
       <td class='px-4 py-2 text-center'>${values.color || ''}</td>
       <td class='px-4 py-2 text-center'>${values.height || ''}</td>
       <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+      <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
       <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
       <td class='px-4 py-2 text-right space-x-2'>
         <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
@@ -376,6 +382,7 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
     `;
     

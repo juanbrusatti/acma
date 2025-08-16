@@ -9,6 +9,7 @@
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Abertura</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
     </tr>
   </thead>
@@ -46,6 +47,7 @@
           <span class="glass-width-view"><%= glass.width %></span>
           <input type="number" class="glass-width-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.width %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
         </td>
+        <td class="text-center px-4 py-2"> <%= glass.type_opening %></td>
         <%# Price field (read-only, calculated automatically) %>
         <td class="text-center px-4 py-2">
           <%= number_to_currency(glass.price, unit: "$", precision: 2) if glass.price.present? %>
