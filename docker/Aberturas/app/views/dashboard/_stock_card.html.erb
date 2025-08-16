@@ -17,10 +17,8 @@
 
   <div class="p-6 pt-0">
     <div class="text-2xl font-bold gradient-text-primary animated-number">
-      <%= stock_summary_text(@stock_data[:total_sheets], @stock_data[:available_scraps]) %>
     </div>
     <p class="text-xs text-muted-foreground pulse-text">
-      <%= stock_scraps_text(@stock_data[:available_scraps]) %>
     </p>
 
     <%= link_to "glassplates", class: "modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium 

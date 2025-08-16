@@ -22,10 +22,7 @@ module GlassplatesHelper
   # Calculate stock summary statistics
   def calculate_stock_summary
     {
-      total_sheets: Glassplate.complete_sheets.count,
-      total_scraps: Glassplate.scraps.count,
-      available_scraps: Glassplate.scraps.available.count,
-      reserved_scraps: Glassplate.scraps.reserved.count
+      total_sheets: Glassplate.plates.count,
     }
   end
 

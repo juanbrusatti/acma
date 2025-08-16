@@ -1,6 +1,6 @@
 class Glasscutting < ApplicationRecord
   belongs_to :project 
-  belongs_to :glassplate, optional: true 
+  belongs_to :scrap, optional: true
 
   # Validates that height and width are present and greater than 0
   validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El alto debe ser mayor que 0" } 

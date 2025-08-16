@@ -1,3 +1,39 @@
+puts "Creando datos de ejemplo para scraps..."
+
+Scrap.create!(
+  ref_number: "S001",
+  scrap_type: "LAM",
+  thickness: "3+3",
+  color: "INC",
+  width: 1200,
+  height: 800,
+  output_work: "Obra 1",
+  status: "Disponible"
+)
+
+Scrap.create!(
+  ref_number: "S002",
+  scrap_type: "FLO",
+  thickness: "5mm",
+  color: "GRS",
+  width: 900,
+  height: 600,
+  output_work: "Obra 2",
+  status: "Reservado"
+)
+
+Scrap.create!(
+  ref_number: "S003",
+  scrap_type: "COL",
+  thickness: "4+4",
+  color: "STB",
+  width: 700,
+  height: 500,
+  output_work: "Obra 3",
+  status: "Disponible"
+)
+
+puts "✅ Retazos de ejemplo creados exitosamente!"
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
@@ -67,12 +103,7 @@ Glassplate.create!(
   color: "INC", # Changed from "Incoloro" to "INC"
   width: 2500,
   height: 3600,
-  standard_measures: "2500x3600",
-  location: "Estante Principal",
-  status: "disponible",
-  is_scrap: false,
-  work: nil,
-  origin: "Proveedor A"
+  quantity: 10,
 )
 
 Glassplate.create!(
@@ -81,111 +112,25 @@ Glassplate.create!(
   color: "INC", # Changed from "Incoloro" to "INC"
   width: 2500,
   height: 3600,
-  standard_measures: "2500x3600",
-  location: "Estante Principal",
-  status: "disponible",
-  is_scrap: false,
-  work: nil,
-  origin: "Proveedor B"
+  quantity: 5,
 )
 
 Glassplate.create!(
   glass_type: "COL", # Changed from "Cool Lite" to "COL"
-  thickness: "5mm",
-  color: "GRS", # Changed from "Gris" to "GRS"
+  thickness: "4+4",
+  color: "NTR", # Changed from "Gris" to "GRS"
   width: 2500,
   height: 3600,
-  standard_measures: "2500x3600",
-  location: "Estante Principal",
-  status: "disponible",
-  is_scrap: false,
-  work: nil,
-  origin: "Proveedor A"
+  quantity: 8,
 )
 
 Glassplate.create!(
-  glass_type: "FLO", # Changed from "Float" to "FLO"
+  glass_type: "LAM", # Changed from "Float" to "FLO"
   thickness: "4+4",
-  color: "BRC", # Changed from "Bronce" to "BRC"
+  color: "INC", # Changed from "Bronce" to "BRC"
   width: 2440,
   height: 3660,
-  standard_measures: "2440x3660",
-  location: "Estante Principal",
-  status: "disponible",
-  is_scrap: false,
-  work: nil,
-  origin: "Proveedor C"
-)
-
-# Example scraps
-Glassplate.create!(
-  glass_type: "FLO", # Changed from "Float" to "FLO"
-  thickness: "5mm",
-  color: "INC", # Changed from "Incoloro" to "INC"
-  width: 800,
-  height: 1200,
-  standard_measures: "800x1200",
-  location: "Estante A3",
-  status: "disponible",
-  is_scrap: true,
-  work: "Ventana Oficina",
-  origin: "Recorte interno"
-)
-
-Glassplate.create!(
-  glass_type: "LAM", # Changed from "Laminado" to "LAM"
-  thickness: "3+3",
-  color: "STG", # Changed from "Esmerilado" to "STG" (satinado gris as closest match)
-  width: 500,
-  height: 950,
-  standard_measures: "500x950",
-  location: "Estante B1",
-  status: "disponible",
-  is_scrap: true,
-  work: "Puerta Principal",
-  origin: "Recorte interno"
-)
-
-Glassplate.create!(
-  glass_type: "FLO", # Changed from "Float" to "FLO"
-  thickness: "4+4",
-  color: "GRS", # Changed from "Gris" to "GRS"
-  width: 1500,
-  height: 400,
-  standard_measures: "1500x400",
-  location: "Estante A1",
-  status: "disponible",
-  is_scrap: true,
-  work: "Baño Principal",
-  origin: "Recorte interno"
-)
-
-Glassplate.create!(
-  glass_type: "COL", # Changed from "Cool Lite" to "COL"
-  thickness: "5+5",
-  color: "BRC", # Changed from "Bronce" to "BRC"
-  width: 1200,
-  height: 800,
-  standard_measures: "1200x800",
-  location: "Estante C2",
-  status: "disponible",
-  is_scrap: true,
-  work: "Divisor Cocina",
-  origin: "Recorte interno"
-)
-
-Glassplate.create!(
-  glass_type: "LAM", # Changed from "Laminado" to "LAM"
-  thickness: "4+4",
-  color: "GRS", # Changed from "Gris" to "GRS"
-  width: 900,
-  height: 600,
-  standard_measures: "900x600",
-  location: "Estante D1",
-  status: "reservado",
-  is_scrap: true,
-  work: "Ventana Pequeña",
-  origin: "Recorte interno"
+  quantity: 5,
 )
 
 puts "Datos de ejemplo creados exitosamente!"
