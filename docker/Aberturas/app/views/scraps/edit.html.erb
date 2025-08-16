@@ -1,0 +1,10 @@
+<% content_for :title, "Editing scrap" %>
+
+<div class="md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">Editing scrap</h1>
+
+  <%= render "form", scrap: @scrap %>
+
+  <%= link_to "Show this scrap", @scrap, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+  <%= link_to "Back to scraps", scraps_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+</div>

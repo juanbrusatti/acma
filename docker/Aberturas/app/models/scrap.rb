@@ -1,0 +1,3 @@
+class Scrap < ApplicationRecord
+  
+end

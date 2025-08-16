@@ -1,0 +1,52 @@
+<%= form_with(model: scrap, class: "contents") do |form| %>
+  <% if scrap.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(scrap.errors.count, "error") %> prohibited this scrap from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% scrap.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :ref_number %>
+    <%= form.text_field :ref_number, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:ref_number].none?, "border-red-400 focus:outline-red-600": scrap.errors[:ref_number].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :scrap_type %>
+    <%= form.text_field :scrap_type, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:scrap_type].none?, "border-red-400 focus:outline-red-600": scrap.errors[:scrap_type].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :thickness %>
+    <%= form.text_field :thickness, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:thickness].none?, "border-red-400 focus:outline-red-600": scrap.errors[:thickness].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :width %>
+    <%= form.text_field :width, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:width].none?, "border-red-400 focus:outline-red-600": scrap.errors[:width].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :height %>
+    <%= form.text_field :height, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:height].none?, "border-red-400 focus:outline-red-600": scrap.errors[:height].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :output_work %>
+    <%= form.text_field :output_work, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:output_work].none?, "border-red-400 focus:outline-red-600": scrap.errors[:output_work].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :status %>
+    <%= form.text_field :status, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:status].none?, "border-red-400 focus:outline-red-600": scrap.errors[:status].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
