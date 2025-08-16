@@ -80,9 +80,4 @@ class Dvh < ApplicationRecord
     price_record&.selling_price || 0.0
   end
 
-  # Update project typologies when DVH changes
-  def update_project_typologies
-    project.send(:assign_typologies) if project
-  end
-
 end
