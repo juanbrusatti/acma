@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
@@ -33,7 +33,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "typology"
+    t.integer "scrap1_id"
+    t.integer "scrap2_id"
+    t.string "type_opening"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
+    t.index ["scrap1_id"], name: "index_dvhs_on_scrap1_id"
+    t.index ["scrap2_id"], name: "index_dvhs_on_scrap2_id"
   end
 
   create_table "glass_prices", force: :cascade do |t|
@@ -55,15 +60,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
     t.string "thickness"
     t.decimal "price"
     t.integer "project_id", null: false
-    t.integer "dvh_id"
-    t.integer "glassplate_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "sequential_id"
     t.string "typology"
-    t.index ["dvh_id"], name: "index_glasscuttings_on_dvh_id"
-    t.index ["glassplate_id"], name: "index_glasscuttings_on_glassplate_id"
+    t.integer "scrap_id"
+    t.string "type_opening"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
+    t.index ["scrap_id"], name: "index_glasscuttings_on_scrap_id"
   end
 
   create_table "glassplates", force: :cascade do |t|
@@ -72,15 +76,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.string "standard_measures"
-    t.string "location"
-    t.string "work"
-    t.string "origin"
-    t.string "status"
     t.boolean "deleted", default: false
-    t.boolean "is_scrap"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "quantity"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -93,8 +92,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.decimal "price"
-    t.decimal "priceWithoutIva"
     t.decimal "price_without_iva"
+  end
+
+  create_table "scraps", force: :cascade do |t|
+    t.string "ref_number"
+    t.string "scrap_type"
+    t.string "thickness"
+    t.float "width"
+    t.float "height"
+    t.string "output_work"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "color"
   end
 
   create_table "supplies", force: :cascade do |t|
@@ -108,7 +119,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_03_154358) do
   end
 
   add_foreign_key "dvhs", "projects"
-  add_foreign_key "glasscuttings", "dvhs"
-  add_foreign_key "glasscuttings", "glassplates"
+  add_foreign_key "dvhs", "scraps", column: "scrap1_id"
+  add_foreign_key "dvhs", "scraps", column: "scrap2_id"
   add_foreign_key "glasscuttings", "projects"
+  add_foreign_key "glasscuttings", "scraps"
 end
