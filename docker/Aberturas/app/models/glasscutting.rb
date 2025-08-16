@@ -26,6 +26,12 @@ class Glasscutting < ApplicationRecord
     message: "El grosor del vidrios no es valido"
   }
 
+  validates :type_opening, presence: { message: "El tipo de abertura no puede estar en blanco" }
+  validates :type_opening, inclusion: {
+    in: ["PVC", "Aluminio"],
+    message: "El tipo de abertura no es valido"
+  }
+
   before_save :ensure_price_is_set
 
   private
