@@ -1,52 +1,58 @@
-<%= form_with(model: scrap, class: "contents") do |form| %>
-  <% if scrap.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(scrap.errors.count, "error") %> prohibited this scrap from being saved:</h2>
 
-      <ul class="list-disc ml-6">
-        <% scrap.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+<%= form_with(model: scrap, local: true, class: "space-y-6") do |form| %>
+  <% if scrap.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold mb-2">Errores al guardar el retazo:</h2>
+      <ul>
+        <% scrap.errors.full_messages.each do |msg| %>
+          <li><%= msg.sub(/^[^ ]+ /, "") %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :ref_number %>
-    <%= form.text_field :ref_number, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:ref_number].none?, "border-red-400 focus:outline-red-600": scrap.errors[:ref_number].any?}] %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 scrap-fields" id="scrap-fields-debug">
+    <div class="space-y-4">
+      <label for="scrap_scrap_type">Tipo</label>
+      <select name="scrap[scrap_type]" id="scrap_scrap_type" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-type-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar tipo</option>
+        <option value="LAM">LAM</option>
+        <option value="FLO">FLO</option>
+        <option value="COL">COL</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <label for="scrap_thickness">Espesor</label>
+      <select name="scrap[thickness]" id="scrap_thickness" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-thickness-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <label for="scrap_color">Color</label>
+      <select name="scrap[color]" id="scrap_color" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-color-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :width, "Ancho (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :width, step: 0.1, placeholder: "ej: 2500", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :status, "Estado", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.text_field :status, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
   </div>
 
-  <div class="my-5">
-    <%= form.label :scrap_type %>
-    <%= form.text_field :scrap_type, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:scrap_type].none?, "border-red-400 focus:outline-red-600": scrap.errors[:scrap_type].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :thickness %>
-    <%= form.text_field :thickness, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:thickness].none?, "border-red-400 focus:outline-red-600": scrap.errors[:thickness].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :width %>
-    <%= form.text_field :width, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:width].none?, "border-red-400 focus:outline-red-600": scrap.errors[:width].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :height %>
-    <%= form.text_field :height, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:height].none?, "border-red-400 focus:outline-red-600": scrap.errors[:height].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :output_work %>
-    <%= form.text_field :output_work, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:output_work].none?, "border-red-400 focus:outline-red-600": scrap.errors[:output_work].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :status %>
-    <%= form.text_field :status, class: ["block shadow rounded-md border outline-none px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": scrap.errors[:status].none?, "border-red-400 focus:outline-red-600": scrap.errors[:status].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="flex justify-end space-x-3 pt-6 border-t">
+    <%= form.submit "Guardar Retazo", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
   </div>
 <% end %>

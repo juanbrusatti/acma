@@ -1,4 +1,4 @@
-<% content_for :title, "Scraps" %>
+<% content_for :title, "Retazos" %>
 
 <div class="w-full">
   <% if notice.present? %>
@@ -6,8 +6,8 @@
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Scraps</h1>
-    <%= link_to "New scrap", new_scrap_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="font-bold text-4xl">Retazos</h1>
+    <%= link_to "Nuevo retazo", new_scrap_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
 
   <div id="scraps" class="min-w-full">
@@ -19,7 +19,7 @@
         </p>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No scraps found.</p>
+      <p class="text-center my-10">No hay retazos en el stock</p>
     <% end %>
   </div>
 </div>
