@@ -8,7 +8,7 @@
           <path d="M8 12h8"></path>
           <path d="M12 8v8"></path>
         </svg>
-        Agregar Material
+        Agregar plancha
       <% end %>
     </div>
 
@@ -16,7 +16,7 @@
     <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Planchas Completas</h3>
+          <h3 class="text-sm font-medium">Planchas completas</h3>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
             <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
             <path d="M2 17l10 5l10-5"></path>
@@ -24,14 +24,14 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:total_sheets] %></div>
+          <div class="text-2xl font-bold"><%= 0 %></div>
           <p class="text-xs text-muted-foreground">Planchas en stock</p>
         </div>
       </div>
 
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Sobrantes</h3>
+          <h3 class="text-sm font-medium">Retazos</h3>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
             <path d="M6 8L2 12L6 16"></path>
             <path d="M22 12L18 8L22 12L18 16"></path>
@@ -40,7 +40,7 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:total_scraps] %></div>
+          <div class="text-2xl font-bold"><%= %></div>
           <p class="text-xs text-muted-foreground">Recortes disponibles</p>
         </div>
       </div>
@@ -55,7 +55,7 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:available_scraps] %></div>
+          <div class="text-2xl font-bold"><%=  %></div>
           <p class="text-xs text-muted-foreground">Sobrantes libres</p>
         </div>
       </div>
@@ -68,7 +68,7 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:reserved_scraps] %></div>
+          <div class="text-2xl font-bold"><%=  %></div>
           <p class="text-xs text-muted-foreground">Sobrantes reservados</p>
         </div>
       </div>
@@ -79,10 +79,10 @@
       <div class="border-b p-4">
         <div class="flex space-x-2">
           <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90" data-tab="planchas">
-            Planchas Completas
+            Planchas completas
           </button>
           <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground" data-tab="sobrantes">
-            Sobrantes (Recortes)
+            Retazos
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@
       <div id="planchas-tab" class="tab-content">
         <div class="p-6">
           <div class="mb-4">
-            <h3 class="text-lg font-semibold">Planchas Completas</h3>
+            <h3 class="text-lg font-semibold">Planchas completas</h3>
             <p class="text-sm text-muted-foreground">Listado de planchas de vidrio estándar en el taller.</p>
           </div>
 
@@ -99,36 +99,28 @@
             <table class="w-full caption-bottom text-sm">
               <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Grosor</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Color</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Medidas Estándar</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Grosor</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cantidad</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
-                <% @complete_sheets.each do |glassplate| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.glass_type %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.thickness %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.color %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.standard_measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-center">
-                      <div class="flex justify-center space-x-2">
-                        <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                            <path d="m15 5 4 4"></path>
-                          </svg>
-                        <% end %>
-                        <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 6h18"></path>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                          </svg>
-                        <% end %>
-                      </div>
+                <% @glassplates&.each do |glassplate| %>
+                  <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="px-4 py-2"><%= glassplate.glass_type %></td>
+                    <td class="px-4 py-2"><%= glassplate.thickness %></td>
+                    <td class="px-4 py-2"><%= glassplate.color %></td>
+                    <td class="px-4 py-2"><%= glassplate.width %></td>
+                    <td class="px-4 py-2"><%= glassplate.height %></td>
+                    <td class="px-4 py-2"><%= glassplate.quantity %></td>
+                    <td class="px-4 py-2 text-center">
+                      <%= link_to 'Ver', glassplate_path(glassplate), class: 'btn btn-sm btn-info' %>
+                      <%= link_to 'Editar', edit_glassplate_path(glassplate), class: 'btn btn-sm btn-warning' %>
+                      <%= link_to 'Eliminar', glassplate_path(glassplate), method: :delete, data: { confirm: '¿Estás seguro?' }, class: 'btn btn-sm btn-danger' %>
                     </td>
                   </tr>
                 <% end %>
@@ -138,62 +130,6 @@
         </div>
       </div>
 
-      <!-- Sobrantes Tab -->
-      <div id="sobrantes-tab" class="tab-content hidden">
-        <div class="p-6">
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold">Sobrantes</h3>
-            <p class="text-sm text-muted-foreground">Recortes de vidrio reutilizables.</p>
-          </div>
-
-          <div class="relative w-full overflow-auto">
-            <table class="w-full caption-bottom text-sm">
-              <thead class="[&_tr]:border-b">
-                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">ID</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Medidas (mm)</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Ubicación</th>
-                  <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Estado</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
-                </tr>
-              </thead>
-              <tbody class="[&_tr:last-child]:border-0">
-                <% @scraps.each do |glassplate| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.id %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.glass_type %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.location %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
-                        <%= glassplate.status %>
-                      </span>
-                    </td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-center">
-                      <div class="flex justify-center space-x-2">
-                        <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                            <path d="m15 5 4 4"></path>
-                          </svg>
-                        <% end %>
-                        <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 6h18"></path>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                          </svg>
-                        <% end %>
-                      </div>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
   </main>
 </div>

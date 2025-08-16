@@ -1,4 +1,4 @@
-<%= form_with(model: glassplate, class: "contents") do |form| %>
+<%= form_with(model: glassplate, local: true) do |form| %>
   <% if glassplate.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(glassplate.errors.count, "error") %> impidieron guardar este material:</h2>
