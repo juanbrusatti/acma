@@ -1,4 +1,3 @@
-
 <%= form_with(model: scrap, local: true, class: "space-y-6") do |form| %>
   <% if scrap.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -56,3 +55,5 @@
     <%= form.submit "Guardar Retazo", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
   </div>
 <% end %>
+
+<%= javascript_import_module_tag "scraps_form" %>
