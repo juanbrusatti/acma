@@ -109,7 +109,6 @@ function updateProjectTotals() {
     }
   });
 
-  // Sum all DVH prices (column 7, not 8)
   document.querySelectorAll('#dvhs-table-body tr').forEach(tr => {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {

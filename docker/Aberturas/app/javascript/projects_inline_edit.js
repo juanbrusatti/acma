@@ -114,6 +114,8 @@ export function setupProjectEditInline() {
     document.querySelectorAll('.glass-height-edit').forEach(e => e.style.display = editing ? '' : 'none');
     document.querySelectorAll('.glass-width-view').forEach(e => e.style.display = editing ? 'none' : '');
     document.querySelectorAll('.glass-width-edit').forEach(e => e.style.display = editing ? '' : 'none');
+    document.querySelectorAll('.glass-type_opening-view').forEach(e => e.style.display = editing ? 'none' : '');
+    document.querySelectorAll('.glass-type_opening-edit').forEach(e => e.style.display = editing ? '' : 'none');
     actionsView.style.display = editing ? 'none' : '';
     actionsEdit.style.display = editing ? '' : 'none';
   }
@@ -151,7 +153,8 @@ export function setupProjectEditInline() {
         color: row.querySelector('.glass-color-edit').value,
         typology: row.querySelector('.glass-typology-edit').value,
         height: row.querySelector('.glass-height-edit').value,
-        width: row.querySelector('.glass-width-edit').value
+        width: row.querySelector('.glass-width-edit').value,
+        type_opening: row.querySelector('.glass-type_opening-edit').value
       });
     });
 

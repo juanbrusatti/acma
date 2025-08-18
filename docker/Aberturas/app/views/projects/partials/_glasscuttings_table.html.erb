@@ -47,7 +47,10 @@
           <span class="glass-width-view"><%= glass.width %></span>
           <input type="number" class="glass-width-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.width %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
         </td>
-        <td class="text-center px-4 py-2"> <%= glass.type_opening %></td>
+        <td class="text-center px-4 py-2"> 
+          <span class="glass-type_opening-view"><%= glass.type_opening %></span>
+          <input type="text" class="glass-type_opening-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.type_opening %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
+        </td>
         <%# Price field (read-only, calculated automatically) %>
         <td class="text-center px-4 py-2">
           <%= number_to_currency(glass.price, unit: "$", precision: 2) if glass.price.present? %>

@@ -80,6 +80,7 @@ export function handleGlasscuttingEvents(e) {
       const color = row.querySelector('td:nth-child(4)').textContent.trim();
       const height = row.querySelector('td:nth-child(5)').textContent.trim();
       const width = row.querySelector('td:nth-child(6)').textContent.trim();
+      const type_opening = row.querySelector('td:nth-child(7)').textContent.trim();
 
       // Hide the row and show edit form using the same template as add
       row.style.display = 'none';
@@ -102,6 +103,7 @@ export function handleGlasscuttingEvents(e) {
       const colorSelect = editContainer.querySelector('.glass-color-select');
       const heightInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][height]"]');
       const widthInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][width]"]');
+      const type_openingSelect = editContainer.querySelector('select[name="project[glasscuttings_attributes][][type_opening]"]');
 
       if (typeSelect) typeSelect.value = glassType;
       // Populate dependent selects then set values in correct order
@@ -123,6 +125,9 @@ export function handleGlasscuttingEvents(e) {
       }
       if (heightInput) heightInput.value = height;
       if (widthInput) widthInput.value = width;
+      if (type_openingSelect) {
+        type_openingSelect.value = type_opening;
+      }
 
       // Change action buttons to save/cancel edit
       const confirmBtn = editContainer.querySelector('.confirm-glass');
@@ -168,6 +173,7 @@ export function handleGlasscuttingEvents(e) {
     const colorSelect = editContainer.querySelector('.glass-color-select');
     const heightInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][height]"]');
     const widthInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][width]"]');
+    const type_openingSelect = editContainer.querySelector('select[name="project[glasscuttings_attributes][][type_opening]"]');
 
     const newValues = {
       typology: typologyHidden ? typologyHidden.value : '',
@@ -176,6 +182,7 @@ export function handleGlasscuttingEvents(e) {
       color: colorSelect ? colorSelect.value : '',
       height: heightInput ? heightInput.value : '',
       width: widthInput ? widthInput.value : '',
+      type_opening: type_openingSelect ? type_openingSelect.value : 'NO'
     };
 
     // Recalculate price
