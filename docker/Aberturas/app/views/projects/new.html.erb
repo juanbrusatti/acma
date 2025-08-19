@@ -22,7 +22,8 @@
   <%= form_with(model: @project, 
                 url: @project.persisted? ? project_path(@project) : projects_path, 
                 method: @project.persisted? ? :patch : :post, 
-                local: true) do |f| %>
+                local: true, 
+                id: "project-form") do |f| %>
 
     <% if @project.persisted? %>
       <%= hidden_field_tag :project_id, @project.id %>

@@ -1,4 +1,5 @@
-// glasscutting_selects.js
+// glassplate_selects.js
+// Inspirado en glasscutting_selects.js
 
 export const GLASS_OPTIONS = {
   LAM: {
@@ -14,10 +15,10 @@ export const GLASS_OPTIONS = {
   }
 };
 
-export function updateGlassSelects(container) {
-  const typeSelect = container.querySelector('.glass-type-select');
-  const thicknessSelect = container.querySelector('.glass-thickness-select');
-  const colorSelect = container.querySelector('.glass-color-select');
+export function updateGlassplateSelects(container) {
+  const typeSelect = container.querySelector('.glassplate-type-select');
+  const thicknessSelect = container.querySelector('.glassplate-thickness-select');
+  const colorSelect = container.querySelector('.glassplate-color-select');
 
   if (!typeSelect || !thicknessSelect || !colorSelect) return;
 
@@ -26,7 +27,6 @@ export function updateGlassSelects(container) {
     const tipo = typeSelect.value;
     thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
     colorSelect.innerHTML = '<option value="">Seleccionar</option>';
-
     if (GLASS_OPTIONS[tipo]) {
       const grosores = Object.keys(GLASS_OPTIONS[tipo]);
       grosores.forEach(grosor => {
@@ -43,7 +43,6 @@ export function updateGlassSelects(container) {
     const tipo = typeSelect.value;
     const grosor = thicknessSelect.value;
     colorSelect.innerHTML = '<option value="">Seleccionar</option>';
-
     if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
       GLASS_OPTIONS[tipo][grosor].forEach(color => {
         const opt = document.createElement('option');
@@ -61,12 +60,11 @@ export function updateGlassSelects(container) {
   // Listeners
   typeSelect.addEventListener('change', () => {
     updateThicknessOptions();
-    updateColorOptions(); 
+    updateColorOptions();
   });
-
   thicknessSelect.addEventListener('change', updateColorOptions);
 }
 
-export function setupAllGlassSelects() {
-  document.querySelectorAll('.glasscutting-fields').forEach(updateGlassSelects);
+export function setupAllGlassplateSelects() {
+  document.querySelectorAll('.glassplate-fields').forEach(updateGlassplateSelects);
 }

@@ -11,30 +11,20 @@
   <tr>
     <td><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
     <td><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
-  </tr>
-  <tr>
     <td><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
-    <td><strong>Estado:</strong> <%= @project.status.present? ? @project.status : 'Pendiente' %></td>
-  </tr>
-  <tr>
-    <td colspan="2"><strong>Descripcion:</strong> <%= @project.description.present? ? @project.description : 'Sin descripcion' %></td>
+
   </tr>
 </table>
 
-<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados al proyecto</h2>
+<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados</h2>
 
 <% dvh_total_con_iva = calculate_dvh_total_with_iva(@project.dvhs) %>
 <%= render_dvh_table(@project.dvhs) %> 
 
-<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados al proyecto</h2>
+<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados</h2>
 
 <% total_con_iva = calculate_glasscuttings_total_with_iva(@project.glasscuttings) %>
 <%= render_glasscuttings_table(@project.glasscuttings) %>
-
-
-
-
-<p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
 
 <% # Tabla resumen de totales %>
 <h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">Resumen de Totales</h2>

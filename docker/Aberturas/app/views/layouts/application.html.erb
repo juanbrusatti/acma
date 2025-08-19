@@ -20,17 +20,15 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "projects_form", "data-turbo-track": "reload" %>
-    <%#= javascript_include_tag "preview_pdf", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <div class="flex h-screen overflow-hidden">
+  <body class="overflow-hidden">
+    <div class="flex h-screen">
       <div class="fixed h-screen w-64 z-10">
         <%= render 'shared/sidebar' %>
       </div>
-      <div class="flex-1 ml-64 overflow-auto">
+      <div class="flex-1 ml-64 overflow-y-auto">
         <% if flash[:notice] %>
           <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
             <%= flash[:notice] %>

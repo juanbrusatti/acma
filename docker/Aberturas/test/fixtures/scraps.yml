@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ref_number: MyString
+  scrap_type: MyString
+  thickness: MyString
+  width: 1.5
+  height: 1.5
+  output_work: MyString
+  status: MyString
+
+two:
+  ref_number: MyString
+  scrap_type: MyString
+  thickness: MyString
+  width: 1.5
+  height: 1.5
+  output_work: MyString
+  status: MyString

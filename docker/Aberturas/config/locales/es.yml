@@ -34,18 +34,54 @@ es:
         color: ""
         typology: ""
         price: ""
+      glassplates:
+        glass_type: ""
+        thickness: ""
+        height: ""
+        width: ""
+        color: ""
+        quantity: ""
+      scraps:
+        scrap_type: ""
+        thickness: ""
+        height: ""
+        width: ""
+        color: ""
+        status: ""
+        output_work: ""
+        ref_number: ""
+    errors:
+      models:
+        scrap:
+          attributes:
+            ref_number:
+              blank: "El número de referencia no puede estar en blanco"
+            color:
+              blank: "El color no puede estar en blanco"
+              inclusion: "El color debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+            scrap_type:
+              blank: "El tipo de vidrio no puede estar en blanco"
+              inclusion: "El tipo debe ser uno de: LAM, FLO, COL"
+            height:
+              blank: "El alto del retazo no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho del retazo no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            thickness:
+              blank: "El grosor del retazo no puede estar en blanco"
+              inclusion: "El grosor debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+            output_work:
+              blank: "La obra de salida no puede estar en blanco"
+            status:
+              blank: "El estado no puede estar en blanco"
+              inclusion: "El estado debe ser uno de: Disponible, Reservado"
     models:
       glasscutting: ""
       glasscuttings: ""
       dvh: ""
       project: ""
-    errors:
-      format: "%{message}"
-      messages:
-        blank: "no puede estar en blanco"
-        not_a_number: "no es un número"
-        greater_than: "debe ser mayor que %{count}"
-        greater_than_or_equal_to: "debe ser mayor o igual que %{count}"
-        taken: "ya ha sido tomado"
-        inclusion: "no está incluido en la lista"
-        record_invalid: "Los datos no son válidos"
+      glassplate: ""
+      scrap: ""

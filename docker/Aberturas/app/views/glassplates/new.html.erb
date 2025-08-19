@@ -1,7 +1,9 @@
+
+
 <div class="flex min-h-screen w-full flex-col">
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
-      <h1 class="text-2xl font-semibold">Agregar Nuevo Material</h1>
+      <h1 class="text-2xl font-semibold">'Agregar plancha'</h1>
       <%= link_to glassplates_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-black hover:text-white h-9 px-3 ml-auto" do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
           <path d="M19 12H5"></path>
@@ -14,130 +16,11 @@
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg max-w-2xl mx-auto w-full">
       <div class="p-6">
         <div class="mb-6">
-          <h3 class="text-lg font-semibold">Detalles del Material</h3>
-          <p class="text-sm text-muted-foreground">Ingrese los detalles del nuevo material para agregarlo al stock.</p>
+          <h3 class="text-lg font-semibold">'Detalles de la plancha'</h3>
+          <p class="text-sm text-muted-foreground">'Ingrese los detalles de la nueva plancha para agregarla al stock.'</p>
         </div>
 
-        <%= form_with model: @glassplate, local: true, class: "space-y-6" do |form| %>
-          <% if @glassplate.errors.any? %>
-            <div class="rounded-md bg-destructive/15 p-4">
-              <div class="flex">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-destructive">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="m15 9-6 6"></path>
-                  <path d="m9 9 6 6"></path>
-                </svg>
-                <div class="ml-3">
-                  <h3 class="text-sm font-medium text-destructive">Se encontraron los siguientes errores:</h3>
-                  <div class="mt-2 text-sm text-destructive">
-                    <ul class="list-disc space-y-1 pl-5">
-                      <% @glassplate.errors.full_messages.each do |message| %>
-                        <li><%= message %></li>
-                      <% end %>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <% end %>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="space-y-4">
-              <%= form.label :glass_type, "Tipo", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.select :glass_type,
-                  options_for_select([
-                    ['Laminado', 'Laminado'],
-                    ['Float', 'Float'],
-                    ['Cool Lite', 'Cool Lite']
-                  ], @glassplate.glass_type),
-                  { prompt: "Seleccionar tipo" },
-                  { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :thickness, "Espesor", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.select :thickness,
-                  options_for_select([
-                    ['3+3', '3+3'],
-                    ['4+4', '4+4'],
-                    ['5+5', '5+5'],
-                    ['5mm', '5mm']
-                  ], @glassplate.thickness),
-                  { prompt: "Seleccionar espesor" },
-                  { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :color, "Color", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.select :color,
-                  options_for_select([
-                    ['Incoloro', 'Incoloro'],
-                    ['Esmerilado', 'Esmerilado'],
-                    ['Gris', 'Gris'],
-                    ['Bronce', 'Bronce']
-                  ], @glassplate.color),
-                  { prompt: "Seleccionar color" },
-                  { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :width, "Ancho (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.number_field :width, step: 0.1, placeholder: "ej: 2500", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :standard_measures, "Medidas Estándar", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.text_field :standard_measures, placeholder: "ej: 2500x3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :location, "Ubicación", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.text_field :location, placeholder: "ej: Estante A3", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :status, "Estado", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.select :status,
-                  options_for_select([
-                    ['Disponible', 'disponible'],
-                    ['Reservado', 'reservado'],
-                    ['Usado', 'usado']
-                  ], @glassplate.status || 'disponible'),
-                  {},
-                  { class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" } %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :work, "Trabajo/Obra", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.text_field :work, placeholder: "ej: Ventana Principal", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4">
-              <%= form.label :origin, "Origen", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-              <%= form.text_field :origin, placeholder: "ej: Proveedor A", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-            </div>
-
-            <div class="space-y-4 md:col-span-2">
-              <div class="flex items-center space-x-3 p-4 border rounded-lg bg-muted/30">
-                <%= form.check_box :is_scrap, class: "h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" %>
-                <div>
-                  <%= form.label :is_scrap, "Es un sobrante/recorte", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-                  <p class="text-xs text-muted-foreground mt-1">Marque esta opción si es un recorte de vidrio reutilizable.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-end space-x-3 pt-6 border-t">
-            <%= link_to "Cancelar", glassplates_path, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" %>
-            <%= form.submit "Guardar Material", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
-          </div>
-        <% end %>
+        <%= render 'form', glassplate: @glassplate %>
       </div>
     </div>
   </main>
