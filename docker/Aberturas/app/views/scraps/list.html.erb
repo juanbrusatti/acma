@@ -1,0 +1,171 @@
+<div class="flex min-h-screen w-full flex-col">
+  <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <div class="flex items-center">
+      <h1 class="text-2xl font-semibold">Gestión de Stock</h1>
+      <div class="flex gap-2 ml-auto">
+        <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar plancha
+        <% end %>
+        <%= link_to new_scrap_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar retazo
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Stock Summary Cards -->
+    <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
+          <h3 class="text-sm font-medium">Planchas completas</h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+            <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
+            <path d="M2 17l10 5l10-5"></path>
+            <path d="M2 12l10 5l10-5"></path>
+          </svg>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="text-2xl font-bold"><%= Glassplate.sum(:quantity).to_i %></div>
+          <p class="text-xs text-muted-foreground">Planchas en stock</p>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
+          <h3 class="text-sm font-medium">Retazos</h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+            <path d="M6 8L2 12L6 16"></path>
+            <path d="M22 12L18 8L22 12L18 16"></path>
+            <path d="M22 4L12 14L2 24"></path>
+            <path d="M2 4L12 14L22 24"></path>
+          </svg>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="text-2xl font-bold"><%= @scraps.count %></div>
+          <p class="text-xs text-muted-foreground">Cantidad de retazos</p>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
+          <h3 class="text-sm font-medium">Disponibles</h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+            <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
+          </svg>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Disponible" }.count %></div>
+          <p class="text-xs text-muted-foreground">Retazos disponibles</p>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
+          <h3 class="text-sm font-medium">Reservados</h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Reservado" }.count %></div>
+          <p class="text-xs text-muted-foreground">Retazos reservados</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
+      <div class="border-b p-4">
+        <div class="flex space-x-2">
+          <a href="<%= glassplates_path %>" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground" data-tab="planchas">
+            Planchas completas
+          </a>
+          <a href="<%= list_scraps_path %>" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90" data-tab="sobrantes">
+            Retazos
+          </a>
+        </div>
+      </div>
+
+      <!-- Scraps Table -->
+      <div class="p-6">
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold">Listado de Retazos</h3>
+          <p class="text-sm text-muted-foreground">Gestiona los retazos de vidrio disponibles.</p>
+        </div>
+        
+        <div class="rounded-md border">
+          <div class="relative w-full overflow-auto">
+            <table class="w-full caption-bottom text-sm">
+              <thead class="[&_tr]:border-b">
+                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">ID</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Espesor</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Obra</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Estado</th>
+                  <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="[&_tr:last-child]:border-0">
+                <% @scraps.each do |scrap| %>
+                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                    <td class="p-4 align-middle">#<%= scrap.id %></td>
+                    <td class="p-4 align-middle"><%= scrap.scrap_type %></td>
+                    <td class="p-4 align-middle"><%= scrap.color %></td>
+                    <td class="p-4 align-middle"><%= scrap.thickness.include?('+') ? scrap.thickness : scrap.thickness.gsub('mm', '') %></td>
+                    <td class="p-4 align-middle"><%= scrap.width %></td>
+                    <td class="p-4 align-middle"><%= scrap.height %></td>
+                    <td class="p-4 align-middle"><%= scrap.output_work.presence || 'N/A' %></td>
+                    <td class="p-4 align-middle">
+                      <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium <%= scrap.status == 'Disponible' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                        <%= scrap.status %>
+                      </span>
+                    </td>
+                    <td class="p-4 align-middle text-right">
+                      <div class="flex justify-end space-x-2">
+                        <%= link_to edit_scrap_path(scrap), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0" do %>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                            <path d="m15 5 4 4"></path>
+                          </svg>
+                          <span class="sr-only">Editar</span>
+                        <% end %>
+                        <%= button_to scrap, method: :delete, data: { confirm: '¿Estás seguro de eliminar este retazo?', turbo_confirm: '¿Estás seguro de eliminar este retazo?' }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0 text-red-600 hover:bg-red-50" do %>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                          </svg>
+                          <span class="sr-only">Eliminar</span>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+                <% if @scraps.empty? %>
+                  <tr>
+                    <td colspan="8" class="p-4 text-center text-muted-foreground">No hay retazos registrados</td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

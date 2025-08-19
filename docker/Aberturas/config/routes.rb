@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :scraps
+  resources :scraps do
+    collection do
+      get 'list', to: 'scraps#list'
+    end
+  end
   resources :supplies
   resources :glassplates
   get "static_pages/home"

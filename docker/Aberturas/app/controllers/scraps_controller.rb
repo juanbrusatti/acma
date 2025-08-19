@@ -4,6 +4,16 @@ class ScrapsController < ApplicationController
   # GET /scraps or /scraps.json
   def index
     @scraps = Scrap.all
+    
+    respond_to do |format|
+      format.html { render :index }
+      format.json { render json: @scraps }
+    end
+  end
+
+  # GET /scraps/list
+  def list
+    @scraps = Scrap.all
   end
 
   # GET /scraps/1 or /scraps/1.json
