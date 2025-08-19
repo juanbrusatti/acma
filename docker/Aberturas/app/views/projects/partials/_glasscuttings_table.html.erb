@@ -2,55 +2,30 @@
 <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg border border-gray-200 shadow p-4 overflow-hidden">
   <thead class="bg-gray-50">
     <tr>
-      <%# Table headers for glasscutting attributes %>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipología</th>
       <th class="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipo</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Espesor</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Abertura</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Cantidad</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
     </tr>
   </thead>
   <tbody class="divide-y divide-gray-100" id="glasscuttings-table-body">
-    <%# Iterate through each glasscutting record and create editable rows %>
-    <% project.glasscuttings.each_with_index do |glass, idx| %>
+    <% grouped = project.glasscuttings.group_by { |g| [g.typology, g.glass_type, g.thickness, g.color, g.height, g.width, g.type_opening, g.price] } %>
+    <% grouped.each do |attrs, glasses| %>
       <tr>
-        <%# Typology field - Free text input for custom glass identification (V1, V2, V5, etc.) %>
+        <% attrs[0..6].each do |val| %>
+          <td class="text-center px-4 py-2"><%= val %></td>
+        <% end %>
+        <td class="text-center px-4 py-2"><%= glasses.size %></td>
         <td class="text-center px-4 py-2">
-          <span class="glass-typology-view"><%= glass.typology %></span>
-          <input type="text" class="glass-typology-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.typology %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Glass type field with view/edit toggle %>
-        <td class="text-center px-4 py-2">
-          <span class="glass-type-view"><%= glass.glass_type %></span>
-          <input type="text" class="glass-type-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.glass_type %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Glass thickness field with view/edit toggle %>
-        <td class="text-center px-4 py-2">
-          <span class="glass-thickness-view"><%= glass.thickness %></span>
-          <input type="text" class="glass-thickness-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.thickness %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Glass color field with view/edit toggle %>
-        <td class="text-center px-4 py-2">
-          <span class="glass-color-view"><%= glass.color %></span>
-          <input type="text" class="glass-color-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.color %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Height field with view/edit toggle (numeric input) %>
-        <td class="text-center px-4 py-2">
-          <span class="glass-height-view"><%= glass.height %></span>
-          <input type="number" class="glass-height-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.height %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Width field with view/edit toggle (numeric input) %>
-        <td class="text-center px-4 py-2">
-          <span class="glass-width-view"><%= glass.width %></span>
-          <input type="number" class="glass-width-edit w-full border rounded px-2 py-2 text-base" value="<%= glass.width %>" style="display:none;" data-idx="<%= idx %>" data-id="<%= glass.id %>" />
-        </td>
-        <%# Price field (read-only, calculated automatically) %>
-        <td class="text-center px-4 py-2">
-          <%= number_to_currency(glass.price, unit: "$", precision: 2) if glass.price.present? %>
+          <% total_price = attrs[7].to_f * glasses.size %>
+          <%= number_to_currency(total_price, unit: "$", precision: 2) if attrs[7].present? %>
         </td>
       </tr>
     <% end %>
   </tbody>
-</table> 
+</table>

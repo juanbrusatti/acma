@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_145540) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_145540) do
     t.string "typology"
     t.integer "scrap1_id"
     t.integer "scrap2_id"
+    t.string "type_opening"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
     t.index ["scrap1_id"], name: "index_dvhs_on_scrap1_id"
     t.index ["scrap2_id"], name: "index_dvhs_on_scrap2_id"
@@ -64,6 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_145540) do
     t.string "sequential_id"
     t.string "typology"
     t.integer "scrap_id"
+    t.string "type_opening"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
     t.index ["scrap_id"], name: "index_glasscuttings_on_scrap_id"
   end

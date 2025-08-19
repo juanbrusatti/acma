@@ -51,6 +51,12 @@ class Dvh < ApplicationRecord
     message: "El color del vidrio 2 no es valido"
   }
 
+  validates :type_opening, presence: { message: "El tipo de abertura no puede estar en blanco" }
+  validates :type_opening, inclusion: {
+    in: ["PVC", "Aluminio"],
+    message: "El tipo de abertura no es valido"
+  }
+
   # Set price if not provided by frontend
   before_save :ensure_price_is_set
 

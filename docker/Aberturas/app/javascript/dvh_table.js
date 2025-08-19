@@ -36,6 +36,7 @@ export function ensureDvhTable() {
           <th class='px-4 py-2 text-center'>ANCHO</th>
           <th class='px-4 py-2 text-center'>CRISTAL 1</th>
           <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+          <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
         </tr>
       </thead>
@@ -78,6 +79,7 @@ export function handleDvhEvents(e) {
       const innertube = row.querySelector('td:nth-child(2)').textContent.trim();
       const width = row.querySelector('td:nth-child(3)').textContent.trim();
       const height = row.querySelector('td:nth-child(4)').textContent.trim();
+      const type_opening = row.querySelector('td:nth-child(7)').textContent.trim();
 
       const glass1Text = row.querySelector('td:nth-child(5)').textContent.trim();
       const glass2Text = row.querySelector('td:nth-child(6)').textContent.trim();
@@ -145,9 +147,11 @@ export function handleDvhEvents(e) {
       const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
       const widthInput = editContainer.querySelector('input[name="project[dvhs_attributes][][width]"]');
       const heightInput = editContainer.querySelector('input[name="project[dvhs_attributes][][height]"]');
+      const type_openingSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][type_opening]"]');
       if (innertubeSelect) innertubeSelect.value = innertube;
       if (widthInput) widthInput.value = width;
       if (heightInput) heightInput.value = height;
+      if (type_openingSelect) type_openingSelect.value = type_opening;
 
       // Initialize dependent selects and set values in order for Glass 1
       updateDvhGlassSelects(editContainer, 'glasscutting1');
@@ -208,12 +212,14 @@ export function handleDvhEvents(e) {
     const typologyNumberInput = editContainer.querySelector('.typology-number-input');
     const typology = (typologyHidden && typologyHidden.value) || (typologyNumberInput && typologyNumberInput.value ? 'V' + typologyNumberInput.value : '');
 
+    const type_openingSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][type_opening]"]');
     const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
     const widthInput = editContainer.querySelector('input[name="project[dvhs_attributes][][width]"]');
     const heightInput = editContainer.querySelector('input[name="project[dvhs_attributes][][height]"]');
     const innertube = innertubeSelect ? innertubeSelect.value : '';
     const width = widthInput ? widthInput.value : '';
     const height = heightInput ? heightInput.value : '';
+    const type_opening = type_openingSelect ? type_openingSelect.value : '';
 
     const glass1Type = (editContainer.querySelector('.glasscutting1-type-select') || {}).value || '';
     const glass1Thickness = (editContainer.querySelector('.glasscutting1-thickness-select') || {}).value || '';
@@ -235,7 +241,8 @@ export function handleDvhEvents(e) {
     row.querySelector('td:nth-child(4)').textContent = height;
     row.querySelector('td:nth-child(5)').textContent = `${glass1Type} ${glass1Thickness} ${glass1Color}`;
     row.querySelector('td:nth-child(6)').textContent = `${glass2Type} ${glass2Thickness} ${glass2Color}`;
-    row.querySelector('td:nth-child(7)').textContent = `$${price.toFixed(2)}`;
+    row.querySelector('td:nth-child(7)').textContent = type_opening;
+    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Show the row again
     row.style.display = '';
@@ -256,7 +263,10 @@ export function handleDvhEvents(e) {
     
     const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][height]"]`);
     if (heightFields.length > 0) heightFields[0].value = height;
-    
+
+    const type_openingFields = document.querySelectorAll(`select[name="project[dvhs_attributes][${key}][type_opening]"]`);
+    if (type_openingFields.length > 0) type_openingFields[0].value = type_opening;
+
     const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_type]"]`);
     if (glass1TypeFields.length > 0) glass1TypeFields[0].value = glass1Type;
     
@@ -274,7 +284,7 @@ export function handleDvhEvents(e) {
     
     const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_color]"]`);
     if (glass2ColorFields.length > 0) glass2ColorFields[0].value = glass2Color;
-    
+
     const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][price]"]`);
     if (priceFields.length > 0) priceFields[0].value = price.toFixed(2);
     
@@ -315,10 +325,22 @@ export function handleDvhEvents(e) {
       if (destroyField) {
         destroyField.value = '1';
         row.style.display = 'none';
+        // Actualizar totales después de eliminar
+        setTimeout(() => {
+          if (typeof window.updateProjectTotals === 'function') {
+            window.updateProjectTotals();
+          }
+        }, 100);
       }
     } else {
       // For new entries without ID, just remove the row
       row.remove();
+      // Actualizar totales después de eliminar
+      setTimeout(() => {
+        if (typeof window.updateProjectTotals === 'function') {
+          window.updateProjectTotals();
+        }
+      }, 100);
     }
     
     // If no more DVHs, show the empty state
@@ -333,12 +355,6 @@ export function handleDvhEvents(e) {
           if (existingTable) {
             existingTable.remove();
           }
-          // Add empty state message
-          container.innerHTML = `
-            <div class="text-center py-4 text-gray-500">
-              No hay DVHs cargados. Agrega uno para comenzar.
-            </div>
-          `;
         }
       }
     }
@@ -366,6 +382,10 @@ export function handleDvhEvents(e) {
       const key = field.name.split("[").pop().replace("]", "");
       values[key] = field.value;
     });
+    
+    // Get quantity value from the quantity input (which doesn't have a name)
+    const quantityInput = container.querySelector('.quantity-input');
+    values.quantity = quantityInput ? quantityInput.value : '';
 
     // requires input validation
     const requiredFields = [
@@ -378,7 +398,8 @@ export function handleDvhEvents(e) {
       { key: 'glasscutting1_color', label: 'Color del cristal 1' },
       { key: 'glasscutting2_type', label: 'Tipo del cristal 2' },
       { key: 'glasscutting2_thickness', label: 'Grosor del cristal 2' },
-      { key: 'glasscutting2_color', label: 'Color del cristal 2' }
+      { key: 'glasscutting2_color', label: 'Color del cristal 2' },
+      { key: 'type_opening', label: 'Tipo de apertura' }
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
@@ -395,8 +416,15 @@ export function handleDvhEvents(e) {
       }
       return;
     }
+
+    // Get quantity value, default to 1 if not specified
+    const quantity = parseInt(values.quantity);
+    if (quantity < 1 || quantity > 100 || isNaN(quantity)) {
+      alert('La cantidad debe estar entre 1 y 100');
+      return;
+    }
     
-    // Ensure table exists before adding row
+    // Ensure table exists before adding rows
     ensureDvhTable();
     
     // Parse dimensions for price calculation
@@ -418,26 +446,69 @@ export function handleDvhEvents(e) {
     // Calculate total price for both glass panes plus innertube
     const price = getDvhTotalGlassPrice(height, width, glass1, glass2, values.innertube);
     
-    // Create new table row
-    const tr = document.createElement("tr");
-    tr.className = "divide-x divide-gray-200";
-    
-    // Populate row with DVH data and delete button
-    tr.innerHTML = `
-      <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.innertube || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.height || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.width || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
-      <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-      <td class='px-4 py-2 text-right space-x-2'>
-        <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
-        <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-      </td>
-    `;
-    
-    dvhTbody.appendChild(tr);
+    // Create multiple rows based on quantity
+    for (let i = 0; i < quantity; i++) {
+      // Create new table row
+      const tr = document.createElement("tr");
+      tr.className = "divide-x divide-gray-200";
+      
+      // Populate row with DVH data and delete button
+      tr.innerHTML = `
+        <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.innertube || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
+        <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
+        <td class='px-4 py-2 text-right space-x-2'>
+          <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+          <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+        </td>
+      `;
+      
+      dvhTbody.appendChild(tr);
+      
+      // Create hidden form inputs for Rails form submission
+      // DVH requires more fields due to dual glass configuration
+      const hiddenDiv = document.createElement("div");
+      hiddenDiv.style.display = "none";
+      hiddenDiv.className = "dvh-hidden-row";
+      
+      // Check if we're editing an existing project (has project_id in the URL)
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get('project_id');
+      
+      // If we're editing, we need to use a unique index for each DVH
+      // to prevent overwriting existing ones
+      const index = projectId ? `new_${Date.now()}_${i}` : `new_${Date.now()}_${i}`;
+      
+      hiddenDiv.innerHTML = `
+        <input type="hidden" name="project[dvhs_attributes][${index}][typology]" value="${values.typology || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][innertube]" value="${values.innertube || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][height]" value="${values.height || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][width]" value="${values.width || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][type_opening]" value="${values.type_opening || ''}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][price]" value="${price.toFixed(2)}">
+        <input type="hidden" name="project[dvhs_attributes][${index}][_destroy]" value="0">
+      `;
+      
+      document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
+      // Tag table row and edit button with temp id for inline editing
+      tr.setAttribute('data-temp-id', index);
+      const editBtn = tr.querySelector('.edit-dvh');
+      if (editBtn) { editBtn.setAttribute('data-temp-id', index); }
+      
+      // Increment counter
+      dvhIdCounter++;
+    }
     
     // Update project totals if function exists
     setTimeout(() => {
@@ -446,43 +517,7 @@ export function handleDvhEvents(e) {
       }
     }, 100);
     
-    // Create hidden form inputs for Rails form submission
-    // DVH requires more fields due to dual glass configuration
-    const hiddenDiv = document.createElement("div");
-    hiddenDiv.style.display = "none";
-    hiddenDiv.className = "dvh-hidden-row";
-    
-    // Check if we're editing an existing project (has project_id in the URL)
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectId = urlParams.get('project_id');
-    
-    // If we're editing, we need to use a unique index for each DVH
-    // to prevent overwriting existing ones
-    const index = projectId ? `new_${Date.now()}` : dvhIdCounter;
-    
-    hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[dvhs_attributes][][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
-      <input type="hidden" name="project[dvhs_attributes][][price]" value="${price.toFixed(2)}">
-      <input type="hidden" name="project[dvhs_attributes][][_destroy]" value="0">
-    `;
-    
-    document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
-    // Tag table row and edit button with temp id for inline editing
-    tr.setAttribute('data-temp-id', index);
-    const editBtn = tr.querySelector('.edit-dvh');
-    if (editBtn) { editBtn.setAttribute('data-temp-id', index); }
-    
-    // Increment counter and remove form container
-    dvhIdCounter++;
+    // Remove form container
     container.remove();
     return;
   }

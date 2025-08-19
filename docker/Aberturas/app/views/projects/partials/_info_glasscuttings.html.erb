@@ -15,6 +15,7 @@
               <th class='px-4 py-2 text-center'>COLOR</th>
               <th class='px-4 py-2 text-center'>ALTO</th>
               <th class='px-4 py-2 text-center'>ANCHO</th>
+              <th class='px-4 py-2 text-center'>ABERTURA</th>
               <th class='px-4 py-2 text-center'>PRECIO</th>
               <th class='px-4 py-2 text-center'>ACCIÓN</th>
             </tr>
@@ -28,6 +29,7 @@
                 <td class="px-4 py-2 text-center"><%= glasscutting.color %></td>
                 <td class="px-4 py-2 text-center"><%= glasscutting.height %></td>
                 <td class="px-4 py-2 text-center"><%= glasscutting.width %></td>
+                <td class="px-4 py-2 text-center"><%= glasscutting.type_opening %></td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(glasscutting.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
                   <div class="flex space-x-1 justify-center">
@@ -49,6 +51,7 @@
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][width]", glasscutting.width %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][color]", glasscutting.color %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][typology]", glasscutting.typology %>
+              <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][type_opening]", glasscutting.type_opening %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][price]", glasscutting.price %>
               <%= hidden_field_tag "project[glasscuttings_attributes][#{glasscutting.id}][_destroy]", "0", id: "glasscuttings_destroy_#{glasscutting.id}" %>
 

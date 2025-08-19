@@ -81,7 +81,7 @@ module ProjectsHelper
     project.as_json(
       only: [:id, :name, :description, :status, :delivery_date], 
       include: { 
-        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :typology, :height, :width] } 
+        glasscuttings: { only: [:id, :glass_type, :thickness, :color, :typology, :height, :width, :type_opening] } 
       }
     )
   end
