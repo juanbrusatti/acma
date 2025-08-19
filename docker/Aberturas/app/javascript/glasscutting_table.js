@@ -182,7 +182,7 @@ export function handleGlasscuttingEvents(e) {
       color: colorSelect ? colorSelect.value : '',
       height: heightInput ? heightInput.value : '',
       width: widthInput ? widthInput.value : '',
-      type_opening: type_openingSelect ? type_openingSelect.value : 'NO'
+      type_opening: type_openingSelect ? type_openingSelect.value : ''
     };
 
     // Recalculate price
@@ -285,12 +285,6 @@ export function handleGlasscuttingEvents(e) {
           if (existingTable) {
             existingTable.remove();
           }
-          // Add empty state message
-          container.innerHTML = `
-            <div class="text-center py-4 text-gray-500">
-              No hay vidrios simples cargados. Agrega uno para comenzar.
-            </div>
-          `;
         }
       }
     }
@@ -318,6 +312,10 @@ export function handleGlasscuttingEvents(e) {
       }
     });
     
+    // Get quantity value from the quantity input (which doesn't have a name)
+    const quantityInput = container.querySelector('.quantity-input');
+    values.quantity = quantityInput ? quantityInput.value : '';
+    
     // requires input validation
     const requiredFields = [
       { key: 'typology', label: 'Tipología' },
@@ -334,53 +332,54 @@ export function handleGlasscuttingEvents(e) {
       return;
     }
 
-    // Ensure table exists before adding row
+    // Get quantity value, default to 1 if not specified
+    const quantity = parseInt(values.quantity)
+    if (quantity < 1 || quantity > 100  || isNaN(quantity)) {
+      alert('La cantidad debe estar entre 1 y 100');
+      return;
+    }
+
+    // Ensure table exists before adding rows
     ensureGlasscuttingTable();
-    
-    // Create new table row
-    const tr = document.createElement("tr");
     
     // Calculate price based on dimensions and glass type
     const price_m2 = getPriceM2(values.glass_type, values.thickness, values.color);
     const area_m2 = (parseFloat(values.height) / 1000) * (parseFloat(values.width) / 1000);
     const price = Math.round(area_m2 * price_m2 * 100) / 100; // Round to 2 decimals
     
-    tr.className = "divide-x divide-gray-200";
-    
-    // Populate row with data and delete button
-    tr.innerHTML = `
-      <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.glass_type || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.thickness || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.color || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.height || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.width || ''}</td>
-      <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-      <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-      <td class='px-4 py-2 text-right space-x-2'>
-        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
-        <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-      </td>
-    `;
-    
-    glasscuttingTbody.appendChild(tr);
-    
-    // Update project totals if function exists
-    setTimeout(() => {
-      if (typeof window.updateProjectTotals === 'function') {
-        window.updateProjectTotals();
-      }
-    }, 100);
-    
-    // Create hidden form inputs for Rails form submission
-    const hiddenDiv = document.createElement("div");
-    hiddenDiv.style.display = "none";
-    hiddenDiv.className = "glasscutting-hidden-row";
-    
-    // Generate a unique ID for the new glasscutting
-    const newId = `new_${Date.now()}`;
-    
-    // Create the hidden inputs for the form
+    // Create multiple rows based on quantity
+    for (let i = 0; i < quantity; i++) {
+      // Create new table row
+      const tr = document.createElement("tr");
+      tr.className = "divide-x divide-gray-200";
+      
+      // Populate row with data and delete button
+      tr.innerHTML = `
+        <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.glass_type || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.thickness || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.color || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+        <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
+        <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
+        <td class='px-4 py-2 text-right space-x-2'>
+          <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+          <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+        </td>
+      `;
+      
+      glasscuttingTbody.appendChild(tr);
+      
+      // Create hidden form inputs for Rails form submission
+      const hiddenDiv = document.createElement("div");
+      hiddenDiv.style.display = "none";
+      hiddenDiv.className = "glasscutting-hidden-row";
+      
+      // Generate a unique ID for the new glasscutting
+      const newId = `new_${Date.now()}_${i}`;
+      
+          // Create the hidden inputs for the form
     hiddenDiv.innerHTML = `
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
@@ -392,31 +391,41 @@ export function handleGlasscuttingEvents(e) {
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
       <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
     `;
-    
-    // Add a data attribute to the row to identify it for deletion and editing
-    tr.setAttribute('data-temp-id', newId);
-    // Set data-temp-id on the edit button
-    const editBtn = tr.querySelector('.edit-glasscutting');
-    if (editBtn) { editBtn.setAttribute('data-temp-id', newId); }
-    
-    // Add delete functionality for the new row
-    const deleteButton = tr.querySelector('.delete-glass');
-    if (deleteButton) {
-      deleteButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        const tempId = tr.getAttribute('data-temp-id');
-        const destroyInput = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][_destroy]"]`);
-        if (destroyInput) {
-          destroyInput.value = '1';
-        }
-        tr.remove();
-        removeGlasscuttingTableIfEmpty();
-      });
+      
+      // Add a data attribute to the row to identify it for deletion and editing
+      tr.setAttribute('data-temp-id', newId);
+      // Set data-temp-id on the edit button
+      const editBtn = tr.querySelector('.edit-glasscutting');
+      if (editBtn) { editBtn.setAttribute('data-temp-id', newId); }
+      
+      // Add delete functionality for the new row
+      const deleteButton = tr.querySelector('.delete-glass');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          const tempId = tr.getAttribute('data-temp-id');
+          const destroyInput = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][_destroy]"]`);
+          if (destroyInput) {
+            destroyInput.value = '1';
+          }
+          tr.remove();
+          removeGlasscuttingTableIfEmpty();
+        });
+      }
+      document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
+      
+      // Increment counter
+      glasscuttingIdCounter++;
     }
-    document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
     
-    // Increment counter and remove form container
-    glasscuttingIdCounter++;
+    // Update project totals if function exists
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
+    
+    // Remove form container
     container.remove();
     return;
   }

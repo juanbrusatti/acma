@@ -46,8 +46,8 @@
 <template id="dvh-template">
   <div class="border border-gray-300 rounded p-4 mb-4 dvh-fields space-y-4">
 
-    <!-- Fila 1: Tipología, Cámara, Ancho, Alto, Abertura -->
-    <div class="grid grid-cols-5 gap-6 mb-4">
+    <!-- Fila 1: Tipología, Cámara, Ancho, Alto, Abertura, Cantidad -->
+    <div class="grid grid-cols-6 gap-6 mb-4">
       <div>
         <label>Tipología</label>
         <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
@@ -83,14 +83,19 @@
           <option value="Aluminio">Aluminio</option>
         </select>
       </div>
+      <div>
+        <label>Cantidad</label>
+        <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
+      </div>
     </div>
 
-    <!-- Fila 2: Cristal 1 -->
+    <!-- Fila 2: Cristal 1 y Cristal 2 -->
     <div class="mb-4">
-      <h3 class="font-semibold text-sm mb-2">Cristal 1</h3>
-      <div class="grid grid-cols-5 gap-6">
+      <h3 class="font-semibold text-sm mb-2">Cristales</h3>
+      <div class="grid grid-cols-6 gap-6">
+        <!-- Cristal 1 -->
         <div>
-          <label>Tipo de vidrio</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Tipo</label>
           <select name="project[dvhs_attributes][][glasscutting1_type]" class="w-full border rounded px-2 py-1 glasscutting1-type-select">
             <option value="">Seleccionar</option>
             <option value="LAM">LAM</option>
@@ -99,26 +104,20 @@
           </select>
         </div>
         <div>
-          <label>Grosor</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Grosor</label>
           <select name="project[dvhs_attributes][][glasscutting1_thickness]" class="w-full border rounded px-2 py-1 glasscutting1-thickness-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
         <div>
-          <label>Color</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Color</label>
           <select name="project[dvhs_attributes][][glasscutting1_color]" class="w-full border rounded px-2 py-1 glasscutting1-color-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
-      </div>
-    </div>
-
-    <!-- Fila 3: Cristal 2 -->
-    <div>
-      <h3 class="font-semibold text-sm mb-2">Cristal 2</h3>
-      <div class="grid grid-cols-5 gap-6">
+        <!-- Cristal 2 -->
         <div>
-          <label>Tipo de vidrio</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Tipo</label>
           <select name="project[dvhs_attributes][][glasscutting2_type]" class="w-full border rounded px-2 py-1 glasscutting2-type-select">
             <option value="">Seleccionar</option>
             <option value="LAM">LAM</option>
@@ -127,13 +126,13 @@
           </select>
         </div>
         <div>
-          <label>Grosor</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Grosor</label>
           <select name="project[dvhs_attributes][][glasscutting2_thickness]" class="w-full border rounded px-2 py-1 glasscutting2-thickness-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
         <div>
-          <label>Color</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Color</label>
           <select name="project[dvhs_attributes][][glasscutting2_color]" class="w-full border rounded px-2 py-1 glasscutting2-color-select">
             <option value="">Seleccionar</option>
           </select>
@@ -153,7 +152,7 @@
 <!-- Hidden template for cloning glasscutting fields -->
 <!--  Template for dynamically adding new glasscutting rows -->
 <template id="glasscutting-template">
-  <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
+  <div class="grid grid-cols-9 gap-4 mb-4 glasscutting-fields">
     <div>
       <label>Tipología</label>
       <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
@@ -200,6 +199,10 @@
         <option value="PVC">PVC</option>
         <option value="Aluminio">Aluminio</option>
       </select>
+    </div>
+    <div>
+      <label>Cantidad</label>
+      <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
     </div>
     <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
       <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
