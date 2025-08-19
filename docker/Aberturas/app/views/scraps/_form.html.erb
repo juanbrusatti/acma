@@ -12,6 +12,16 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 scrap-fields" id="scrap-fields-debug">
     <div class="space-y-4">
+      <label for="scrap_ref_number">Número de referencia</label>
+      <%= form.text_field :ref_number, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-100", readonly: true %>
+    </div>
+
+    <div class="space-y-4">
+      <label for="scrap_output_work">Obra</label>
+      <%= form.text_field :output_work, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", placeholder: "Nombre de la obra" %>
+    </div>
+
+    <div class="space-y-4">
       <label for="scrap_scrap_type">Tipo</label>
       <select name="scrap[scrap_type]" id="scrap_scrap_type" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-type-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
         <option value="">Seleccionar tipo</option>
@@ -24,14 +34,14 @@
     <div class="space-y-4">
       <label for="scrap_thickness">Espesor</label>
       <select name="scrap[thickness]" id="scrap_thickness" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-thickness-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-        <option value="">Seleccionar</option>
+        <option value="">Seleccionar espesor</option>
       </select>
     </div>
 
     <div class="space-y-4">
       <label for="scrap_color">Color</label>
       <select name="scrap[color]" id="scrap_color" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-color-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-        <option value="">Seleccionar</option>
+        <option value="">Seleccionar color</option>
       </select>
     </div>
 
@@ -46,8 +56,12 @@
     </div>
 
     <div class="space-y-4">
-      <%= form.label :status, "Estado", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-      <%= form.text_field :status, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+      <label for="scrap_status">Estado</label>
+      <select name="scrap[status]" id="scrap_status" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar estado</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Reservado">Reservado</option>
+      </select>
     </div>
   </div>
 

@@ -13,6 +13,8 @@ class ScrapsController < ApplicationController
   # GET /scraps/new
   def new
     @scrap = Scrap.new
+    last_ref = Scrap.maximum("CAST(SUBSTRING(ref_number, 5) AS INTEGER)") || 0
+    @scrap.ref_number = "REF-" + "%03d" % (last_ref + 1)
   end
 
   # GET /scraps/1/edit
@@ -25,7 +27,7 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if @scrap.save
-        format.html { redirect_to @scrap, notice: "Scrap was successfully created." }
+        format.html { redirect_to glassplates_path, notice: "El retazo fue creado exitosamente." }
         format.json { render :show, status: :created, location: @scrap }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +40,7 @@ class ScrapsController < ApplicationController
   def update
     respond_to do |format|
       if @scrap.update(scrap_params)
-        format.html { redirect_to @scrap, notice: "Scrap was successfully updated." }
+        format.html { redirect_to glassplates_path, notice: "El retazo fue actualizado exitosamente." }
         format.json { render :show, status: :ok, location: @scrap }
       else
         format.html { render :edit, status: :unprocessable_entity }
