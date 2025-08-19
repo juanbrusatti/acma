@@ -28,6 +28,7 @@ Follow these steps to get the project running in your local environment:
 
 2.  **Install Ruby gems:**
     ```bash
+    cd docker
     cd Aberturas
     bundle install
     ```
