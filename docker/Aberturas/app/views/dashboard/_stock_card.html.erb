@@ -16,24 +16,21 @@
   </div>
 
   <div class="p-6 pt-0">
-    <div class="text-2xl font-bold gradient-text-primary animated-number">
-    </div>
-    <p class="text-xs text-muted-foreground pulse-text">
-    </p>
-
+    <div class="text-2xl font-bold gradient-text-primary animated-number"><%= @stock_data[:glassplates][:total] %> Planchas</div>
+    <div class="text-2xl font-bold gradient-text-primary animated-number"><%= @stock_data[:scraps][:total] %> Retazos</div>
     <%= link_to "glassplates", class: "modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium 
-       border border-input bg-background hover:bg-accent transition-all duration-300 
-       h-9 px-3 mt-4 ripple-effect" do %>
-      Ir a Stock
+      border border-input bg-background hover:bg-accent transition-all duration-300 
+      h-9 px-3 mt-4 ripple-effect" do %>
+      Ir a stock
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-           stroke-linecap="round" stroke-linejoin="round" 
-           class="h-4 w-4">
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+          stroke-linecap="round" stroke-linejoin="round" 
+          class="h-4 w-4">
         <path d="M7 7L17 17"></path>
         <path d="M17 7V17H7"></path>
       </svg>
     <% end %>
+    </div>
   </div>
-</div>
 
 <!-- Estilos movidos a app/assets/stylesheets/dashboard.css para mejor rendimiento -->

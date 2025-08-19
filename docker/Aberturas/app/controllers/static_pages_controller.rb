@@ -10,17 +10,21 @@ class StaticPagesController < ApplicationController
 
   # === DASHBOARD DATA LOADING ===
   def load_dashboard_data
-    #@stock_data = load_stock_data
+    @stock_data = load_stock_data
     @projects_data = load_projects_data
     @recent_projects = Project.order(created_at: :desc).limit(3)
   end
 
-  #def load_stock_data
-  #  {
-  #    total_sheets: Glassplate.complete_sheets.count,
-  #    available_scraps: Glassplate.scraps.count,
-  #  }
-  #end
+  def load_stock_data
+    {
+      glassplates: {
+        total: Glassplate.count.to_i
+      },
+      scraps: {
+        total: Scrap.count.to_i
+      }
+    }
+  end
 
   # === PROJECTS DATA LOADING ===
   def load_projects_data
