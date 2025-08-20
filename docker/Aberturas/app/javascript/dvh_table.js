@@ -403,34 +403,22 @@ export function handleDvhEvents(e) {
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
-      if (window.Swal) {
-        window.Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'warning',
-          title: 'Falta rellenar: ' + missingField.label,
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true
-        });
-      }
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
       return;
     }
 
     // Get quantity value, default to 1 if not specified
     const quantity = parseInt(values.quantity);
     if (quantity < 1 || quantity > 100 || isNaN(quantity)) {
-      if (window.Swal) {
-        window.Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'warning',
-          title: 'La cantidad debe estar entre 1 y 100',
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true
-        });
-      }
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
       return;
     }
     

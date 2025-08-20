@@ -69,7 +69,7 @@ class ProjectsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
         format.json {
           render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
         }

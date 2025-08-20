@@ -328,17 +328,11 @@ export function handleGlasscuttingEvents(e) {
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
-       if (window.Swal) {
-        window.Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'warning',
-          title: 'Falta rellenar: ' + missingField.label,
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true
-        });
-      }
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
       return;
     }
 
