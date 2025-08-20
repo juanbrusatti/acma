@@ -172,17 +172,11 @@ document.addEventListener('turbo:load', () => {
     const openGlasscuttingForms = document.querySelectorAll('.glasscutting-fields:not(.hidden) input:not([disabled])');
     const openDvhForms = document.querySelectorAll('.dvh-fields:not(.hidden) input:not([disabled])');
     if (openGlasscuttingForms.length > 0 || openDvhForms.length > 0) {
-      if (window.Swal) {
-        window.Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'warning',
-          title: 'Faltan vidrios por confirmar',
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true
-        });
-      }
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Faltan vidrios por confirmar',
+      });
       event.preventDefault();
     }
     });

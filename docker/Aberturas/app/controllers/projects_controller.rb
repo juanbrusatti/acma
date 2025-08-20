@@ -69,7 +69,7 @@ class ProjectsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
         format.json {
           render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
         }
@@ -176,12 +176,14 @@ class ProjectsController < ApplicationController
       :status,
       :price,
       :price_without_iva,
-      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :typology, :price ],
+      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :typology, :price, :type_opening ],
       dvhs_attributes: [
+        :id,
         :innertube,
         :typology,
         :height,
         :width,
+        :type_opening,
         :glasscutting1_type,
         :glasscutting1_thickness,
         :glasscutting1_color,

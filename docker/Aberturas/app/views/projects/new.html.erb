@@ -141,10 +141,13 @@
       </div>
     </div>
 
-    <!-- Confirm button -->
-    <div class="mt-4">
-      <button type="button" class="confirm-dvh bg-black text-white px-3 py-1 rounded">Confirmar</button>
-      <button type="button" class="cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded ml-2">Cancelar</button>
+    <div class="flex items-center gap-1 col-span-1 mt-6">
+      <div>
+        <button type="button" class="confirm-dvh bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+      </div>
+      <div> 
+        <button type="button" class="cancel-dvh bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
+      </div>
     </div>
 
   </div>
@@ -201,14 +204,17 @@
         <option value="Aluminio">Aluminio</option>
       </select>
     </div>
-    <div>
+    <div class="quantity-field">
       <label>Cantidad</label>
       <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
     </div>
-    <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
-      <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
-      <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
+    <div class="flex items-center gap-1 col-span-1 mt-6">
+      <div>
+        <button type="button" class="confirm-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+      </div>
+      <div> 
+        <button type="button" class="cancel-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
+      </div>
     </div>
-  </div>
   </div>
 </template>

@@ -252,40 +252,40 @@ export function handleDvhEvents(e) {
 
     // Update hidden fields (use id or tempId)
     const key = id || tempId;
-    const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][typology]"]`);
+    const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][typology]"]`);
     if (typologyFields.length > 0) typologyFields[0].value = typology;
     
-    const innertubeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][innertube]"]`);
+    const innertubeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][innertube]"]`);
     if (innertubeFields.length > 0) innertubeFields[0].value = innertube;
     
-    const widthFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][width]"]`);
+    const widthFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][width]"]`);
     if (widthFields.length > 0) widthFields[0].value = width;
     
-    const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][height]"]`);
+    const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][height]"]`);
     if (heightFields.length > 0) heightFields[0].value = height;
 
-    const type_openingFields = document.querySelectorAll(`select[name="project[dvhs_attributes][${key}][type_opening]"]`);
+    const type_openingFields = document.querySelectorAll(`select[name="project[dvhs_attributes][][type_opening]"]`);
     if (type_openingFields.length > 0) type_openingFields[0].value = type_opening;
 
-    const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_type]"]`);
+    const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_type]"]`);
     if (glass1TypeFields.length > 0) glass1TypeFields[0].value = glass1Type;
     
-    const glass1ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_thickness]"]`);
+    const glass1ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_thickness]"]`);
     if (glass1ThicknessFields.length > 0) glass1ThicknessFields[0].value = glass1Thickness;
     
-    const glass1ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting1_color]"]`);
+    const glass1ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_color]"]`);
     if (glass1ColorFields.length > 0) glass1ColorFields[0].value = glass1Color;
     
-    const glass2TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_type]"]`);
+    const glass2TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_type]"]`);
     if (glass2TypeFields.length > 0) glass2TypeFields[0].value = glass2Type;
     
-    const glass2ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_thickness]"]`);
+    const glass2ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_thickness]"]`);
     if (glass2ThicknessFields.length > 0) glass2ThicknessFields[0].value = glass2Thickness;
     
-    const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][glasscutting2_color]"]`);
+    const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_color]"]`);
     if (glass2ColorFields.length > 0) glass2ColorFields[0].value = glass2Color;
 
-    const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][${key}][price]"]`);
+    const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][price]"]`);
     if (priceFields.length > 0) priceFields[0].value = price.toFixed(2);
     
     // Update project totals
@@ -403,24 +403,22 @@ export function handleDvhEvents(e) {
     ];
     const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
     if (missingField) {
-      if (window.Swal) {
-        window.Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'warning',
-          title: 'Falta rellenar: ' + missingField.label,
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true
-        });
-      }
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
       return;
     }
 
     // Get quantity value, default to 1 if not specified
     const quantity = parseInt(values.quantity);
     if (quantity < 1 || quantity > 100 || isNaN(quantity)) {
-      alert('La cantidad debe estar entre 1 y 100');
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
       return;
     }
     
@@ -485,19 +483,19 @@ export function handleDvhEvents(e) {
       const index = projectId ? `new_${Date.now()}_${i}` : `new_${Date.now()}_${i}`;
       
       hiddenDiv.innerHTML = `
-        <input type="hidden" name="project[dvhs_attributes][${index}][typology]" value="${values.typology || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][innertube]" value="${values.innertube || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][height]" value="${values.height || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][width]" value="${values.width || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][type_opening]" value="${values.type_opening || ''}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][price]" value="${price.toFixed(2)}">
-        <input type="hidden" name="project[dvhs_attributes][${index}][_destroy]" value="0">
+        <input type="hidden" name="project[dvhs_attributes][][typology]" value="${values.typology || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][type_opening]" value="${values.type_opening || ''}">
+        <input type="hidden" name="project[dvhs_attributes][][price]" value="${price.toFixed(2)}">
+        <input type="hidden" name="project[dvhs_attributes][][_destroy]" value="0">
       `;
       
       document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
