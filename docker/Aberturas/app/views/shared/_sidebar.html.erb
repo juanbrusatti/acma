@@ -21,7 +21,7 @@
           </svg>
           Pagina Principal
         <% end %>
-        <%= link_to "glassplates", class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path.start_with?('/glassplates') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
+        <%= link_to glassplates_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path == glassplates_path ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
             <path d="M2 17l10 5l10-5"></path>
