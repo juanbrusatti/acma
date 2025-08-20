@@ -94,16 +94,6 @@
       // Table is already rendered with server-side data
       return;
     }
-    
-    // If no DVHs, show the empty state
-    const container = document.getElementById('dvhs-table-container');
-    if (container) {
-      container.innerHTML = `
-        <div class="text-center py-4 text-gray-500">
-          No hay DVHs cargados. Agrega uno para comenzar.
-        </div>
-      ` + container.innerHTML;
-    }
   });
   
 
