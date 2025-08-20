@@ -7,7 +7,6 @@ import "glass_prices_calculator"
 import "supply_editing"
 import "preview_pdf"
 
-
 document.addEventListener("turbo:load", () => {
 	// Exponer funciones para depuración manual
 	window.setupAllScrapSelects = setupAllScrapSelects;
