@@ -345,7 +345,17 @@ export function handleGlasscuttingEvents(e) {
     // Get quantity value, default to 1 if not specified
     const quantity = parseInt(values.quantity)
     if (quantity < 1 || quantity > 100  || isNaN(quantity)) {
-      alert('La cantidad debe estar entre 1 y 100');
+      if (window.Swal) {
+        window.Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'warning',
+          title: 'La cantidad debe estar entre 1 y 100',
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true
+        });
+      }
       return;
     }
 
@@ -391,15 +401,15 @@ export function handleGlasscuttingEvents(e) {
       
           // Create the hidden inputs for the form
     hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
+      <input type="hidden" name="project[glasscuttings_attributes][][_destroy]" value="0">
+      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][type_opening]" value="${values.type_opening || ''}">
+      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
     `;
       
       // Add a data attribute to the row to identify it for deletion and editing
