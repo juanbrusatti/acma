@@ -2,11 +2,60 @@
 // Manages dynamic table creation and manipulation for double-glazed window entries in projects
 // DVH stands for "Doble Vidriado Hermético" (Hermetic Double Glazing)
 import { updateDvhGlassSelects } from "dvh_selects";
+import { getDvhTotalGlassPrice, calculateInnertubeTotal, getGlassPriceM2, requireFields, validateQuantity } from "utils";
 
 // Global variables to track table state and unique IDs
 let dvhIdCounter = 1;
 let dvhTable = null;
 let dvhTbody = null;
+
+// Pure builder for DVH table row and corresponding hidden inputs
+function buildDvhRow(values, price, index) {
+  const tempId = `new_${Date.now()}_${index}`;
+  
+  const tr = document.createElement("tr");
+  tr.className = "divide-x divide-gray-200";
+  tr.innerHTML = `
+    <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.innertube || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
+    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class="px-4 py-2 text-center">
+      <div class="flex space-x-1 justify-center">
+        <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${tempId}">Editar</button>
+        <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
+      </div>
+    </td>
+  `;
+
+  // Hidden form inputs for Rails submission
+  const hiddenDiv = document.createElement("div");
+  hiddenDiv.style.display = "none";
+  hiddenDiv.className = "dvh-hidden-row";
+  hiddenDiv.innerHTML = `
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][innertube]" value="${values.innertube || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][price]" value="${price.toFixed(2)}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][_destroy]" value="0">
+  `;
+
+  tr.setAttribute('data-temp-id', tempId);
+
+  return { tr, hiddenDiv, tempId };
+}
 
 // Ensures the DVH table exists in the DOM
 // Creates the table structure if it doesn't exist, or references existing one
@@ -38,6 +87,7 @@ export function ensureDvhTable() {
           <th class='px-4 py-2 text-center'>CRISTAL 2</th>
           <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>ACCION</th>
         </tr>
       </thead>
     `;
@@ -55,9 +105,9 @@ export function ensureDvhTable() {
 export function removeDvhTableIfEmpty() {
   if (dvhTbody && dvhTbody.children.length === 0) {
     if (dvhTable && dvhTable.parentNode) {
+      // Remove table includes <thead>
       dvhTable.parentNode.removeChild(dvhTable);
     }
-    // Reset references to null
     dvhTable = null;
     dvhTbody = null;
   }
@@ -130,6 +180,12 @@ export function handleDvhEvents(e) {
         cancelBtn.classList.remove('cancel-dvh');
         cancelBtn.classList.add('cancel-dvh-edit');
         cancelBtn.textContent = 'Cancelar';
+      }
+
+      // Ocultar el campo cantidad en modo edición
+      const quantityField = editContainer.querySelector('.quantity-field[data-only-create]');
+      if (quantityField) {
+        quantityField.style.display = 'none';
       }
 
       // Append container into td and insert before the row
@@ -230,19 +286,20 @@ export function handleDvhEvents(e) {
     const glass2Color = (editContainer.querySelector('.glasscutting2-color-select') || {}).value || '';
 
     // Calculate new price
-    const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
-    const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
-    const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
+  const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
+  const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');
+  const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
+  const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
+  const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
 
-    // Update row content
-    row.querySelector('td:nth-child(1)').textContent = typology;
-    row.querySelector('td:nth-child(2)').textContent = innertube;
-    row.querySelector('td:nth-child(3)').textContent = width;
-    row.querySelector('td:nth-child(4)').textContent = height;
-    row.querySelector('td:nth-child(5)').textContent = `${glass1Type} ${glass1Thickness} ${glass1Color}`;
-    row.querySelector('td:nth-child(6)').textContent = `${glass2Type} ${glass2Thickness} ${glass2Color}`;
-    row.querySelector('td:nth-child(7)').textContent = type_opening;
-    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
+  row.querySelector('td:nth-child(1)').textContent = typology;
+  row.querySelector('td:nth-child(2)').textContent = innertube;
+  row.querySelector('td:nth-child(3)').textContent = width;
+  row.querySelector('td:nth-child(4)').textContent = height;
+  row.querySelector('td:nth-child(5)').textContent = glass1Display;
+  row.querySelector('td:nth-child(6)').textContent = glass2Display;
+  row.querySelector('td:nth-child(7)').textContent = type_opening;
+  row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Show the row again
     row.style.display = '';
@@ -320,34 +377,27 @@ export function handleDvhEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Mark for destruction instead of removing, in case it's an existing record
+      // Mark for destruction and remove the row from DOM so totals update correctly
       const destroyField = document.getElementById(`dvhs_destroy_${id}`);
       if (destroyField) {
         destroyField.value = '1';
-        row.style.display = 'none';
-        // Actualizar totales después de eliminar
-        setTimeout(() => {
-          if (typeof window.updateProjectTotals === 'function') {
-            window.updateProjectTotals();
-          }
-        }, 100);
       }
+      row.remove();
     } else {
       // For new entries without ID, just remove the row
       row.remove();
-      // Actualizar totales después de eliminar
-      setTimeout(() => {
-        if (typeof window.updateProjectTotals === 'function') {
-          window.updateProjectTotals();
+      const tempId = row.getAttribute('data-temp-id');
+      if (tempId) {
+        const hiddenDiv = document.querySelector(`.dvh-hidden-row input[name="project[dvhs_attributes][${tempId}][typology]"]`);
+        if (hiddenDiv && hiddenDiv.parentElement && hiddenDiv.parentElement.classList.contains('dvh-hidden-row')) {
+          hiddenDiv.parentElement.remove();
         }
-      }, 100);
+      }
     }
-    
-    // If no more DVHs, show the empty state
+    // Si no quedan filas, eliminar la tabla
     const tableBody = document.getElementById('dvhs-table-body');
     if (tableBody) {
-      const visibleRows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
-      if (visibleRows.length === 0) {
+      if (tableBody.children.length === 0) {
         const container = document.getElementById('dvhs-table-container');
         if (container) {
           // Remove existing table
@@ -358,6 +408,12 @@ export function handleDvhEvents(e) {
         }
       }
     }
+    // Update totals after deletion
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     return;
   }
   // CONFIRM: Add new DVH entry to table
@@ -387,7 +443,6 @@ export function handleDvhEvents(e) {
     const quantityInput = container.querySelector('.quantity-input');
     values.quantity = quantityInput ? quantityInput.value : '';
 
-    // requires input validation
     const requiredFields = [
       { key: 'typology', label: 'Tipología' },
       { key: 'innertube', label: 'Cámara' },
@@ -401,7 +456,7 @@ export function handleDvhEvents(e) {
       { key: 'glasscutting2_color', label: 'Color del cristal 2' },
       { key: 'type_opening', label: 'Tipo de apertura' }
     ];
-    const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
+    const missingField = requireFields(values, requiredFields);
     if (missingField) {
       const swalConfig = window.getSwalConfig();
       window.Swal.fire({
@@ -411,13 +466,13 @@ export function handleDvhEvents(e) {
       return;
     }
 
-    // Get quantity value, default to 1 if not specified
     const quantity = parseInt(values.quantity);
-    if (quantity < 1 || quantity > 100 || isNaN(quantity)) {
+    const quantityError = validateQuantity(quantity, 1, 100);
+    if (quantityError) {
       const swalConfig = window.getSwalConfig();
       window.Swal.fire({
         ...swalConfig,
-        title: 'Falta rellenar: ' + missingField.label
+        title: quantityError
       });
       return;
     }
@@ -446,65 +501,9 @@ export function handleDvhEvents(e) {
     
     // Create multiple rows based on quantity
     for (let i = 0; i < quantity; i++) {
-      // Create new table row
-      const tr = document.createElement("tr");
-      tr.className = "divide-x divide-gray-200";
-      
-      // Populate row with DVH data and delete button
-      tr.innerHTML = `
-        <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.innertube || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.height || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.width || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-        <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-        <td class='px-4 py-2 text-right space-x-2'>
-          <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
-          <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-        </td>
-      `;
-      
+      const { tr, hiddenDiv } = buildDvhRow(values, price, i);
       dvhTbody.appendChild(tr);
-      
-      // Create hidden form inputs for Rails form submission
-      // DVH requires more fields due to dual glass configuration
-      const hiddenDiv = document.createElement("div");
-      hiddenDiv.style.display = "none";
-      hiddenDiv.className = "dvh-hidden-row";
-      
-      // Check if we're editing an existing project (has project_id in the URL)
-      const urlParams = new URLSearchParams(window.location.search);
-      const projectId = urlParams.get('project_id');
-      
-      // If we're editing, we need to use a unique index for each DVH
-      // to prevent overwriting existing ones
-      const index = projectId ? `new_${Date.now()}_${i}` : `new_${Date.now()}_${i}`;
-      
-      hiddenDiv.innerHTML = `
-        <input type="hidden" name="project[dvhs_attributes][][typology]" value="${values.typology || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][type_opening]" value="${values.type_opening || ''}">
-        <input type="hidden" name="project[dvhs_attributes][][price]" value="${price.toFixed(2)}">
-        <input type="hidden" name="project[dvhs_attributes][][_destroy]" value="0">
-      `;
-      
       document.getElementById("dvhs-hidden").appendChild(hiddenDiv);
-      // Tag table row and edit button with temp id for inline editing
-      tr.setAttribute('data-temp-id', index);
-      const editBtn = tr.querySelector('.edit-dvh');
-      if (editBtn) { editBtn.setAttribute('data-temp-id', index); }
-      
-      // Increment counter
       dvhIdCounter++;
     }
     
@@ -516,7 +515,11 @@ export function handleDvhEvents(e) {
     }, 100);
     
     // Remove form container
+    console.log('Removing DVH form container');
     container.remove();
+    console.log('DVH form container removed, checking for remaining forms...');
+    const remainingForms = document.querySelectorAll('#dvhs-wrapper .dvh-fields');
+    console.log('Remaining DVH forms after removal:', remainingForms.length);
     return;
   }
   
@@ -548,7 +551,9 @@ export function handleDvhEvents(e) {
   // CANCEL: Remove form without adding entry
   if (e.target.classList.contains("cancel-dvh")) {
     const container = e.target.closest(".dvh-fields");
+    console.log('Canceling DVH form, removing container');
     container.remove();
+    console.log('Cancel DVH form container removed');
     return;
   }
 }
@@ -559,49 +564,4 @@ export function resetDvhTableVars() {
   dvhIdCounter = 1;
   dvhTable = null;
   dvhTbody = null;
-}
-
-// Utility function to get price per square meter for specific glass configuration
-// Searches the global GLASS_PRICES array populated from Rails backend
-export function getDvhGlassPriceM2(type, thickness, color) {
-  if (!window.GLASS_PRICES) return 0;
-  const found = window.GLASS_PRICES.find(p =>
-    p.glass_type === type && p.thickness === thickness && p.color === color
-  );
-  return found ? found.selling_price : 0;
-}
-
-// Calculate total innertube price including 4 fixed angles
-// This matches the Ruby calculation in AppConfig.calculate_innertube_total_price
-export function calculateInnertubeTotal(innertubeSize, perimeterM) {
-  // Get price per linear meter (without angles)
-  const pricePerMeter = window.INNERTUBE_PRICES ? (window.INNERTUBE_PRICES[innertubeSize] || 0) : 0;
-  const linearCost = perimeterM * pricePerMeter;
-  
-  // Add fixed cost of 4 angles per DVH
-  const anglePrice = window.SUPPLY_PRICES ? (window.SUPPLY_PRICES['Angulos'] || 0) : 0;
-  const anglesCost = anglePrice * 4;  // Always 4 angles per DVH
-  
-  return linearCost + anglesCost;
-}
-
-// Calculates total price for DVH unit with two glass panes plus innertube cost
-// Takes dimensions, specifications for both glass layers, and innertube size
-export function getDvhTotalGlassPrice(height, width, glass1, glass2, innertubeSize) {
-  // Calculate area in square meters for glass
-  const area = (height * width) / 1000000;
-  
-  // Calculate perimeter in linear meters for innertube
-  const perimeter = 2 * ((height / 1000) + (width / 1000));
-
-  // Get price per square meter for each glass pane
-  const price1 = getDvhGlassPriceM2(glass1.type, glass1.thickness, glass1.color);
-  const price2 = getDvhGlassPriceM2(glass2.type, glass2.thickness, glass2.color);
-
-  // Calculate total prices
-  const glassPrice = area * (price1 + price2);
-  const innertubePrice = calculateInnertubeTotal(innertubeSize, perimeter);
-
-  // Return total price for glass panes plus innertube (including 4 angles)
-  return glassPrice + innertubePrice;
 }

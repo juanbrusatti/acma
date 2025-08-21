@@ -8,12 +8,12 @@
           <thead>
             <tr class='bg-gray-50 text-gray-500'>
               <th class='px-4 py-2 text-center'>TIPOLOGIA</th>
-              <th class='px-6 py-2 text-center'>CÁMARA</th>
+              <th class='px-4 py-2 text-center'>CÁMARA</th>
               <th class='px-4 py-2 text-center'>ANCHO</th>
               <th class='px-4 py-2 text-center'>ALTO</th>
-              <th class='px-4 py-2 text-center'>ABERTURA</th>
               <th class='px-4 py-2 text-center'>CRISTAL 1</th>
               <th class='px-4 py-2 text-center'>CRISTAL 2</th>
+              <th class='px-4 py-2 text-center'>ABERTURA</th>
               <th class='px-4 py-2 text-center'>PRECIO</th>
               <th class='px-4 py-2 text-center'>ACCIÓN</th>
             </tr>
@@ -25,13 +25,13 @@
                 <td class="px-6 py-2 text-center"><%= dvh.innertube %></td>
                 <td class="px-4 py-2 text-center"><%= dvh.width %></td>
                 <td class="px-4 py-2 text-center"><%= dvh.height %></td>
+                <td class="px-4 py-2 text-center">
+                  <%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].join(' / ') %>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].join(' / ') %>
+                </td>
                 <td class="px-4 py-2 text-center"><%= dvh.type_opening %></td>
-                <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting1_type %> <%= dvh.glasscutting1_thickness %> <%= dvh.glasscutting1_color %>
-                </td>
-                <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting2_type.present? ? "#{dvh.glasscutting2_type} #{dvh.glasscutting2_thickness} #{dvh.glasscutting2_color}" : 'N/A' %>
-                </td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
                 <td class="px-4 py-2 text-center">
                   <div class="flex space-x-1 justify-center">
@@ -68,11 +68,6 @@
 
     <!-- Container for hidden form inputs of confirmed DVH entries -->
     <div id="dvhs-hidden">
-      <% if @project.persisted? %>
-        <% @project.dvhs.each_with_index do |dvh, index| %>
-          <%= hidden_field_tag "project[dvhs_attributes][#{index}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
-        <% end %>
-      <% end %>
     </div>
 
     <!-- Container for dynamically generated DVH entry forms -->

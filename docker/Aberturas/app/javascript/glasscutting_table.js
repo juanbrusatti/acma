@@ -1,11 +1,55 @@
 // Glass Cutting Table Module
 // Manages dynamic table creation and manipulation for glass cutting entries in projects
 import { updateGlassSelects } from "glasscutting_selects";
+import { getGlassPriceM2, requireFields, validateQuantity } from "utils";
 
 // Global variables to track table state and unique IDs
 let glasscuttingIdCounter = 1;
 let glasscuttingTable = null;
 let glasscuttingTbody = null;
+
+// Pure builder for table row and hidden inputs for a glasscutting record
+function buildGlasscuttingRow(values, price, index) {
+  const newId = `new_${Date.now()}_${index}`;
+  
+  const tr = document.createElement("tr");
+  tr.className = "divide-x divide-gray-200";
+  tr.innerHTML = `
+    <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.glass_type || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.thickness || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.color || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.height || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.width || ''}</td>
+    <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
+    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class='px-4 py-2 text-center space-x-2'>
+      <div class="flex space-x-1 justify-center">
+        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${newId}">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
+      </div>    
+    </td>
+  `;
+
+  const hiddenDiv = document.createElement("div");
+  hiddenDiv.style.display = "none";
+  hiddenDiv.className = "glasscutting-hidden-row";
+  hiddenDiv.innerHTML = `
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${`$${price.toFixed(2)}`}">
+  `;
+
+  tr.setAttribute('data-temp-id', newId);
+
+  return { tr, hiddenDiv, tempId: newId };
+}
 
 // Ensures the glass cutting table exists in the DOM
 // Creates the table structure if it doesn't exist, or references existing one
@@ -37,6 +81,7 @@ export function ensureGlasscuttingTable() {
           <th class='px-4 py-2 text-center'>ANCHO</th>
           <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>ACCIÓN</th>
         </tr>
       </thead>
     `;
@@ -54,9 +99,9 @@ export function ensureGlasscuttingTable() {
 export function removeGlasscuttingTableIfEmpty() {
   if (glasscuttingTbody && glasscuttingTbody.children.length === 0) {
     if (glasscuttingTable && glasscuttingTable.parentNode) {
+      // Remove table includes <thead>
       glasscuttingTable.parentNode.removeChild(glasscuttingTable);
     }
-    // Reset references to null
     glasscuttingTable = null;
     glasscuttingTbody = null;
   }
@@ -129,20 +174,15 @@ export function handleGlasscuttingEvents(e) {
         type_openingSelect.value = type_opening;
       }
 
-      // Change action buttons to save/cancel edit
-      const confirmBtn = editContainer.querySelector('.confirm-glass');
-      const cancelBtn = editContainer.querySelector('.cancel-glass');
-      if (confirmBtn) {
-        confirmBtn.classList.remove('confirm-glass');
-        confirmBtn.classList.add('save-glasscutting-edit');
-        confirmBtn.textContent = 'Guardar';
-        if (id) confirmBtn.setAttribute('data-id', id);
-        if (tempId) confirmBtn.setAttribute('data-temp-id', tempId);
-      }
-      if (cancelBtn) {
-        cancelBtn.classList.remove('cancel-glass');
-        cancelBtn.classList.add('cancel-glasscutting-edit');
-        cancelBtn.textContent = 'Cancelar';
+      const divCreate = editContainer.querySelector('.btns-create-glass');
+      const divEdit = editContainer.querySelector('.btns-edit-glass');
+      if (divCreate) divCreate.classList.add('hidden');
+      if (divEdit) divEdit.classList.remove('hidden');
+
+      // Ocult quantity field
+      const quantityField = editContainer.querySelector('.quantity-field[data-only-create]');
+      if (quantityField) {
+        quantityField.style.display = 'none';
       }
 
       // Insert the edit form before the row inside a full-width table row
@@ -186,7 +226,7 @@ export function handleGlasscuttingEvents(e) {
     };
 
     // Recalculate price
-    const price_m2 = getPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
+    const price_m2 = getGlassPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
     const area_m2 = (parseFloat(newValues.height) / 1000) * (parseFloat(newValues.width) / 1000);
     const price = Math.round(area_m2 * price_m2 * 100) / 100;
 
@@ -198,7 +238,7 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(5)').textContent = newValues.height || '';
     row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
     row.querySelector('td:nth-child(7)').textContent = newValues.type_opening || '';
-    row.querySelector('td:nth-child(8)').textContent = price.toFixed(2);
+    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Update hidden inputs for existing or temp record
     const id = e.target.getAttribute('data-id');
@@ -215,7 +255,7 @@ export function handleGlasscuttingEvents(e) {
       setByName('height', newValues.height);
       setByName('width', newValues.width);
       setByName('type_opening', newValues.type_opening);
-      setByName('price', price.toFixed(2));
+      setByName('price', `${price.toFixed(2)}`);
     } else if (tempId) {
       const setByName = (field, value) => {
         const input = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][${field}]"]`);
@@ -231,9 +271,9 @@ export function handleGlasscuttingEvents(e) {
       setByName('price', price.toFixed(2));
     }
 
-    // Show the row again and remove form
-    row.style.display = '';
-    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+  // Show the row again y restaurar botones crear
+  row.style.display = '';
+  if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
 
     // Update totals
     setTimeout(() => {
@@ -250,8 +290,8 @@ export function handleGlasscuttingEvents(e) {
     const editContainer = e.target.closest('.glasscutting-edit-form');
     const editRow = editContainer.closest('tr.glasscutting-edit-row');
     const row = editRow ? editRow.nextElementSibling : null;
-    if (row) { row.style.display = ''; }
-    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+  if (row) { row.style.display = ''; }
+  if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
     return;
   }
   
@@ -262,12 +302,12 @@ export function handleGlasscuttingEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Mark for destruction instead of removing, in case it's an existing record
+      // Mark for destruction and remove the row from DOM so totals update correctly
       const destroyField = document.getElementById(`glasscuttings_destroy_${id}`);
       if (destroyField) {
         destroyField.value = '1';
-        row.style.display = 'none';
       }
+      row.remove();
     } else {
       // For new entries without ID, just remove the row
       row.remove();
@@ -276,8 +316,7 @@ export function handleGlasscuttingEvents(e) {
     // If no more glasscuttings, show the empty state
     const tableBody = document.getElementById('glasscuttings-table-body');
     if (tableBody) {
-      const visibleRows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
-      if (visibleRows.length === 0) {
+      if (tableBody.children.length === 0) {
         const container = document.getElementById('glasscuttings-table-container');
         if (container) {
           // Remove existing table
@@ -288,6 +327,12 @@ export function handleGlasscuttingEvents(e) {
         }
       }
     }
+    // Update totals after deletion
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     return;
   }
   // CONFIRM: Add new glass cutting entry to table
@@ -316,7 +361,6 @@ export function handleGlasscuttingEvents(e) {
     const quantityInput = container.querySelector('.quantity-input');
     values.quantity = quantityInput ? quantityInput.value : '';
     
-    // requires input validation
     const requiredFields = [
       { key: 'typology', label: 'Tipología' },
       { key: 'glass_type', label: 'Tipo' },
@@ -326,7 +370,7 @@ export function handleGlasscuttingEvents(e) {
       { key: 'width', label: 'Ancho' },
       { key: 'type_opening', label: 'Tipo de apertura' }
     ];
-    const missingField = requiredFields.find(field => !values[field.key] || values[field.key].trim() === '');
+    const missingField = requireFields(values, requiredFields);
     if (missingField) {
       const swalConfig = window.getSwalConfig();
       window.Swal.fire({
@@ -336,13 +380,13 @@ export function handleGlasscuttingEvents(e) {
       return;
     }
 
-    // Get quantity value, default to 1 if not specified
     const quantity = parseInt(values.quantity)
-    if (quantity < 1 || quantity > 100  || isNaN(quantity)) {
+    const quantityError = validateQuantity(quantity, 1, 100);
+    if (quantityError) {
       const swalConfig = window.getSwalConfig();
       window.Swal.fire({
         ...swalConfig,
-        title: 'La cantidad debe estar entre 1 y 100'
+        title: quantityError
       });
       return;
     }
@@ -351,67 +395,23 @@ export function handleGlasscuttingEvents(e) {
     ensureGlasscuttingTable();
     
     // Calculate price based on dimensions and glass type
-    const price_m2 = getPriceM2(values.glass_type, values.thickness, values.color);
+    const price_m2 = getGlassPriceM2(values.glass_type, values.thickness, values.color);
     const area_m2 = (parseFloat(values.height) / 1000) * (parseFloat(values.width) / 1000);
     const price = Math.round(area_m2 * price_m2 * 100) / 100; // Round to 2 decimals
     
     // Create multiple rows based on quantity
     for (let i = 0; i < quantity; i++) {
-      // Create new table row
-      const tr = document.createElement("tr");
-      tr.className = "divide-x divide-gray-200";
-      
-      // Populate row with data and delete button
-      tr.innerHTML = `
-        <td class='px-4 py-2 text-center'>${values.typology || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.glass_type || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.thickness || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.color || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.height || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.width || ''}</td>
-        <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-        <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-        <td class='px-4 py-2 text-right space-x-2'>
-          <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
-          <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-        </td>
-      `;
-      
+      const { tr, hiddenDiv, tempId } = buildGlasscuttingRow(values, price, i);
       glasscuttingTbody.appendChild(tr);
-      
-      // Create hidden form inputs for Rails form submission
-      const hiddenDiv = document.createElement("div");
-      hiddenDiv.style.display = "none";
-      hiddenDiv.className = "glasscutting-hidden-row";
-      
-      // Generate a unique ID for the new glasscutting
-      const newId = `new_${Date.now()}_${i}`;
-      
-          // Create the hidden inputs for the form
-    hiddenDiv.innerHTML = `
-      <input type="hidden" name="project[glasscuttings_attributes][][_destroy]" value="0">
-      <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][type_opening]" value="${values.type_opening || ''}">
-      <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
-    `;
-      
-      // Add a data attribute to the row to identify it for deletion and editing
-      tr.setAttribute('data-temp-id', newId);
-      // Set data-temp-id on the edit button
-      const editBtn = tr.querySelector('.edit-glasscutting');
-      if (editBtn) { editBtn.setAttribute('data-temp-id', newId); }
-      
+
+      console.log('Created glasscutting row with tempId:', tempId);
+      console.log('Hidden div HTML:', hiddenDiv.innerHTML);
+
       // Add delete functionality for the new row
       const deleteButton = tr.querySelector('.delete-glass');
       if (deleteButton) {
         deleteButton.addEventListener('click', function(e) {
           e.preventDefault();
-          const tempId = tr.getAttribute('data-temp-id');
           const destroyInput = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][_destroy]"]`);
           if (destroyInput) {
             destroyInput.value = '1';
@@ -420,9 +420,8 @@ export function handleGlasscuttingEvents(e) {
           removeGlasscuttingTableIfEmpty();
         });
       }
+
       document.getElementById("glasscuttings-hidden").appendChild(hiddenDiv);
-      
-      // Increment counter
       glasscuttingIdCounter++;
     }
     
@@ -433,6 +432,10 @@ export function handleGlasscuttingEvents(e) {
       }
     }, 100);
     
+    const divCrear = container.querySelector('.btns-create-glass');
+    const divEditar = container.querySelector('.btns-edit-glass');
+    if (divCrear) divCrear.classList.remove('hidden');
+    if (divEditar) divEditar.classList.add('hidden');
     // Remove form container
     container.remove();
     return;
@@ -466,7 +469,9 @@ export function handleGlasscuttingEvents(e) {
   // CANCEL: Remove form without adding entry
   if (e.target.classList.contains("cancel-glass")) {
     const container = e.target.closest(".glasscutting-fields");
+    console.log('Canceling glasscutting form, removing container');
     container.remove();
+    console.log('Cancel form container removed');
     return;
   }
 }
@@ -479,12 +484,4 @@ export function resetGlasscuttingTableVars() {
   glasscuttingTbody = null;
 }
 
-// Utility function to get price per square meter for specific glass configuration
-// Searches the global GLASS_PRICES array populated from Rails backend
-function getPriceM2(type, thickness, color) {
-  if (!window.GLASS_PRICES) return 0;
-  const found = window.GLASS_PRICES.find(p =>
-    p.glass_type === type && p.thickness === thickness && p.color === color
-  );
-  return found ? found.selling_price : 0;
-}
+// Price lookup moved to utils.getGlassPriceM2

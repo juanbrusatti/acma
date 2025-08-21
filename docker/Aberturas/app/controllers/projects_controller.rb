@@ -56,7 +56,14 @@ class ProjectsController < ApplicationController
 
   def update
     @project = Project.find(params[:id])
+    
+    # Log the parameters for debugging
+    Rails.logger.info "Update params: #{params[:project]}"
+    Rails.logger.info "Glasscuttings attributes: #{params[:project][:glasscuttings_attributes]}"
+    Rails.logger.info "DVHs attributes: #{params[:project][:dvhs_attributes]}"
+    
     if @project.update(project_params)
+      Rails.logger.info "Project updated successfully"
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Proyecto actualizado exitosamente." }
         format.json {
@@ -68,8 +75,12 @@ class ProjectsController < ApplicationController
         }
       end
     else
+      Rails.logger.error "Project update failed: #{@project.errors.full_messages}"
       respond_to do |format|
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { 
+          # Redirect back to edit form with errors
+          redirect_to new_project_path(project_id: @project.id), alert: "Error al actualizar: #{@project.errors.full_messages.join(', ')}"
+        }
         format.json {
           render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
         }
@@ -167,7 +178,8 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    params.require(:project).permit(
+    # First get the basic parameters
+    permitted = params.require(:project).permit(
       :name,
       :phone,
       :address,
@@ -193,5 +205,32 @@ class ProjectsController < ApplicationController
         :price
       ]
     )
+    
+    # Handle glasscuttings_attributes manually
+    if params[:project][:glasscuttings_attributes].present?
+      glasscuttings_attrs = {}
+      params[:project][:glasscuttings_attributes].each do |key, value|
+        glasscuttings_attrs[key] = value.permit(
+          :id, :_destroy, :glass_type, :thickness, :height, :width, 
+          :color, :typology, :price, :type_opening
+        ) if value.is_a?(ActionController::Parameters)
+      end
+      permitted[:glasscuttings_attributes] = glasscuttings_attrs
+    end
+    
+    # Handle dvhs_attributes manually  
+    if params[:project][:dvhs_attributes].present?
+      dvhs_attrs = {}
+      params[:project][:dvhs_attributes].each do |key, value|
+        dvhs_attrs[key] = value.permit(
+          :id, :_destroy, :innertube, :typology, :height, :width, :type_opening,
+          :glasscutting1_type, :glasscutting1_thickness, :glasscutting1_color,
+          :glasscutting2_type, :glasscutting2_thickness, :glasscutting2_color, :price
+        ) if value.is_a?(ActionController::Parameters)
+      end
+      permitted[:dvhs_attributes] = dvhs_attrs
+    end
+    
+    permitted
   end
 end
