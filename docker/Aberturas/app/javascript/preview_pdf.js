@@ -41,6 +41,7 @@ function initializePdfButton() {
     
     // Create FormData object with all form inputs
     const formData = new FormData(form);
+    formData.delete('_method');
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     
     // Validate CSRF token exists for security
