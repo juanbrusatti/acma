@@ -10,6 +10,8 @@ let glasscuttingTbody = null;
 
 // Pure builder for table row and hidden inputs for a glasscutting record
 function buildGlasscuttingRow(values, price, index) {
+  const newId = `new_${Date.now()}_${index}`;
+  
   const tr = document.createElement("tr");
   tr.className = "divide-x divide-gray-200";
   tr.innerHTML = `
@@ -22,7 +24,7 @@ function buildGlasscuttingRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
     <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
     <td class='px-4 py-2 text-right space-x-2'>
-      <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+      <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="${newId}">Editar</button>
       <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
     </td>
   `;
@@ -31,21 +33,18 @@ function buildGlasscuttingRow(values, price, index) {
   hiddenDiv.style.display = "none";
   hiddenDiv.className = "glasscutting-hidden-row";
   hiddenDiv.innerHTML = `
-    <input type="hidden" name="project[glasscuttings_attributes][][_destroy]" value="0">
-    <input type="hidden" name="project[glasscuttings_attributes][][typology]" value="${values.typology || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][glass_type]" value="${values.glass_type || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][thickness]" value="${values.thickness || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][color]" value="${values.color || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][height]" value="${values.height || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][width]" value="${values.width || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][][price]" value="${price.toFixed(2)}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
   `;
 
-  const newId = `new_${Date.now()}_${index}`;
   tr.setAttribute('data-temp-id', newId);
-  const editBtn = tr.querySelector('.edit-glasscutting');
-  if (editBtn) { editBtn.setAttribute('data-temp-id', newId); }
 
   return { tr, hiddenDiv, tempId: newId };
 }
@@ -402,6 +401,9 @@ export function handleGlasscuttingEvents(e) {
       const { tr, hiddenDiv, tempId } = buildGlasscuttingRow(values, price, i);
       glasscuttingTbody.appendChild(tr);
 
+      console.log('Created glasscutting row with tempId:', tempId);
+      console.log('Hidden div HTML:', hiddenDiv.innerHTML);
+
       // Add delete functionality for the new row
       const deleteButton = tr.querySelector('.delete-glass');
       if (deleteButton) {
@@ -428,7 +430,11 @@ export function handleGlasscuttingEvents(e) {
     }, 100);
     
     // Remove form container
+    console.log('Removing glasscutting form container');
     container.remove();
+    console.log('Form container removed, checking for remaining forms...');
+    const remainingForms = document.querySelectorAll('#glasscuttings-wrapper .glasscutting-fields');
+    console.log('Remaining forms after removal:', remainingForms.length);
     return;
   }
   
@@ -460,7 +466,9 @@ export function handleGlasscuttingEvents(e) {
   // CANCEL: Remove form without adding entry
   if (e.target.classList.contains("cancel-glass")) {
     const container = e.target.closest(".glasscutting-fields");
+    console.log('Canceling glasscutting form, removing container');
     container.remove();
+    console.log('Cancel form container removed');
     return;
   }
 }

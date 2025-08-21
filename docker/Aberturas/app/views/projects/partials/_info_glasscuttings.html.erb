@@ -63,11 +63,6 @@
 
     <!-- Container for hidden form inputs of confirmed glasscutting entries -->
     <div id="glasscuttings-hidden">
-      <% if @project.persisted? %>
-        <% @project.glasscuttings.each_with_index do |glasscutting, index| %>
-          <%= hidden_field_tag "project[glasscuttings_attributes][#{index}][id]", glasscutting.id, id: "glasscuttings_#{glasscutting.id}" %>
-        <% end %>
-      <% end %>
     </div>
 
     <!-- Container for dynamically generated glasscutting entry forms -->

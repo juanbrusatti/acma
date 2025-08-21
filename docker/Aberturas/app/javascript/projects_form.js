@@ -169,16 +169,27 @@ document.addEventListener('turbo:load', () => {
   const projectForm = document.getElementById('project-form');
   if (projectForm) {
     projectForm.addEventListener('submit', function(event) {
-    const openGlasscuttingForms = document.querySelectorAll('.glasscutting-fields:not(.hidden) input:not([disabled])');
-    const openDvhForms = document.querySelectorAll('.dvh-fields:not(.hidden) input:not([disabled])');
-    if (openGlasscuttingForms.length > 0 || openDvhForms.length > 0) {
-      const swalConfig = window.getSwalConfig();
-      window.Swal.fire({
-        ...swalConfig,
-        title: 'Faltan vidrios por confirmar',
-      });
-      event.preventDefault();
-    }
+      console.log('Form submit event triggered');
+      console.log('Form action:', this.action);
+      console.log('Form method:', this.method);
+      
+      // Only check for forms that are actually open and need confirmation
+      // This prevents interference with the normal add/edit process
+      const hasUnconfirmedForms = document.querySelectorAll('#glasscuttings-wrapper .glasscutting-fields, #dvhs-wrapper .dvh-fields, .glasscutting-edit-form, .dvh-edit-form').length > 0;
+      
+      console.log('Has unconfirmed forms:', hasUnconfirmedForms);
+      
+      if (hasUnconfirmedForms) {
+        console.log('Preventing form submission - unconfirmed forms detected');
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Faltan vidrios por confirmar',
+        });
+        event.preventDefault();
+      } else {
+        console.log('Form submission allowed - no unconfirmed forms');
+      }
     });
   }
 });

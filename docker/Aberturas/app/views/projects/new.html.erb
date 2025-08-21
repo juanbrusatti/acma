@@ -27,6 +27,7 @@
 
     <% if @project.persisted? %>
       <%= hidden_field_tag :project_id, @project.id %>
+      <%= hidden_field_tag :_method, 'patch' %>
     <% end %>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

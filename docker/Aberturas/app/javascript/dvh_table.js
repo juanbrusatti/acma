@@ -11,6 +11,8 @@ let dvhTbody = null;
 
 // Pure builder for DVH table row and corresponding hidden inputs
 function buildDvhRow(values, price, index) {
+  const tempId = `new_${Date.now()}_${index}`;
+  
   const tr = document.createElement("tr");
   tr.className = "divide-x divide-gray-200";
   tr.innerHTML = `
@@ -23,7 +25,7 @@ function buildDvhRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
     <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
     <td class='px-4 py-2 text-right space-x-2'>
-      <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="">Editar</button>
+      <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="${tempId}">Editar</button>
       <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
     </td>
   `;
@@ -33,25 +35,22 @@ function buildDvhRow(values, price, index) {
   hiddenDiv.style.display = "none";
   hiddenDiv.className = "dvh-hidden-row";
   hiddenDiv.innerHTML = `
-    <input type="hidden" name="project[dvhs_attributes][][typology]" value="${values.typology || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][innertube]" value="${values.innertube || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][height]" value="${values.height || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][width]" value="${values.width || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[dvhs_attributes][][price]" value="${price.toFixed(2)}">
-    <input type="hidden" name="project[dvhs_attributes][][_destroy]" value="0">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][innertube]" value="${values.innertube || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][price]" value="${price.toFixed(2)}">
+    <input type="hidden" name="project[dvhs_attributes][${tempId}][_destroy]" value="0">
   `;
 
-  const tempId = `new_${Date.now()}_${index}`;
   tr.setAttribute('data-temp-id', tempId);
-  const editBtn = tr.querySelector('.edit-dvh');
-  if (editBtn) { editBtn.setAttribute('data-temp-id', tempId); }
 
   return { tr, hiddenDiv, tempId };
 }
@@ -507,7 +506,11 @@ export function handleDvhEvents(e) {
     }, 100);
     
     // Remove form container
+    console.log('Removing DVH form container');
     container.remove();
+    console.log('DVH form container removed, checking for remaining forms...');
+    const remainingForms = document.querySelectorAll('#dvhs-wrapper .dvh-fields');
+    console.log('Remaining DVH forms after removal:', remainingForms.length);
     return;
   }
   
@@ -539,7 +542,9 @@ export function handleDvhEvents(e) {
   // CANCEL: Remove form without adding entry
   if (e.target.classList.contains("cancel-dvh")) {
     const container = e.target.closest(".dvh-fields");
+    console.log('Canceling DVH form, removing container');
     container.remove();
+    console.log('Cancel DVH form container removed');
     return;
   }
 }

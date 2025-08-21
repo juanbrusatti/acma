@@ -68,11 +68,6 @@
 
     <!-- Container for hidden form inputs of confirmed DVH entries -->
     <div id="dvhs-hidden">
-      <% if @project.persisted? %>
-        <% @project.dvhs.each_with_index do |dvh, index| %>
-          <%= hidden_field_tag "project[dvhs_attributes][#{index}][id]", dvh.id, id: "dvh_#{dvh.id}" %>
-        <% end %>
-      <% end %>
     </div>
 
     <!-- Container for dynamically generated DVH entry forms -->
