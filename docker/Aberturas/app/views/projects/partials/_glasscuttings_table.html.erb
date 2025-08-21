@@ -23,7 +23,7 @@
         <td class="text-center px-4 py-2"><%= glasses.size %></td>
         <td class="text-center px-4 py-2">
           <% total_price = attrs[7].to_f * glasses.size %>
-          <%= number_to_currency(total_price, unit: "$", precision: 2) if attrs[7].present? %>
+          <%= format_argentine_currency(total_price, unit: "$", precision: 2) if attrs[7].present? %>
         </td>
       </tr>
     <% end %>

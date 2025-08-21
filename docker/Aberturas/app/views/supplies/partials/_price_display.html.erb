@@ -5,7 +5,7 @@
       <span class="text-xs text-gray-500 uppercase">USD</span>
       <span class="font-semibold text-blue-700">
         <% if supply.price_usd.present? && supply.price_usd > 0 %>
-          US$<%= number_with_precision(supply.price_usd, precision: 2) %>
+          <%= format_argentine_currency(supply.price_usd, unit: "US$", precision: 2) %>
         <% else %>
           N/A
         <% end %>
@@ -17,7 +17,7 @@
       <span class="text-xs text-gray-500 uppercase">Pesos</span>
       <span class="font-semibold text-green-700">
         <% if supply.price_peso.present? && supply.price_peso > 0 %>
-          $<%= number_with_precision(supply.price_peso, precision: 2) %>
+          <%= format_argentine_currency(supply.price_peso, unit: "$", precision: 2) %>
         <% else %>
           N/A
         <% end %>

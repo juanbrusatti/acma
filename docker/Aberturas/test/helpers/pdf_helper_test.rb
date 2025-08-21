@@ -27,15 +27,15 @@ class PdfHelperTest < ActionView::TestCase
   end
 
   test "should format currency for PDF display" do
-    # Verificar formateo de moneda
-    assert_equal "$150.00", number_to_currency(150.00, unit: "$", precision: 2)
-    assert_equal "$1,250.50", number_to_currency(1250.50, unit: "$", precision: 2)
-    assert_equal "$0.00", number_to_currency(0, unit: "$", precision: 2)
+    # Verificar formateo de moneda con formato argentino
+    assert_equal "$150,00", format_argentine_currency(150.00, unit: "$", precision: 2)
+    assert_equal "$1.250,50", format_argentine_currency(1250.50, unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency(0, unit: "$", precision: 2)
     
     # Casos edge - algunos helpers pueden devolver string vacío o nil
-    result = number_to_currency(nil, unit: "$", precision: 2)
+    result = format_argentine_currency(nil, unit: "$", precision: 2)
     # Aceptar tanto nil como string vacío
-    assert (result.nil? || result == "" || result == "$0.00"), "number_to_currency should handle nil gracefully"
+    assert (result.nil? || result == "" || result == "N/A"), "format_argentine_currency should handle nil gracefully"
   end
 
   test "should handle PDF template asset paths" do
@@ -141,10 +141,10 @@ class PdfHelperTest < ActionView::TestCase
     assert_equal 750.75, dvh_total
     assert_equal 1176.50, grand_total
     
-    # Verificar formateo de moneda
-    assert_equal "$425.75", number_to_currency(glass_total, unit: "$", precision: 2)
-    assert_equal "$750.75", number_to_currency(dvh_total, unit: "$", precision: 2)
-    assert_equal "$1,176.50", number_to_currency(grand_total, unit: "$", precision: 2)
+    # Verificar formateo de moneda con formato argentino
+    assert_equal "$425,75", format_argentine_currency(glass_total, unit: "$", precision: 2)
+    assert_equal "$750,75", format_argentine_currency(dvh_total, unit: "$", precision: 2)
+    assert_equal "$1.176,50", format_argentine_currency(grand_total, unit: "$", precision: 2)
   end
 
   test "should handle empty collections in PDF calculations" do
@@ -159,7 +159,7 @@ class PdfHelperTest < ActionView::TestCase
     assert_equal 0, dvh_total
     
     # Verificar formateo
-    assert_equal "$0.00", number_to_currency(glass_total, unit: "$", precision: 2)
-    assert_equal "$0.00", number_to_currency(dvh_total, unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency(glass_total, unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency(dvh_total, unit: "$", precision: 2)
   end
 end

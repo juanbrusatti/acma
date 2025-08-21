@@ -10,7 +10,7 @@
     <%= project.delivery_date&.strftime('%d-%m-%Y') %>
   </td>
   <td class="text-center py-5 px-6 align-middle">
-    <%= '$' + number_with_precision(project.total, precision: 2) %>
+    <%= format_argentine_currency(project.total, unit: "$", precision: 2) %>
   </td>
   <td class="text-center py-5 px-6 align-middle">
     <%= link_to "Ver Detalles", project_path(project), class: "inline-flex items-center justify-center rounded-md px-3 py-1 bg-white border border-gray-200 shadow transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xs font-medium text-gray-900 whitespace-nowrap" %>

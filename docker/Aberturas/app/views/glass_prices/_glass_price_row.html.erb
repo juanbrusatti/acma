@@ -7,7 +7,7 @@
       <div class="grid grid-cols-4 items-center gap-1 md:gap-2">
         <div class="px-1 md:px-2 py-1 text-center text-sm">
           <% if glass_price.buying_price.present? && glass_price.buying_price > 0 %>
-            $<%= number_with_precision(glass_price.buying_price, precision: 2) %>
+            <%= format_argentine_currency(glass_price.buying_price, unit: "$", precision: 2) %>
           <% else %>
             <span class="text-gray-400 text-xs">N/A</span>
           <% end %>
@@ -22,7 +22,7 @@
         <div class="px-1 md:px-2 py-1 text-center text-sm">
           <span class="font-semibold text-green-700">
             <% if glass_price.selling_price.present? && glass_price.selling_price > 0 %>
-              $<%= number_with_precision(glass_price.selling_price, precision: 2) %>
+              <%= format_argentine_currency(glass_price.selling_price, unit: "$", precision: 2) %>
             <% else %>
               N/A
             <% end %>

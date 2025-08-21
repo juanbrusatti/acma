@@ -4,17 +4,17 @@
 
     <div class="flex justify-between text-sm text-gray-600">
       <span>Subtotal (sin IVA)</span>
-      <span id="subtotal-price">$<%= number_with_precision(@project.try(:subtotal) || 0, precision: 2) %></span>
+      <span id="subtotal-price"><%= format_argentine_currency(@project.try(:subtotal) || 0, unit: "$", precision: 2) %></span>
     </div>
 
     <div class="flex justify-between text-sm text-gray-600">
       <span>IVA (21%)</span>
-      <span id="iva-value">$<%= number_with_precision(@project.try(:iva) || 0, precision: 2) %></span>
+      <span id="iva-value"><%= format_argentine_currency(@project.try(:iva) || 0, unit: "$", precision: 2) %></span>
     </div>
 
     <div class="border-t border-gray-200 pt-4 flex justify-between text-base font-bold text-gray-900">
       <span>Total con IVA</span>
-      <span id="price-total">$<%= number_with_precision(@project.try(:total) || 0, precision: 2) %></span>
+      <span id="price-total"><%= format_argentine_currency(@project.try(:total) || 0, unit: "$", precision: 2) %></span>
     </div>
 
   </div>

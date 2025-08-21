@@ -35,7 +35,7 @@
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0;">Total General con IVA</td>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
         <% total_general_con_iva = (total_con_iva || 0) + (dvh_total_con_iva || 0) %>
-        <%= number_to_currency(total_general_con_iva, unit: "$", precision: 2) %>
+        <%= format_argentine_currency(total_general_con_iva, unit: "$", precision: 2) %>
       </td>
     </tr>
   </tbody>
