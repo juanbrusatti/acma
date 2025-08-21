@@ -105,9 +105,9 @@ export function ensureDvhTable() {
 export function removeDvhTableIfEmpty() {
   if (dvhTbody && dvhTbody.children.length === 0) {
     if (dvhTable && dvhTable.parentNode) {
+      // Remove table includes <thead>
       dvhTable.parentNode.removeChild(dvhTable);
     }
-    // Reset references to null
     dvhTable = null;
     dvhTbody = null;
   }

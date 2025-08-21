@@ -99,9 +99,9 @@ export function ensureGlasscuttingTable() {
 export function removeGlasscuttingTableIfEmpty() {
   if (glasscuttingTbody && glasscuttingTbody.children.length === 0) {
     if (glasscuttingTable && glasscuttingTable.parentNode) {
+      // Remove table includes <thead>
       glasscuttingTable.parentNode.removeChild(glasscuttingTable);
     }
-    // Reset references to null
     glasscuttingTable = null;
     glasscuttingTbody = null;
   }
