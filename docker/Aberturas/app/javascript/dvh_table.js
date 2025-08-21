@@ -23,10 +23,12 @@ function buildDvhRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
     <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-    <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-    <td class='px-4 py-2 text-right space-x-2'>
-      <button type="button" class="edit-dvh bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="${tempId}">Editar</button>
-      <button type="button" class="delete-dvh bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class="px-4 py-2 text-center">
+      <div class="flex space-x-1 justify-center">
+        <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${tempId}">Editar</button>
+        <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
+      </div>
     </td>
   `;
 

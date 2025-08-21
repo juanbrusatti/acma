@@ -22,10 +22,12 @@ function buildGlasscuttingRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.height || ''}</td>
     <td class='px-4 py-2 text-center'>${values.width || ''}</td>
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-    <td class='px-4 py-2 text-center'>${price.toFixed(2) || ''}</td>
-    <td class='px-4 py-2 text-right space-x-2'>
-      <button type="button" class="edit-glasscutting bg-blue-500 text-white px-3 py-1 rounded" data-temp-id="${newId}">Editar</button>
-      <button type="button" class="delete-glass bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class='px-4 py-2 text-center space-x-2'>
+      <div class="flex space-x-1 justify-center">
+        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${newId}">Editar</button>
+        <button type="button" class="delete-glass bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
+      </div>    
     </td>
   `;
 
