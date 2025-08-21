@@ -187,7 +187,23 @@ class ProjectsController < ApplicationController
       :description,
       :status,
       :price,
-      :price_without_iva
+      :price_without_iva,
+      glasscuttings_attributes: [ :id, :glass_type, :thickness, :height, :width, :color, :typology, :type_opening, :price ],
+      dvhs_attributes: [
+        :id,
+        :innertube,
+        :typology,
+        :height,
+        :width,
+        :type_opening,
+        :glasscutting1_type,
+        :glasscutting1_thickness,
+        :glasscutting1_color,
+        :glasscutting2_type,
+        :glasscutting2_thickness,
+        :glasscutting2_color,
+        :price
+      ]
     )
     
     # Handle glasscuttings_attributes manually

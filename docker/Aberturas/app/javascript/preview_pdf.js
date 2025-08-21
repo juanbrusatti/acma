@@ -7,12 +7,13 @@ function initializePdfButton() {
   console.log('Inicializando botón PDF...');
   
   const pdfBtn = document.getElementById('preview-pdf-btn');
-  
+
   // Early return if PDF button doesn't exist in DOM
   if (!pdfBtn) {
     console.warn('Botón PDF no encontrado');
     return;
   }
+
   
   // Prevent duplicate initialization by checking data attribute
   if (pdfBtn.hasAttribute('data-pdf-initialized')) {
@@ -29,34 +30,47 @@ function initializePdfButton() {
   pdfBtn.addEventListener('click', function(e) {
     console.log('=== PDF Button Clicked ===');
     e.preventDefault();
-    
+
+    // Validar si hay vidrios por confirmar o cancelar
+    const openGlasscuttingForms = document.querySelectorAll('.glasscutting-fields:not(.hidden) input:not([disabled])');
+    const openDvhForms = document.querySelectorAll('.dvh-fields:not(.hidden) input:not([disabled])');
+    if (openGlasscuttingForms.length > 0 || openDvhForms.length > 0) {
+      const swalConfig = window.getSwalConfig ? window.getSwalConfig() : {};
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Faltan vidrios por confirmar o cancelar',
+      });
+      return;
+    }
+
     // Find the parent form containing project data
     const form = pdfBtn.closest('form');
-    
+
     if (!form) {
       console.error('Formulario no encontrado');
       alert('Error: No se encontró el formulario');
       return;
     }
-    
+
     // Create FormData object with all form inputs
     const formData = new FormData(form);
+    formData.delete('_method');
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
-    
+
     // Validate CSRF token exists for security
     if (!csrfToken) {
       console.error('CSRF token no encontrado');
       alert('Error: No se encontró el token CSRF');
       return;
     }
-    
+
     const tokenValue = csrfToken.getAttribute('content');
     console.log('Enviando request PDF...');
-    
+
     // Update button state to show loading
     pdfBtn.disabled = true;
     pdfBtn.textContent = 'Generando PDF...';
-    
+
     // Send POST request to backend for PDF generation
     fetch('/projects/preview_pdf', {
       method: 'POST',
@@ -68,29 +82,29 @@ function initializePdfButton() {
     })
     .then(async response => {
       console.log('Response:', response.status, response.statusText);
-      
+
       // Handle non-successful responses
       if (!response.ok) {
         const text = await response.text();
         console.error('Error response:', text);
         throw new Error(`Error ${response.status}: ${text}`);
       }
-      
+
       // Convert response to blob for file download
       return response.blob();
     })
     .then(blob => {
       console.log('PDF recibido:', blob.size, 'bytes');
-      
+
       // Validate PDF blob is not empty
       if (blob.size === 0) {
         throw new Error('El PDF está vacío');
       }
-      
+
       // Generate filename based on project name
       const projectNameInput = form.querySelector('input[name="project[name]"]');
       let fileName = 'Proyecto';
-      
+
       if (projectNameInput && projectNameInput.value.trim()) {
         // Clean project name for safe filename usage
         const projectName = projectNameInput.value.trim()
@@ -99,7 +113,7 @@ function initializePdfButton() {
           .substring(0, 50); // Limit length to avoid filesystem issues
         fileName = `Proyecto_${projectName}`;
       }
-      
+
       // Create and trigger download link
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -109,7 +123,7 @@ function initializePdfButton() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url); // Clean up memory
-      
+
       console.log(`Descarga PDF completada: ${fileName}.pdf`);
     })
     .catch(err => {
