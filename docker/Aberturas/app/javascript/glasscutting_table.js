@@ -43,7 +43,7 @@ function buildGlasscuttingRow(values, price, index) {
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${`$${price.toFixed(2)}`}">
   `;
 
   tr.setAttribute('data-temp-id', newId);
@@ -81,6 +81,7 @@ export function ensureGlasscuttingTable() {
           <th class='px-4 py-2 text-center'>ANCHO</th>
           <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>ACCIÓN</th>
         </tr>
       </thead>
     `;
@@ -173,20 +174,15 @@ export function handleGlasscuttingEvents(e) {
         type_openingSelect.value = type_opening;
       }
 
-      // Change action buttons to save/cancel edit
-      const confirmBtn = editContainer.querySelector('.confirm-glass');
-      const cancelBtn = editContainer.querySelector('.cancel-glass');
-      if (confirmBtn) {
-        confirmBtn.classList.remove('confirm-glass');
-        confirmBtn.classList.add('save-glasscutting-edit');
-        confirmBtn.textContent = 'Guardar';
-        if (id) confirmBtn.setAttribute('data-id', id);
-        if (tempId) confirmBtn.setAttribute('data-temp-id', tempId);
-      }
-      if (cancelBtn) {
-        cancelBtn.classList.remove('cancel-glass');
-        cancelBtn.classList.add('cancel-glasscutting-edit');
-        cancelBtn.textContent = 'Cancelar';
+      const divCreate = editContainer.querySelector('.btns-create-glass');
+      const divEdit = editContainer.querySelector('.btns-edit-glass');
+      if (divCreate) divCreate.classList.add('hidden');
+      if (divEdit) divEdit.classList.remove('hidden');
+
+      // Ocult quantity field
+      const quantityField = editContainer.querySelector('.quantity-field[data-only-create]');
+      if (quantityField) {
+        quantityField.style.display = 'none';
       }
 
       // Insert the edit form before the row inside a full-width table row
@@ -242,7 +238,7 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(5)').textContent = newValues.height || '';
     row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
     row.querySelector('td:nth-child(7)').textContent = newValues.type_opening || '';
-    row.querySelector('td:nth-child(8)').textContent = price.toFixed(2);
+    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Update hidden inputs for existing or temp record
     const id = e.target.getAttribute('data-id');
@@ -259,7 +255,7 @@ export function handleGlasscuttingEvents(e) {
       setByName('height', newValues.height);
       setByName('width', newValues.width);
       setByName('type_opening', newValues.type_opening);
-      setByName('price', price.toFixed(2));
+      setByName('price', `${price.toFixed(2)}`);
     } else if (tempId) {
       const setByName = (field, value) => {
         const input = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][${field}]"]`);
@@ -275,9 +271,9 @@ export function handleGlasscuttingEvents(e) {
       setByName('price', price.toFixed(2));
     }
 
-    // Show the row again and remove form
-    row.style.display = '';
-    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+  // Show the row again y restaurar botones crear
+  row.style.display = '';
+  if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
 
     // Update totals
     setTimeout(() => {
@@ -294,8 +290,8 @@ export function handleGlasscuttingEvents(e) {
     const editContainer = e.target.closest('.glasscutting-edit-form');
     const editRow = editContainer.closest('tr.glasscutting-edit-row');
     const row = editRow ? editRow.nextElementSibling : null;
-    if (row) { row.style.display = ''; }
-    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+  if (row) { row.style.display = ''; }
+  if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
     return;
   }
   
@@ -306,12 +302,12 @@ export function handleGlasscuttingEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Mark for destruction instead of removing, in case it's an existing record
+      // Mark for destruction and remove the row from DOM so totals update correctly
       const destroyField = document.getElementById(`glasscuttings_destroy_${id}`);
       if (destroyField) {
         destroyField.value = '1';
-        row.style.display = 'none';
       }
+      row.remove();
     } else {
       // For new entries without ID, just remove the row
       row.remove();
@@ -320,8 +316,7 @@ export function handleGlasscuttingEvents(e) {
     // If no more glasscuttings, show the empty state
     const tableBody = document.getElementById('glasscuttings-table-body');
     if (tableBody) {
-      const visibleRows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
-      if (visibleRows.length === 0) {
+      if (tableBody.children.length === 0) {
         const container = document.getElementById('glasscuttings-table-container');
         if (container) {
           // Remove existing table
@@ -332,6 +327,12 @@ export function handleGlasscuttingEvents(e) {
         }
       }
     }
+    // Update totals after deletion
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     return;
   }
   // CONFIRM: Add new glass cutting entry to table
@@ -431,12 +432,12 @@ export function handleGlasscuttingEvents(e) {
       }
     }, 100);
     
+    const divCrear = container.querySelector('.btns-create-glass');
+    const divEditar = container.querySelector('.btns-edit-glass');
+    if (divCrear) divCrear.classList.remove('hidden');
+    if (divEditar) divEditar.classList.add('hidden');
     // Remove form container
-    console.log('Removing glasscutting form container');
     container.remove();
-    console.log('Form container removed, checking for remaining forms...');
-    const remainingForms = document.querySelectorAll('#glasscuttings-wrapper .glasscutting-fields');
-    console.log('Remaining forms after removal:', remainingForms.length);
     return;
   }
   

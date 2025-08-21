@@ -85,7 +85,7 @@
           <option value="Aluminio">Aluminio</option>
         </select>
       </div>
-      <div>
+      <div class="quantity-field" data-only-create>
         <label>Cantidad</label>
         <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
       </div>
@@ -205,16 +205,18 @@
         <option value="Aluminio">Aluminio</option>
       </select>
     </div>
-    <div class="quantity-field">
+    <div class="quantity-field" data-only-create>
       <label>Cantidad</label>
       <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
     </div>
-    <div class="flex items-center gap-1 col-span-1 mt-6">
-      <div>
-        <button type="button" class="confirm-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+    <div class="flex items-center gap-2 col-span-1 mt-3">
+      <div class="btns-create-glass flex gap-2 mt-3">
+        <button type="button" class="confirm-glass btn-create-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+        <button type="button" class="cancel-glass btn-create-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
       </div>
-      <div> 
-        <button type="button" class="cancel-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
+      <div class="btns-edit-glass flex gap-2 hidden">
+        <button type="button" class="save-glasscutting-edit btn-edit-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:0.5;">Guardar</button>
+        <button type="button" class="cancel-glasscutting-edit btn-edit-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:0.5;">Cancelar</button>
       </div>
     </div>
   </div>

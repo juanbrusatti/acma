@@ -96,27 +96,25 @@ function updateProjectTotals() {
   
   console.log('=== updateProjectTotals called ===');
 
-  // Sum all simple glass prices (column 7, not 8)
+  // Sum all simple glass prices (column 7, not 8), ignoring hidden rows (deleted)
   document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
+    if (tr.style.display === 'none') return; // Ignore hidden (deleted) rows
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
-      // Clean the text: remove $, commas, and handle decimal points
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      priceText = priceText.replace(/[$,]/g, '');
       const price = parseFloat(priceText) || 0;
-      console.log('Glasscutting price:', priceText, '->', price);
       subtotal += price;
     }
   });
 
   document.querySelectorAll('#dvhs-table-body tr').forEach(tr => {
+    if (tr.style.display === 'none') return; // Ignore hidden (deleted) rows
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
-      // Clean the text: remove $, commas, and handle decimal points
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      priceText = priceText.replace(/[$,]/g, '');
       const price = parseFloat(priceText) || 0;
-      console.log('DVH price:', priceText, '->', price);
       subtotal += price;
     }
   });

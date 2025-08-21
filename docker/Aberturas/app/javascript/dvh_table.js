@@ -87,6 +87,7 @@ export function ensureDvhTable() {
           <th class='px-4 py-2 text-center'>CRISTAL 2</th>
           <th class='px-4 py-2 text-center'>ABERTURA</th>
           <th class='px-4 py-2 text-center'>PRECIO</th>
+          <th class='px-4 py-2 text-center'>ACCION</th>
         </tr>
       </thead>
     `;
@@ -179,6 +180,12 @@ export function handleDvhEvents(e) {
         cancelBtn.classList.remove('cancel-dvh');
         cancelBtn.classList.add('cancel-dvh-edit');
         cancelBtn.textContent = 'Cancelar';
+      }
+
+      // Ocultar el campo cantidad en modo edición
+      const quantityField = editContainer.querySelector('.quantity-field[data-only-create]');
+      if (quantityField) {
+        quantityField.style.display = 'none';
       }
 
       // Append container into td and insert before the row
@@ -279,19 +286,20 @@ export function handleDvhEvents(e) {
     const glass2Color = (editContainer.querySelector('.glasscutting2-color-select') || {}).value || '';
 
     // Calculate new price
-    const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
-    const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
-    const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
+  const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
+  const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');
+  const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
+  const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
+  const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
 
-    // Update row content
-    row.querySelector('td:nth-child(1)').textContent = typology;
-    row.querySelector('td:nth-child(2)').textContent = innertube;
-    row.querySelector('td:nth-child(3)').textContent = width;
-    row.querySelector('td:nth-child(4)').textContent = height;
-    row.querySelector('td:nth-child(5)').textContent = `${glass1Type} ${glass1Thickness} ${glass1Color}`;
-    row.querySelector('td:nth-child(6)').textContent = `${glass2Type} ${glass2Thickness} ${glass2Color}`;
-    row.querySelector('td:nth-child(7)').textContent = type_opening;
-    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
+  row.querySelector('td:nth-child(1)').textContent = typology;
+  row.querySelector('td:nth-child(2)').textContent = innertube;
+  row.querySelector('td:nth-child(3)').textContent = width;
+  row.querySelector('td:nth-child(4)').textContent = height;
+  row.querySelector('td:nth-child(5)').textContent = glass1Display;
+  row.querySelector('td:nth-child(6)').textContent = glass2Display;
+  row.querySelector('td:nth-child(7)').textContent = type_opening;
+  row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
 
     // Show the row again
     row.style.display = '';
@@ -369,34 +377,27 @@ export function handleDvhEvents(e) {
     const row = button.closest('tr');
     
     if (id) {
-      // Mark for destruction instead of removing, in case it's an existing record
+      // Mark for destruction and remove the row from DOM so totals update correctly
       const destroyField = document.getElementById(`dvhs_destroy_${id}`);
       if (destroyField) {
         destroyField.value = '1';
-        row.style.display = 'none';
-        // Actualizar totales después de eliminar
-        setTimeout(() => {
-          if (typeof window.updateProjectTotals === 'function') {
-            window.updateProjectTotals();
-          }
-        }, 100);
       }
+      row.remove();
     } else {
       // For new entries without ID, just remove the row
       row.remove();
-      // Actualizar totales después de eliminar
-      setTimeout(() => {
-        if (typeof window.updateProjectTotals === 'function') {
-          window.updateProjectTotals();
+      const tempId = row.getAttribute('data-temp-id');
+      if (tempId) {
+        const hiddenDiv = document.querySelector(`.dvh-hidden-row input[name="project[dvhs_attributes][${tempId}][typology]"]`);
+        if (hiddenDiv && hiddenDiv.parentElement && hiddenDiv.parentElement.classList.contains('dvh-hidden-row')) {
+          hiddenDiv.parentElement.remove();
         }
-      }, 100);
+      }
     }
-    
-    // If no more DVHs, show the empty state
+    // Si no quedan filas, eliminar la tabla
     const tableBody = document.getElementById('dvhs-table-body');
     if (tableBody) {
-      const visibleRows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
-      if (visibleRows.length === 0) {
+      if (tableBody.children.length === 0) {
         const container = document.getElementById('dvhs-table-container');
         if (container) {
           // Remove existing table
@@ -407,6 +408,12 @@ export function handleDvhEvents(e) {
         }
       }
     }
+    // Update totals after deletion
+    setTimeout(() => {
+      if (typeof window.updateProjectTotals === 'function') {
+        window.updateProjectTotals();
+      }
+    }, 100);
     return;
   }
   // CONFIRM: Add new DVH entry to table

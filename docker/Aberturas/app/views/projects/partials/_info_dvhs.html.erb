@@ -26,10 +26,10 @@
                 <td class="px-4 py-2 text-center"><%= dvh.width %></td>
                 <td class="px-4 py-2 text-center"><%= dvh.height %></td>
                 <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting1_type %> / <%= dvh.glasscutting1_thickness %> / <%= dvh.glasscutting1_color %>
+                  <%= [dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].join(' / ') %>
                 </td>
                 <td class="px-4 py-2 text-center">
-                  <%= dvh.glasscutting2_type %> / <%= dvh.glasscutting2_thickness %> / <%= dvh.glasscutting2_color %>
+                  <%= [dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].join(' / ') %>
                 </td>
                 <td class="px-4 py-2 text-center"><%= dvh.type_opening %></td>
                 <td class="px-4 py-2 text-center">$<%= number_with_precision(dvh.price, precision: 2) %></td>
