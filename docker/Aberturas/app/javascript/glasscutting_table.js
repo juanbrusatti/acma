@@ -1,6 +1,7 @@
 // Glass Cutting Table Module
 // Manages dynamic table creation and manipulation for glass cutting entries in projects
 import { updateGlassSelects } from "glasscutting_selects";
+import { getGlassPriceM2 } from "utils";
 
 // Global variables to track table state and unique IDs
 let glasscuttingIdCounter = 1;
@@ -186,7 +187,7 @@ export function handleGlasscuttingEvents(e) {
     };
 
     // Recalculate price
-    const price_m2 = getPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
+    const price_m2 = getGlassPriceM2(newValues.glass_type, newValues.thickness, newValues.color);
     const area_m2 = (parseFloat(newValues.height) / 1000) * (parseFloat(newValues.width) / 1000);
     const price = Math.round(area_m2 * price_m2 * 100) / 100;
 
@@ -351,7 +352,7 @@ export function handleGlasscuttingEvents(e) {
     ensureGlasscuttingTable();
     
     // Calculate price based on dimensions and glass type
-    const price_m2 = getPriceM2(values.glass_type, values.thickness, values.color);
+    const price_m2 = getGlassPriceM2(values.glass_type, values.thickness, values.color);
     const area_m2 = (parseFloat(values.height) / 1000) * (parseFloat(values.width) / 1000);
     const price = Math.round(area_m2 * price_m2 * 100) / 100; // Round to 2 decimals
     
@@ -479,12 +480,4 @@ export function resetGlasscuttingTableVars() {
   glasscuttingTbody = null;
 }
 
-// Utility function to get price per square meter for specific glass configuration
-// Searches the global GLASS_PRICES array populated from Rails backend
-function getPriceM2(type, thickness, color) {
-  if (!window.GLASS_PRICES) return 0;
-  const found = window.GLASS_PRICES.find(p =>
-    p.glass_type === type && p.thickness === thickness && p.color === color
-  );
-  return found ? found.selling_price : 0;
-}
+// Price lookup moved to utils.getGlassPriceM2
