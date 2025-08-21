@@ -95,6 +95,29 @@ document.addEventListener('turbo:load', () => {
   }
 });
 
+// Función para formatear números en formato argentino
+function formatArgentineCurrency(amount, unit = "$") {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return "N/A";
+  }
+  
+  // Convertir a número y redondear a 2 decimales
+  const num = Math.round(parseFloat(amount) * 100) / 100;
+  
+  // Convertir a string y separar parte entera y decimal
+  const parts = num.toString().split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1] || '00';
+  
+  // Agregar separadores de miles (puntos)
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Asegurar que la parte decimal tenga 2 dígitos
+  const formattedDecimal = decimalPart.padEnd(2, '0').substring(0, 2);
+  
+  return `${unit}${formattedInteger},${formattedDecimal}`;
+}
+
 function updateProjectTotals() {
   let subtotal = 0;
   
@@ -105,7 +128,8 @@ function updateProjectTotals() {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, '');
+      // Remover símbolo de moneda y separadores, pero mantener el formato argentino
+      priceText = priceText.replace(/[^\d,.-]/g, '').replace(',', '.');
       const price = parseFloat(priceText) || 0;
       subtotal += price;
     }
@@ -116,7 +140,8 @@ function updateProjectTotals() {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, '');
+      // Remover símbolo de moneda y separadores, pero mantener el formato argentino
+      priceText = priceText.replace(/[^\d,.-]/g, '').replace(',', '.');
       const price = parseFloat(priceText) || 0;
       subtotal += price;
     }
@@ -127,8 +152,8 @@ function updateProjectTotals() {
   // Try to update both possible element IDs for subtotal
   const subtotalPriceElem = document.getElementById('subtotal-price') || document.getElementById('project-price-view');
   if (subtotalPriceElem) {
-    subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
-    console.log('Updated subtotal element:', subtotalPriceElem.id, 'to:', '$' + subtotal.toFixed(2));
+    subtotalPriceElem.textContent = formatArgentineCurrency(subtotal, '$');
+    console.log('Updated subtotal element:', subtotalPriceElem.id, 'to:', formatArgentineCurrency(subtotal, '$'));
   } else {
     console.log('No subtotal element found');
   }
@@ -137,8 +162,8 @@ function updateProjectTotals() {
   const iva = subtotal * 0.21;
   const ivaElem = document.getElementById('iva-value') || document.getElementById('project-iva-view');
   if (ivaElem) {
-    ivaElem.textContent = '$' + iva.toFixed(2);
-    console.log('Updated IVA element:', ivaElem.id, 'to:', '$' + iva.toFixed(2));
+    ivaElem.textContent = formatArgentineCurrency(iva, '$');
+    console.log('Updated IVA element:', ivaElem.id, 'to:', formatArgentineCurrency(iva, '$'));
   } else {
     console.log('No IVA element found');
   }
@@ -147,13 +172,13 @@ function updateProjectTotals() {
   const total = subtotal + iva;
   const totalElem = document.getElementById('price-total') || document.getElementById('project-price-iva-view');
   if (totalElem) {
-    totalElem.textContent = '$' + total.toFixed(2);
-    console.log('Updated total element:', totalElem.id, 'to:', '$' + total.toFixed(2));
+    totalElem.textContent = formatArgentineCurrency(total, '$');
+    console.log('Updated total element:', totalElem.id, 'to:', formatArgentineCurrency(total, '$'));
   } else {
     console.log('No total element found');
   }
 
-  // Update hidden fields with the calculated prices
+  // Update hidden fields with the calculated prices (sin formato para el backend)
   const hiddenPriceField = document.getElementById('hidden-project-price');
   if (hiddenPriceField) {
     hiddenPriceField.value = total.toFixed(2);

@@ -4,6 +4,29 @@
 import { updateDvhGlassSelects } from "dvh_selects";
 import { getDvhTotalGlassPrice, calculateInnertubeTotal, getGlassPriceM2, requireFields, validateQuantity } from "utils";
 
+// Función para formatear números en formato argentino
+function formatArgentineCurrency(amount, unit = "$") {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return "N/A";
+  }
+  
+  // Convertir a número y redondear a 2 decimales
+  const num = Math.round(parseFloat(amount) * 100) / 100;
+  
+  // Convertir a string y separar parte entera y decimal
+  const parts = num.toString().split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1] || '00';
+  
+  // Agregar separadores de miles (puntos)
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Asegurar que la parte decimal tenga 2 dígitos
+  const formattedDecimal = decimalPart.padEnd(2, '0').substring(0, 2);
+  
+  return `${unit}${formattedInteger},${formattedDecimal}`;
+}
+
 // Global variables to track table state and unique IDs
 let dvhIdCounter = 1;
 let dvhTable = null;
@@ -23,7 +46,7 @@ function buildDvhRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.glasscutting1_type || ''} / ${values.glasscutting1_thickness || ''} / ${values.glasscutting1_color || ''}</td>
     <td class='px-4 py-2 text-center'>${values.glasscutting2_type || ''} / ${values.glasscutting2_thickness || ''} / ${values.glasscutting2_color || ''}</td>
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class='px-4 py-2 text-center'>${formatArgentineCurrency(price, '$') || ''}</td>
     <td class="px-4 py-2 text-center">
       <div class="flex space-x-1 justify-center">
         <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${tempId}">Editar</button>
@@ -299,7 +322,7 @@ export function handleDvhEvents(e) {
   row.querySelector('td:nth-child(5)').textContent = glass1Display;
   row.querySelector('td:nth-child(6)').textContent = glass2Display;
   row.querySelector('td:nth-child(7)').textContent = type_opening;
-  row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
+  row.querySelector('td:nth-child(8)').textContent = formatArgentineCurrency(price, '$');
 
     // Show the row again
     row.style.display = '';

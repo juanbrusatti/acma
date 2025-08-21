@@ -3,6 +3,29 @@
 import { updateGlassSelects } from "glasscutting_selects";
 import { getGlassPriceM2, requireFields, validateQuantity } from "utils";
 
+// Función para formatear números en formato argentino
+function formatArgentineCurrency(amount, unit = "$") {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return "N/A";
+  }
+  
+  // Convertir a número y redondear a 2 decimales
+  const num = Math.round(parseFloat(amount) * 100) / 100;
+  
+  // Convertir a string y separar parte entera y decimal
+  const parts = num.toString().split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1] || '00';
+  
+  // Agregar separadores de miles (puntos)
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Asegurar que la parte decimal tenga 2 dígitos
+  const formattedDecimal = decimalPart.padEnd(2, '0').substring(0, 2);
+  
+  return `${unit}${formattedInteger},${formattedDecimal}`;
+}
+
 // Global variables to track table state and unique IDs
 let glasscuttingIdCounter = 1;
 let glasscuttingTable = null;
@@ -22,7 +45,7 @@ function buildGlasscuttingRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${values.height || ''}</td>
     <td class='px-4 py-2 text-center'>${values.width || ''}</td>
     <td class='px-4 py-2 text-center'>${values.type_opening || ''}</td>
-    <td class='px-4 py-2 text-center'>$${price.toFixed(2) || ''}</td>
+    <td class='px-4 py-2 text-center'>${formatArgentineCurrency(price, '$') || ''}</td>
     <td class='px-4 py-2 text-center space-x-2'>
       <div class="flex space-x-1 justify-center">
         <button type="button" class="edit-glasscutting bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${newId}">Editar</button>
@@ -43,7 +66,7 @@ function buildGlasscuttingRow(values, price, index) {
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
     <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${`$${price.toFixed(2)}`}">
+    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
   `;
 
   tr.setAttribute('data-temp-id', newId);
@@ -238,7 +261,7 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(5)').textContent = newValues.height || '';
     row.querySelector('td:nth-child(6)').textContent = newValues.width || '';
     row.querySelector('td:nth-child(7)').textContent = newValues.type_opening || '';
-    row.querySelector('td:nth-child(8)').textContent = `$${price.toFixed(2)}`;
+    row.querySelector('td:nth-child(8)').textContent = formatArgentineCurrency(price, '$');
 
     // Update hidden inputs for existing or temp record
     const id = e.target.getAttribute('data-id');
