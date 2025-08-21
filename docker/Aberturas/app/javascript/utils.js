@@ -41,3 +41,19 @@ export function getDvhTotalGlassPrice(height, width, glass1, glass2, innertubeSi
 
   return glassPrice + innertubePrice;
 }
+
+// Validation helpers
+// fields: array of { key, label }
+export function requireFields(values, fields) {
+  if (!values || !fields) return null;
+  return fields.find(f => !values[f.key] || String(values[f.key]).trim() === '');
+}
+
+// Returns null if ok, otherwise an error message string
+export function validateQuantity(q, min = 1, max = 100) {
+  const n = parseInt(q, 10);
+  if (isNaN(n) || n < min || n > max) {
+    return `La cantidad debe estar entre ${min} y ${max}`;
+  }
+  return null;
+}
