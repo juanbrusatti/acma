@@ -31,64 +31,68 @@ if (!window._projectsFormEventRegistered) {
 }
 
 document.addEventListener('turbo:load', () => {
-  // Reset variables for new page load
-  resetGlasscuttingTableVars();
-  resetDvhTableVars();
+  // Solo ejecutar en páginas de formulario (new/edit), no en show
+  const projectForm = document.getElementById('project-form');
+  if (projectForm) {
+    // Reset variables for new page load
+    resetGlasscuttingTableVars();
+    resetDvhTableVars();
 
-  // Remove previous listeners if any by replacing the button with its clone
-  const addGlasscuttingBtn = document.getElementById('add-glasscutting');
-  if (addGlasscuttingBtn) {
-    addGlasscuttingBtn.replaceWith(addGlasscuttingBtn.cloneNode(true));
-  }
-  const addDvhBtn = document.getElementById('add-dvh');
-  if (addDvhBtn) {
-    addDvhBtn.replaceWith(addDvhBtn.cloneNode(true));
-  }
+    // Remove previous listeners if any by replacing the button with its clone
+    const addGlasscuttingBtn = document.getElementById('add-glasscutting');
+    if (addGlasscuttingBtn) {
+      addGlasscuttingBtn.replaceWith(addGlasscuttingBtn.cloneNode(true));
+    }
+    const addDvhBtn = document.getElementById('add-dvh');
+    if (addDvhBtn) {
+      addDvhBtn.replaceWith(addDvhBtn.cloneNode(true));
+    }
 
-  // Now re-select the new buttons (with no previous listeners)
-  const newAddGlasscuttingBtn = document.getElementById('add-glasscutting');
-  if (newAddGlasscuttingBtn) {
-    newAddGlasscuttingBtn.addEventListener('click', () => {
-      const template = document.getElementById('glasscutting-template').content.cloneNode(true);
-      document.getElementById('glasscuttings-wrapper').appendChild(template);
-      setTimeout(() => {
-        // Only the last added one
-        const fields = document.querySelectorAll('.glasscutting-fields');
-        updateGlassSelects(fields[fields.length - 1]);
-      }, 0);
-    });
-  }
+    // Now re-select the new buttons (with no previous listeners)
+    const newAddGlasscuttingBtn = document.getElementById('add-glasscutting');
+    if (newAddGlasscuttingBtn) {
+      newAddGlasscuttingBtn.addEventListener('click', () => {
+        const template = document.getElementById('glasscutting-template').content.cloneNode(true);
+        document.getElementById('glasscuttings-wrapper').appendChild(template);
+        setTimeout(() => {
+          // Only the last added one
+          const fields = document.querySelectorAll('.glasscutting-fields');
+          updateGlassSelects(fields[fields.length - 1]);
+        }, 0);
+      });
+    }
 
-  const newAddDvhBtn = document.getElementById('add-dvh');
-  console.log('DVH button found:', newAddDvhBtn);
-  if (newAddDvhBtn) {
-    newAddDvhBtn.addEventListener('click', () => {
-      console.log('DVH button clicked');
-      const template = document.getElementById('dvh-template');
-      console.log('DVH Template found:', template);
-      const templateContent = template.content.cloneNode(true);
-      console.log('DVH Template content:', templateContent);
-      const wrapper = document.getElementById('dvhs-wrapper');
-      console.log('DVH Wrapper found:', wrapper);
-      wrapper.appendChild(templateContent);
-      setTimeout(() => {
-        // Only the last added one
-        const fields = document.querySelectorAll('.dvh-fields');
-        console.log('DVH Fields found:', fields.length);
-        updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting1');
-        updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting2');
-      }, 0);
-    });
-  }
+    const newAddDvhBtn = document.getElementById('add-dvh');
+    console.log('DVH button found:', newAddDvhBtn);
+    if (newAddDvhBtn) {
+      newAddDvhBtn.addEventListener('click', () => {
+        console.log('DVH button clicked');
+        const template = document.getElementById('dvh-template');
+        console.log('DVH Template found:', template);
+        const templateContent = template.content.cloneNode(true);
+        console.log('DVH Template content:', templateContent);
+        const wrapper = document.getElementById('dvhs-wrapper');
+        console.log('DVH Wrapper found:', wrapper);
+        wrapper.appendChild(templateContent);
+        setTimeout(() => {
+          // Only the last added one
+          const fields = document.querySelectorAll('.dvh-fields');
+          console.log('DVH Fields found:', fields.length);
+          updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting1');
+          updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting2');
+        }, 0);
+      });
+    }
 
-  // Initialize dependent selects on existing ones
-  setupAllGlassSelects();
-  setupAllDvhGlassSelects();
-  
-  // Initialize project totals on page load
-  setTimeout(() => {
-    updateProjectTotals();
-  }, 100);
+    // Initialize dependent selects on existing ones
+    setupAllGlassSelects();
+    setupAllDvhGlassSelects();
+
+    // Initialize project totals on page load
+    setTimeout(() => {
+      updateProjectTotals();
+    }, 100);
+  }
 });
 
 function updateProjectTotals() {
@@ -96,7 +100,6 @@ function updateProjectTotals() {
   
   console.log('=== updateProjectTotals called ===');
 
-  // Sum all simple glass prices (column 7, not 8)
   document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
