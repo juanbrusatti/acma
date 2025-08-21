@@ -128,8 +128,11 @@ function updateProjectTotals() {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
       let priceText = priceCell.textContent.trim();
-      // Remover símbolo de moneda y separadores, pero mantener el formato argentino
-      priceText = priceText.replace(/[^\d,.-]/g, '').replace(',', '.');
+      // Limpiar símbolo de moneda/espacios y normalizar formato AR -> JS
+      priceText = priceText
+        .replace(/[^\d,.-]/g, '') // quita $, espacios, etc.
+        .replace(/\./g, '')        // quita separadores de miles
+        .replace(',', '.');         // convierte decimal
       const price = parseFloat(priceText) || 0;
       subtotal += price;
     }
@@ -140,8 +143,11 @@ function updateProjectTotals() {
     const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
       let priceText = priceCell.textContent.trim();
-      // Remover símbolo de moneda y separadores, pero mantener el formato argentino
-      priceText = priceText.replace(/[^\d,.-]/g, '').replace(',', '.');
+      // Limpiar símbolo de moneda/espacios y normalizar formato AR -> JS
+      priceText = priceText
+        .replace(/[^\d,.-]/g, '') // quita $, espacios, etc.
+        .replace(/\./g, '')        // quita separadores de miles
+        .replace(',', '.');         // convierte decimal
       const price = parseFloat(priceText) || 0;
       subtotal += price;
     }
