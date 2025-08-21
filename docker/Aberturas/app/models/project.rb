@@ -41,7 +41,7 @@ class Project < ApplicationRecord
   def subtotal
     # If we have a saved price without IVA, use it directly
     return price_without_iva if price_without_iva.present?
-    
+
     # Fallback calculation - handle nil prices gracefully
     glasscutting_total = glasscuttings.sum { |g| g.price || 0 }
     dvh_total = dvhs.sum { |d| d.price || 0 }
@@ -61,10 +61,6 @@ class Project < ApplicationRecord
   # Alias methods for clarity
   def precio_sin_iva
     subtotal
-  end
-
-  def precio_con_iva
-    total
   end
 
   # Return color class for status display in views

@@ -51,15 +51,15 @@
   <div class="mb-4 flex gap-8 items-center">
     <div>
       <span class="font-semibold">Precio sin IVA:</span>
-      <span id="project-price-view" class="ml-2">$<%= number_with_precision(@project.subtotal, precision: 2) %></span>
+      <span id="project-price-view" class="ml-2">$<%= number_with_precision((@project.price_without_iva || @project.subtotal), precision: 2) %></span>
     </div>
     <div>
       <span class="font-semibold">IVA (21%):</span>
-      <span id="project-iva-view" class="ml-2">$<%= number_with_precision(@project.iva, precision: 2) %></span>
+      <span id="project-iva-view" class="ml-2">$<%= number_with_precision((@project.price_without_iva || @project.subtotal) * 0.21, precision: 2) %></span>
     </div>
     <div>
       <span class="font-semibold">Total:</span>
-      <span id="project-price-iva-view" class="ml-2 text-lg font-bold">$<%= number_with_precision(@project.total, precision: 2) %></span>
+      <span id="project-price-iva-view" class="ml-2 text-lg font-bold">$<%= number_with_precision((@project.price_without_iva || @project.subtotal) * 1.21, precision: 2) %></span>
     </div>
   </div>
 
