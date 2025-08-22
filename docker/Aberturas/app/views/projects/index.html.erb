@@ -18,9 +18,9 @@
 
         <!-- Barra de búsqueda y filtro -->
         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-          <%= form_tag projects_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full" do %>
+          <%= form_tag projects_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full", data: { controller: "search", turbo_frame: "projects_table" } do %>
             <div class="relative w-full md:w-64">
-              <%= text_field_tag :search, params[:search], placeholder: "Buscar por nombre", class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              <%= text_field_tag :search, params[:search], placeholder: "Buscar por nombre", class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", data: { action: "input->search#onInput" } %>
               <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -37,7 +37,7 @@
                     ["Terminado", "Terminado"]
                   ], selected: params[:status] || "Todos"),
                   class: "border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
-                  onchange: "this.form.submit();"
+                  data: { action: "change->search#submit" }
               %>
             </div>
 
@@ -55,6 +55,7 @@
       </div>
     </div>
     <div class="px-8 py-6 rounded-b-2xl">
+      <%= turbo_frame_tag "projects_table" do %>
       <table class="w-full rounded-2xl overflow-hidden text-base">
         <thead>
           <tr>
@@ -73,7 +74,7 @@
           <% else %>
             <tr>
               <td colspan="5" class="text-center py-10 text-gray-400">
-                <% if params[:search].present? || params[:status].present? && params[:status] != "Todos" %>
+                <% if params[:search].present? || (params[:status].present? && params[:status] != "Todos") %>
                   No se encontraron proyectos con los filtros aplicados.
                 <% else %>
                   No hay proyectos cargados.
@@ -97,6 +98,7 @@
           params: { search: params[:search], status: params[:status] }
         %>
       </div>
+      <% end %>
     </div>
   </div>
 </div>
