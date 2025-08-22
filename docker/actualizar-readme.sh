@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Actualizar README principal con documentacion completa del servidor
+cat > /home/bash/Desktop/DLAY/AR-Aberturas/acma/README.md << 'EOF'
 # ACMA - Sistema de Aberturas
 
 ## 🏢 Descripción del Sistema
@@ -388,3 +392,6 @@ Desarrollado para gestión de fabricación de aberturas con arquitectura distrib
 ---
 
 **🎯 Objetivo**: Sistema robusto, automático y fácil de mantener para entornos de producción Windows.
+EOF
+
+echo "✅ README principal actualizado con documentación completa"

@@ -12,7 +12,8 @@ FROM ruby:3.3
 # Install dependencies
 RUN apt-get update -qq && apt-get install -y \
   build-essential \
-  libsqlite3-dev \
+  libpq-dev \
+  postgresql-client \
   nodejs \
   yarn \
   git \
