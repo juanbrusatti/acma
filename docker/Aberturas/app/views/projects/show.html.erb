@@ -43,8 +43,8 @@
     </select>
   </div>
   <% if @project.delivery_date.present? %>
-    <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%Y-%m-%d') %></span></p>
-    <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
+    <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%d-%m-%Y') %></span></p>
+    <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%d-%m-%Y') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
   <% end %>
   <p class="mb-2 text-sm text-gray-400">ID: <%= @project.id %></p>
 
