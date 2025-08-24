@@ -70,7 +70,18 @@ Este archivo contiene:
 ### **Para iniciar el servidor:**
 ```bash
 cd C:\acma\docker
+
+# Opción 1: Servidor en segundo plano (recomendado)
 1-start_server.bat
+
+# Opción 2: Servidor con logs visibles (para diagnóstico)
+1-start_server_con_logs.bat
+```
+
+### **Para verificar conectividad de red:**
+```bash
+cd C:\acma\docker
+verificar-red.bat
 ```
 
 ### **Para hacer backup:**
@@ -107,14 +118,31 @@ docker compose up --build -d
 
 ## 🆘 **En caso de problemas**
 
-### **"Esperando a que Docker arranque" se queda mucho tiempo**
-1. **Abrir Docker Desktop manualmente** y esperar que aparezca el ícono verde
-2. **Verificar que Docker esté funcionando:**
+### **No me puedo conectar desde otra PC en la red**
+1. **Verificar la IP del servidor:**
    ```bash
-   docker --version
-   docker info
+   ipconfig
    ```
-3. **Si Docker no responde:** Reiniciar Docker Desktop o la PC
+2. **Ejecutar verificador de red:**
+   ```bash
+   cd C:\acma\docker
+   verificar-red.bat
+   ```
+3. **Configurar firewall de Windows:**
+   - Ir a "Panel de Control" > "Sistema y seguridad" > "Firewall de Windows Defender"
+   - Clic en "Permitir una aplicación o característica"
+   - Buscar "Docker Desktop" y asegurarse que esté permitido
+   - O agregar excepción para puerto 3000
+
+4. **Desde la PC cliente, probar:**
+   ```bash
+   ping [IP-DEL-SERVIDOR]
+   ```
+
+### **El script se cierra después de ejecutar**
+- **Usar:** `1-start_server_con_logs.bat` en lugar de `1-start_server.bat`
+- **No cerrar la ventana** hasta que quieras parar el servidor
+- **Para parar:** Presionar Ctrl+C en la ventana
 
 ### **Otros problemas comunes**
 1. **Ejecutar diagnóstico automático:**

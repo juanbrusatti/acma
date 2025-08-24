@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Iniciando servidor Rails con Docker...
+echo 🚀 Iniciando servidor Rails con Docker (CON LOGS)...
 
 :: Ir a la carpeta donde está tu docker-compose.yml
 cd /d %~dp0
@@ -49,9 +49,6 @@ goto checkDocker
 :dockerReady
 echo 🐳 Docker está listo! Iniciando aplicación...
 
-:dockerReady
-echo 🐳 Docker está listo! Iniciando aplicación...
-
 :: Verificar que existe el archivo .env
 if not exist ".env" (
     echo ❌ ERROR: Archivo .env no encontrado
@@ -71,30 +68,17 @@ if not exist "docker-compose.yml" (
 )
 echo ✅ Archivo docker-compose.yml encontrado
 
-:: Levantar los contenedores
-echo 🚢 Iniciando contenedores Docker...
-docker compose up -d
-
-if errorlevel 1 (
-    echo ❌ ERROR: Falló al iniciar los contenedores
-    echo 📋 Comandos de diagnóstico:
-    echo    docker compose logs
-    echo    docker compose down
-    echo    docker system prune
-    pause
-    exit /b 1
-)
-
-echo ✅ Servidor levantado exitosamente!
+:: Levantar los contenedores CON LOGS
+echo 🚢 Iniciando contenedores Docker con logs visibles...
 echo.
+echo ✅ Servidor iniciándose! 
 echo 🌐 Acceso local: http://localhost:3000
 echo 🌍 Acceso desde red: http://192.168.0.150:3000
 echo.
-echo 📋 Comandos útiles:
-echo    Para ver logs: docker compose logs
-echo    Para parar: docker compose down
-echo.
 echo ⚠️  IMPORTANTE: NO cierres esta ventana para mantener el servidor funcionando
-echo 🔍 Para ver logs en tiempo real, ejecuta: docker compose logs -f
+echo 🛑 Para DETENER el servidor, presiona Ctrl+C
 echo.
-echo 🛑 Para DETENER el servidor, presiona Ctrl+C o cierra esta ventana
+echo 📋 LOGS DEL SERVIDOR:
+echo ==========================================
+
+docker compose up
