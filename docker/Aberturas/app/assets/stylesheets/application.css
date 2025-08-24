@@ -1,7 +1,4 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "dashboard";
+/* Application styles */
 
 @layer base {
   :root {
@@ -87,8 +84,8 @@
   backdrop-filter: blur(24px) saturate(120%);
   transform: translateZ(0);
   will-change: transform, box-shadow, border-color;
-  background: linear-gradient(135deg, 
-    rgba(255,255,255,0.1) 0%, 
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.1) 0%,
     rgba(255,255,255,0.05) 100%);
 }
 
@@ -97,9 +94,9 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, 
-              rgba(255,255,255,0.15) 0%, 
-              rgba(255,255,255,0.08) 50%, 
+  background: linear-gradient(135deg,
+              rgba(255,255,255,0.15) 0%,
+              rgba(255,255,255,0.08) 50%,
               rgba(255,255,255,0.2) 100%);
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
@@ -122,8 +119,8 @@
   inset: 1px;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(180deg, 
-              rgba(255,255,255,0.15) 0%, 
+  background: linear-gradient(180deg,
+              rgba(255,255,255,0.15) 0%,
               rgba(255,255,255,0.05) 100%);
   mix-blend-mode: overlay;
   opacity: 0.7;

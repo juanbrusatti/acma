@@ -4,19 +4,17 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-acma_production}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Acma2024!Secure}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      # Volumen persistente que se conecta a una carpeta local
       - ./postgres_data:/var/lib/postgresql/data
-      # Script de inicialización si es necesario
       - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,8 +26,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./Aberturas:/app
-      # Asegura que la base de datos y los indicadores persistan entre reinicios
+      # Persistencia de datos de la app
       - ./Aberturas/storage:/app/storage
       - ./Aberturas/tmp:/app/tmp
     ports:

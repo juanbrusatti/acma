@@ -1,50 +1,48 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t aberturas .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name aberturas aberturas
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
 FROM ruby:3.3
 
-# Install dependencies
+# Instalar dependencias
 RUN apt-get update -qq && apt-get install -y \
   build-essential \
   libpq-dev \
   postgresql-client \
-  nodejs \
-  yarn \
+  curl \
   git \
-  curl
+  nodejs \
+  npm
 
-# Create app directory
+# Instalar yarn globalmente
+RUN npm install -g yarn
+
+# Crear directorio de la app
 WORKDIR /app
 
-# Copy Gemfile and Gemfile.lock
+# Copiar Gemfile primero para aprovechar cache
 COPY ./Aberturas/Gemfile ./Aberturas/Gemfile.lock ./
+RUN gem install bundler && bundle install --jobs 4 --retry 3
 
-# Install gems
-RUN gem install bundler
-RUN bundle install
-
-# Copy the rest of the application code
+# Copiar el resto del código
 COPY ./Aberturas/ .
 
-# Precompile tailwindcss assets (only production)
-RUN bundle exec rails tailwindcss:build
-RUN bundle exec rails assets:precompile
+# Instalar Node.js dependencies si hay package.json
+RUN if [ -f package.json ]; then yarn install; fi
 
-# Entrypoint script to set up the environment
+# Precompilar assets con variables de entorno de producción
+ENV RAILS_ENV=production
+RUN bundle exec rails tailwindcss:build && \
+    bundle exec rails assets:precompile
+
+# Copiar entrypoint
 COPY ./entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 
-# Set Rails port
+# Exponer puerto Rails
 EXPOSE 3000
 
-# Use script as entrypoint
+# Usar entrypoint custom
 ENTRYPOINT ["entrypoint.sh"]
 
-# Default command to run the Rails server
+# Comando por defecto
 CMD ["rails", "server", "-b", "0.0.0.0"]
