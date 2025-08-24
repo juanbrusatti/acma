@@ -2,7 +2,7 @@
 
 FROM ruby:3.3
 
-# Instalar dependencias
+# Instalar dependencias incluyendo wkhtmltopdf para PDFs
 RUN apt-get update -qq && apt-get install -y \
   build-essential \
   libpq-dev \
@@ -10,7 +10,9 @@ RUN apt-get update -qq && apt-get install -y \
   curl \
   git \
   nodejs \
-  npm
+  npm \
+  wkhtmltopdf \
+  xvfb
 
 # Instalar yarn globalmente
 RUN npm install -g yarn
