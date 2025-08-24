@@ -2,8 +2,8 @@
 <% total_con_iva = 0 %>
 <% dvh_total_con_iva = 0 %>
 
-<div style="margin-bottom: 10px; text-align: center;">
-  <h1 style="color: #333; margin: 0;">ACMA - ABERTURAS</h1>
+<div style="margin-bottom: 10px;">
+<img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
 </div>
 
 <h1 style="text-align:center; margin-bottom: 20px; color: #444;">PRESUPUESTO</h1>
@@ -12,7 +12,7 @@
 <table style="width:100%; margin-bottom: 20px; font-size: 14px;">
   <tr>
     <td style="padding: 5px;"><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
-    <td style="padding: 5px;"><strong>Teléfono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
+    <td style="padding: 5px;"><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
   </tr>
   <tr>
     <td style="padding: 5px;" colspan="2"><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
@@ -22,7 +22,7 @@
 <h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados</h2>
 
 <% dvh_total_con_iva = calculate_dvh_total_with_iva(@project.dvhs) %>
-<%= render_dvh_table(@project.dvhs) %> 
+<%= render_dvh_table(@project.dvhs) %>
 
 <h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados</h2>
 
