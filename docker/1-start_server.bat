@@ -2,7 +2,7 @@
 echo 🚀 Iniciando servidor Rails con Docker...
 
 :: Ir a la carpeta donde está tu docker-compose.yml
-cd /d C:\docker
+cd /d %~dp0
 
 :: Asegurarse de que Docker Desktop esté levantado
 echo ⏳ Esperando a que Docker arranque...
