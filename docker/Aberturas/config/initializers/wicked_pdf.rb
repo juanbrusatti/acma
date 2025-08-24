@@ -1,6 +1,6 @@
 WickedPdf.configure do |c|
   # Path to the wkhtmltopdf executable: Using system wkhtmltopdf
-  c.exe_path = '/usr/bin/wkhtmltopdf'
+  c.exe_path = '/usr/local/bin/wkhtmltopdf'
 
   # Layout file to be used for all PDFs
   # (but can be overridden in `render :pdf` calls)
