@@ -22,7 +22,14 @@ git checkout deploy
 git pull origin deploy
 ```
 
-### **Paso 4: Ejecutar la Aplicación**
+### **Paso 4: Copiar el archivo de configuración**
+```bash
+# IMPORTANTE: Copiar el archivo .env que se proporcionó
+# en la carpeta C:\acma\docker\
+# (Asegurarse de que se llame exactamente ".env")
+```
+
+### **Paso 5: Ejecutar la Aplicación**
 ```bash
 # Ir a la carpeta del Docker
 cd C:\acma\docker
@@ -31,8 +38,26 @@ cd C:\acma\docker
 1-start_server.bat
 ```
 
-### **¡LISTO!** 
+### **¡LISTO!**
 - La aplicación estará corriendo en: **http://localhost:3000**
+- Lo siguiente es desde el Admin de Tareas hacer que el script se ejecute al iniciar la pc.
+- Tambien hacer backups automaticos (preguntar cada cuanto)
+
+---
+
+## 📄 **ARCHIVO .env REQUERIDO**
+
+**IMPORTANTE**: Antes de ejecutar, debe copiar el archivo `.env` que se le proporcionó en:
+```
+C:\acma\docker\.env
+```
+
+Este archivo contiene:
+- Configuración de la base de datos
+- Claves de seguridad
+- Configuración del servidor
+
+**Sin este archivo, la aplicación NO funcionará.**
 
 ---
 
@@ -71,6 +96,7 @@ docker compose up --build -d
 - **NO necesita instalar Ruby, Rails, PostgreSQL**
 - **Todo está en Docker**
 - **Solo necesita Git + Docker Desktop**
+- **CRÍTICO: Debe copiar el archivo .env en C:\acma\docker\ antes de ejecutar**
 - **Los datos se guardan en C:\acma\docker\postgres_data\**
 
 ---
