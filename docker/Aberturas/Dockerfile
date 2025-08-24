@@ -31,6 +31,8 @@ RUN if [ -f package.json ]; then yarn install; fi
 
 # Precompilar assets con variables de entorno de producción
 ENV RAILS_ENV=production
+ENV RAILS_MASTER_KEY=94d64d6202fefd0e6ec3305d03767cbe
+ENV SECRET_KEY_BASE=dummy_key_for_build
 RUN bundle exec rails tailwindcss:build && \
     bundle exec rails assets:precompile
 
