@@ -2,17 +2,20 @@
 <% total_con_iva = 0 %>
 <% dvh_total_con_iva = 0 %>
 
-<div style="margin-bottom: 10px;">
-<img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
+<div style="margin-bottom: 10px; text-align: center;">
+  <h1 style="color: #333; margin: 0;">ACMA - ABERTURAS</h1>
 </div>
-<h1 style="text-align:center; margin-bottom: 0;">PRESUPUESTO</h1>
-<hr>
-<table style="width:100%; margin-bottom: 10px;">
-  <tr>
-    <td><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
-    <td><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
-    <td><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
 
+<h1 style="text-align:center; margin-bottom: 20px; color: #444;">PRESUPUESTO</h1>
+<hr style="border: 1px solid #ddd;">
+
+<table style="width:100%; margin-bottom: 20px; font-size: 14px;">
+  <tr>
+    <td style="padding: 5px;"><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
+    <td style="padding: 5px;"><strong>Teléfono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
+  </tr>
+  <tr>
+    <td style="padding: 5px;" colspan="2"><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
   </tr>
 </table>
 

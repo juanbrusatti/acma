@@ -14,6 +14,21 @@ WickedPdf.configure do |c|
   # You can specify default options for all PDFs here.
   # These can be overridden in individual calls to `render :pdf`
   c.enable_local_file_access = true
+  
+  # Additional options for better PDF generation
+  c.default_options = {
+    page_size: 'A4',
+    margin_top: '10mm',
+    margin_bottom: '10mm', 
+    margin_left: '10mm',
+    margin_right: '10mm',
+    disable_smart_shrinking: true,
+    print_media_type: true,
+    disable_external_links: true,
+    enable_local_file_access: true,
+    javascript_delay: 1000,
+    timeout: 30
+  }
   c.disable_smart_shrinking = true
   c.margin = {
     top: 10,
