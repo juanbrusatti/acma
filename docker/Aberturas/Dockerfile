@@ -11,8 +11,17 @@ RUN apt-get update -qq && apt-get install -y \
   git \
   nodejs \
   npm \
-  wkhtmltopdf \
-  xvfb
+  xvfb \
+  wget \
+  fontconfig \
+  libxrender1 \
+  xfonts-75dpi \
+  xfonts-base
+
+# Instalar wkhtmltopdf manualmente
+RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb && \
+    dpkg -i wkhtmltox_0.12.6.1-3.bookworm_amd64.deb || apt-get install -f -y && \
+    rm wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
 
 # Instalar yarn globalmente
 RUN npm install -g yarn
