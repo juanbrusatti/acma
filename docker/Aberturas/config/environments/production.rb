@@ -83,6 +83,8 @@ Rails.application.configure do
   config.hosts = [
     "localhost",           # Allow requests from localhost
     "192.168.68.69",      # Allow requests from the configured IP
+    "192.168.0.143",      # Allow requests from current server IP
+    /192\.168\.\d+\.\d+/, # Allow requests from any 192.168.x.x IP
     /.*\.localhost/,      # Allow requests from subdomains of localhost
     "127.0.0.1",          # Allow requests from 127.0.0.1
     "0.0.0.0"             # Allow requests from 0.0.0.0

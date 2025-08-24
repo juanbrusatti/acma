@@ -22,6 +22,10 @@ git checkout deploy
 git pull origin deploy
 ```
 
+### Paso 3.5:
+- Cambiar la ip del main.js para la build
+- Cambiar en el .env la ip del servidor
+
 ### **Paso 4: Copiar el archivo de configuración**
 ```bash
 # IMPORTANTE: Copiar el archivo .env que se proporcionó
@@ -103,18 +107,34 @@ docker compose up --build -d
 
 ## 🆘 **En caso de problemas**
 
-1. **Verificar que Docker esté corriendo:**
+### **"Esperando a que Docker arranque" se queda mucho tiempo**
+1. **Abrir Docker Desktop manualmente** y esperar que aparezca el ícono verde
+2. **Verificar que Docker esté funcionando:**
+   ```bash
+   docker --version
+   docker info
+   ```
+3. **Si Docker no responde:** Reiniciar Docker Desktop o la PC
+
+### **Otros problemas comunes**
+1. **Ejecutar diagnóstico automático:**
+   ```bash
+   cd C:\acma\docker
+   0-diagnostico.bat
+   ```
+
+2. **Verificar que Docker esté corriendo:**
    ```bash
    docker --version
    ```
 
-2. **Ver logs de la aplicación:**
+3. **Ver logs de la aplicación:**
    ```bash
    cd C:\acma\docker
    docker compose logs web
    ```
 
-3. **Reiniciar todo:**
+4. **Reiniciar todo:**
    ```bash
    cd C:\acma\docker
    docker compose down
