@@ -71,9 +71,7 @@ echo ✅ Archivo docker-compose.yml encontrado
 :: Levantar los contenedores CON LOGS
 echo 🚢 Iniciando contenedores Docker con logs visibles...
 echo.
-echo ✅ Servidor iniciándose! 
-echo 🌐 Acceso local: http://localhost:3000
-echo 🌍 Acceso desde red: http://192.168.0.150:3000
+echo ✅ Servidor iniciándose!
 echo.
 echo ⚠️  IMPORTANTE: NO cierres esta ventana para mantener el servidor funcionando
 echo 🛑 Para DETENER el servidor, presiona Ctrl+C
