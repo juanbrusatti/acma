@@ -2,68 +2,74 @@
 
 ## 🎯 **PROCESO COMPLETO: GitHub + Docker**
 
-### **Paso 1: Instalar Git en Windows**
-1. Descargar Git desde: https://git-scm.com/download/win
-2. Instalar con opciones por defecto
-3. Reiniciar la PC
+### **Paso 1: Copiar carpeta "docker"**
+1. Entrar al repo en google, descargar la carpeta "docker" y descomprimirla en C:\acma\docker
+2. Copiar el .env(docker) y master.key (docker/Aberturas/config) 
 
 ### **Paso 2: Instalar Docker Desktop**
 1. Descargar Docker Desktop desde: https://www.docker.com/products/docker-desktop
 2. Instalar y reiniciar la PC
 3. Abrir Docker Desktop y esperar que arranque
 
-### **Paso 3: Clonar el Repositorio**
-```bash
-# Abrir CMD o PowerShell como Administrador
-cd C:\
-git clone https://github.com/juanbrusatti/acma.git
-cd C:\acma
-git checkout deploy
-git pull origin deploy
-```
+### Paso 3:
+1. Abrí las conexiones de red
+   Win + R → escribí ncpa.cpl → Enter.
 
-### Paso 3.5:
-- Cambiar la ip del main.js para la build
-- Cambiar en el .env la ip del servidor
+2. Elegí el adaptador (Wi-Fi o Ethernet, según uses).
+   Botón derecho → Propiedades.
 
-### **Paso 4: Copiar el archivo de configuración**
-```bash
-# IMPORTANTE: Copiar el archivo .env que se proporcionó
-# en la carpeta C:\acma\docker\
-# (Asegurarse de que se llame exactamente ".env")
-```
+3. Seleccioná Protocolo de Internet versión 4 (TCP/IPv4)
+   Clic en Propiedades.
 
-### **Paso 5: Ejecutar la Aplicación**
+4. Marcá Usar la siguiente dirección IP e ingresá:
+   Dirección IP: elegí una fija dentro de tu red. Ejemplo: 192.168.1.150
+   Máscara de subred: 255.255.255.0
+   Puerta de enlace predeterminada: la IP de tu router (mirala con ipconfig, suele ser 192.168.1.1).
+   
+   (Si la puerta es *.*.0.*, la Ip fija en el tercer componente tambien debe tener un 0, lo mismo con el 1)
+
+5. En Servidor DNS podés poner:
+   8.8.8.8 y 8.8.4.4 (Google)
+
+6. Cambiar la ip del main.js para la build, por el que acabamos de configurar.
+7. Cambiar en el .env la ip del servidor.
+
+### **Paso 4: Ejecutar la Aplicación**
 ```bash
 # Ir a la carpeta del Docker
 cd C:\acma\docker
 
 # Ejecutar el script
-1-start_server.bat
+1-start_server_con_logs.bat
 ```
+
+### **Paso 5: Crear las Tareas**
+1. Tarea para que se ejecute apenas se prenda la pc el script de inicio
+2. Tarea para backups diarios o semanales
+
+### **Paso 6: Comprobar que todo anda correctamente**
+1. Verificar que el contenedor esté corriendo:
+```bash
+docker ps
+```
+2. Probar acceso a la aplicación:
+```bash
+curl http://localhost:3000
+```
+3. Probar hacer un backup
+4. Probar restaurar el backup
+
+### **Paso 7: Crear la build de Electron**
+1. Poner la IP correcta en el main.js
+2. Ejecutar el siguiente comando en la carpeta electron-app(en mi pc):
+```bash
+npm run build
+```
+3. Compartir la build a Ariana
 
 ### **¡LISTO!**
-- La aplicación estará corriendo en: **http://localhost:3000**
-- Lo siguiente es desde el Admin de Tareas hacer que el script se ejecute al iniciar la pc.
-- Tambien hacer backups automaticos (preguntar cada cuanto)
+- La aplicación estará corriendo.
 
----
-
-## 📄 **ARCHIVO .env REQUERIDO**
-
-**IMPORTANTE**: Antes de ejecutar, debe copiar el archivo `.env` que se le proporcionó en:
-```
-C:\acma\docker\.env
-```
-
-Este archivo contiene:
-- Configuración de la base de datos
-- Claves de seguridad
-- Configuración del servidor
-
-**Sin este archivo, la aplicación NO funcionará.**
-
----
 
 ## 🔧 **COMANDOS ÚTILES**
 
@@ -95,26 +101,6 @@ cd C:\acma\docker
 cd C:\acma\docker
 3-restore.bat
 ```
-
-### **Para actualizar el código:**
-```bash
-cd C:\acma
-git pull origin deploy
-cd docker
-docker compose up --build -d
-```
-
----
-
-## ⚠️ **IMPORTANTE**
-
-- **NO necesita instalar Ruby, Rails, PostgreSQL**
-- **Todo está en Docker**
-- **Solo necesita Git + Docker Desktop**
-- **CRÍTICO: Debe copiar el archivo .env en C:\acma\docker\ antes de ejecutar**
-- **Los datos se guardan en C:\acma\docker\postgres_data\**
-
----
 
 ## 🆘 **En caso de problemas**
 

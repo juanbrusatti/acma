@@ -18,9 +18,18 @@ if not exist "%BACKUP_DIR%\%FILE%" (
     exit /b
 )
 
-echo ⚠️ Esto va a reemplazar la base de datos %DB% con el backup seleccionado.
+echo ✅ Restauración completada!
+pause
+echo ⚠️ Esto va a borrar y recrear la base de datos %DB% antes de restaurar.
 pause
 
+:: Borrar conexiones activas y eliminar la base de datos
+docker exec -i %CONTAINER% psql -U %USER% -d postgres -c "REVOKE CONNECT ON DATABASE %DB% FROM public;"
+docker exec -i %CONTAINER% psql -U %USER% -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='%DB%';"
+docker exec -i %CONTAINER% psql -U %USER% -d postgres -c "DROP DATABASE IF EXISTS %DB%;"
+docker exec -i %CONTAINER% psql -U %USER% -d postgres -c "CREATE DATABASE %DB% WITH OWNER=%USER%;"
+
+:: Restaurar el backup
 type "%BACKUP_DIR%\%FILE%" | docker exec -i %CONTAINER% psql -U %USER% -d %DB%
 
 echo ✅ Restauración completada!
