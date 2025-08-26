@@ -20,7 +20,8 @@ class ProjectTest < ActiveSupport::TestCase
       typology: "V1",
       height: 100,
       width: 50,
-      price: 100.0
+      price: 100.0,
+      type_opening: "PVC"
     )
     
     glasscutting2 = project.glasscuttings.create!(
@@ -30,7 +31,8 @@ class ProjectTest < ActiveSupport::TestCase
       typology: "V2",
       height: 200,
       width: 75,
-      price: 200.0
+      price: 200.0,
+      type_opening: "PVC"
     )
 
     # Create DVH
@@ -45,7 +47,8 @@ class ProjectTest < ActiveSupport::TestCase
       glasscutting2_type: "FLO",
       glasscutting2_thickness: "3+3",
       glasscutting2_color: "GRS",
-      price: 300.0
+      price: 300.0,
+      type_opening: "PVC"
     )
 
     # Trigger typology assignment
@@ -72,19 +75,20 @@ class ProjectTest < ActiveSupport::TestCase
     # Create glasscuttings
     glasscutting1 = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
+      height: 100, width: 50, price: 100.0, type_opening: "PVC"
     )
     
     glasscutting2 = project.glasscuttings.create!(
       glass_type: "FLO", thickness: "3+3", color: "GRS", typology: "V2",
-      height: 200, width: 75, price: 200.0
+      height: 200, width: 75, price: 200.0, type_opening: "PVC"
     )
 
     dvh = project.dvhs.create!(
       innertube: 9, typology: "V3", height: 150, width: 100,
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
-      price: 300.0
+      price: 300.0,
+      type_opening: "PVC"
     )
 
     project.save!
@@ -119,21 +123,23 @@ class ProjectTest < ActiveSupport::TestCase
 
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
+      height: 100, width: 50, price: 100.0, type_opening: "PVC"
     )
 
     dvh1 = project.dvhs.create!(
       innertube: 9, typology: "V2", height: 150, width: 100,
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
-      price: 300.0
+      price: 300.0,
+      type_opening: "PVC"
     )
 
     dvh2 = project.dvhs.create!(
       innertube: 12, typology: "V3", height: 200, width: 150,
       glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
       glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
-      price: 400.0
+      price: 400.0,
+      type_opening: "PVC"
     )
 
     project.save!
@@ -181,14 +187,15 @@ class ProjectTest < ActiveSupport::TestCase
     # Force glasscutting to use our price by updating after creation
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800
+      height: 1000, width: 800, type_opening: "PVC"
     )
     glasscutting.update_column(:price, 100.0)
     
     dvh = project.dvhs.create!(
       innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
+      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
+      type_opening: "PVC"
     )
     
     # Directly update price column to override calculation
@@ -243,14 +250,15 @@ class ProjectTest < ActiveSupport::TestCase
     # Create components with frontend-calculated prices
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 400.0 # Frontend calculated
+      height: 1000, width: 800, price: 400.0, type_opening: "PVC" # Frontend calculated
     )
     
     dvh = project.dvhs.create!(
       innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
-      price: 600.0 # Frontend calculated
+      price: 600.0, # Frontend calculated
+      type_opening: "PVC"
     )
 
     # Project should use saved prices (not recalculate)
@@ -275,14 +283,15 @@ class ProjectTest < ActiveSupport::TestCase
     # Components with frontend prices
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 300.0
+      height: 1000, width: 800, price: 300.0, type_opening: "PVC"
     )
     
     dvh = project.dvhs.create!(
       innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
-      price: 500.0
+      price: 500.0,
+      type_opening: "PVC"
     )
 
     # Project should calculate from component prices
@@ -309,14 +318,15 @@ class ProjectTest < ActiveSupport::TestCase
     # Glasscutting with frontend price
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 333.33 # Frontend calculated
+      height: 1000, width: 800, price: 333.33, type_opening: "PVC" # Frontend calculated
     )
     
     # DVH without frontend price (should be calculated by backend)
     dvh = project.dvhs.create!(
       innertube: "6", typology: "V001", height: 1000, width: 800,
       glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
+      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
+      type_opening: "PVC"
       # No price set - should trigger backend calculation
     )
 

@@ -2,6 +2,7 @@ require "test_helper"
 
 class GlasscuttingTest < ActiveSupport::TestCase
   def setup
+    GlassPrice.delete_all
     @project = projects(:one)
     @glasscutting = Glasscutting.new(
       project: @project,
@@ -10,7 +11,8 @@ class GlasscuttingTest < ActiveSupport::TestCase
       height: 1000,
       width: 800,
       color: "INC",
-      typology: "V1"
+      typology: "V1",
+      type_opening: "PVC"
     )
   end
 
@@ -78,6 +80,12 @@ class GlasscuttingTest < ActiveSupport::TestCase
     end
   end
 
+  test "should validate type_opening inclusion" do
+    @glasscutting.type_opening = "INVALID"
+    assert_not @glasscutting.valid?
+    assert_includes @glasscutting.errors[:type_opening], "El tipo de abertura no es valido"
+  end
+
   test "should trigger typology update on create" do
     project = Project.create!(
       name: "Test Project",
@@ -93,6 +101,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       typology: "V1",
       height: 100,
       width: 50,
+      type_opening: "PVC",
       price: 100.0
     )
 
@@ -108,6 +117,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       typology: "V2",
       height: 200,
       width: 75,
+      type_opening: "Aluminio",
       price: 200.0
     )
 
@@ -128,12 +138,12 @@ class GlasscuttingTest < ActiveSupport::TestCase
     # Create two glasscuttings
     glasscutting1 = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
+      height: 100, width: 50, type_opening: "PVC", price: 100.0
     )
     
     glasscutting2 = project.glasscuttings.create!(
       glass_type: "FLO", thickness: "3+3", color: "GRS", typology: "V2",
-      height: 200, width: 75, price: 200.0
+      height: 200, width: 75, type_opening: "Aluminio", price: 200.0
     )
 
     project.save!
@@ -256,7 +266,8 @@ class GlasscuttingTest < ActiveSupport::TestCase
       color: "INC",
       typology: "V001",
       height: 1000,
-      width: 800
+      width: 800,
+      type_opening: "PVC"
     )
 
     # Glasscutting should have a calculated price
@@ -287,6 +298,7 @@ class GlasscuttingTest < ActiveSupport::TestCase
       typology: "V001",
       height: 1000,
       width: 800,
+      type_opening: "PVC",
       price: frontend_calculated_price
     )
 

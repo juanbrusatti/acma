@@ -2,6 +2,7 @@ require "test_helper"
 
 class GlassPriceTest < ActiveSupport::TestCase
   def setup
+    GlassPrice.delete_all
     @glass_price = GlassPrice.new(
       glass_type: "LAM",
       thickness: "3+3",

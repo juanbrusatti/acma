@@ -14,7 +14,8 @@ class DvhTest < ActiveSupport::TestCase
       glasscutting1_color: "INC",
       glasscutting2_type: "FLO",
       glasscutting2_thickness: "4+4",
-      glasscutting2_color: "GRS"
+      glasscutting2_color: "GRS",
+      type_opening: "PVC"
     )
   end
 
@@ -94,7 +95,7 @@ class DvhTest < ActiveSupport::TestCase
     # Create a glasscutting first
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
+      height: 100, width: 50, type_opening: "PVC", price: 100.0
     )
 
     # Create DVH
@@ -109,6 +110,7 @@ class DvhTest < ActiveSupport::TestCase
       glasscutting2_type: "FLO",
       glasscutting2_thickness: "3+3",
       glasscutting2_color: "GRS",
+      type_opening: "PVC",
       price: 300.0
     )
 
@@ -131,18 +133,18 @@ class DvhTest < ActiveSupport::TestCase
     # Create glasscutting and two DVHs
     glasscutting = project.glasscuttings.create!(
       glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
+      height: 100, width: 50, type_opening: "PVC", price: 100.0
     )
 
     dvh1 = project.dvhs.create!(
-      innertube: 9, typology: "V2", height: 150, width: 100,
+      innertube: 9, typology: "V2", height: 150, width: 100, type_opening: "PVC",
       glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
       glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
       price: 300.0
     )
 
     dvh2 = project.dvhs.create!(
-      innertube: 12, typology: "V3", height: 200, width: 150,
+      innertube: 12, typology: "V3", height: 200, width: 150, type_opening: "PVC",
       glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
       glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
       price: 400.0
@@ -220,7 +222,8 @@ class DvhTest < ActiveSupport::TestCase
       glasscutting1_color: "INC",
       glasscutting2_type: "FLO",
       glasscutting2_thickness: "4+4",
-      glasscutting2_color: "GRS"
+      glasscutting2_color: "GRS",
+      type_opening: "PVC"
     )
 
     # DVH should have a calculated price
