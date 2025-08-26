@@ -14,7 +14,8 @@ class GlasscuttingsControllerTest < ActionDispatch::IntegrationTest
           height: 120,
           width: 80,
           color: "INC",
-          typology: "V001"
+          typology: "V001",
+          type_opening: "PVC"
         }
       }
     end

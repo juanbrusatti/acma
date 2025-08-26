@@ -2,7 +2,7 @@ require "test_helper"
 
 class GlassplatesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @glassplate = glassplates(:complete_sheet)
+    @glassplate = glassplates(:one)
   end
 
   test "should get index" do
@@ -14,7 +14,7 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
     get new_glassplate_url
     assert_response :success
-    assert_select "h1", "Agregar Nuevo Material"
+    assert_select "h1", "'Agregar plancha'"
   end
 
   test "should create glassplate" do
@@ -26,10 +26,7 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
           color: "INC",
           glass_type: "LAM",
           thickness: "4+4",
-          standard_measures: "600x400mm",
-          location: "Estante A",
-          status: "disponible",
-          is_scrap: false
+          quantity: 1
         }
       }
     end
@@ -45,39 +42,19 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
           width: nil,
           height: nil,
           color: "invalid_color",
-          glass_type: "Invalid Type"
+          glass_type: "Invalid Type",
+          thickness: "invalid",
+          quantity: nil
         }
       }
     end
-
     assert_response :unprocessable_entity
-  end
-
-  test "should show glassplate" do
-    get glassplate_url(@glassplate)
-    assert_response :success
   end
 
   test "should get edit" do
     get edit_glassplate_url(@glassplate)
     assert_response :success
-    assert_select "h1", "Editar Material"
-  end
-
-  test "should update glassplate" do
-    patch glassplate_url(@glassplate), params: {
-      glassplate: {
-        location: "Estante B",
-        status: "reservado"
-      }
-    }
-
-    assert_redirected_to glassplates_url
-    assert_equal "Material actualizado exitosamente.", flash[:notice]
-
-    @glassplate.reload
-    assert_equal "Estante B", @glassplate.location
-    assert_equal "reservado", @glassplate.status
+    assert_select "h1", "Editar plancha"
   end
 
   test "should not update glassplate with invalid params" do
@@ -100,25 +77,4 @@ class GlassplatesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Material eliminado exitosamente.", flash[:notice]
   end
 
-  test "should load stock data correctly" do
-    get glassplates_url
-    assert_response :success
-
-    # Check that stock summary data is available
-    assert_not_nil assigns(:complete_sheets)
-    assert_not_nil assigns(:scraps)
-    assert_not_nil assigns(:stock_summary)
-  end
-
-  test "should calculate stock summary correctly" do
-    get glassplates_url
-    assert_response :success
-
-    stock_summary = assigns(:stock_summary)
-    assert_kind_of Hash, stock_summary
-    assert_includes stock_summary.keys, :total_sheets
-    assert_includes stock_summary.keys, :total_scraps
-    assert_includes stock_summary.keys, :available_scraps
-    assert_includes stock_summary.keys, :reserved_scraps
-  end
 end

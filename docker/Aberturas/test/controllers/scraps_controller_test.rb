@@ -17,7 +17,7 @@ class ScrapsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create scrap" do
     assert_difference("Scrap.count") do
-      post scraps_url, params: { scrap: { height: @scrap.height, output_work: @scrap.output_work, ref_number: @scrap.ref_number, scrap_type: @scrap.scrap_type, status: @scrap.status, thickness: @scrap.thickness, width: @scrap.width } }
+      post scraps_url, params: { scrap: { color: @scrap.color, height: @scrap.height, output_work: @scrap.output_work, ref_number: @scrap.ref_number, scrap_type: @scrap.scrap_type, status: @scrap.status, thickness: @scrap.thickness, width: @scrap.width } }
     end
 
     assert_redirected_to scrap_url(Scrap.last)

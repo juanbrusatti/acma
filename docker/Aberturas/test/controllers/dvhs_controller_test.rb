@@ -18,7 +18,8 @@ class DvhsControllerTest < ActionDispatch::IntegrationTest
           glasscutting1_color: "INC",
           glasscutting2_type: "LAM",
           glasscutting2_thickness: "3+3",
-          glasscutting2_color: "INC"
+          glasscutting2_color: "INC",
+          type_opening: "PVC",
         }
       }
     end

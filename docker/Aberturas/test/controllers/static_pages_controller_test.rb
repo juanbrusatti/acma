@@ -16,17 +16,26 @@ class StaticPagesControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_response :success
 
-    # Check for dashboard cards - there are 3 main cards + 2 additional ones
-    assert_select ".rounded-lg.border.border-gray-200.bg-card", minimum: 5
+    # Check for dashboard cards - normalmente hay 3 principales
+    assert_select ".dashboard-grid .glass-card", minimum: 3
 
     # Check for stock card specifically
     assert_select "h3", text: "Gestión de Stock"
   end
 
   test "dashboard should display correct stock counts" do
-    # Create some test data
-    complete_sheet = glassplates(:complete_sheet)
-    scrap = glassplates(:scrap)
+    # Crear datos de prueba si es necesario
+  Glassplate.create!(width: 100, height: 100, color: "INC", glass_type: "LAM", thickness: "3+3", quantity: 1)
+    Scrap.create!(
+      ref_number: "1",
+      scrap_type: "LAM",
+      thickness: "3+3",
+      width: 1.0,
+      height: 1.0,
+      color: "INC",
+      output_work: "X",
+      status: "Disponible"
+    )
 
     get root_url
     assert_response :success

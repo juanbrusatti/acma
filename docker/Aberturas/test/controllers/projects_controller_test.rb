@@ -18,6 +18,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       width: 800,           
       color: "INC",
       typology: "V1",
+      type_opening: "PVC",
       price: 150.00
     )
     
@@ -32,6 +33,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       glasscutting2_type: "LAM",
       glasscutting2_thickness: "4+4",
       glasscutting2_color: "GRS",
+      type_opening: "PVC",
       price: 300.00
     )
   end
@@ -65,6 +67,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               typology: "V1",
               height: 1000,
               width: 800,
+              type_opening: "PVC",
               price: 400.0 # Frontend calculated price
             }
           },
@@ -80,6 +83,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               glasscutting2_type: "FLO",
               glasscutting2_thickness: "4+4",
               glasscutting2_color: "GRS",
+              type_opening: "PVC",
               price: 600.0 # Frontend calculated price
             }
           }
@@ -87,17 +91,18 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    project = Project.last
-    assert_equal 1000.0, project.price_without_iva
-    assert_equal 1210.0, project.price
+  project = Project.last
+  puts "DEBUG price_without_iva: #{project.price_without_iva.inspect} (class: #{project.price_without_iva.class})"
+  assert_equal 1000.0, project.price_without_iva
+  assert_equal 1210.0, project.price
     
-    glasscutting = project.glasscuttings.first
-    assert_equal 400.0, glasscutting.price
+  glasscutting = project.glasscuttings.first
+  assert_equal 400.0, glasscutting.price
     
-    dvh = project.dvhs.first
-    assert_equal 600.0, dvh.price
+  dvh = project.dvhs.first
+  assert_equal 600.0, dvh.price
 
-    assert_redirected_to projects_path
+  assert_redirected_to projects_path
   end
 
   test "should create project without frontend prices and trigger backend calculation" do
@@ -117,7 +122,8 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               color: "INC",
               typology: "V1",
               height: 1000,
-              width: 800
+              width: 800,
+              type_opening: "PVC"
               # No price provided - should trigger backend calculation
             }
           },
@@ -132,7 +138,8 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               glasscutting1_color: "INC",
               glasscutting2_type: "FLO",
               glasscutting2_thickness: "4+4",
-              glasscutting2_color: "GRS"
+              glasscutting2_color: "GRS",
+              type_opening: "PVC"
               # No price provided - should trigger backend calculation
             }
           }
@@ -170,6 +177,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               typology: "V1",
               height: 1000,
               width: 800,
+              type_opening: "PVC",
               price: 333.33 # Frontend calculated
             }
           },
@@ -184,7 +192,8 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
               glasscutting1_color: "INC",
               glasscutting2_type: "FLO",
               glasscutting2_thickness: "4+4",
-              glasscutting2_color: "GRS"
+              glasscutting2_color: "GRS",
+              type_opening: "PVC",
               # No price - should trigger backend calculation
             }
           }
@@ -317,6 +326,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
                   typology: "V1",
                   height: 1000,
                   width: 800,
+                  type_opening: "PVC",
                   price: 200.0
                 },
                 "1" => {
@@ -326,6 +336,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
                   typology: "V2",
                   height: 1200,
                   width: 600,
+                  type_opening: "Aluminio",
                   price: 180.0
                 }
               },
@@ -341,6 +352,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
                   glasscutting2_type: "FLO",
                   glasscutting2_thickness: "4+4",
                   glasscutting2_color: "GRS",
+                  type_opening: "PVC",
                   price: 450.0
                 }
               }
@@ -407,7 +419,8 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
             height: "1200",
             width: "800",
             color: "INC",
-            typology: "V1"
+            typology: "V1",
+            type_opening: "PVC"
           }
         },
         dvhs_attributes: {
@@ -421,7 +434,8 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
             glasscutting1_color: "INC",
             glasscutting2_type: "LAM",
             glasscutting2_thickness: "4+4",
-            glasscutting2_color: "GRS"
+            glasscutting2_color: "GRS",
+            type_opening: "PVC"
           }
         }
       }
@@ -494,6 +508,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       width: 1200,
       color: "GRS",
       typology: "V3",
+      type_opening: "Aluminio",
       price: 200.00
     )
 
@@ -522,6 +537,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       glasscutting2_type: "FLO",
       glasscutting2_thickness: "5mm",
       glasscutting2_color: "INC",
+      type_opening: "PVC",
       price: 450.00
     )
 
@@ -591,6 +607,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       width: 800,
       color: "INC",
       typology: "V5",
+      type_opening: "PVC",
       price: 150.00
     )
 
@@ -614,6 +631,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
         width: rand(600..1500),
         color: ["INC", "STB", "GRS", "BRC"].sample,
         typology: "V#{i + 10}",
+        type_opening: ["PVC", "Aluminio"].sample,
         price: rand(100.0..500.0).round(2)
       )
     end
