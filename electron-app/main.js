@@ -1,7 +1,7 @@
 const { app, BrowserWindow, dialog } = require("electron");
 const path = require("path");
 
-const IP = "192.168.68.69"; // Cambia esto a la IP de tu servidor
+const IP = "192.168.0.143"; // Cambia esto a la IP de tu servidor
 const PORT = "3000"; // Puerto del servidor
 
 // --- CONFIGURACIÓN PRINCIPAL ---

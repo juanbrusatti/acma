@@ -1,6 +1,6 @@
 {
   "name": "acma-electron",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "description": "Sistema de gestión de aberturas ACMA",
   "main": "main.js",
   "author": "Tu Empresa <contacto@tuempresa.com>",
