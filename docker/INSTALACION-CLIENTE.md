@@ -11,6 +11,10 @@
 2. Instalar y reiniciar la PC
 3. Abrir Docker Desktop y esperar que arranque
 
+- Chequear que en Docker Desktop no aparezca ningun error.
+- Cambiar en Settings → General → Desmarcar la opción “Use the WSL 2 based engine” → Aceptá y reiniciá Docker Desktop.
+- Si hay otro error preguntarle a Gepeto
+
 ### Paso 3:
 1. Abrí las conexiones de red
    Win + R → escribí ncpa.cpl → Enter.
