@@ -1,0 +1,23 @@
+  <%# Use the correct URL and method for new or existing projects %>
+  <%= form_with(model: @project, 
+                url: @project.persisted? ? project_path(@project) : projects_path, 
+                method: @project.persisted? ? :patch : :post, 
+                local: true, 
+                id: "project-form") do |f| %>
+
+    <% if @project.persisted? %>
+      <%= hidden_field_tag :project_id, @project.id %>
+      <%= hidden_field_tag :_method, 'patch' %>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%= render partial: "projects/partials/info_client", locals: { f: f, readonly: @project.persisted? } %>
+      <%= render partial: "projects/partials/info_project", locals: { f: f, readonly: @project.persisted? } %>
+    </div>
+
+    <% if @project.persisted? %>
+      <!-- Solo mostrar formularios de DVH y glasscutting después de crear el proyecto base -->
+      <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
+      <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
+    <% end %>
+  <% end %>

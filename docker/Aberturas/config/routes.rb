@@ -19,8 +19,8 @@ Rails.application.routes.draw do
     collection do
       post :preview_pdf
     end
-    resources :dvhs, only: [ :create ]
-    resources :glasscuttings, only: [ :create ]
+    resources :dvhs, only: [ :create, :edit ]
+    resources :glasscuttings, only: [ :create, :edit ]
   end
 
   resources :glass_prices do
