@@ -85,3 +85,102 @@ es:
       project: ""
       glassplate: ""
       scrap: ""
+      supply: ""
+      app_config: ""
+
+  errors:
+    messages:
+      blank: "no puede estar en blanco"
+      not_a_number: "no es un número"
+      greater_than: "debe ser mayor que 0"
+      greater_than_or_equal_to: "debe ser mayor o igual que 0"
+      taken: "ya ha sido tomado"
+      inclusion: "no está incluido en la lista"
+      record_invalid: "La validación falló: %{errors}"
+
+  activerecord:
+    errors:
+      models:
+        glassplate:
+          attributes:
+            glass_type:
+              blank: "no puede estar en blanco"
+              inclusion: "debe ser uno de: LAM, FLO, COL"
+            thickness:
+              blank: "no puede estar en blanco"
+              inclusion: "debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+            color:
+              blank: "no puede estar en blanco"
+              inclusion: "debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+            height:
+              blank: "no puede estar en blanco"
+              not_a_number: "no es un número"
+              greater_than: "debe ser mayor que 0"
+            width:
+              blank: "no puede estar en blanco"
+              not_a_number: "no es un número"
+              greater_than: "debe ser mayor que 0"
+            quantity:
+              blank: "no puede estar en blanco"
+        glasscutting:
+          attributes:
+            glass_type:
+              blank: "El tipo de vidrio no puede estar en blanco"
+              inclusion: "El tipo de vidrio no es valido"
+            thickness:
+              blank: "El espesor del vidrio no puede estar en blanco"
+              inclusion: "El grosor del vidrios no es valido"
+            color:
+              blank: "El color del vidrio no puede estar en blanco"
+              inclusion: "Color de vidrio no valido"
+            height:
+              blank: "El alto del vidrio no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho del vidrio no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            typology:
+              blank: "La tipología del vidrio no puede estar en blanco"
+            type_opening:
+              blank: "El tipo de abertura no puede estar en blanco"
+              inclusion: "El tipo de abertura no es valido"
+        dvh:
+          attributes:
+            innertube:
+              blank: "La camara no puede estar en blanco"
+            typology:
+              blank: "La tipología del DVH no puede estar en blanco"
+            height:
+              blank: "El alto del vidrio no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho del vidrio no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+        project:
+          attributes:
+            name:
+              blank: "no puede estar en blanco"
+            phone:
+              blank: "no puede estar en blanco"
+            description:
+              blank: "no puede estar en blanco"
+        supply:
+          attributes:
+            name:
+              blank: "no puede estar en blanco"
+              taken: "ya ha sido tomado"
+            price_usd:
+              greater_than_or_equal_to: "debe ser mayor o igual que 0"
+            price_peso:
+              greater_than_or_equal_to: "debe ser mayor o igual que 0"
+        app_config:
+          attributes:
+            key:
+              blank: "no puede estar en blanco"
+              taken: "ya ha sido tomado"
+            value:
+              blank: "no puede estar en blanco"
