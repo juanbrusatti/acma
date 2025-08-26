@@ -34,8 +34,8 @@ let dvhTbody = null;
 
 // Pure builder for DVH table row and corresponding hidden inputs
 function buildDvhRow(values, price, index) {
-  const tempId = `new_${Date.now()}_${index}`;
-  
+  // Use real id if present (for edit), otherwise generate new temp id
+  const id = values.id || `new_${Date.now()}_${index}`;
   const tr = document.createElement("tr");
   tr.className = "divide-x divide-gray-200";
   tr.innerHTML = `
@@ -49,7 +49,7 @@ function buildDvhRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${formatArgentineCurrency(price, '$') || ''}</td>
     <td class="px-4 py-2 text-center">
       <div class="flex space-x-1 justify-center">
-        <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${tempId}">Editar</button>
+        <button type="button" class="edit-dvh bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-id="${values.id || ''}" data-temp-id="${id}">Editar</button>
         <button type="button" class="delete-dvh bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
       </div>
     </td>
@@ -60,24 +60,29 @@ function buildDvhRow(values, price, index) {
   hiddenDiv.style.display = "none";
   hiddenDiv.className = "dvh-hidden-row";
   hiddenDiv.innerHTML = `
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][typology]" value="${values.typology || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][innertube]" value="${values.innertube || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][height]" value="${values.height || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][width]" value="${values.width || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][price]" value="${price.toFixed(2)}">
-    <input type="hidden" name="project[dvhs_attributes][${tempId}][_destroy]" value="0">
+    ${values.id ? `<input type=\"hidden\" name=\"project[dvhs_attributes][${id}][id]\" value=\"${id}\">` : ''}
+    <input type="hidden" name="project[dvhs_attributes][${id}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][innertube]" value="${values.innertube || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting1_type]" value="${values.glasscutting1_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting1_thickness]" value="${values.glasscutting1_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting1_color]" value="${values.glasscutting1_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting2_type]" value="${values.glasscutting2_type || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting2_thickness]" value="${values.glasscutting2_thickness || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][glasscutting2_color]" value="${values.glasscutting2_color || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][price]" value="${price.toFixed(2)}">
+    <input type="hidden" name="project[dvhs_attributes][${id}][_destroy]" value="0">
   `;
 
-  tr.setAttribute('data-temp-id', tempId);
+  if (values.id) {
+    tr.setAttribute('data-id', values.id);
+  } else {
+    tr.setAttribute('data-temp-id', id);
+  }
 
-  return { tr, hiddenDiv, tempId };
+  return { tr, hiddenDiv, tempId: id };
 }
 
 // Ensures the DVH table exists in the DOM
@@ -309,20 +314,20 @@ export function handleDvhEvents(e) {
     const glass2Color = (editContainer.querySelector('.glasscutting2-color-select') || {}).value || '';
 
     // Calculate new price
-  const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
-  const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');
-  const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
-  const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
-  const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
+    const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
+    const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');
+    const glass1 = { type: glass1Type, thickness: glass1Thickness, color: glass1Color };
+    const glass2 = { type: glass2Type, thickness: glass2Thickness, color: glass2Color };
+    const price = getDvhTotalGlassPrice(parseFloat(height), parseFloat(width), glass1, glass2, parseFloat(innertube));
 
-  row.querySelector('td:nth-child(1)').textContent = typology;
-  row.querySelector('td:nth-child(2)').textContent = innertube;
-  row.querySelector('td:nth-child(3)').textContent = width;
-  row.querySelector('td:nth-child(4)').textContent = height;
-  row.querySelector('td:nth-child(5)').textContent = glass1Display;
-  row.querySelector('td:nth-child(6)').textContent = glass2Display;
-  row.querySelector('td:nth-child(7)').textContent = type_opening;
-  row.querySelector('td:nth-child(8)').textContent = formatArgentineCurrency(price, '$');
+    row.querySelector('td:nth-child(1)').textContent = typology;
+    row.querySelector('td:nth-child(2)').textContent = innertube;
+    row.querySelector('td:nth-child(3)').textContent = width;
+    row.querySelector('td:nth-child(4)').textContent = height;
+    row.querySelector('td:nth-child(5)').textContent = glass1Display;
+    row.querySelector('td:nth-child(6)').textContent = glass2Display;
+    row.querySelector('td:nth-child(7)').textContent = type_opening;
+    row.querySelector('td:nth-child(8)').textContent = formatArgentineCurrency(price, '$');
 
     // Show the row again
     row.style.display = '';
@@ -332,49 +337,32 @@ export function handleDvhEvents(e) {
 
     // Update hidden fields (use id or tempId)
     const key = id || tempId;
-    const typologyFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][typology]"]`);
-    if (typologyFields.length > 0) typologyFields[0].value = typology;
-    
-    const innertubeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][innertube]"]`);
-    if (innertubeFields.length > 0) innertubeFields[0].value = innertube;
-    
-    const widthFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][width]"]`);
-    if (widthFields.length > 0) widthFields[0].value = width;
-    
-    const heightFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][height]"]`);
-    if (heightFields.length > 0) heightFields[0].value = height;
+    if (key) {
+      const setByName = (field, value) => {
+        const input = document.querySelector(`input[name="project[dvhs_attributes][${key}][${field}]"]`);
+        if (input) input.value = value;
+      };
+      setByName('typology', typology);
+      setByName('innertube', innertube);
+      setByName('width', width);
+      setByName('height', height);
+      setByName('type_opening', type_opening);
+      setByName('glasscutting1_type', glass1Type);
+      setByName('glasscutting1_thickness', glass1Thickness);
+      setByName('glasscutting1_color', glass1Color);
+      setByName('glasscutting2_type', glass2Type);
+      setByName('glasscutting2_thickness', glass2Thickness);
+      setByName('glasscutting2_color', glass2Color);
+      setByName('price', price.toFixed(2));
+    }
 
-    const type_openingFields = document.querySelectorAll(`select[name="project[dvhs_attributes][][type_opening]"]`);
-    if (type_openingFields.length > 0) type_openingFields[0].value = type_opening;
-
-    const glass1TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_type]"]`);
-    if (glass1TypeFields.length > 0) glass1TypeFields[0].value = glass1Type;
-    
-    const glass1ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_thickness]"]`);
-    if (glass1ThicknessFields.length > 0) glass1ThicknessFields[0].value = glass1Thickness;
-    
-    const glass1ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting1_color]"]`);
-    if (glass1ColorFields.length > 0) glass1ColorFields[0].value = glass1Color;
-    
-    const glass2TypeFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_type]"]`);
-    if (glass2TypeFields.length > 0) glass2TypeFields[0].value = glass2Type;
-    
-    const glass2ThicknessFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_thickness]"]`);
-    if (glass2ThicknessFields.length > 0) glass2ThicknessFields[0].value = glass2Thickness;
-    
-    const glass2ColorFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][glasscutting2_color]"]`);
-    if (glass2ColorFields.length > 0) glass2ColorFields[0].value = glass2Color;
-
-    const priceFields = document.querySelectorAll(`input[name="project[dvhs_attributes][][price]"]`);
-    if (priceFields.length > 0) priceFields[0].value = price.toFixed(2);
-    
     // Update project totals
     setTimeout(() => {
       if (typeof window.updateProjectTotals === 'function') {
         window.updateProjectTotals();
       }
     }, 100);
-    
+
     return;
   }
   
@@ -550,22 +538,26 @@ export function handleDvhEvents(e) {
   if (e.target.classList.contains("delete-dvh")) {
     const tr = e.target.closest("tr");
     if (tr) {
+      // Remove corresponding hidden form div for this row (by tempId or id)
+      const tempId = tr.getAttribute('data-temp-id');
+      const id = tr.getAttribute('data-id');
+      const key = id || tempId;
+      if (key) {
+        const hiddenDiv = document.querySelector(`#dvhs-hidden .dvh-hidden-row input[name="project[dvhs_attributes][${key}][typology]"]`);
+        if (hiddenDiv && hiddenDiv.parentElement && hiddenDiv.parentElement.classList.contains('dvh-hidden-row')) {
+          hiddenDiv.parentElement.remove();
+        }
+      }
       tr.remove();
       removeDvhTableIfEmpty();
-      
       // Update project totals after deletion
       setTimeout(() => {
         if (typeof window.updateProjectTotals === 'function') {
           window.updateProjectTotals();
         }
       }, 100);
-      
-      // Remove corresponding hidden form inputs
-      const hiddenRows = document.querySelectorAll("#dvhs-hidden .dvh-hidden-row");
-      if (hiddenRows.length > 0) hiddenRows[hiddenRows.length - 1].remove();
       return;
     }
-    
     // Handle deletion from form containers
     const container = e.target.closest(".dvh-fields") || e.target.closest(".dvh-view");
     if (container) { container.remove(); return; }

@@ -33,8 +33,8 @@ let glasscuttingTbody = null;
 
 // Pure builder for table row and hidden inputs for a glasscutting record
 function buildGlasscuttingRow(values, price, index) {
-  const newId = `new_${Date.now()}_${index}`;
-  
+  // Use real id if present (for edit), otherwise generate new temp id
+  const id = values.id || `new_${Date.now()}_${index}`;
   const tr = document.createElement("tr");
   tr.className = "divide-x divide-gray-200";
   tr.innerHTML = `
@@ -48,7 +48,7 @@ function buildGlasscuttingRow(values, price, index) {
     <td class='px-4 py-2 text-center'>${formatArgentineCurrency(price, '$') || ''}</td>
     <td class='px-4 py-2 text-center space-x-2'>
       <div class="flex space-x-1 justify-center">
-        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-temp-id="${newId}">Editar</button>
+        <button type="button" class="edit-glasscutting bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-id="${values.id || ''}" data-temp-id="${id}">Editar</button>
         <button type="button" class="delete-glass bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Eliminar</button>
       </div>    
     </td>
@@ -58,20 +58,25 @@ function buildGlasscuttingRow(values, price, index) {
   hiddenDiv.style.display = "none";
   hiddenDiv.className = "glasscutting-hidden-row";
   hiddenDiv.innerHTML = `
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][_destroy]" value="0">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][typology]" value="${values.typology || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][glass_type]" value="${values.glass_type || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][thickness]" value="${values.thickness || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][color]" value="${values.color || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][height]" value="${values.height || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][width]" value="${values.width || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][type_opening]" value="${values.type_opening || ''}">
-    <input type="hidden" name="project[glasscuttings_attributes][${newId}][price]" value="${price.toFixed(2)}">
+    ${values.id ? `<input type="hidden" name="project[glasscuttings_attributes][${id}][id]" value="${id}">` : ''}
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][_destroy]" value="0">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][typology]" value="${values.typology || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][glass_type]" value="${values.glass_type || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][thickness]" value="${values.thickness || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][color]" value="${values.color || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][height]" value="${values.height || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][width]" value="${values.width || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][type_opening]" value="${values.type_opening || ''}">
+    <input type="hidden" name="project[glasscuttings_attributes][${id}][price]" value="${price.toFixed(2)}">
   `;
 
-  tr.setAttribute('data-temp-id', newId);
+  if (values.id) {
+    tr.setAttribute('data-id', values.id);
+  } else {
+    tr.setAttribute('data-temp-id', id);
+  }
 
-  return { tr, hiddenDiv, tempId: newId };
+  return { tr, hiddenDiv, tempId: id };
 }
 
 // Ensures the glass cutting table exists in the DOM
@@ -139,7 +144,6 @@ export function handleGlasscuttingEvents(e) {
     const id = button.getAttribute('data-id');
     const row = button.closest('tr');
     const tempId = button.getAttribute('data-temp-id') || (row && row.getAttribute('data-temp-id'));
-    
     if (id || tempId) {
       // Read current values from row
       const typology = row.querySelector('td:nth-child(1)').textContent.trim();
@@ -218,6 +222,9 @@ export function handleGlasscuttingEvents(e) {
       editTd.appendChild(editContainer);
       editTr.appendChild(editTd);
       row.parentNode.insertBefore(editTr, row);
+      // Store id/tempId for later use
+      editTr.setAttribute('data-id', id || '');
+      editTr.setAttribute('data-temp-id', tempId || '');
     }
     return;
   }
@@ -264,24 +271,12 @@ export function handleGlasscuttingEvents(e) {
     row.querySelector('td:nth-child(8)').textContent = formatArgentineCurrency(price, '$');
 
     // Update hidden inputs for existing or temp record
-    const id = e.target.getAttribute('data-id');
-    const tempId = e.target.getAttribute('data-temp-id') || (row && row.getAttribute('data-temp-id'));
-    if (id) {
+    const id = editRow.getAttribute('data-id');
+    const tempId = editRow.getAttribute('data-temp-id');
+    const key = id || tempId;
+    if (key) {
       const setByName = (field, value) => {
-        const input = document.querySelector(`input[name="project[glasscuttings_attributes][${id}][${field}]"]`);
-        if (input) input.value = value;
-      };
-      setByName('typology', newValues.typology);
-      setByName('glass_type', newValues.glass_type);
-      setByName('thickness', newValues.thickness);
-      setByName('color', newValues.color);
-      setByName('height', newValues.height);
-      setByName('width', newValues.width);
-      setByName('type_opening', newValues.type_opening);
-      setByName('price', `${price.toFixed(2)}`);
-    } else if (tempId) {
-      const setByName = (field, value) => {
-        const input = document.querySelector(`input[name="project[glasscuttings_attributes][${tempId}][${field}]"]`);
+        const input = document.querySelector(`input[name="project[glasscuttings_attributes][${key}][${field}]"]`);
         if (input) input.value = value;
       };
       setByName('typology', newValues.typology);
@@ -294,9 +289,9 @@ export function handleGlasscuttingEvents(e) {
       setByName('price', price.toFixed(2));
     }
 
-  // Show the row again y restaurar botones crear
-  row.style.display = '';
-  if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
+    // Show the row again y restaurar botones crear
+    row.style.display = '';
+    if (editRow && editRow.parentNode) { editRow.parentNode.removeChild(editRow); }
 
     // Update totals
     setTimeout(() => {
@@ -468,22 +463,26 @@ export function handleGlasscuttingEvents(e) {
   if (e.target.classList.contains("delete-glass")) {
     const tr = e.target.closest("tr");
     if (tr) {
+      // Remove corresponding hidden form div for this row (by tempId or id)
+      const tempId = tr.getAttribute('data-temp-id');
+      const id = tr.getAttribute('data-id');
+      const key = id || tempId;
+      if (key) {
+        const hiddenDiv = document.querySelector(`#glasscuttings-hidden .glasscutting-hidden-row input[name="project[glasscuttings_attributes][${key}][typology]"]`);
+        if (hiddenDiv && hiddenDiv.parentElement && hiddenDiv.parentElement.classList.contains('glasscutting-hidden-row')) {
+          hiddenDiv.parentElement.remove();
+        }
+      }
       tr.remove();
       removeGlasscuttingTableIfEmpty();
-      
       // Update project totals after deletion
       setTimeout(() => {
         if (typeof window.updateProjectTotals === 'function') {
           window.updateProjectTotals();
         }
       }, 100);
-      
-      // Remove corresponding hidden form inputs
-      const hiddenRows = document.querySelectorAll("#glasscuttings-hidden .glasscutting-hidden-row");
-      if (hiddenRows.length > 0) hiddenRows[hiddenRows.length - 1].remove();
       return;
     }
-    
     // Handle deletion from form containers
     const container = e.target.closest(".glasscutting-fields") || e.target.closest(".glasscutting-view");
     if (container) { container.remove(); return; }

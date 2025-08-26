@@ -3,22 +3,21 @@
 <% content_for :title, @project.persisted? ? "Agregar elementos al proyecto" : "Crear proyecto" %>
 
 <div class="w-full p-4 md:p-8">
-  <h1 class="text-lg font-semibold mb-3">
-    <%= @project.persisted? ? "Agregar elementos al proyecto" : "Generar proyecto" %>
-  </h1>
+    <h1 class="text-lg font-semibold mb-3">
+        <%= @project.persisted? ? "Agregar elementos al proyecto" : "Generar proyecto" %>
+    </h1>
 
-  <% if @project.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-      <h2 class="font-bold mb-2">Errores al guardar el proyecto:</h2>
-      <ul>
-        <% @project.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <%= render partial: "projects/partials/form" %>
+    <% if @project.errors.any? %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <h2 class="font-bold mb-2">Errores al guardar el proyecto:</h2>
+        <ul>
+            <% @project.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+            <% end %>
+        </ul>
+        </div>
+    <% end %>
+    <%= render partial: "projects/partials/form" %>
 </div>
 
 <!-- Hidden template for cloning DVH fields -->
