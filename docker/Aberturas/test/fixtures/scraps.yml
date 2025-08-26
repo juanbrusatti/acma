@@ -1,19 +1,59 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  ref_number: MyString
-  scrap_type: MyString
-  thickness: MyString
+  ref_number: R1
+  scrap_type: LAM
+  thickness: 3+3
   width: 1.5
   height: 1.5
-  output_work: MyString
-  status: MyString
+  color: INC
+  output_work: X
+  status: Disponible
 
 two:
-  ref_number: MyString
-  scrap_type: MyString
-  thickness: MyString
+  ref_number: R2
+  scrap_type: FLO
+  thickness: 4+4
   width: 1.5
   height: 1.5
-  output_work: MyString
-  status: MyString
+  color: STB
+  output_work: Y
+  status: Reservado
+
+three:
+  ref_number: R3
+  scrap_type: COL
+  thickness: 5+5
+  width: 2.0
+  height: 2.0
+  color: GRS
+  output_work: Z
+  status: Disponible
+
+four:
+  ref_number: R4
+  scrap_type: LAM
+  thickness: 5mm
+  width: 2.5
+  height: 2.5
+  color: BRC
+  output_work: W
+  status: Reservado
+
+five:
+  ref_number: R5
+  scrap_type: FLO
+  thickness: 3+3
+  width: 3.0
+  height: 3.0
+  color: NTR
+  output_work: V
+  status: Disponible
+
+six:
+  ref_number: R6
+  scrap_type: LAM
+  thickness: 3+3
+  width: 1.0
+  height: 1.0
+  color: INC
+  output_work: X
+  status: Disponible

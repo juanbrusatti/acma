@@ -1,68 +1,41 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-complete_sheet:
+glassplate:
   width: 600
   height: 400
   color: INC
   glass_type: LAM
   thickness: 4+4
-  standard_measures: 600x400mm
-  location: Estante A
-  status: disponible
-  is_scrap: false
+  quantity: 5
 
-scrap:
-  width: 300
-  height: 200
-  color: INC
-  glass_type: LAM
-  thickness: 3+3
-  standard_measures: 300x200mm
-  location: Rack de sobrantes
-  status: disponible
-  is_scrap: true
-
-available:
-  width: 500
-  height: 300
-  color: GRS
-  glass_type: FLO
-  thickness: 5mm
-  standard_measures: 500x300mm
-  location: Estante B
-  status: disponible
-  is_scrap: true
-
-reserved:
-  width: 400
-  height: 250
-  color: BRC
-  glass_type: FLO
-  thickness: 5mm
-  standard_measures: 400x250mm
-  location: Estante C
-  status: reservado
-  is_scrap: true
-
-# Legacy fixtures for backward compatibility
 one:
   width: 600
   height: 400
   color: INC
   glass_type: LAM
   thickness: 3+3
-  standard_measures: 600x400mm
-  location: Estante A
-  status: disponible
-  is_scrap: false
+  quantity: 6
 
 two:
+  width: 500
+  height: 300
+  color: GRS
+  glass_type: FLO
+  thickness: 4+4
+  quantity: 1
+
+three:
+  width: 700
+  height: 500
+  color: BRC
+  glass_type: COL
+  thickness: 5+5
+  quantity: 3
+
+four:
   width: 800
   height: 600
-  color: STG
-  glass_type: COL
-  thickness: 4+4
-  standard_measures: 800x600mm
-  location: Estante B
-  status: disponible
-  is_scrap: false
+  color: STB
+  glass_type: LAM
+  thickness: 3+3
+  quantity: 4

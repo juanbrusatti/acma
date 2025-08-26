@@ -12,6 +12,7 @@ one:
   glasscutting2_type: FLO
   glasscutting2_thickness: 4+4
   glasscutting2_color: GRS
+  type_opening: PVC
   price: 299.99
 
 two:
@@ -26,4 +27,5 @@ two:
   glasscutting2_type: LAM
   glasscutting2_thickness: 3+3
   glasscutting2_color: STB
+  type_opening: Aluminio
   price: 399.99

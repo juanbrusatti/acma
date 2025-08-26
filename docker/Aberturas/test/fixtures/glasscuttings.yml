@@ -7,9 +7,9 @@ one:
   glass_type: LAM
   thickness: 3+3
   typology: V1
+  type_opening: PVC
   price: 9.99
   project: one
-  #glassplate: one
 
 two:
   height: 1.5
@@ -18,6 +18,6 @@ two:
   glass_type: FLO
   thickness: 4+4
   typology: V2
+  type_opening: Aluminio
   price: 9.99
   project: two
-  #glassplate: two
