@@ -10,10 +10,20 @@
 1. Descargar Docker Desktop desde: https://www.docker.com/products/docker-desktop
 2. Instalar y reiniciar la PC
 3. Abrir Docker Desktop y esperar que arranque
+4. Si estoy en Windows 10 Pro tengo que instalar Hyper-v:
+   ```bash
+   dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All /NoRestart
+   ```
+5. Reiniciar la PC
+6. Chequear que en Docker Desktop no aparezca ningun error.
+7. Cambiar en Settings → General → Desmarcar la opción “Use the WSL 2 based engine” → Aceptá y reiniciá Docker Desktop.
+8. Si hay otro error preguntarle a Gepeto
 
-- Chequear que en Docker Desktop no aparezca ningun error.
-- Cambiar en Settings → General → Desmarcar la opción “Use the WSL 2 based engine” → Aceptá y reiniciá Docker Desktop.
-- Si hay otro error preguntarle a Gepeto
+- Si no puedo activar Hyper-V le instalo wsl:
+   ```bash
+   wsl --install
+   wsl --update
+   ```
 
 ### Paso 3:
 1. Abrí las conexiones de red
