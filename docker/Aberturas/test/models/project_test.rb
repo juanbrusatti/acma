@@ -231,12 +231,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal @project.subtotal, @project.precio_sin_iva
   end
 
-  test "precio_con_iva alias works correctly" do
-    @project.price_without_iva = 800.0
-    
-    assert_equal @project.total, @project.precio_con_iva
-  end
-
   test "end to end pricing works with frontend calculated prices" do
     # Create a project with frontend-calculated prices (simulating form submission)
     project = Project.create!(

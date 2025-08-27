@@ -1,6 +1,8 @@
 WickedPdf.configure do |c|
+  # Explicitly set the xvfb-run binary path
+  c.xvfb_run_binary_path = '/usr/bin/xvfb-run'
   # Path to the wkhtmltopdf executable: Using system wkhtmltopdf
-  c.exe_path = '/usr/local/bin/wkhtmltopdf'
+  c.exe_path = '/usr/bin/wkhtmltopdf'
 
   # Layout file to be used for all PDFs
   # (but can be overridden in `render :pdf` calls)

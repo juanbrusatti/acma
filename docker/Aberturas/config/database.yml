@@ -11,7 +11,7 @@ default: &default
 development:
   <<: *default
   database: acma_development
-  host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -19,7 +19,7 @@ development:
 test:
   <<: *default
   database: acma_test
-  host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
 
 production:
   primary:

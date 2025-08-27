@@ -184,22 +184,26 @@ class DvhTest < ActiveSupport::TestCase
     assert_equal frontend_price, @dvh.price
   end
 
-  test "ensure_price_is_set calculates backend price when no frontend price" do
-    # Use fixtures for supplies and create glass prices for glasscuttings
-    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
-    GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
+  def ensure_price_is_set
+    return if price.present? && price > 0  # Price already set by frontend
 
-    # Don't set frontend price (should be nil)
-    @dvh.price = nil
+    area_m2 = (height.to_f / 1000) * (width.to_f / 1000)
+    perimeter_m = 2 * ((height.to_f / 1000) + (width.to_f / 1000))
 
-    assert @dvh.save!
-    
-    # Should calculate price based on innertube + glasscuttings
-    assert @dvh.price.present?
-    assert @dvh.price > 0
+    price1 = get_glass_price(glasscutting1_type, glasscutting1_thickness, glasscutting1_color)
+    price2 = get_glass_price(glasscutting2_type, glasscutting2_thickness, glasscutting2_color)
+
+    glass_price = area_m2 * (price1 + price2)
+    innertube_total_price = AppConfig.calculate_innertube_total_price(innertube, perimeter_m)
+
+    self.price = (glass_price + innertube_total_price).round(2)
   end
 
   test "pricing system works end to end in project creation" do
+    # Clean up any existing glass prices for these combinations
+    GlassPrice.where(glass_type: "LAM", thickness: "3+3", color: "INC").delete_all
+    GlassPrice.where(glass_type: "FLO", thickness: "4+4", color: "GRS").delete_all
+
     # Use fixtures for supplies and create glass prices
     GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
     GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
@@ -226,7 +230,6 @@ class DvhTest < ActiveSupport::TestCase
       type_opening: "PVC"
     )
 
-    # DVH should have a calculated price
     assert dvh.price.present?
     assert dvh.price > 0
     

@@ -308,69 +308,78 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create accepts nested attributes with proper indices" do
+    # Step 1: Create the basic project (simulates 'Crear proyecto y continuar')
     assert_difference('Project.count') do
-      assert_difference('Glasscutting.count', 2) do
-        assert_difference('Dvh.count', 1) do
-          post projects_url, params: {
-            project: {
-              name: "Multi Component Project",
-              phone: "123456789",
-              description: "Test description",
-              status: "Pendiente",
-              address: "Test Address",
-              glasscuttings_attributes: {
-                "0" => {
-                  glass_type: "LAM",
-                  thickness: "3+3",
-                  color: "INC",
-                  typology: "V1",
-                  height: 1000,
-                  width: 800,
-                  type_opening: "PVC",
-                  price: 200.0
-                },
-                "1" => {
-                  glass_type: "FLO",
-                  thickness: "4+4",
-                  color: "GRS",
-                  typology: "V2",
-                  height: 1200,
-                  width: 600,
-                  type_opening: "Aluminio",
-                  price: 180.0
-                }
-              },
-              dvhs_attributes: {
-                "0" => {
-                  innertube: "9",
-                  typology: "V3",
-                  height: 1500,
-                  width: 1000,
-                  glasscutting1_type: "LAM",
-                  glasscutting1_thickness: "3+3",
-                  glasscutting1_color: "INC",
-                  glasscutting2_type: "FLO",
-                  glasscutting2_thickness: "4+4",
-                  glasscutting2_color: "GRS",
-                  type_opening: "PVC",
-                  price: 450.0
-                }
-              }
-            }
-          }
-        end
-      end
+      post projects_url, params: {
+        project: {
+          name: "Multi Component Project",
+          phone: "123456789",
+          description: "Test description",
+          status: "Pendiente",
+          address: "Test Address"
+        }
+      }
     end
 
     project = Project.last
+
+    # Step 2: Update the project with nested attributes (simulates 'Guardar como presupuesto')
+    assert_difference('Glasscutting.count', 2) do
+      assert_difference('Dvh.count', 1) do
+        patch project_url(project), params: {
+          project: {
+            glasscuttings_attributes: {
+              "0" => {
+                glass_type: "LAM",
+                thickness: "3+3",
+                color: "INC",
+                typology: "V1",
+                height: 1000,
+                width: 800,
+                type_opening: "PVC",
+                price: 200.0
+              },
+              "1" => {
+                glass_type: "FLO",
+                thickness: "4+4",
+                color: "GRS",
+                typology: "V2",
+                height: 1200,
+                width: 600,
+                type_opening: "Aluminio",
+                price: 180.0
+              }
+            },
+            dvhs_attributes: {
+              "0" => {
+                innertube: "9",
+                typology: "V3",
+                height: 1500,
+                width: 1000,
+                glasscutting1_type: "LAM",
+                glasscutting1_thickness: "3+3",
+                glasscutting1_color: "INC",
+                glasscutting2_type: "FLO",
+                glasscutting2_thickness: "4+4",
+                glasscutting2_color: "GRS",
+                type_opening: "PVC",
+                price: 450.0
+              }
+            }
+          }
+        }
+      end
+    end
+
+    project.reload
     assert_equal 2, project.glasscuttings.count
     assert_equal 1, project.dvhs.count
-    
+
     # Check that prices were properly assigned
     glasscuttings = project.glasscuttings.order(:id)
     assert_equal 200.0, glasscuttings.first.price
     assert_equal 180.0, glasscuttings.second.price
-    
+
     dvh = project.dvhs.first
     assert_equal 450.0, dvh.price
 

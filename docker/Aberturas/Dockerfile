@@ -16,7 +16,7 @@ RUN apt-get update -qq && apt-get install -y \
   fontconfig \
   libxrender1 \
   xfonts-75dpi \
-  xfonts-base
+  xfonts-base \
 
 # Instalar wkhtmltopdf manualmente
 RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb && \
