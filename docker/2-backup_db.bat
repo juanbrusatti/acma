@@ -31,6 +31,7 @@ docker exec %CONTAINER% pg_dump -U %USER% %DB% > "%FILE%" 2> "%LOGFILE%"
 
 if %ERRORLEVEL% equ 0 (
     echo ✅ Backup completado!
+    if exist "%LOGFILE%" del "%LOGFILE%"
 ) else (
     echo ❌ Error en el backup, revisa %LOGFILE%
 )
