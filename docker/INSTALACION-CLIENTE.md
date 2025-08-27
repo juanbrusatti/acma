@@ -16,8 +16,10 @@
    ```
 5. Reiniciar la PC
 6. Chequear que en Docker Desktop no aparezca ningun error.
-7. Cambiar en Settings → General → Desmarcar la opción “Use the WSL 2 based engine” → Aceptá y reiniciá Docker Desktop.
-8. Si hay otro error preguntarle a Gepeto
+7. Marcar la casilla "Start Docker Desktop when you sign in to your computer"
+8. Desmarcar la casilla "Open Docker Dashboard when Docker Desktop starts"
+9. Cambiar en Settings → General → Desmarcar la opción “Use the WSL 2 based engine” → Aceptá y reiniciá Docker Desktop.
+10. Si hay otro error preguntarle a Gepeto
 
 - Si no puedo activar Hyper-V le instalo wsl:
    ```bash
@@ -59,7 +61,13 @@ cd C:\acma\docker
 
 ### **Paso 5: Crear las Tareas**
 1. Tarea para que se ejecute apenas se prenda la pc el script de inicio
-2. Tarea para backups diarios o semanales
+   1. Win + R (taskschd.msc)
+   2. En el panel de acciones, selecciona Crear Tarea.
+   3. Dale un nombre a la tarea (ej. Iniciar_Docker_Rails).
+   4. Para el activador, elige Cuando se inicie el equipo.
+   5. En la acción, selecciona Iniciar un programa, y poner el script.
+   6. Hacerlo con permisos de sudo y Oculta
+2. Tarea para backups diarios o semanales, mismo procedimiento pero poniendo fecha y corriendo backup_db.bat
 
 ### **Paso 6: Comprobar que todo anda correctamente**
 1. Verificar que el contenedor esté corriendo:
