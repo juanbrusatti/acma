@@ -19,7 +19,7 @@ echo ⏳ Esperando a que Docker arranque completamente...
 
 :: Contador para timeout (máximo 2 minutos = 24 intentos de 5 segundos)
 set /a counter=0
-set /a maxAttempts=24
+set /a maxAttempts=100
 
 :checkDocker
 set /a counter+=1
@@ -79,4 +79,4 @@ echo.
 echo 📋 LOGS DEL SERVIDOR:
 echo ==========================================
 
-docker compose up
+docker compose up -d
