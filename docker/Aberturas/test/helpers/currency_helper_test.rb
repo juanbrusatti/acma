@@ -21,10 +21,10 @@ class CurrencyHelperTest < ActionView::TestCase
 
   test "should handle edge cases" do
     # Valores nil o vacíos
-    assert_equal "N/A", format_argentine_currency(nil, unit: "$", precision: 2)
-    assert_equal "N/A", format_argentine_currency("", unit: "$", precision: 2)
-    assert_equal "N/A", format_argentine_currency(0, unit: "$", precision: 2)
-    
+    assert_equal "$0,00", format_argentine_currency(nil, unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency("", unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency(0, unit: "$", precision: 2)
+
     # Valores negativos
     assert_equal "$-150,00", format_argentine_currency(-150.00, unit: "$", precision: 2)
     assert_equal "$-1.250,50", format_argentine_currency(-1250.50, unit: "$", precision: 2)

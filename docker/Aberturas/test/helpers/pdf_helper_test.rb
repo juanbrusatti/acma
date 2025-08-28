@@ -2,6 +2,7 @@ require "test_helper"
 
 class PdfHelperTest < ActionView::TestCase
   include ApplicationHelper
+  include CurrencyHelper
 
   test "should handle glass type humanization for PDF" do
     # Verificar que los helpers de glass type funcionan correctamente
@@ -32,10 +33,9 @@ class PdfHelperTest < ActionView::TestCase
     assert_equal "$1.250,50", format_argentine_currency(1250.50, unit: "$", precision: 2)
     assert_equal "$0,00", format_argentine_currency(0, unit: "$", precision: 2)
     
-    # Casos edge - algunos helpers pueden devolver string vacío o nil
-    result = format_argentine_currency(nil, unit: "$", precision: 2)
-    # Aceptar tanto nil como string vacío
-    assert (result.nil? || result == "" || result == "N/A"), "format_argentine_currency should handle nil gracefully"
+    # Casos edge - nil y string vacío deben devolver "$0,00"
+    assert_equal "$0,00", format_argentine_currency(nil, unit: "$", precision: 2)
+    assert_equal "$0,00", format_argentine_currency("", unit: "$", precision: 2)
   end
 
   test "should handle PDF template asset paths" do

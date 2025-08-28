@@ -2,6 +2,7 @@ require "test_helper"
 
 class SuppliesHelperTest < ActionView::TestCase
   include SuppliesHelper
+  include CurrencyHelper
 
   def setup
     @supply_with_price = Supply.new(name: "Test Supply", price_usd: 25.50)

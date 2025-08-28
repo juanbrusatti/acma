@@ -2,6 +2,7 @@ require "test_helper"
 
 class GlassPricesHelperTest < ActionView::TestCase
   include GlassPricesHelper
+  include CurrencyHelper
 
   def setup
     AppConfig.delete_all
