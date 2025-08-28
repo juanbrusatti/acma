@@ -13,7 +13,9 @@ module GlassPricesHelper
   # Format price for display
   def format_glass_price(price)
     return "No establecido" if price.blank? || price.zero?
-    format_argentine_currency(price, unit: "$", precision: 2)
+    amount = price.to_f.round(2)
+    formatted = number_with_precision(amount, precision: 2, separator: '.', delimiter: ',')
+    "$#{formatted}"
   end
 
   # Calculate selling price from buying price and margin
@@ -24,15 +26,23 @@ module GlassPricesHelper
 
   # Format innertube price for display
   def format_innertube_price(size)
-    price = AppConfig.get_innertube_price(size)
-    return "No establecido" if price.blank? || price.zero?
-    format_argentine_currency(price, unit: "$", precision: 2)
+  price = AppConfig.get_innertube_price(size)
+  return "No establecido" if price.blank? || price.zero?
+  amount = price.to_f.round(2)
+  formatted = number_with_precision(amount, precision: 2, separator: '.', delimiter: ',')
+  "$#{formatted}"
   end
 
   # Get all innertube prices formatted for display
   def formatted_innertube_prices
     AppConfig.get_all_innertube_prices.transform_values do |price|
-      price > 0 ? format_argentine_currency(price, unit: "$", precision: 2) : "No establecido"
+      if price > 0
+        amount = price.to_f.round(2)
+        formatted = number_with_precision(amount, precision: 2, separator: '.', delimiter: ',')
+        "$#{formatted}"
+      else
+        "No establecido"
+      end
     end
   end
 end

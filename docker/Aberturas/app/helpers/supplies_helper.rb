@@ -2,7 +2,10 @@ module SuppliesHelper
   # Format supply USD price for display
   def format_supply_usd_price(supply)
     if supply.price_usd.present? && supply.price_usd > 0
-      format_argentine_currency(supply.price_usd, unit: "US$", precision: 2)
+      # Formatear con punto como separador decimal para USD
+      amount = supply.price_usd.to_f.round(2)
+      formatted = number_with_precision(amount, precision: 2, separator: '.', delimiter: ',')
+      "US$#{formatted}"
     else
       "N/A"
     end
