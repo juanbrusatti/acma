@@ -50,7 +50,19 @@
 6. Cambiar la ip del main.js para la build, por el que acabamos de configurar.
 7. Cambiar en el .env la ip del servidor.
 
-### **Paso 4: Ejecutar la Aplicación**
+### **Paso 4: Instalar Postgres**
+1. Descargar Postgres 17 desde: https://www.postgresql.org/
+2. Instalarlo (dejando todas las casillas marcadas).
+3. Me va a pedir una contraseña, ingreso la que esta en .env
+4. Comprobar si se descargo correctamente en /"Program Files"/PostgreSQL/17/bin usando psql -U postgres
+5. Si todo esta instalado correctamente me va a pedir un password, debo ingresar la misma que antes.
+6. Luego, debo correr los siguientes comandos:
+- CREATE DATABASE acma_production;
+- CREATE USER acma WITH ENCRYPTED PASSWORD <usada en .env>;
+- GRANT ALL PRIVILEGES ON DATABASE acma_production TO acma;
+7. Ir a /"Program Files"/PostgreSQL/17/data/postgresql.conf y buscar esta linea: listen_addresses = '*'. Si no esta el '*' debemos ponerlo.
+
+### **Paso 5: Ejecutar la Aplicación**
 ```bash
 # Ir a la carpeta del Docker
 cd C:\acma\docker
@@ -59,7 +71,7 @@ cd C:\acma\docker
 1-start_server_con_logs.bat
 ```
 
-### **Paso 5: Crear las Tareas**
+### **Paso 6: Crear las Tareas**
 1. Tarea para que se ejecute apenas se prenda la pc el script de inicio
    1. Win + R (taskschd.msc)
    2. En el panel de acciones, selecciona Crear Tarea.
@@ -69,7 +81,7 @@ cd C:\acma\docker
    6. Hacerlo con permisos de sudo y Oculta
 2. Tarea para backups diarios o semanales, mismo procedimiento pero poniendo fecha y corriendo backup_db.bat
 
-### **Paso 6: Comprobar que todo anda correctamente**
+### **Paso 7: Comprobar que todo anda correctamente**
 1. Verificar que el contenedor esté corriendo:
 ```bash
 docker ps
@@ -81,7 +93,7 @@ curl http://localhost:3000
 3. Probar hacer un backup
 4. Probar restaurar el backup
 
-### **Paso 7: Crear la build de Electron**
+### **Paso 8: Crear la build de Electron**
 1. Poner la IP correcta en el main.js
 2. Ejecutar el siguiente comando en la carpeta electron-app(en mi pc):
 ```bash
