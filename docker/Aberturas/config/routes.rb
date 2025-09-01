@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :scraps
+  resources :scraps, except: [:show, :index]
   resources :supplies
   resources :glassplates
   get "static_pages/home"

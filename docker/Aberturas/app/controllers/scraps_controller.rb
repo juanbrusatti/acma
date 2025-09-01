@@ -1,14 +1,5 @@
 class ScrapsController < ApplicationController
-  before_action :set_scrap, only: %i[ show edit update destroy ]
-
-  # GET /scraps or /scraps.json
-  def index
-    @scraps = Scrap.all
-  end
-
-  # GET /scraps/1 or /scraps/1.json
-  def show
-  end
+  before_action :set_scrap, only: %i[ edit update destroy ]
 
   # GET /scraps/new
   def new
@@ -25,7 +16,7 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if @scrap.save
-        format.html { redirect_to @scrap, notice: "Retazo agregado exitosamente al stock." }
+        format.html { redirect_to glassplates_path, notice: "Retazo agregado exitosamente al stock." }
         format.json { render :show, status: :created, location: @scrap }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +29,7 @@ class ScrapsController < ApplicationController
   def update
     respond_to do |format|
       if @scrap.update(scrap_params)
-        format.html { redirect_to @scrap, notice: "Retazo actualizado exitosamente." }
+        format.html { redirect_to glassplates_path, notice: "Retazo actualizado exitosamente." }
         format.json { render :show, status: :ok, location: @scrap }
       else
         format.html { render :edit, status: :unprocessable_entity }
