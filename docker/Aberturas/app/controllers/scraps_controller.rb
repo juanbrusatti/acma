@@ -60,11 +60,11 @@ class ScrapsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_scrap
-      @scrap = Scrap.find(params.expect(:id))
+      @scrap = Scrap.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.expect(scrap: [ :ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status ])
+      params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status)
     end
 end
