@@ -126,7 +126,51 @@
                     <td class="px-4 py-2 text-center"><%= glassplate.color %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.width %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.height %></td>
-                    <td class="px-4 py-2 text-center"><%= glassplate.quantity.to_i %></td>
+                    <td class="px-4 py-2 text-center">
+                      <div class="quantity-controls" data-glassplate-id="<%= glassplate.id %>" data-current-quantity="<%= glassplate.quantity %>">
+                        <!-- Vista normal -->
+                        <div class="quantity-display">
+                          <button class="quantity-btn minus-btn" title="Reducir cantidad" type="button">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                          </button>
+                          <span class="quantity-value"><%= glassplate.quantity.to_i %></span>
+                          <button class="quantity-btn plus-btn" title="Aumentar cantidad" type="button">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                          </button>
+                        </div>
+                        
+                        <!-- Vista de edición (oculta por defecto) -->
+                        <div class="quantity-edit hidden">
+                          <div class="flex items-center gap-2">
+                            <button class="quantity-btn minus-btn-edit" title="Reducir cantidad" type="button">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                              </svg>
+                            </button>
+                            <input type="number" class="quantity-input" min="0" value="<%= glassplate.quantity.to_i %>">
+                            <button class="quantity-btn plus-btn-edit" title="Aumentar cantidad" type="button">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                              </svg>
+                            </button>
+                            <button class="confirm-btn" title="Confirmar cambios" type="button">
+                              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                              </svg>
+                            </button>
+                            <button class="cancel-btn" title="Cancelar" type="button">
+                              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     <td class="px-4 py-2 text-center">
                       <%= link_to edit_glassplate_path(glassplate), class: "w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center", title: "Editar" do %>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

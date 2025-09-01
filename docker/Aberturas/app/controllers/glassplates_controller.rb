@@ -40,10 +40,10 @@ class GlassplatesController < ApplicationController
     respond_to do |format|
       if @glassplate.update(glassplate_params)
         format.html { redirect_to glassplates_path, notice: "Material actualizado exitosamente." }
-        format.json { render :show, status: :ok, location: @glassplate }
+        format.json { render json: { success: true, quantity: @glassplate.quantity }, status: :ok }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @glassplate.errors, status: :unprocessable_entity }
+        format.json { render json: { success: false, errors: @glassplate.errors }, status: :unprocessable_entity }
       end
     end
   end
