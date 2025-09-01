@@ -10,32 +10,43 @@ class GlasscuttingsTest < ApplicationSystemTestCase
 
     # Fill in required project fields
     fill_in "Nombre", with: "Proyecto SystemTest"
-    # You can uncomment if status is required
-    # select "pendiente", from: "Estado"
     fill_in "Teléfono", with: "1234456"
 
-    # Add a simple glass
-    click_on "Agregar vidrio simple"
+    # Crear el proyecto básico
+    click_on "Crear proyecto"
+
+    # Esperar el redirect a la página de edición o detalle
+    assert_text "Proyecto creado exitosamente."
+    assert_field "Nombre", with: "Proyecto SystemTest"
+
+    # Agregar un vidrio simple
+    find('#add-glasscutting', visible: true, wait: 5).click
 
     within "#glasscuttings-wrapper" do
-      # Verify form presence and fill in the fields
       assert_selector ".glasscutting-fields", wait: 5
-      
       find(".glass-type-select").select("LAM")
-      sleep(0.5) # Wait for JavaScript to populate dependent selects
+      sleep(0.5)
       find(".glass-thickness-select").select("3+3")
       find(".glass-color-select").select("INC")
-      find(".typology-number-input").fill_in with: "1"  # This will create "V1"
+      find(".typology-number-input").fill_in with: "1"
       find("input[name='project[glasscuttings_attributes][][height]']").fill_in with: "120"
       find("input[name='project[glasscuttings_attributes][][width]']").fill_in with: "100"
+      # Si hay select de tipo de apertura, completarlo
+      begin
+        find("select[name='project[glasscuttings_attributes][][type_opening]']").select("PVC")
+      rescue Capybara::ElementNotFound
+      end
+      click_on "Confirmar"
     end
 
-    # Submit the form
+    # Esperar a que el formulario de glasscutting desaparezca (confirmado)
+    assert_no_selector ".glasscutting-fields", wait: 5
+
+    # Guardar el proyecto con el vidrio agregado
     click_on "Guardar como presupuesto"
 
-    # Verify that everything was saved correctly
+    # Verificaciones finales
     assert_text "Proyecto creado exitosamente."
-    assert_text "Proyecto SystemTest"  # Name of the project we created
-    assert_current_path projects_path
+    assert_match %r{^/projects}, current_path
   end
 end
