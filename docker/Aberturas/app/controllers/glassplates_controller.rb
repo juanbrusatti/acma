@@ -53,7 +53,7 @@ class GlassplatesController < ApplicationController
     @glassplate.destroy!
 
     respond_to do |format|
-      format.html { redirect_to glassplates_path, status: :see_other, notice: "Material eliminado exitosamente." }
+      format.html { redirect_to glassplates_path, status: :see_other, notice: "Plancha eliminada exitosamente de la base de datos." }
       format.json { head :no_content }
     end
   end

@@ -18,5 +18,6 @@ pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.12
 pin "glass_selects_common", to: "glass_selects_common.js"
 pin "glassplate_selects", to: "glassplate_selects.js"
 pin "scrap_selects", to: "scrap_selects.js"
+pin "delete_confirmation", to: "delete_confirmation.js"
 pin "sweetalert2", to: "https://ga.jspm.io/npm:sweetalert2@11.22.3/dist/sweetalert2.all.js"
 pin "utils", to: "utils.js"

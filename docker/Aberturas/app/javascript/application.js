@@ -8,6 +8,7 @@ import "supply_editing"
 import "preview_pdf"
 import { setupAllGlassplateSelects } from "glassplate_selects"
 import { setupAllScrapSelects } from "scrap_selects"
+import "delete_confirmation"
 
 document.addEventListener("turbo:load", () => {
 	// Inicializar selects dinámicos para glassplates y scraps

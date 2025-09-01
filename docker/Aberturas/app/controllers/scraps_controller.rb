@@ -43,7 +43,7 @@ class ScrapsController < ApplicationController
     @scrap.destroy!
 
     respond_to do |format|
-      format.html { redirect_to scraps_path, status: :see_other, notice: "Retazo eliminado exitosamente." }
+      format.html { redirect_to glassplates_path, status: :see_other, notice: "Retazo eliminado exitosamente de la base de datos." }
       format.json { head :no_content }
     end
   end
