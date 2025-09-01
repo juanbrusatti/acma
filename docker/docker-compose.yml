@@ -1,25 +1,4 @@
 services:
-  db:
-    image: postgres:15
-    container_name: db
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   web:
     build:
       context: .
@@ -27,18 +6,36 @@ services:
     env_file:
       - .env
     volumes:
-      # Persistencia de datos de la app
       - ./Aberturas/storage:/app/storage
       - ./Aberturas/tmp:/app/tmp
     ports:
       - "${RAILS_PORT:-3000}:3000"
     environment:
-      - RAILS_ENV=${RAILS_ENV:-production}
-      - DATABASE_URL=${DATABASE_URL}
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - RAILS_ENV=${RAILS_ENV:-development}
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     stdin_open: true
     tty: true
     restart: unless-stopped
+    container_name: web
+
+  # Servicio de Postgres solo para desarrollo
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Acma2024!Secure}
+      POSTGRES_DB: ${DEV_POSTGRES_DB:-acma_development}
+    ports:
+      - "5433:5432"  # Exponemos 5433 solo para desarrollo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - default
+
+volumes:
+  pgdata:
+
+networks:
+  default:

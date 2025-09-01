@@ -71,6 +71,26 @@ if not exist "docker-compose.yml" (
 )
 echo ✅ Archivo docker-compose.yml encontrado
 
+:: Verificar si el puerto 3000 está ocupado
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000') do (
+    echo ⚠️ El puerto 3000 está en uso. Intentando liberarlo...
+    
+    :: Buscar el ID del contenedor que usa el puerto
+    docker ps -q --filter "publish=3000" > temp_docker_id.txt
+    set /p CONTAINER_ID=<temp_docker_id.txt
+    del temp_docker_id.txt
+
+    if not "%CONTAINER_ID%"=="" (
+        echo 🔻 Parando contenedor que usa el puerto 3000...
+        docker stop %CONTAINER_ID%
+        docker rm %CONTAINER_ID%
+    ) else (
+        echo ❌ El puerto está ocupado pero no por Docker. No se puede continuar.
+        pause
+        exit /b 1
+    )
+)
+
 :: Levantar los contenedores
 echo 🚢 Iniciando contenedores Docker...
 docker compose up -d
@@ -84,6 +104,18 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+
+echo 🛠️ Ejecutando migraciones...
+
+docker exec -it web bash -c "RAILS_ENV=production bundle exec rails db:prepare"
+
+if errorlevel 1 (
+    echo ❌ ERROR al ejecutar las migraciones
+    pause
+    exit /b 1
+)
+
+echo ✅ Migraciones completadas!
 
 echo ✅ Servidor levantado exitosamente!
 echo.

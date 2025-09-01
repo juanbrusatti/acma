@@ -2,9 +2,11 @@
 setlocal enabledelayedexpansion
 
 :: Configuración
-set CONTAINER=db
+set PG_PATH="C:\Program Files\PostgreSQL\17\bin\pg_dump.exe"
 set USER=postgres
 set DB=acma_production
+set HOST=localhost
+set PORT=5432
 set BACKUP_DIR=%~dp0backups
 
 :: Crear carpeta de backups si no existe
@@ -24,7 +26,7 @@ set FILE=%BACKUP_DIR%\backup_%timestamp%.sql
 
 echo 💾 Creando backup en %FILE% ...
 
-docker exec %CONTAINER% pg_dump -U %USER% %DB% > "%FILE%"
+%PG_PATH% -U %USER% -h %HOST% -p %PORT% -d %DB% -F p > "%FILE%"
 
 echo ✅ Backup completado!
 pause
