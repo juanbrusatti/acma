@@ -60,7 +60,14 @@
 - CREATE DATABASE acma_production;
 - CREATE USER acma WITH ENCRYPTED PASSWORD <usada en .env>;
 - GRANT ALL PRIVILEGES ON DATABASE acma_production TO acma;
-7. Ir a /"Program Files"/PostgreSQL/17/data/postgresql.conf y buscar esta linea: listen_addresses = '*'. Si no esta el '*' debemos ponerlo.
+7. Si tengo algun problema para correr el programa me fijo lo siguiente:
+  - Ir a /"Program Files"/PostgreSQL/17/data/postgresql.conf y buscar esta linea: listen_addresses = '*'. Si no esta el '*' debemos ponerlo.
+  - Habilitar el puerto para Postgres: ir a 'Windows Defender Firewall con Seguridad Avanzada" --> Reglas de entrada --> Nueva Regla --> Puerto --> Marcamos TCP y ponemos el puerto (5432).
+  - El puerto 5432 podria estar ocupado, para resolver esto tenemos dos opciones: la primera es usar otro puerto y actualizarlo en todos los archivos; por otro lado podriamos ver si
+    el proceso que esta en ese puerto se puede matar, para ello vamos a hacer ejecutar en la terminal 'netstat -ano | findstr "5432"', y el PID resultante lo matamos de la siguiente manera:
+    taskkill /PID <...> /F.
+  - Verificamos que el Posgres este corriendo, si no lo ponemos en ejecución, para ello hacemos lo siguiente: Win + R → escribí services.msc → Enter. Luego, buscamos Postgres y deberia estar en ejecución,
+    si no esta lo activamos. Como ultima opción, podemos desactivarlo y activarlo de nuevo por las dudas.
 
 ### **Paso 5: Ejecutar la Aplicación**
 ```bash
