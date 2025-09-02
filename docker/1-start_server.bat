@@ -1,49 +1,86 @@
 @echo off
-echo 🚀 Iniciando servidor Rails con Docker (DETACHED)...
-echo.
+:: ==============================================
+:: start_server.bat - Solo PRODUCCIÓN
+:: ==============================================
 
-:: Obtener la ruta del script
-set "scriptDir=%~dp0"
-cd /d "%scriptDir%"
+cd /d %~dp0
 
-echo 🔍 Verificando Docker...
-set /a counter=0
-set /a maxAttempts=100
+:: -----------------------------
+:: 1️⃣ Variables de producción
+:: -----------------------------
+set RAILS_ENV=production
+set DATABASE_URL=postgresql://postgres:Acma2024!Secure@host.docker.internal:5432/acma_production
+set RAILS_PORT=3000
+set PROD_RAILS_HOST=192.168.0.6
 
-:checkDocker
-set /a counter+=1
-echo 🔄 Intento %counter%/%maxAttempts% - Verificando Docker...
+echo 🔹 Entorno fijo: %RAILS_ENV%
+echo 🔹 DATABASE_URL: %DATABASE_URL%
+echo 🔹 RAILS_PORT: %RAILS_PORT%
 
-docker info >nul 2>&1
-if not errorlevel 1 (
-    echo ✅ Docker está funcionando!
-    goto dockerReady
-)
-
-if %counter% geq %maxAttempts% (
-    echo ❌ TIMEOUT: Docker no arrancó después de 100 intentos
-    echo 📞 Por favor, revisa el estado de Docker Desktop.
+:: -----------------------------
+:: 2️⃣ Verificar Docker Desktop
+:: -----------------------------
+docker --version >nul 2>&1
+if errorlevel 1 (
+    echo ❌ ERROR: Docker Desktop no está instalado o no está en el PATH
+    pause
     exit /b 1
 )
+echo ✅ Docker Desktop encontrado
 
-echo ⏳ Docker aún no está listo... esperando 5 segundos
+:: -----------------------------
+:: 3️⃣ Esperar Docker
+:: -----------------------------
+set /a counter=0
+set /a maxAttempts=24
+:checkDocker
+set /a counter+=1
+docker info >nul 2>&1
+if not errorlevel 1 goto dockerReady
+if %counter% geq %maxAttempts% (
+    echo ❌ TIMEOUT: Docker no arrancó después de 2 minutos
+    pause
+    exit /b 1
+)
 timeout /t 5 >nul
 goto checkDocker
 
 :dockerReady
-echo 🐳 Docker está listo!
+echo ✅ Docker listo
 
-:: Verificar que existe docker-compose.yml
+:: -----------------------------
+:: 4️⃣ Verificar docker-compose.yml
+:: -----------------------------
 if not exist "docker-compose.yml" (
-    echo ❌ ERROR: Archivo docker-compose.yml no encontrado
-    echo 📍 Asegúrate de estar en la carpeta correcta.
+    echo ❌ ERROR: docker-compose.yml no encontrado
+    pause
     exit /b 1
 )
-echo ✅ Archivo docker-compose.yml encontrado
+echo ✅ docker-compose.yml encontrado
 
-:: Levantar los contenedores en segundo plano
-echo 🚢 Iniciando contenedores Docker en modo "detached"...
-docker compose up -d
+:: -----------------------------
+:: 5️⃣ Levantar contenedor web
+:: -----------------------------
+echo 🚀 Levantando contenedor web (Rails)...
+docker compose up -d web
 
-echo ✅ Servidor iniciado en segundo plano!
-exit /b 0
+:: -----------------------------
+:: 6️⃣ Ejecutar migraciones en Rails
+:: -----------------------------
+echo 🛠️ Ejecutando migraciones en Rails...
+docker exec -e RAILS_ENV=production web bundle exec rails db:prepare
+if errorlevel 1 (
+    echo ❌ ERROR al ejecutar migraciones
+    pause
+    exit /b 1
+)
+echo ✅ Migraciones completadas
+
+:: -----------------------------
+:: 7️⃣ Servidor iniciado
+:: -----------------------------
+echo ✅ Servidor Rails levantado en PRODUCCIÓN!
+echo 🌐 Acceso: http://%PROD_RAILS_HOST%:%RAILS_PORT%
+echo 📋 Para ver logs: docker compose logs -f
+echo 🛑 Para detener servidor: Ctrl+C o cerrar esta ventana
+pause
