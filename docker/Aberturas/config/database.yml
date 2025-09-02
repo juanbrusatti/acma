@@ -1,51 +1,27 @@
-# PostgreSQL configuration
 default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
-  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
-  username: <%= ENV.fetch("DATABASE_USERNAME") { "postgres" } %>
-  password: <%= ENV.fetch("DATABASE_PASSWORD") { "Acma2024!Secure" } %>
-
-development:
-  <<: *default
-  database: acma_development
-  host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
-
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test:
-  <<: *default
-  database: acma_test
-  host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+  url: <%= ENV['DATABASE_URL'] %>
 
 production:
   primary:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_DB") { "acma_production" } %>
-    username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD") { "Acma2024!Secure" } %>
-    host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
   cache:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_DB") { "acma_production" } %>_cache
-    username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD") { "Acma2024!Secure" } %>
-    host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+    database: <%= ENV['PROD_POSTGRES_DB'] %>_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_DB") { "acma_production" } %>_queue
-    username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD") { "Acma2024!Secure" } %>
-    host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+    database: <%= ENV['PROD_POSTGRES_DB'] %>_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_DB") { "acma_production" } %>_cable
-    username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD") { "Acma2024!Secure" } %>
-    host: <%= ENV.fetch("DATABASE_HOST") { "db" } %>
+    database: <%= ENV['PROD_POSTGRES_DB'] %>_cable
     migrations_paths: db/cable_migrate
+
+development:
+  primary:
+    <<: *default
+    database: <%= ENV['DEV_POSTGRES_DB'] %>
