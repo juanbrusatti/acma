@@ -2,7 +2,7 @@ module CurrencyHelper
   # Formatea un precio usando el formato argentino: punto para miles, coma para decimales
   # Ejemplo: 1234567.89 -> $1.234.567,89
   def format_argentine_currency(amount, unit: "$", precision: 2)
-    return "N/A" if amount.blank? || amount.zero?
+    return "$0.00" if amount.blank? || amount.zero?
     
     # Convertir a float y redondear
     amount = amount.to_f.round(precision)
