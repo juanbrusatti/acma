@@ -1,6 +1,6 @@
 @echo off
 :: ==============================================
-:: start_server.bat - Solo PRODUCCIÓN
+:: start_server.bat - Solo PRODUCCIÓN (Optimizado para reinicio)
 :: ==============================================
 
 cd /d %~dp0
@@ -17,28 +17,29 @@ echo 🔹 Entorno fijo: %RAILS_ENV%
 echo 🔹 DATABASE_URL: %DATABASE_URL%
 echo 🔹 RAILS_PORT: %RAILS_PORT%
 
-:: -----------------------------
-:: 2️⃣ Verificar Docker Desktop
-:: -----------------------------
-docker --version >nul 2>&1
-if errorlevel 1 (
-    echo ❌ ERROR: Docker Desktop no está instalado o no está en el PATH
-    pause
-    exit /b 1
-)
-echo ✅ Docker Desktop encontrado
 
 :: -----------------------------
-:: 3️⃣ Esperar Docker
+:: 2️⃣ Iniciar Docker Desktop si no está corriendo
+:: -----------------------------
+tasklist /FI "IMAGENAME eq Docker Desktop.exe" | find /I "Docker Desktop.exe" >nul
+if errorlevel 1 (
+    echo 🐳 Abriendo Docker Desktop (minimizado)...
+    start /MIN "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+) else (
+    echo ✅ Docker Desktop ya estaba abierto
+)
+
+:: -----------------------------
+:: 3️⃣ Esperar Docker (hasta 3 minutos)
 :: -----------------------------
 set /a counter=0
-set /a maxAttempts=24
+set /a maxAttempts=36
 :checkDocker
 set /a counter+=1
 docker info >nul 2>&1
 if not errorlevel 1 goto dockerReady
 if %counter% geq %maxAttempts% (
-    echo ❌ TIMEOUT: Docker no arrancó después de 2 minutos
+    echo ❌ TIMEOUT: Docker no arrancó después de 3 minutos
     pause
     exit /b 1
 )
@@ -59,18 +60,18 @@ if not exist "docker-compose.yml" (
 echo ✅ docker-compose.yml encontrado
 
 :: -----------------------------
-:: 5️⃣ Levantar contenedor web
+:: 5️⃣ Levantar contenedor web y loguear
 :: -----------------------------
 echo 🚀 Levantando contenedor web (Rails)...
-docker compose up -d web
+docker compose up -d web >> "%~dp0start_server.log" 2>&1
 
 :: -----------------------------
-:: 6️⃣ Ejecutar migraciones en Rails
+:: 6️⃣ Ejecutar migraciones en Rails y loguear
 :: -----------------------------
 echo 🛠️ Ejecutando migraciones en Rails...
-docker exec -e RAILS_ENV=production web bundle exec rails db:prepare
+docker exec -e RAILS_ENV=production web bundle exec rails db:prepare >> "%~dp0start_server.log" 2>&1
 if errorlevel 1 (
-    echo ❌ ERROR al ejecutar migraciones
+    echo ❌ ERROR al ejecutar migraciones, revisar start_server.log
     pause
     exit /b 1
 )
@@ -83,4 +84,3 @@ echo ✅ Servidor Rails levantado en PRODUCCIÓN!
 echo 🌐 Acceso: http://%PROD_RAILS_HOST%:%RAILS_PORT%
 echo 📋 Para ver logs: docker compose logs -f
 echo 🛑 Para detener servidor: Ctrl+C o cerrar esta ventana
-pause
