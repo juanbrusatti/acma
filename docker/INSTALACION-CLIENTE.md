@@ -54,14 +54,14 @@
 1. Descargar Postgres 17 desde: https://www.postgresql.org/
 2. Instalarlo (dejando todas las casillas marcadas).
 3. NO INSTALAR EL STACK BUILDER.
-3. Me va a pedir una contraseña, ingreso la que esta en .env
-4. Comprobar si se descargo correctamente en /"Program Files"/PostgreSQL/17/bin usando psql -U postgres
-5. Si todo esta instalado correctamente me va a pedir un password, debo ingresar la misma que antes.
-6. Luego, debo correr los siguientes comandos:
+4. Me va a pedir una contraseña, ingreso la que esta en .env
+5. Comprobar si se descargo correctamente en /"Program Files"/PostgreSQL/17/bin usando psql -U postgres
+6. Si todo esta instalado correctamente me va a pedir un password, debo ingresar la misma que antes.
+7. Luego, debo correr los siguientes comandos:
 - ``` CREATE DATABASE acma_production; ```
 - ``` CREATE USER acma WITH ENCRYPTED PASSWORD <usada en .env>; ```
 - ``` GRANT ALL PRIVILEGES ON DATABASE acma_production TO acma; ```
-7. Si tengo algun problema para correr el programa me fijo lo siguiente:
+8. Si tengo algun problema para correr el programa me fijo lo siguiente:
   - Ir a /"Program Files"/PostgreSQL/17/data/postgresql.conf y buscar esta linea: listen_addresses = '*'. Si no esta el '*' debemos ponerlo.
   - Habilitar el puerto para Postgres: ir a 'Windows Defender Firewall con Seguridad Avanzada" --> Reglas de entrada --> Nueva Regla --> Puerto --> Marcamos TCP y ponemos el puerto (5432).
   - El puerto 5432 podria estar ocupado, para resolver esto tenemos dos opciones: la primera es usar otro puerto y actualizarlo en todos los archivos; por otro lado podriamos ver si el proceso que esta en ese puerto se puede matar, para ello vamos a hacer ejecutar en la terminal ``` netstat -ano | findstr "5432" ```, y el PID resultante lo matamos de la siguiente manera: ``` taskkill /PID <...> /F ```
@@ -107,7 +107,7 @@ curl http://localhost:3000
 3. Probar hacer un backup
 4. Probar restaurar el backup
 
-### **Paso 7: Crear la build de Electron**
+### **Paso 8: Crear la build de Electron**
 1. Poner la IP correcta en el main.js
 2. Ejecutar el siguiente comando en la carpeta electron-app(en mi pc):
 ```bash
