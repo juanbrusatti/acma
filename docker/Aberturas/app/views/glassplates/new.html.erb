@@ -25,3 +25,91 @@
     </div>
   </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 DOM loaded, initializing glassplate selects');
+  
+  const GLASS_OPTIONS = {
+    LAM: {
+      "3+3": ["INC", "BLS"],
+      "4+4": ["INC"],
+      "5+5": ["INC"]
+    },
+    FLO: {
+      "5mm": ["GRS", "BRC", "INC"]
+    },
+    COL: {
+      "4+4": ["STB", "STG", "NTR"]
+    }
+  };
+
+  const typeSelect = document.querySelector('.glassplate-type-select');
+  const thicknessSelect = document.querySelector('.glassplate-thickness-select');
+  const colorSelect = document.querySelector('.glassplate-color-select');
+
+  console.log('🔍 Found selects:', {
+    typeSelect: !!typeSelect,
+    thicknessSelect: !!thicknessSelect,
+    colorSelect: !!colorSelect
+  });
+
+  if (!typeSelect || !thicknessSelect || !colorSelect) {
+    console.log('❌ Missing required selects');
+    return;
+  }
+
+  function updateThicknessOptions() {
+    const tipo = typeSelect.value;
+    console.log('🔄 Updating thickness for type:', tipo);
+    thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo]) {
+      const grosores = Object.keys(GLASS_OPTIONS[tipo]);
+      grosores.forEach(grosor => {
+        const opt = document.createElement('option');
+        opt.value = grosor;
+        opt.textContent = grosor;
+        thicknessSelect.appendChild(opt);
+      });
+      console.log('✅ Added thickness options:', grosores);
+    }
+  }
+
+  function updateColorOptions() {
+    const tipo = typeSelect.value;
+    const grosor = thicknessSelect.value;
+    console.log('🔄 Updating colors for type:', tipo, 'thickness:', grosor);
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
+      GLASS_OPTIONS[tipo][grosor].forEach(color => {
+        const opt = document.createElement('option');
+        opt.value = color;
+        opt.textContent = color;
+        colorSelect.appendChild(opt);
+      });
+      console.log('✅ Added color options:', GLASS_OPTIONS[tipo][grosor]);
+    }
+  }
+
+  // Inicializar
+  updateThicknessOptions();
+  updateColorOptions();
+
+  // Listeners
+  typeSelect.addEventListener('change', () => {
+    console.log('📝 Type changed to:', typeSelect.value);
+    updateThicknessOptions();
+    updateColorOptions();
+  });
+
+  thicknessSelect.addEventListener('change', () => {
+    console.log('📝 Thickness changed to:', thicknessSelect.value);
+    updateColorOptions();
+  });
+
+  console.log('✅ Glassplate selects initialized');
+});
+</script>
