@@ -25,7 +25,7 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if @scrap.save
-        format.html { redirect_to @scrap, notice: "Scrap was successfully created." }
+        format.html { redirect_to glassplates_path, notice: "Retazo creado exitosamente." }
         format.json { render :show, status: :created, location: @scrap }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +38,7 @@ class ScrapsController < ApplicationController
   def update
     respond_to do |format|
       if @scrap.update(scrap_params)
-        format.html { redirect_to @scrap, notice: "Scrap was successfully updated." }
+        format.html { redirect_to glassplates_path, notice: "Retazo actualizado exitosamente." }
         format.json { render :show, status: :ok, location: @scrap }
       else
         format.html { render :edit, status: :unprocessable_entity }
