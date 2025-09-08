@@ -24,3 +24,91 @@
     </div>
   </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 DOM loaded, initializing scrap selects');
+  
+  const GLASS_OPTIONS = {
+    LAM: {
+      "3+3": ["INC", "BLS"],
+      "4+4": ["INC"],
+      "5+5": ["INC"]
+    },
+    FLO: {
+      "5mm": ["GRS", "BRC", "INC"]
+    },
+    COL: {
+      "4+4": ["STB", "STG", "NTR"]
+    }
+  };
+
+  const typeSelect = document.querySelector('.scrap-type-select');
+  const thicknessSelect = document.querySelector('.scrap-thickness-select');
+  const colorSelect = document.querySelector('.scrap-color-select');
+
+  console.log('🔍 Found scrap selects:', {
+    typeSelect: !!typeSelect,
+    thicknessSelect: !!thicknessSelect,
+    colorSelect: !!colorSelect
+  });
+
+  if (!typeSelect || !thicknessSelect || !colorSelect) {
+    console.log('❌ Missing required scrap selects');
+    return;
+  }
+
+  function updateThicknessOptions() {
+    const tipo = typeSelect.value;
+    console.log('🔄 Updating thickness for scrap type:', tipo);
+    thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo]) {
+      const grosores = Object.keys(GLASS_OPTIONS[tipo]);
+      grosores.forEach(grosor => {
+        const opt = document.createElement('option');
+        opt.value = grosor;
+        opt.textContent = grosor;
+        thicknessSelect.appendChild(opt);
+      });
+      console.log('✅ Added thickness options for scrap:', grosores);
+    }
+  }
+
+  function updateColorOptions() {
+    const tipo = typeSelect.value;
+    const grosor = thicknessSelect.value;
+    console.log('🔄 Updating colors for scrap type:', tipo, 'thickness:', grosor);
+    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
+      GLASS_OPTIONS[tipo][grosor].forEach(color => {
+        const opt = document.createElement('option');
+        opt.value = color;
+        opt.textContent = color;
+        colorSelect.appendChild(opt);
+      });
+      console.log('✅ Added color options for scrap:', GLASS_OPTIONS[tipo][grosor]);
+    }
+  }
+
+  // Inicializar
+  updateThicknessOptions();
+  updateColorOptions();
+
+  // Listeners
+  typeSelect.addEventListener('change', () => {
+    console.log('📝 Scrap type changed to:', typeSelect.value);
+    updateThicknessOptions();
+    updateColorOptions();
+  });
+
+  thicknessSelect.addEventListener('change', () => {
+    console.log('📝 Scrap thickness changed to:', thicknessSelect.value);
+    updateColorOptions();
+  });
+
+  console.log('✅ Scrap selects initialized');
+});
+</script>
