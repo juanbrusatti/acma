@@ -8,6 +8,7 @@ import "supply_editing"
 import "preview_pdf"
 import "glassplate_selects"
 import "scrap_selects"
+import "confirmations"
 
 
 document.addEventListener("turbo:load", () => {

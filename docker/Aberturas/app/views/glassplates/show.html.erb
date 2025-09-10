@@ -54,29 +54,25 @@
 
             <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Estado:</span>
-              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= @glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
-                <%= @glassplate.status %>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
+                Disponible
               </span>
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Tipo de Material:</span>
-              <span class="text-sm"><%= @glassplate.is_scrap? ? 'Sobrante/Recorte' : 'Plancha Completa' %></span>
+              <span class="text-sm">Plancha Completa</span>
             </div>
 
-            <% if @glassplate.work.present? %>
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Trabajo/Obra:</span>
-              <span class="text-sm"><%= @glassplate.work %></span>
+              <span class="text-sm font-medium text-muted-foreground">Cantidad:</span>
+              <span class="text-sm"><%= @glassplate.quantity %></span>
             </div>
-            <% end %>
 
-            <% if @glassplate.origin.present? %>
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Origen:</span>
-              <span class="text-sm"><%= @glassplate.origin %></span>
+              <span class="text-sm font-medium text-muted-foreground">Eliminado:</span>
+              <span class="text-sm"><%= @glassplate.deleted? ? 'Sí' : 'No' %></span>
             </div>
-            <% end %>
           </div>
         </div>
       </div>
@@ -102,17 +98,12 @@
 
             <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Medidas:</span>
-              <span class="text-sm font-medium"><%= @glassplate.measures %> mm</span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Medidas Estándar:</span>
-              <span class="text-sm"><%= @glassplate.standard_measures %></span>
+              <span class="text-sm font-medium"><%= @glassplate.width %> x <%= @glassplate.height %> mm</span>
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Ubicación:</span>
-              <span class="text-sm"><%= @glassplate.location %></span>
+              <span class="text-sm">Almacén Principal</span>
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
@@ -169,7 +160,8 @@
         Editar Material
       <% end %>
 
-      <%= link_to glassplate_path(@glassplate), method: :delete, data: { confirm: "¿Estás seguro de que quieres eliminar este material?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2" do %>
+      <% confirm_message = "¿Estás seguro de que quieres eliminar esta plancha?\n\nTipo: #{@glassplate.glass_type}\nGrosor: #{@glassplate.thickness}\nColor: #{@glassplate.color}\nDimensiones: #{@glassplate.width}mm x #{@glassplate.height}mm\nCantidad: #{@glassplate.quantity}\n\nEsta acción no se puede deshacer." %>
+      <%= link_to glassplate_path(@glassplate), method: :delete, data: { confirm: confirm_message }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2" do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2">
           <path d="M3 6h18"></path>
           <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>

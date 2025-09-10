@@ -20,6 +20,22 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    
+    <style>
+      .swal2-popup-custom {
+        font-family: inherit;
+      }
+      .swal2-popup-custom .swal2-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      .swal2-popup-custom .swal2-content {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        white-space: pre-line;
+      }
+    </style>
+    
   <%= javascript_importmap_tags %>
   </head>
 
