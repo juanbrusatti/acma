@@ -206,16 +206,37 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Función para inicializar el sistema de tabs
+function initializeTabs() {
+  console.log('🚀 Initializing tabs system');
+  
   const tabs = document.querySelectorAll('[data-tab]');
   const tabContents = document.querySelectorAll('.tab-content');
 
+  console.log('🔍 Found tabs:', tabs.length);
+  console.log('🔍 Found tab contents:', tabContents.length);
+
+  if (tabs.length === 0 || tabContents.length === 0) {
+    console.log('❌ Missing required tab elements');
+    return;
+  }
+
+  // Limpiar listeners existentes para evitar duplicados
   tabs.forEach(tab => {
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+  });
+
+  // Obtener los nuevos elementos después del reemplazo
+  const newTabs = document.querySelectorAll('[data-tab]');
+
+  newTabs.forEach(tab => {
     tab.addEventListener('click', function() {
+      console.log('📝 Tab clicked:', this.getAttribute('data-tab'));
       const targetTab = this.getAttribute('data-tab');
 
       // Update tab buttons
-      tabs.forEach(t => {
+      newTabs.forEach(t => {
         t.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
         t.classList.add('bg-background', 'text-muted-foreground');
       });
@@ -226,8 +247,22 @@ document.addEventListener('DOMContentLoaded', function() {
       tabContents.forEach(content => {
         content.classList.add('hidden');
       });
-      document.getElementById(targetTab + '-tab').classList.remove('hidden');
+      const targetContent = document.getElementById(targetTab + '-tab');
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
+        console.log('✅ Switched to tab:', targetTab);
+      } else {
+        console.log('❌ Target content not found:', targetTab + '-tab');
+      }
     });
   });
-});
+
+  console.log('✅ Tabs system initialized');
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeTabs);
+
+// También inicializar cuando se navega con Turbo (para Rails 7+)
+document.addEventListener('turbo:load', initializeTabs);
 </script>
