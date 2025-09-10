@@ -26,8 +26,9 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 DOM loaded, initializing scrap selects');
+// Función para inicializar los selects de retazos
+function initializeScrapSelects() {
+  console.log('🚀 Initializing scrap selects');
   
   const GLASS_OPTIONS = {
     LAM: {
@@ -58,11 +59,20 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
+  // Limpiar listeners existentes para evitar duplicados
+  const newTypeSelect = typeSelect.cloneNode(true);
+  const newThicknessSelect = thicknessSelect.cloneNode(true);
+  const newColorSelect = colorSelect.cloneNode(true);
+  
+  typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+  thicknessSelect.parentNode.replaceChild(newThicknessSelect, thicknessSelect);
+  colorSelect.parentNode.replaceChild(newColorSelect, colorSelect);
+
   function updateThicknessOptions() {
-    const tipo = typeSelect.value;
+    const tipo = newTypeSelect.value;
     console.log('🔄 Updating thickness for scrap type:', tipo);
-    thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
-    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+    newThicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
 
     if (GLASS_OPTIONS[tipo]) {
       const grosores = Object.keys(GLASS_OPTIONS[tipo]);
@@ -70,24 +80,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const opt = document.createElement('option');
         opt.value = grosor;
         opt.textContent = grosor;
-        thicknessSelect.appendChild(opt);
+        newThicknessSelect.appendChild(opt);
       });
       console.log('✅ Added thickness options for scrap:', grosores);
     }
   }
 
   function updateColorOptions() {
-    const tipo = typeSelect.value;
-    const grosor = thicknessSelect.value;
+    const tipo = newTypeSelect.value;
+    const grosor = newThicknessSelect.value;
     console.log('🔄 Updating colors for scrap type:', tipo, 'thickness:', grosor);
-    colorSelect.innerHTML = '<option value="">Seleccionar</option>';
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
 
     if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
       GLASS_OPTIONS[tipo][grosor].forEach(color => {
         const opt = document.createElement('option');
         opt.value = color;
         opt.textContent = color;
-        colorSelect.appendChild(opt);
+        newColorSelect.appendChild(opt);
       });
       console.log('✅ Added color options for scrap:', GLASS_OPTIONS[tipo][grosor]);
     }
@@ -98,17 +108,23 @@ document.addEventListener('DOMContentLoaded', function() {
   updateColorOptions();
 
   // Listeners
-  typeSelect.addEventListener('change', () => {
-    console.log('📝 Scrap type changed to:', typeSelect.value);
+  newTypeSelect.addEventListener('change', () => {
+    console.log('📝 Scrap type changed to:', newTypeSelect.value);
     updateThicknessOptions();
     updateColorOptions();
   });
 
-  thicknessSelect.addEventListener('change', () => {
-    console.log('📝 Scrap thickness changed to:', thicknessSelect.value);
+  newThicknessSelect.addEventListener('change', () => {
+    console.log('📝 Scrap thickness changed to:', newThicknessSelect.value);
     updateColorOptions();
   });
 
   console.log('✅ Scrap selects initialized');
-});
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeScrapSelects);
+
+// También inicializar cuando se navega con Turbo (para Rails 7+)
+document.addEventListener('turbo:load', initializeScrapSelects);
 </script>
