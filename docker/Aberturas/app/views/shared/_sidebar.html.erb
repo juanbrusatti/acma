@@ -21,34 +21,14 @@
           </svg>
           Pagina Principal
         <% end %>
-        <!-- Sección Stock - Deshabilitada -->
-        <%# Stock (deshabilitado). Para habilitar cambiar hay que eliminar el bloque condicional incluyendo el placeholder. %>
-        <% if false %>
-          <%= link_to glassplates_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path == glassplates_path ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-            Stock
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5 ml-auto">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-          <% end %>
-        <% else %>
-          <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 cursor-not-allowed" title="En desarrollo - Próximamente">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-            <span>Stock</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5 ml-auto">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-          </div>
+        <!-- Stock Section - Enabled -->
+        <%= link_to glassplates_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path == glassplates_path ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+          Stock
         <% end %>
 
         <%= link_to projects_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{current_page?(projects_path) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
@@ -62,19 +42,15 @@
           Proyectos
         <% end %>
 
-        <!-- Sección Optimizador - Deshabilitada -->
-        <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 cursor-not-allowed" title="En desarrollo - Próximamente">
+        <!-- Optimizer Section - Enabled styling but non-functional -->
+        <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M6 8L2 12L6 16"></path>
             <path d="M22 12L18 8L22 12L18 16"></path>
             <path d="M22 4L12 14L2 24"></path>
             <path d="M2 4L12 14L22 24"></path>
           </svg>
-          <span>Optimizador</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5 ml-auto">
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
+          Optimizador
         </div>
 
         <%= link_to glass_prices_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{current_page?(glass_prices_path) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
