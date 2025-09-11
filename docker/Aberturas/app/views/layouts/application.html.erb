@@ -49,8 +49,8 @@
           glass_type: gp.glass_type,
           thickness: gp.thickness,
           color: gp.color,
-          price: gp.price.to_f,
-          price_m2: gp.price_m2.to_f
+          price: gp.price&.to_f || 0.0,
+          price_m2: gp.price_m2&.to_f || 0.0
         }
       }.to_json.html_safe %>;
 
