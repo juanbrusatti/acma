@@ -12,25 +12,17 @@
     <%= glass_price.color %>
   </p>
   <p class="my-5">
-    <strong class="block font-medium mb-1">Precio de compra:</strong>
-    <% if glass_price.buying_price.present? && glass_price.buying_price > 0 %>
-      <%= format_argentine_currency(glass_price.buying_price, unit: "$", precision: 2) %>
+    <strong class="block font-medium mb-1">Precio:</strong>
+    <% if glass_price.price.present? && glass_price.price > 0 %>
+      <%= format_argentine_currency(glass_price.price, unit: "$", precision: 2) %>
     <% else %>
       N/A
     <% end %>
   </p>
   <p class="my-5">
-    <strong class="block font-medium mb-1">%:</strong>
-    <% if glass_price.percentage.present? %>
-      <%= number_with_precision(glass_price.percentage, precision: 1) %> %
-    <% else %>
-      N/A
-    <% end %>
-  </p>
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Precio de venta:</strong>
-    <% if glass_price.selling_price.present? && glass_price.selling_price > 0 %>
-      <%= format_argentine_currency(glass_price.selling_price, unit: "$", precision: 2) %>
+    <strong class="block font-medium mb-1">Precio por m²:</strong>
+    <% if glass_price.price_m2.present? && glass_price.price_m2 > 0 %>
+      <%= format_argentine_currency(glass_price.price_m2, unit: "$", precision: 2) %>
     <% else %>
       N/A
     <% end %>
