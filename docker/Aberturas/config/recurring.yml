@@ -1,10 +1,18 @@
-# production:
-#   periodic_cleanup:
-#     class: CleanSoftDeletedRecordsJob
-#     queue: background
-#     args: [ 1000, { batch_size: 500 } ]
-#     schedule: every hour
-#   periodic_command:
-#     command: "SoftDeletedRecord.due.delete_all"
-#     priority: 2
-#     schedule: at 5am every day
+# Configuración de tareas recurrentes para producción
+production:
+  update_official_rate_daily:
+    class: UpdateOfficialRateJob
+    queue: default
+    schedule: at 9:00am every weekday  # Lunes a viernes a las 9:00 AM
+  
+  update_official_rate_weekend:
+    class: UpdateOfficialRateJob
+    queue: default
+    schedule: at 10:00am every saturday  # Sábados a las 10:00 AM
+
+# Configuración para desarrollo (opcional)
+development:
+  update_official_rate_test:
+    class: UpdateOfficialRateJob
+    queue: default
+    schedule: every 1 hour  # Para testing, cada hora

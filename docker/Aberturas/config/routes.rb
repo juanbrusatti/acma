@@ -27,6 +27,11 @@ Rails.application.routes.draw do
     collection do
       patch :update_all_percentages
       patch :update_all_supplies_mep
+      post :update_mep_from_api
+      get :mep_history
+      patch :update_all_supplies_official
+      post :update_official_from_api
+      get :official_history
     end
   end
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

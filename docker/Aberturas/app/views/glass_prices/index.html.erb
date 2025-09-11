@@ -74,15 +74,17 @@
           <p class="text-sm text-gray-500">Edite el precio de cada insumo adicional.</p>
         </div>
 
-        <!-- MEP Dollar Update Form - Similar to percentage form -->
-        <%= form_with url: update_all_supplies_mep_glass_prices_path, method: :patch, local: false,
-                      class: "flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200",
-                      data: {
-                        turbo: true,
-                        turbo_method: "patch",
-                        controller: "mep-form",
-                        action: "submit->mep-form#submit"
-                      } do |form| %>
+        <!-- MEP Controls Section -->
+        <div class="flex items-center gap-3">
+          <!-- MEP Dollar Update Form - Similar to percentage form -->
+          <%= form_with url: update_all_supplies_mep_glass_prices_path, method: :patch, local: false,
+                        class: "flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200",
+                        data: {
+                          turbo: true,
+                          turbo_method: "patch",
+                          controller: "mep-form",
+                          action: "submit->mep-form#submit"
+                        } do |form| %>
 
           <!-- Form Label Section with Icon and Text -->
           <div class="flex items-center gap-2">
@@ -115,7 +117,34 @@
                           class: "px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
                           data: { "mep-form-target": "submit" } %>
 
-        <% end %>
+          <% end %>
+
+          <!-- Additional MEP Controls -->
+          <div class="flex gap-2">
+            <!-- Update from API Button -->
+            <%= link_to update_mep_from_api_glass_prices_path, 
+                method: :post, 
+                class: "px-3 py-2 text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
+                data: { 
+                  confirm: "¿Está seguro que desea actualizar el dólar MEP desde la API?",
+                  turbo_method: "post"
+                } do %>
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              API
+            <% end %>
+
+            <!-- History Button -->
+            <%= link_to mep_history_glass_prices_path, 
+                class: "px-3 py-2 text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200" do %>
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Historial
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Supplies Table Section -->

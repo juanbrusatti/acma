@@ -123,4 +123,74 @@ class AppConfig < ApplicationRecord
       set_innertube_price(size, price)
     end
   end
+
+  # Get the current official rate
+  def self.current_official_rate
+    config = find_by(key: 'official_rate')
+    config&.value&.to_f || 0.0
+  end
+
+  # Set the current official rate
+  def self.set_official_rate(rate)
+    config = find_or_initialize_by(key: 'official_rate')
+    config.value = rate.to_s
+    config.save!
+    rate.to_f
+  end
+
+  # Check if official rate is set
+  def self.official_rate_set?
+    current_official_rate > 0
+  end
+
+  # Official Rate History methods
+  def self.get_official_rate_for_date(date)
+    OfficialRateHistory.find_by(date: date)&.rate || current_official_rate
+  end
+
+  def self.get_previous_day_official_rate
+    OfficialRateHistory.previous_day_rate || current_official_rate
+  end
+
+  def self.get_today_official_rate
+    OfficialRateHistory.today_rate || current_official_rate
+  end
+
+  def self.official_rate_history_statistics(days: 30)
+    OfficialRateHistory.statistics(days: days)
+  end
+
+  def self.last_official_rate_update
+    OfficialRateHistory.recent.first&.created_at
+  end
+
+  def self.official_rate_change_percentage
+    current = get_today_official_rate
+    previous = get_previous_day_official_rate
+    
+    return 0.0 if previous.zero?
+    
+    ((current - previous) / previous * 100).round(2)
+  end
+
+  def self.format_official_rate_change
+    change = official_rate_change_percentage
+    return "Sin cambios" if change.zero?
+    
+    direction = change > 0 ? "↑" : "↓"
+    "#{direction} #{change.abs}%"
+  end
+
+  # Mantener compatibilidad con métodos anteriores (deprecated)
+  def self.current_mep_rate
+    current_official_rate
+  end
+
+  def self.set_mep_rate(rate)
+    set_official_rate(rate)
+  end
+
+  def self.mep_rate_set?
+    official_rate_set?
+  end
 end

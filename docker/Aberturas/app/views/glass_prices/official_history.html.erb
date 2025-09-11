@@ -1,0 +1,122 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Historial del Dólar Oficial</h1>
+      <div class="flex gap-4">
+        <%= link_to "Actualizar desde API", update_official_from_api_glass_prices_path, 
+            method: :post, 
+            class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+            data: { confirm: "¿Está seguro que desea actualizar el dólar oficial desde la API?" } %>
+        <%= link_to "Volver a Precios", glass_prices_path, 
+            class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+      </div>
+    </div>
+
+    <!-- Estadísticas actuales -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <h3 class="text-sm font-medium text-blue-600">Cotización Actual</h3>
+        <p class="text-2xl font-bold text-blue-800">$<%= number_with_precision(@current_rate, precision: 2) %></p>
+      </div>
+      
+      <div class="bg-green-50 p-4 rounded-lg">
+        <h3 class="text-sm font-medium text-green-600">Cambio vs Ayer</h3>
+        <p class="text-2xl font-bold text-green-800">
+          <% if @change_percentage > 0 %>
+            ↑ <%= number_with_precision(@change_percentage, precision: 2) %>%
+          <% elsif @change_percentage < 0 %>
+            ↓ <%= number_with_precision(@change_percentage.abs, precision: 2) %>%
+          <% else %>
+            Sin cambios
+          <% end %>
+        </p>
+      </div>
+      
+      <div class="bg-purple-50 p-4 rounded-lg">
+        <h3 class="text-sm font-medium text-purple-600">Promedio 30 días</h3>
+        <p class="text-2xl font-bold text-purple-800">$<%= number_with_precision(@statistics[:average_rate], precision: 2) %></p>
+      </div>
+      
+      <div class="bg-orange-50 p-4 rounded-lg">
+        <h3 class="text-sm font-medium text-orange-600">Volatilidad</h3>
+        <p class="text-2xl font-bold text-orange-800">$<%= number_with_precision(@statistics[:volatility], precision: 2) %></p>
+      </div>
+    </div>
+
+    <!-- Tabla de historial -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cotización</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fuente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notas</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actualizado</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @history.each do |record| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= record.date.strftime("%d/%m/%Y") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="font-mono text-lg">$<%= number_with_precision(record.rate, precision: 2) %></span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <%= record.source %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <% if record.manual? %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    Manual
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Automático
+                  </span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                <%= record.notes.present? ? record.notes : "-" %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= record.created_at.strftime("%d/%m/%Y %H:%M") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @history.empty? %>
+      <div class="text-center py-8">
+        <p class="text-gray-500 text-lg">No hay historial de cotizaciones disponible.</p>
+        <p class="text-gray-400 text-sm mt-2">Haga clic en "Actualizar desde API" para obtener la primera cotización.</p>
+      </div>
+    <% end %>
+
+    <!-- Información adicional -->
+    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">Información del Sistema</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+        <div>
+          <strong>Actualización automática:</strong> Lunes a viernes a las 9:00 AM, sábados a las 10:00 AM
+        </div>
+        <div>
+          <strong>APIs utilizadas:</strong> DolarAPI Oficial (principal), BCRA (respaldo)
+        </div>
+        <div>
+          <strong>Registros mostrados:</strong> Últimos 30 días
+        </div>
+        <div>
+          <strong>Precisión:</strong> 2 decimales
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
