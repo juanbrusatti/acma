@@ -74,16 +74,16 @@
           <p class="text-sm text-gray-500">Edite el precio de cada insumo adicional.</p>
         </div>
 
-        <!-- MEP Controls Section -->
+        <!-- Official Rate Controls Section -->
         <div class="flex items-center gap-3">
-          <!-- MEP Dollar Update Form - Similar to percentage form -->
-          <%= form_with url: update_all_supplies_mep_glass_prices_path, method: :patch, local: false,
+          <!-- Official Rate Update Form - Similar to percentage form -->
+          <%= form_with url: update_all_supplies_official_glass_prices_path, method: :patch, local: false,
                         class: "flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200",
                         data: {
                           turbo: true,
                           turbo_method: "patch",
-                          controller: "mep-form",
-                          action: "submit->mep-form#submit"
+                          controller: "official-form",
+                          action: "submit->official-form#submit"
                         } do |form| %>
 
           <!-- Form Label Section with Icon and Text -->
@@ -92,22 +92,22 @@
             <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
             </svg>
-            <label for="mep_rate_input" class="text-sm font-medium text-green-900 whitespace-nowrap">
-              Dólar MEP:
+            <label for="official_rate_input" class="text-sm font-medium text-green-900 whitespace-nowrap">
+              Dólar Oficial:
             </label>
           </div>
 
           <!-- Input Field Section with Dollar Symbol -->
           <div class="flex items-center gap-2">
-            <!-- Number input for MEP rate value -->
-            <%= form.number_field :mep_rate,
-                                  id: "mep_rate_input",
+            <!-- Number input for official rate value -->
+            <%= form.number_field :official_rate,
+                                  id: "official_rate_input",
                                   step: 0.01,
                                   min: 0,
-                                  value: AppConfig.current_mep_rate > 0 ? AppConfig.current_mep_rate : nil,
+                                  value: AppConfig.current_official_rate > 0 ? AppConfig.current_official_rate : nil,
                                   placeholder: "0.00",
                                   class: "w-28 px-3 py-2 text-sm font-medium text-center border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm transition-all duration-200",
-                                  data: { "mep-form-target": "input" } %>
+                                  data: { "official-form-target": "input" } %>
             <!-- Dollar symbol for visual reference -->
             <span class="text-sm font-medium text-green-700">ARS</span>
           </div>
@@ -115,18 +115,18 @@
           <!-- Submit Button with Gradient and Hover Effects -->
           <%= form.submit "Actualizar",
                           class: "px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
-                          data: { "mep-form-target": "submit" } %>
+                          data: { "official-form-target": "submit" } %>
 
           <% end %>
 
-          <!-- Additional MEP Controls -->
+          <!-- Additional Official Rate Controls -->
           <div class="flex gap-2">
             <!-- Update from API Button -->
-            <%= link_to update_mep_from_api_glass_prices_path, 
+            <%= link_to update_official_from_api_glass_prices_path, 
                 method: :post, 
                 class: "px-3 py-2 text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200",
                 data: { 
-                  confirm: "¿Está seguro que desea actualizar el dólar MEP desde la API?",
+                  confirm: "¿Está seguro que desea actualizar el dólar oficial desde la API?",
                   turbo_method: "post"
                 } do %>
               <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@
             <% end %>
 
             <!-- History Button -->
-            <%= link_to mep_history_glass_prices_path, 
+            <%= link_to official_history_glass_prices_path, 
                 class: "px-3 py-2 text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200" do %>
               <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>

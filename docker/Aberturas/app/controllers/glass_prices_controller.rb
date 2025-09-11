@@ -64,8 +64,8 @@ class GlassPricesController < ApplicationController
   #   # TODO: Implementar nueva funcionalidad de precios
   # end
 
-  # PATCH /glass_prices/update_all_supplies_mep
-  def update_all_supplies_mep
+  # PATCH /glass_prices/update_all_supplies_official
+  def update_all_supplies_official
     mep_rate = params[:mep_rate].to_f
     
     if mep_rate > 0
@@ -103,8 +103,8 @@ class GlassPricesController < ApplicationController
     end
   end
 
-  # POST /glass_prices/update_mep_from_api
-  def update_mep_from_api
+  # POST /glass_prices/update_official_from_api
+  def update_official_from_api
     begin
       # Obtener cotización desde la API
       api_result = OfficialRateApiService.get_current_official_rate
@@ -164,8 +164,8 @@ class GlassPricesController < ApplicationController
     end
   end
 
-  # GET /glass_prices/mep_history
-  def mep_history
+  # GET /glass_prices/official_history
+  def official_history
     @history = OfficialRateHistory.recent.limit(30)
     @statistics = OfficialRateHistory.statistics(days: 30)
     @current_rate = AppConfig.current_official_rate
