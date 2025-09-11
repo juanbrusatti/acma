@@ -10,10 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_catalog.plpgsql"
-
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
@@ -22,7 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
   end
 
   create_table "dvhs", force: :cascade do |t|
-    t.bigint "project_id", null: false
+    t.integer "project_id", null: false
     t.integer "innertube"
     t.float "height"
     t.float "width"
@@ -36,8 +33,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "typology"
-    t.bigint "scrap1_id"
-    t.bigint "scrap2_id"
+    t.integer "scrap1_id"
+    t.integer "scrap2_id"
     t.string "type_opening"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
     t.index ["scrap1_id"], name: "index_dvhs_on_scrap1_id"
@@ -48,10 +45,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.decimal "price"
-    t.decimal "price_m2"
+    t.decimal "buying_price"
+    t.decimal "selling_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "percentage", precision: 5, scale: 2
   end
 
   create_table "glasscuttings", force: :cascade do |t|
@@ -61,11 +59,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
     t.string "glass_type"
     t.string "thickness"
     t.decimal "price"
-    t.bigint "project_id", null: false
+    t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sequential_id"
     t.string "typology"
-    t.bigint "scrap_id"
+    t.integer "scrap_id"
     t.string "type_opening"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
     t.index ["scrap_id"], name: "index_glasscuttings_on_scrap_id"
@@ -83,18 +82,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
     t.float "quantity"
   end
 
-  create_table "official_rate_histories", force: :cascade do |t|
-    t.decimal "rate", precision: 10, scale: 2, null: false
-    t.string "source", null: false
-    t.date "date", null: false
-    t.text "notes"
-    t.boolean "is_manual", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["date"], name: "index_official_rate_histories_on_date", unique: true
-    t.index ["source"], name: "index_official_rate_histories_on_source"
-  end
-
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -105,6 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_194904) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.decimal "price"
+    t.decimal "price_without_iva"
   end
 
   create_table "scraps", force: :cascade do |t|

@@ -160,12 +160,12 @@ sample_prices = {
 # Create all glassprice registers
 sample_prices.each do |combination, price_m2|
   glass_price = GlassPrice.find_or_initialize_by(combination)
-  # Using buying_price and percentage to calculate selling_price based on the GlassPrice model
-  glass_price.buying_price = price_m2
-  glass_price.percentage = 20 # Setting a 20% markup
+  # Using price and price_m2 columns (20% markup applied)
+  glass_price.price = price_m2 * 1.20  # Precio con 20% de ganancia
+  glass_price.price_m2 = price_m2 * 1.20  # Precio por m² con 20% de ganancia
 
   if glass_price.save
-    puts "✅ Precio creado: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]} - $#{price_m2}/m²"
+    puts "✅ Precio creado: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]} - $#{price_m2 * 1.20}/m²"
   else
     puts "❌ Error creando precio para: #{combination[:glass_type]} #{combination[:thickness]} #{combination[:color]}"
     puts "   Errores: #{glass_price.errors.full_messages.join(', ')}"
