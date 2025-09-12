@@ -1,0 +1,257 @@
+<% content_for :title, "Cotizaciones Oficiales del Dólar" %>
+
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Cotizaciones Oficiales del Dólar</h1>
+          <p class="mt-2 text-gray-600">Sistema automatizado de actualización de cotizaciones del Banco Nación</p>
+        </div>
+        
+        <!-- Status Badge -->
+        <div class="flex items-center gap-4">
+          <% if @system_active %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              Sistema Activo
+            </span>
+          <% else %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              Sistema Inactivo
+            </span>
+          <% end %>
+          
+          <!-- Manual Update Button -->
+          <%= link_to "Actualizar Manualmente", 
+                      update_manual_official_rates_path, 
+                      method: :post,
+                      class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                      data: { 
+                        confirm: "¿Está seguro que desea actualizar la cotización oficial manualmente?",
+                        turbo_method: :post
+                      } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Rates Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Today's Rate -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Cotización de Hoy</dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  <% if @today_rate %>
+                    ARS $<%= number_with_delimiter(@today_rate, delimiter: '.') %>
+                  <% else %>
+                    No disponible
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yesterday's Rate -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Cotización de Ayer</dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  <% if @yesterday_rate %>
+                    ARS $<%= number_with_delimiter(@yesterday_rate, delimiter: '.') %>
+                  <% else %>
+                    No disponible
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest Rate -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Última Cotización</dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  <% if @latest_rate %>
+                    ARS $<%= number_with_delimiter(@latest_rate, delimiter: '.') %>
+                  <% else %>
+                    No disponible
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <% if @month_stats.any? %>
+      <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Estadísticas del Último Mes</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900">
+                ARS $<%= number_with_delimiter(@month_stats[:min_rate], delimiter: '.') %>
+              </div>
+              <div class="text-sm text-gray-500">Cotización Mínima</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900">
+                ARS $<%= number_with_delimiter(@month_stats[:max_rate], delimiter: '.') %>
+              </div>
+              <div class="text-sm text-gray-500">Cotización Máxima</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900">
+                ARS $<%= number_with_delimiter(@month_stats[:avg_rate]&.round(2), delimiter: '.') %>
+              </div>
+              <div class="text-sm text-gray-500">Promedio</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900">
+                <%= @month_stats[:significant_changes] %>
+              </div>
+              <div class="text-sm text-gray-500">Cambios Significativos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- History Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Historial de Cotizaciones</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Registro completo de todas las cotizaciones oficiales</p>
+      </div>
+      
+      <% if @official_rates.any? %>
+        <ul class="divide-y divide-gray-200">
+          <% @official_rates.each do |rate| %>
+            <li>
+              <%= link_to official_rate_path(rate), class: "block hover:bg-gray-50" do %>
+                <div class="px-4 py-4 sm:px-6">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <% if rate.significant_change? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <%= rate.formatted_change_percentage %>
+                          </span>
+                        <% elsif rate.change_percentage.present? && rate.change_percentage != 0 %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <%= rate.formatted_change_percentage %>
+                          </span>
+                        <% else %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Sin cambio
+                          </span>
+                        <% end %>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          <%= rate.formatted_rate %>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          <%= rate.rate_date.strftime("%d/%m/%Y") %> - <%= rate.source.humanize %>
+                          <% if rate.manual_update? %>
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              Manual
+                            </span>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-center">
+                      <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+        
+        <!-- Paginación simple -->
+        <% if @total_pages > 1 %>
+          <div class="px-4 py-3 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-gray-500">
+                Mostrando <%= (@current_page - 1) * 20 + 1 %>-<%= [@current_page * 20, @total_count].min %> de <%= @total_count %> registros
+              </div>
+              <div class="flex items-center space-x-2">
+                <% if @current_page > 1 %>
+                  <%= link_to "← Anterior", official_rates_path(page: @current_page - 1), 
+                              class: "px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200" %>
+                <% end %>
+                
+                <span class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded">
+                  Página <%= @current_page %> de <%= @total_pages %>
+                </span>
+                
+                <% if @current_page < @total_pages %>
+                  <%= link_to "Siguiente →", official_rates_path(page: @current_page + 1), 
+                              class: "px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="px-4 py-8 sm:px-6 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No hay cotizaciones</h3>
+          <p class="mt-1 text-sm text-gray-500">Aún no se han registrado cotizaciones oficiales.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- API Status Link -->
+    <div class="mt-8 text-center">
+      <%= link_to "Ver Estado de las APIs", 
+                  api_status_official_rates_path, 
+                  class: "text-blue-600 hover:text-blue-500 text-sm font-medium" %>
+    </div>
+  </div>
+</div>
