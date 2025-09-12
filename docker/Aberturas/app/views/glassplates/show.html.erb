@@ -3,14 +3,14 @@
 <div class="flex min-h-screen w-full flex-col">
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
-      <h1 class="text-2xl font-semibold">Detalles del Material</h1>
-      <div class="ml-auto flex space-x-2">
+      <h1 class="text-2xl font-semibold">Detalles de la Plancha</h1>
+      <div class="flex gap-2 ml-auto">
         <%= link_to edit_glassplate_path(@glassplate), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
             <path d="m15 5 4 4"></path>
           </svg>
-          Editar
+          Editar Plancha
         <% end %>
         <%= link_to glassplates_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
@@ -23,27 +23,22 @@
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
-      <!-- Información Principal -->
+      <!-- Información General -->
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="p-6">
           <div class="mb-4">
-            <h3 class="text-lg font-semibold">Información del Material</h3>
-            <p class="text-sm text-muted-foreground">Detalles básicos del material en stock.</p>
+            <h3 class="text-lg font-semibold">Información General</h3>
+            <p class="text-sm text-muted-foreground">Características principales del material.</p>
           </div>
 
           <div class="space-y-4">
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">ID:</span>
-              <span class="text-sm"><%= @glassplate.id %></span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Tipo:</span>
-              <span class="text-sm font-medium"><%= @glassplate.glass_type %></span>
+              <span class="text-sm"><%= @glassplate.glass_type %></span>
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Espesor:</span>
+              <span class="text-sm font-medium text-muted-foreground">Grosor:</span>
               <span class="text-sm"><%= @glassplate.thickness %></span>
             </div>
 
@@ -53,36 +48,19 @@
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Estado:</span>
-              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
-                Disponible
-              </span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Tipo de Material:</span>
-              <span class="text-sm">Plancha Completa</span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Cantidad:</span>
               <span class="text-sm"><%= @glassplate.quantity %></span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Eliminado:</span>
-              <span class="text-sm"><%= @glassplate.deleted? ? 'Sí' : 'No' %></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Medidas y Ubicación -->
+      <!-- Medidas -->
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="p-6">
           <div class="mb-4">
-            <h3 class="text-lg font-semibold">Medidas y Ubicación</h3>
-            <p class="text-sm text-muted-foreground">Dimensiones y ubicación física del material.</p>
+            <h3 class="text-lg font-semibold">Medidas</h3>
+            <p class="text-sm text-muted-foreground">Dimensiones del material.</p>
           </div>
 
           <div class="space-y-4">
@@ -94,16 +72,6 @@
             <div class="flex justify-between items-center py-2 border-b">
               <span class="text-sm font-medium text-muted-foreground">Alto:</span>
               <span class="text-sm"><%= @glassplate.height %> mm</span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Medidas:</span>
-              <span class="text-sm font-medium"><%= @glassplate.width %> x <%= @glassplate.height %> mm</span>
-            </div>
-
-            <div class="flex justify-between items-center py-2 border-b">
-              <span class="text-sm font-medium text-muted-foreground">Ubicación:</span>
-              <span class="text-sm">Almacén Principal</span>
             </div>
 
             <div class="flex justify-between items-center py-2 border-b">

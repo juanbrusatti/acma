@@ -11,8 +11,18 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 scrap-fields" id="scrap-fields-debug">
-    <div class="space-y-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 scrap-fields" id="scrap-fields-debug">
+    <div class="space-y-4">
+      <%= form.label :ref_number, "Número de referencia", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.text_field :ref_number, placeholder: "ej: REF001", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :output_work, "Obra de salida", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.text_field :output_work, placeholder: "ej: Obra ABC", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
       <label for="scrap_scrap_type">Tipo</label>
       <select name="scrap[scrap_type]" id="scrap_scrap_type" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-type-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
         <option value="">Seleccionar tipo</option>
@@ -46,27 +56,14 @@
       <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>
 
-    <div class="space-y-2">
-      <%= form.label :ref_number, "Número de Referencia", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-      <%= form.text_field :ref_number, placeholder: "ej: REF-001", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-    </div>
-
-    <div class="space-y-2">
-      <%= form.label :output_work, "Obra", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-      <%= form.text_field :output_work, placeholder: "ej: Casa Rodriguez", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-    </div>
-
-    <div class="space-y-2">
-      <label for="scrap_status">Estado</label>
-      <select name="scrap[status]" id="scrap_status" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-        <option value="">Seleccionar estado</option>
-        <option value="Disponible">Disponible</option>
-        <option value="Reservado">Reservado</option>
-      </select>
+    <div class="space-y-4">
+      <%= form.label :status, "Estado", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.select :status, options_for_select([["Disponible", "Disponible"], ["Reservado", "Reservado"]], scrap.status), {}, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>
   </div>
 
-  <div class="flex justify-end space-x-3 pt-4 border-t">
+  <div class="flex justify-end space-x-3 pt-6 border-t">
+    <%= link_to "Cancelar", glassplates_path, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" %>
     <%= form.submit "Guardar Retazo", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
   </div>
 <% end %>

@@ -1,0 +1,211 @@
+<% content_for :title, "Estado de las APIs" %>
+
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Estado de las APIs</h1>
+          <p class="mt-2 text-gray-600">Monitoreo del estado de las APIs de cotización del dólar oficial</p>
+        </div>
+        
+        <!-- Back Button -->
+        <%= link_to "← Volver a Cotizaciones", 
+                    official_rates_path, 
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+
+    <!-- Overall Status -->
+    <div class="bg-white shadow rounded-lg mb-8">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <% if @api_status[:overall_status] == 'operational' %>
+              <svg class="h-8 w-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            <% else %>
+              <svg class="h-8 w-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            <% end %>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-gray-900">
+              Estado General: 
+              <span class="<%= @api_status[:overall_status] == 'operational' ? 'text-green-600' : 'text-red-600' %>">
+                <%= @api_status[:overall_status] == 'operational' ? 'Operacional' : 'No Operacional' %>
+              </span>
+            </h3>
+            <p class="text-sm text-gray-500">
+              Última verificación: <%= @api_status[:last_check].strftime("%d/%m/%Y %H:%M:%S") %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Primary API (DolarAPI) -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900">API Principal</h3>
+            <% if @api_status[:primary_api][:status] == 'available' %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Disponible
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                No Disponible
+              </span>
+            <% end %>
+          </div>
+          
+          <div class="space-y-3">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Nombre</dt>
+              <dd class="text-sm text-gray-900"><%= @api_status[:primary_api][:name] %></dd>
+            </div>
+            
+            <div>
+              <dt class="text-sm font-medium text-gray-500">URL</dt>
+              <dd class="text-sm text-gray-900 break-all">
+                <a href="<%= @api_status[:primary_api][:url] %>" 
+                   target="_blank" 
+                   class="text-blue-600 hover:text-blue-500">
+                  <%= @api_status[:primary_api][:url] %>
+                </a>
+              </dd>
+            </div>
+            
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Estado</dt>
+              <dd class="text-sm text-gray-900">
+                <span class="<%= @api_status[:primary_api][:status] == 'available' ? 'text-green-600' : 'text-red-600' %>">
+                  <%= @api_status[:primary_api][:status] == 'available' ? 'Disponible' : 'No Disponible' %>
+                </span>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup API (BCRA) -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900">API de Respaldo</h3>
+            <% if @api_status[:backup_api][:status] == 'available' %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Disponible
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                No Disponible
+              </span>
+            <% end %>
+          </div>
+          
+          <div class="space-y-3">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Nombre</dt>
+              <dd class="text-sm text-gray-900"><%= @api_status[:backup_api][:name] %></dd>
+            </div>
+            
+            <div>
+              <dt class="text-sm font-medium text-gray-500">URL</dt>
+              <dd class="text-sm text-gray-900 break-all">
+                <a href="<%= @api_status[:backup_api][:url] %>" 
+                   target="_blank" 
+                   class="text-blue-600 hover:text-blue-500">
+                  <%= @api_status[:backup_api][:url] %>
+                </a>
+              </dd>
+            </div>
+            
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Estado</dt>
+              <dd class="text-sm text-gray-900">
+                <span class="<%= @api_status[:backup_api][:status] == 'available' ? 'text-green-600' : 'text-red-600' %>">
+                  <%= @api_status[:backup_api][:status] == 'available' ? 'Disponible' : 'No Disponible' %>
+                </span>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability Details -->
+    <div class="mt-8 bg-white shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Detalles de Disponibilidad</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-sm font-medium text-gray-500 mb-2">DolarAPI</h4>
+            <div class="flex items-center">
+              <% if @availability[:dolarapi] %>
+                <svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm text-green-600">Respondiendo correctamente</span>
+              <% else %>
+                <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm text-red-600">No responde o error</span>
+              <% end %>
+            </div>
+          </div>
+          
+          <div>
+            <h4 class="text-sm font-medium text-gray-500 mb-2">BCRA</h4>
+            <div class="flex items-center">
+              <% if @availability[:bcra] %>
+                <svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm text-green-600">Respondiendo correctamente</span>
+              <% else %>
+                <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm text-red-600">No responde o error</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800">Información del Sistema</h3>
+          <div class="mt-2 text-sm text-blue-700">
+            <ul class="list-disc list-inside space-y-1">
+              <li>El sistema utiliza <strong>DolarAPI</strong> como fuente principal de cotizaciones</li>
+              <li>En caso de falla, automáticamente recurre a la <strong>API del BCRA</strong></li>
+              <li>Las actualizaciones automáticas se ejecutan de lunes a viernes a las 9:00 AM y los sábados a las 10:00 AM</li>
+              <li>Los domingos no se ejecutan actualizaciones automáticas (mercado cerrado)</li>
+              <li>Se detectan cambios significativos cuando la variación supera el 5%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

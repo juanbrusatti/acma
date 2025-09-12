@@ -1,4 +1,9 @@
-/* Application styles */
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "dashboard";
+@import "quantity_controls";
 
 @layer base {
   :root {

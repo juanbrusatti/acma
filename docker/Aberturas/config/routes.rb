@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
-  resources :scraps
-  resources :supplies
 
+  resources :official_rates, only: [:index, :show] do
+    collection do
+      post :update_manual
+      get :api_status
+    end
+  end
+  resources :scraps, except: [:show, :index]
+
+  resources :supplies
   resources :glassplates
 
   get "static_pages/home"
