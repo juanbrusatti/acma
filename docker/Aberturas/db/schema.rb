@@ -36,8 +36,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_122241) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "typology"
-    t.bigint "scrap1_id"
-    t.bigint "scrap2_id"
+    t.integer "scrap1_id"
+    t.integer "scrap2_id"
     t.string "type_opening"
     t.index ["project_id"], name: "index_dvhs_on_project_id"
     t.index ["scrap1_id"], name: "index_dvhs_on_scrap1_id"
@@ -48,10 +48,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_122241) do
     t.string "color"
     t.string "glass_type"
     t.string "thickness"
-    t.decimal "price"
-    t.decimal "price_m2"
+    t.decimal "buying_price"
+    t.decimal "selling_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "percentage", precision: 5, scale: 2
   end
 
   create_table "glasscuttings", force: :cascade do |t|
@@ -61,11 +62,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_122241) do
     t.string "glass_type"
     t.string "thickness"
     t.decimal "price"
-    t.bigint "project_id", null: false
+    t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "typology"
-    t.bigint "scrap_id"
+    t.integer "scrap_id"
     t.string "type_opening"
     t.index ["project_id"], name: "index_glasscuttings_on_project_id"
     t.index ["scrap_id"], name: "index_glasscuttings_on_scrap_id"
@@ -108,6 +109,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_122241) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.decimal "price"
+    t.decimal "price_without_iva"
   end
 
   create_table "scraps", force: :cascade do |t|
