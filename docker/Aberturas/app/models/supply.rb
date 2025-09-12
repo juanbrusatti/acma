@@ -35,8 +35,12 @@ class Supply < ApplicationRecord
 
   # Automatically calculate peso price when USD price changes
   def calculate_peso_price_if_needed
-    if price_usd_changed? && price_usd.present? && AppConfig.mep_rate_set?
-      self.price_peso = calculate_peso_price_from_usd(AppConfig.current_mep_rate)
+    if price_usd_changed? && price_usd.present?
+      # Usar la cotización oficial del día anterior para cálculos de precios
+      rate = AppConfig.current_official_rate_for_pricing
+      if rate > 0
+        self.price_peso = calculate_peso_price_from_usd(rate)
+      end
     end
   end
 end

@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  resources :official_rates, only: [:index, :show] do
+    collection do
+      post :update_manual
+      get :api_status
+    end
+  end
   resources :scraps
   resources :supplies
   resources :glassplates

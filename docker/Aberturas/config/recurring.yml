@@ -1,10 +1,26 @@
-# production:
-#   periodic_cleanup:
-#     class: CleanSoftDeletedRecordsJob
-#     queue: background
-#     args: [ 1000, { batch_size: 500 } ]
-#     schedule: every hour
-#   periodic_command:
-#     command: "SoftDeletedRecord.due.delete_all"
-#     priority: 2
-#     schedule: at 5am every day
+production:
+  update_official_rate_weekdays:
+    class: UpdateOfficialRateJob
+    queue: default
+    args: ['automatic']
+    schedule: at 9:00am on weekdays
+  update_official_rate_saturday:
+    class: UpdateOfficialRateJob
+    queue: default
+    args: ['automatic']
+    schedule: at 10:00am on saturday
+
+development:
+  update_official_rate_weekdays:
+    class: UpdateOfficialRateJob
+    queue: default
+    args: ['automatic']
+    schedule: at 9:00am on weekdays
+  update_official_rate_saturday:
+    class: UpdateOfficialRateJob
+    queue: default
+    args: ['automatic']
+    schedule: at 10:00am on saturday
+
+test:
+  # No scheduled jobs in test environment

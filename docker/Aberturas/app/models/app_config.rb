@@ -21,6 +21,29 @@ class AppConfig < ApplicationRecord
     current_mep_rate > 0
   end
 
+  # Get the official rate for pricing calculations (yesterday's rate)
+  def self.current_official_rate_for_pricing
+    # Usar la cotización del día anterior para calcular precios de hoy
+    yesterday_rate = OfficialRateHistory.yesterday_rate
+    
+    if yesterday_rate && yesterday_rate > 0
+      yesterday_rate
+    else
+      # Fallback al MEP rate actual si no hay cotización oficial del día anterior
+      current_mep_rate
+    end
+  end
+
+  # Get today's official rate (for tomorrow's pricing)
+  def self.current_official_rate_today
+    OfficialRateHistory.today_rate || current_mep_rate
+  end
+
+  # Check if official rate system is active
+  def self.official_rate_system_active?
+    OfficialRateHistory.exists?
+  end
+
   # Innertube (air chamber) prices methods
   def self.get_innertube_price(size)
     config = find_by(key: "innertube_price_#{size}")
