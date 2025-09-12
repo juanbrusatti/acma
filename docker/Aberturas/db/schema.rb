@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_11_235808) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "app_configs", force: :cascade do |t|
     t.string "key"
     t.string "value"
@@ -19,7 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
   end
 
   create_table "dvhs", force: :cascade do |t|
-    t.integer "project_id", null: false
+    t.bigint "project_id", null: false
     t.integer "innertube"
     t.float "height"
     t.float "width"
@@ -62,7 +65,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
     t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "sequential_id"
     t.string "typology"
     t.integer "scrap_id"
     t.string "type_opening"
@@ -80,6 +82,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_194828) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "quantity"
+  end
+
+  create_table "official_rate_histories", force: :cascade do |t|
+    t.decimal "rate", precision: 10, scale: 2, null: false
+    t.string "source", null: false
+    t.date "date", null: false
+    t.text "notes"
+    t.boolean "is_manual", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_official_rate_histories_on_date", unique: true
+    t.index ["source"], name: "index_official_rate_histories_on_source"
   end
 
   create_table "projects", force: :cascade do |t|
