@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   resources :official_rates, only: [:index, :show] do
     collection do
       post :update_manual
@@ -6,6 +7,9 @@ Rails.application.routes.draw do
     end
   end
   resources :scraps
+
+  resources :scraps, except: [:show, :index]
+
   resources :supplies
   resources :glassplates
 
