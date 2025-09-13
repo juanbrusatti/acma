@@ -56,12 +56,12 @@ class ProjectsController < ApplicationController
 
   def update
     @project = Project.find(params[:id])
-    
+
     # Log the parameters for debugging
     Rails.logger.info "Update params: #{params[:project]}"
     Rails.logger.info "Glasscuttings attributes: #{params[:project][:glasscuttings_attributes]}"
     Rails.logger.info "DVHs attributes: #{params[:project][:dvhs_attributes]}"
-    
+
     if @project.update(project_params)
       Rails.logger.info "Project updated successfully"
       respond_to do |format|
@@ -77,7 +77,7 @@ class ProjectsController < ApplicationController
     else
       Rails.logger.error "Project update failed: #{@project.errors.full_messages}"
       respond_to do |format|
-        format.html { 
+        format.html {
           # Redirect back to edit form with errors
           redirect_to new_project_path(project_id: @project.id), alert: "Error al actualizar: #{@project.errors.full_messages.join(', ')}"
         }
@@ -171,6 +171,30 @@ class ProjectsController < ApplicationController
     end
   end
 
+  # Optimize the project using the python microservice
+  def optimize
+    @project = Project.find(params[:id])
+    require 'net/http'
+    optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
+    uri = URI.parse(optimizer_url)
+    begin
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.read_timeout = 180
+      req = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(req)
+      if response.code.to_i == 200
+        data = response.body
+        send_data data, filename: "cutting_plan_visuals.zip", type: 'application/zip', disposition: 'attachment'
+      else
+        Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
+        redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
+      end
+    rescue => e
+      Rails.logger.error "Optimizer request error: #{e.message}"
+      redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
+    end
+  end
+
   private
 
   def project_basic_params
@@ -205,20 +229,20 @@ class ProjectsController < ApplicationController
         :price
       ]
     )
-    
+
     # Handle glasscuttings_attributes manually
     if params[:project][:glasscuttings_attributes].present?
       glasscuttings_attrs = {}
       params[:project][:glasscuttings_attributes].each do |key, value|
         glasscuttings_attrs[key] = value.permit(
-          :id, :_destroy, :glass_type, :thickness, :height, :width, 
+          :id, :_destroy, :glass_type, :thickness, :height, :width,
           :color, :typology, :price, :type_opening
         ) if value.is_a?(ActionController::Parameters)
       end
       permitted[:glasscuttings_attributes] = glasscuttings_attrs
     end
-    
-    # Handle dvhs_attributes manually  
+
+    # Handle dvhs_attributes manually
     if params[:project][:dvhs_attributes].present?
       dvhs_attrs = {}
       params[:project][:dvhs_attributes].each do |key, value|
@@ -230,7 +254,7 @@ class ProjectsController < ApplicationController
       end
       permitted[:dvhs_attributes] = dvhs_attrs
     end
-    
+
     permitted
   end
 end

@@ -76,6 +76,27 @@
   }
 }
 
+/* Optimize button (no @apply to avoid PostCSS/Tailwind processing issues) */
+.btn-optimize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem; /* rounded-md */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  font-weight: 500; /* font-medium */
+  color: #ffffff;
+  height: 2.5rem; /* h-10 */
+  padding: 0 1.5rem; /* px-6 */
+  /* Intermediate gray between dark primary (#171717 approx from hsl(var(--primary))) and light border/input grays */
+  background-color: #303133; /* base */
+  transition: background-color 150ms, filter 150ms;
+}
+.btn-optimize:hover { background-color: #51565b; }
+.btn-optimize:active { background-color: #464b50; }
+.btn-optimize:focus { outline: 2px solid #464b50; outline-offset: 2px; }
+
 .pagination {
   display: flex;
   gap: 0.25rem; /* gap-1 en Tailwind */

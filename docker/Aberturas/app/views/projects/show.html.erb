@@ -5,10 +5,10 @@
       <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
         <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
       <% end %>
-      <%= button_to project_path(@project), 
-                  method: :delete, 
-                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2", 
-                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.", 
+      <%= button_to project_path(@project),
+                  method: :delete,
+                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2",
+                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.",
                           turbo_method: :delete },
                   title: "Eliminar proyecto" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,6 +79,7 @@
 
   <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-between" id="project-actions-view">
     <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
+    <%= button_to "Optimizar Corte", optimize_project_path(@project), method: :post, data: { turbo: false }, class: "btn-optimize text-primary-foreground" %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
   <div class="mt-8 flex flex-col sm:flex-row gap-4" id="project-actions-edit" style="display:none;">
