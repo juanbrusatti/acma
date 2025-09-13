@@ -37,6 +37,23 @@ services:
     networks:
       - acma_net
 
+  optimizer:
+    build:
+      context: .
+      dockerfile: ./optimizer/Dockerfile
+    container_name: optimizer
+    working_dir: /app
+    volumes:
+      - ./optimizer:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    profiles: ["development", "production"]
+    networks:
+      - acma_net
+
 volumes:
   pgdata:
 
