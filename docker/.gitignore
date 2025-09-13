@@ -12,3 +12,7 @@ tmp/
 
 # Backup files
 backup_*.sql
+
+optimizer/__pycache__
+optimizer/output_plan
+optimizer/output_visuals
