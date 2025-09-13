@@ -17,7 +17,7 @@
     <link rel="shortcut icon" href="<%= asset_path('logo-ar-transparente.png') %>" type="image/png">
     <link rel="apple-touch-icon" sizes="192x192" href="<%= asset_path('logo-ar-transparente.png') %>">
     <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('logo-ar-transparente.png') %>">
-    
+
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
@@ -31,16 +31,7 @@
         <%= render 'shared/sidebar' %>
       </div>
       <div class="flex-1 ml-64 overflow-y-auto">
-        <% if flash[:notice] %>
-          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
-            <%= flash[:notice] %>
-          </div>
-        <% end %>
-        <% if flash[:alert] %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
-            <%= flash[:alert] %>
-          </div>
-        <% end %>
+  <%= render 'shared/flash' %>
         <%= yield %>
       </div>
     </div>
