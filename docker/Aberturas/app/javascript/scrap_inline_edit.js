@@ -367,9 +367,16 @@ class ScrapInlineEditor {
     const inputs = row.querySelectorAll('input, select');
     inputs.forEach(input => {
       if (input.name && input.value !== '') {
+        console.log('Adding field:', input.name, '=', input.value); // Debug
         formData.append(`scrap[${input.name}]`, input.value);
       }
     });
+    
+    // Log de todos los datos que se van a enviar
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, ':', value);
+    }
     
     // Enviar datos al servidor
     fetch(`/scraps/${this.originalData.id}`, {
@@ -381,10 +388,15 @@ class ScrapInlineEditor {
       }
     })
     .then(response => {
+      console.log('Response status:', response.status); // Debug
       if (response.ok) {
         return response.json();
+      } else {
+        return response.text().then(text => {
+          console.error('Server response:', text); // Debug
+          throw new Error(`HTTP ${response.status}: ${text}`);
+        });
       }
-      throw new Error('Error al guardar');
     })
     .then(data => {
       console.log('Scrap saved successfully:', data);
@@ -394,7 +406,7 @@ class ScrapInlineEditor {
     })
     .catch(error => {
       console.error('Error saving scrap:', error);
-      this.showMessage('Error al actualizar el retazo', 'error');
+      this.showMessage(`Error al actualizar el retazo: ${error.message}`, 'error');
     });
   }
 

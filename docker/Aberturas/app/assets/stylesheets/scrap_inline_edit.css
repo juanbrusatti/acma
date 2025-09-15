@@ -5,11 +5,15 @@
 .scrap-inline-edit input[type="text"],
 .scrap-inline-edit input[type="number"],
 .scrap-inline-edit select {
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  min-height: 3rem;
+  width: 100%;
+  background-color: #ffffff;
+  transition: all 0.2s ease-in-out;
 }
 
 .scrap-inline-edit input[type="text"]:focus,
@@ -17,7 +21,8 @@
 .scrap-inline-edit select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  transform: scale(1.02);
 }
 
 /* Estilos específicos para selects de retazos */
@@ -25,7 +30,8 @@
 .scrap-thickness-select,
 .scrap-color-select,
 .scrap-status-select {
-  min-width: 80px;
+  min-width: 120px;
+  min-height: 2.5rem;
 }
 
 /* Estilos para los botones de acción */
@@ -54,13 +60,15 @@
 /* Estilos para campos de entrada numérica */
 .scrap-inline-edit input[type="number"] {
   text-align: center;
-  min-width: 80px;
+  min-width: 100px;
+  min-height: 2.5rem;
 }
 
 /* Estilos para campos de texto */
 .scrap-inline-edit input[type="text"] {
   text-align: center;
-  min-width: 100px;
+  min-width: 120px;
+  min-height: 2.5rem;
 }
 
 /* Estilos para el estado de edición */
@@ -70,7 +78,9 @@
 }
 
 .scrap-inline-edit td {
-  padding: 0.5rem;
+  padding: 1rem;
+  vertical-align: middle;
+  min-height: 4rem;
 }
 
 /* Animaciones suaves */
