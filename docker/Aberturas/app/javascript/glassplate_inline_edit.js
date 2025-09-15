@@ -39,14 +39,23 @@ class GlassplateInlineEditor {
     document.querySelectorAll('.edit-glassplate-btn').forEach(btn => {
       // Remover listeners existentes para evitar duplicados
       btn.removeEventListener('click', this.handleEditClick);
-      btn.addEventListener('click', (e) => this.handleEditClick(e));
+      btn.addEventListener('click', (e) => this.handleEditClick(e), true); // true = capture phase
     });
   }
 
   handleEditClick(e) {
     e.preventDefault();
-    console.log('Edit button clicked'); // Debug
+    e.stopPropagation(); // Evitar que otros sistemas capturen el evento
+    console.log('🎯 Glassplate edit button clicked - OUR SYSTEM'); // Debug
+    
     const row = e.target.closest('tr');
+    console.log('Row found:', row); // Debug
+    
+    if (!row) {
+      console.error('❌ No se pudo encontrar la fila (tr)');
+      return;
+    }
+    
     this.startEdit(row);
   }
 
@@ -59,11 +68,29 @@ class GlassplateInlineEditor {
     this.editingRow = row;
     this.originalData = this.extractRowData(row);
     console.log('Original data:', this.originalData); // Debug
+    
+    if (!this.originalData) {
+      console.error('❌ No se pudo extraer los datos de la fila');
+      return;
+    }
+    
     this.convertToEditMode(row);
   }
 
   extractRowData(row) {
+    if (!row) {
+      console.error('❌ extractRowData: row es null');
+      return null;
+    }
+    
     const cells = row.querySelectorAll('td');
+    console.log('Cells found:', cells.length); // Debug
+    
+    if (cells.length < 6) {
+      console.error('❌ extractRowData: No hay suficientes celdas (td)');
+      return null;
+    }
+    
     return {
       id: row.dataset.glassplateId,
       glass_type: cells[0].textContent.trim(),
