@@ -39,7 +39,7 @@ class GlassplateInlineEditor {
     document.querySelectorAll('.edit-glassplate-btn').forEach(btn => {
       // Remover listeners existentes para evitar duplicados
       btn.removeEventListener('click', this.handleEditClick);
-      btn.addEventListener('click', this.handleEditClick.bind(this));
+      btn.addEventListener('click', (e) => this.handleEditClick(e));
     });
   }
 
@@ -58,6 +58,7 @@ class GlassplateInlineEditor {
     console.log('Starting edit mode'); // Debug
     this.editingRow = row;
     this.originalData = this.extractRowData(row);
+    console.log('Original data:', this.originalData); // Debug
     this.convertToEditMode(row);
   }
 
@@ -78,22 +79,22 @@ class GlassplateInlineEditor {
     const cells = row.querySelectorAll('td');
     
     // Tipo de vidrio
-    cells[0].innerHTML = this.createTypeSelect(this.originalData.glass_type);
+    this.createTypeSelectInCell(cells[0], this.originalData.glass_type);
     
     // Grosor
-    cells[1].innerHTML = this.createThicknessSelect(this.originalData.thickness);
+    this.createThicknessSelectInCell(cells[1], this.originalData.thickness, this.originalData.glass_type);
     
     // Color
-    cells[2].innerHTML = this.createColorSelect(this.originalData.color);
+    this.createColorSelectInCell(cells[2], this.originalData.color, this.originalData.glass_type, this.originalData.thickness);
     
     // Ancho
-    cells[3].innerHTML = this.createNumberInput('width', this.originalData.width);
+    this.createNumberInputInCell(cells[3], 'width', this.originalData.width);
     
     // Alto
-    cells[4].innerHTML = this.createNumberInput('height', this.originalData.height);
+    this.createNumberInputInCell(cells[4], 'height', this.originalData.height);
     
     // Cantidad
-    cells[5].innerHTML = this.createNumberInput('quantity', this.originalData.quantity, 0);
+    this.createNumberInputInCell(cells[5], 'quantity', this.originalData.quantity, 0);
     
     // Acciones
     cells[6].innerHTML = this.createActionButtons();
@@ -102,7 +103,10 @@ class GlassplateInlineEditor {
     this.setupDependentSelects(row);
   }
 
-  createTypeSelect(currentValue) {
+  createTypeSelectInCell(cell, currentValue) {
+    console.log('Creating type select in cell:', currentValue); // Debug
+    cell.innerHTML = '';
+    
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-type-select';
     select.name = 'glass_type';
@@ -120,10 +124,13 @@ class GlassplateInlineEditor {
       select.appendChild(option);
     });
     
-    return select.outerHTML;
+    cell.appendChild(select);
   }
 
-  createThicknessSelect(currentValue) {
+  createThicknessSelectInCell(cell, currentValue, currentType) {
+    console.log('Creating thickness select in cell:', { currentValue, currentType }); // Debug
+    cell.innerHTML = '';
+    
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-thickness-select';
     select.name = 'thickness';
@@ -133,10 +140,28 @@ class GlassplateInlineEditor {
     defaultOption.textContent = 'Seleccionar';
     select.appendChild(defaultOption);
     
-    return select.outerHTML;
+    // Llenar con opciones disponibles para el tipo actual
+    if (this.glassOptions[currentType]) {
+      const grosores = Object.keys(this.glassOptions[currentType]);
+      console.log('Available thicknesses for', currentType, ':', grosores); // Debug
+      grosores.forEach(grosor => {
+        const opt = document.createElement('option');
+        opt.value = grosor;
+        opt.textContent = grosor;
+        opt.selected = grosor === currentValue;
+        select.appendChild(opt);
+      });
+    } else {
+      console.log('No glass options found for type:', currentType); // Debug
+    }
+    
+    cell.appendChild(select);
   }
 
-  createColorSelect(currentValue) {
+  createColorSelectInCell(cell, currentValue, currentType, currentThickness) {
+    console.log('Creating color select in cell:', { currentValue, currentType, currentThickness }); // Debug
+    cell.innerHTML = '';
+    
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-color-select';
     select.name = 'color';
@@ -146,7 +171,37 @@ class GlassplateInlineEditor {
     defaultOption.textContent = 'Seleccionar';
     select.appendChild(defaultOption);
     
-    return select.outerHTML;
+    // Llenar con opciones disponibles para el tipo y grosor actuales
+    if (this.glassOptions[currentType] && this.glassOptions[currentType][currentThickness]) {
+      const colores = this.glassOptions[currentType][currentThickness];
+      console.log('Available colors for', currentType, currentThickness, ':', colores); // Debug
+      colores.forEach(color => {
+        const opt = document.createElement('option');
+        opt.value = color;
+        opt.textContent = color;
+        opt.selected = color === currentValue;
+        select.appendChild(opt);
+      });
+    } else {
+      console.log('No color options found for:', currentType, currentThickness); // Debug
+    }
+    
+    cell.appendChild(select);
+  }
+
+  createNumberInputInCell(cell, name, value, min = 0.01) {
+    console.log('Creating number input in cell:', { name, value }); // Debug
+    cell.innerHTML = '';
+    
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.name = name;
+    input.value = value;
+    input.min = min;
+    input.step = name === 'quantity' ? '1' : '0.01';
+    input.className = 'w-full border rounded px-2 py-1 text-center';
+    
+    cell.appendChild(input);
   }
 
   createNumberInput(name, value, min = 0.01) {
@@ -184,9 +239,12 @@ class GlassplateInlineEditor {
     
     if (!typeSelect || !thicknessSelect || !colorSelect) return;
     
-    // Función para actualizar grosores
+    // Función para actualizar grosores cuando cambia el tipo
     const updateThicknessOptions = () => {
       const tipo = typeSelect.value;
+      const currentThickness = thicknessSelect.value;
+      const currentColor = colorSelect.value;
+      
       thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
       colorSelect.innerHTML = '<option value="">Seleccionar</option>';
       
@@ -196,36 +254,46 @@ class GlassplateInlineEditor {
           const opt = document.createElement('option');
           opt.value = grosor;
           opt.textContent = grosor;
-          if (grosor === this.originalData.thickness) {
-            opt.selected = true;
-          }
+          // Mantener el grosor actual si está disponible en el nuevo tipo
+          opt.selected = grosor === currentThickness;
           thicknessSelect.appendChild(opt);
         });
+        
+        // Si el grosor actual no está disponible en el nuevo tipo, seleccionar el primero
+        if (!grosores.includes(currentThickness) && grosores.length > 0) {
+          thicknessSelect.value = grosores[0];
+        }
+        
+        // Actualizar colores después de cambiar grosor
+        updateColorOptions();
       }
     };
     
-    // Función para actualizar colores
+    // Función para actualizar colores cuando cambia el grosor
     const updateColorOptions = () => {
       const tipo = typeSelect.value;
       const grosor = thicknessSelect.value;
+      const currentColor = colorSelect.value;
+      
       colorSelect.innerHTML = '<option value="">Seleccionar</option>';
       
       if (this.glassOptions[tipo] && this.glassOptions[tipo][grosor]) {
-        this.glassOptions[tipo][grosor].forEach(color => {
+        const colores = this.glassOptions[tipo][grosor];
+        colores.forEach(color => {
           const opt = document.createElement('option');
           opt.value = color;
           opt.textContent = color;
-          if (color === this.originalData.color) {
-            opt.selected = true;
-          }
+          // Mantener el color actual si está disponible para el nuevo grosor
+          opt.selected = color === currentColor;
           colorSelect.appendChild(opt);
         });
+        
+        // Si el color actual no está disponible para el nuevo grosor, seleccionar el primero
+        if (!colores.includes(currentColor) && colores.length > 0) {
+          colorSelect.value = colores[0];
+        }
       }
     };
-    
-    // Inicializar con valores actuales
-    updateThicknessOptions();
-    updateColorOptions();
     
     // Event listeners
     typeSelect.addEventListener('change', updateThicknessOptions);
