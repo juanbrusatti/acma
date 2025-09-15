@@ -1,0 +1,128 @@
+/* scrap_inline_edit.css */
+/* Estilos para la edición inline de retazos */
+
+/* Estilos para los campos de entrada en modo edición */
+.scrap-inline-edit input[type="text"],
+.scrap-inline-edit input[type="number"],
+.scrap-inline-edit select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.scrap-inline-edit input[type="text"]:focus,
+.scrap-inline-edit input[type="number"]:focus,
+.scrap-inline-edit select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Estilos específicos para selects de retazos */
+.scrap-type-select,
+.scrap-thickness-select,
+.scrap-color-select,
+.scrap-status-select {
+  min-width: 80px;
+}
+
+/* Estilos para los botones de acción */
+.scrap-inline-edit .save-scrap-btn,
+.scrap-inline-edit .cancel-scrap-btn {
+  transition: all 0.15s ease-in-out;
+}
+
+.scrap-inline-edit .save-scrap-btn:hover {
+  transform: scale(1.05);
+}
+
+.scrap-inline-edit .cancel-scrap-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Estilos para el botón de editar */
+.edit-scrap-btn {
+  transition: all 0.15s ease-in-out;
+}
+
+.edit-scrap-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Estilos para campos de entrada numérica */
+.scrap-inline-edit input[type="number"] {
+  text-align: center;
+  min-width: 80px;
+}
+
+/* Estilos para campos de texto */
+.scrap-inline-edit input[type="text"] {
+  text-align: center;
+  min-width: 100px;
+}
+
+/* Estilos para el estado de edición */
+.scrap-inline-edit tr {
+  background-color: #f8fafc;
+  border: 2px solid #3b82f6;
+}
+
+.scrap-inline-edit td {
+  padding: 0.5rem;
+}
+
+/* Animaciones suaves */
+.scrap-inline-edit * {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilos para mensajes de estado */
+.scrap-message {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 500;
+  z-index: 50;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Estilos para el estado de carga */
+.scrap-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.scrap-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #3b82f6;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
