@@ -2,7 +2,7 @@
 
 <div class="min-h-screen bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
+
     <!-- Header Section -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -10,7 +10,7 @@
           <h1 class="text-3xl font-bold text-gray-900">Cotizaciones Oficiales del Dólar</h1>
           <p class="mt-2 text-gray-600">Sistema automatizado de actualización de cotizaciones del Banco Nación</p>
         </div>
-        
+
         <!-- Status Badge -->
         <div class="flex items-center gap-4">
           <% if @system_active %>
@@ -28,13 +28,13 @@
               Sistema Inactivo
             </span>
           <% end %>
-          
+
           <!-- Manual Update Button -->
-          <%= link_to "Actualizar Manualmente", 
-                      update_manual_official_rates_path, 
+          <%= link_to "Actualizar Manualmente",
+                      update_manual_official_rates_path,
                       method: :post,
                       class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-                      data: { 
+                      data: {
                         confirm: "¿Está seguro que desea actualizar la cotización oficial manualmente?",
                         turbo_method: :post
                       } %>
@@ -161,7 +161,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">Historial de Cotizaciones</h3>
         <p class="mt-1 max-w-2xl text-sm text-gray-500">Registro completo de todas las cotizaciones oficiales</p>
       </div>
-      
+
       <% if @official_rates.any? %>
         <ul class="divide-y divide-gray-200">
           <% @official_rates.each do |rate| %>
@@ -210,7 +210,7 @@
             </li>
           <% end %>
         </ul>
-        
+
         <!-- Paginación simple -->
         <% if @total_pages > 1 %>
           <div class="px-4 py-3 sm:px-6">
@@ -220,16 +220,16 @@
               </div>
               <div class="flex items-center space-x-2">
                 <% if @current_page > 1 %>
-                  <%= link_to "← Anterior", official_rates_path(page: @current_page - 1), 
+                  <%= link_to "← Anterior", official_rates_path(page: @current_page - 1),
                               class: "px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200" %>
                 <% end %>
-                
+
                 <span class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded">
                   Página <%= @current_page %> de <%= @total_pages %>
                 </span>
-                
+
                 <% if @current_page < @total_pages %>
-                  <%= link_to "Siguiente →", official_rates_path(page: @current_page + 1), 
+                  <%= link_to "Siguiente →", official_rates_path(page: @current_page + 1),
                               class: "px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200" %>
                 <% end %>
               </div>
@@ -249,8 +249,8 @@
 
     <!-- API Status Link -->
     <div class="mt-8 text-center">
-      <%= link_to "Ver Estado de las APIs", 
-                  api_status_official_rates_path, 
+      <%= link_to "Ver Estado de las APIs",
+                  api_status_official_rates_path,
                   class: "text-blue-600 hover:text-blue-500 text-sm font-medium" %>
     </div>
   </div>

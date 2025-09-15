@@ -7,20 +7,20 @@ class OfficialRatesController < ApplicationController
     page = 1 if page < 1
     per_page = 20
     offset = (page - 1) * per_page
-    
+
     @official_rates = OfficialRateHistory.recent.limit(per_page).offset(offset)
     @total_count = OfficialRateHistory.count
     @current_page = page
     @total_pages = (@total_count.to_f / per_page).ceil
-    
+
     @latest_rate = OfficialRateHistory.latest_rate
     @yesterday_rate = OfficialRateHistory.yesterday_rate
     @today_rate = OfficialRateHistory.today_rate
     @system_active = AppConfig.official_rate_system_active?
-    
+
     # Estadísticas del último mes
     @month_stats = OfficialRateHistory.statistics_for_period(
-      1.month.ago.to_date, 
+      1.month.ago.to_date,
       Date.current
     )
   end
@@ -34,25 +34,20 @@ class OfficialRatesController < ApplicationController
     begin
       # Ejecutar el job de actualización manualmente
       UpdateOfficialRateJob.perform_now('manual')
-      
+
       respond_to do |format|
-        format.html { redirect_to official_rates_path, notice: "Cotización oficial actualizada manualmente." }
-        format.json { render json: { success: true, message: "Cotización oficial actualizada manualmente." } }
-        format.turbo_stream { 
-          flash.now[:notice] = "Cotización oficial actualizada manualmente."
-          render turbo_stream: turbo_stream.replace("flash", partial: "shared/flash")
-        }
+            # HTML y JSON: establecen flash; en Turbo usamos solo redirect sin duplicar flash.
+      format.html { redirect_to glass_prices_path, notice: "Cotización oficial actualizada manualmente." }
+      format.json { render json: { success: true, message: "Cotización oficial actualizada manualmente." } }
+      format.turbo_stream { redirect_to glass_prices_path, status: :see_other, notice: "Cotización oficial actualizada manualmente." }
       end
     rescue => e
       Rails.logger.error "Error en actualización manual: #{e.message}"
-      
+
       respond_to do |format|
-        format.html { redirect_to official_rates_path, alert: "Error al actualizar la cotización: #{e.message}" }
-        format.json { render json: { success: false, message: "Error al actualizar la cotización: #{e.message}" } }
-        format.turbo_stream {
-          flash.now[:alert] = "Error al actualizar la cotización: #{e.message}"
-          render turbo_stream: turbo_stream.replace("flash", partial: "shared/flash")
-        }
+  format.html { redirect_to glass_prices_path, alert: "Error al actualizar la cotización: #{e.message}" }
+  format.json { render json: { success: false, message: "Error al actualizar la cotización: #{e.message}" } }
+  format.turbo_stream { redirect_to glass_prices_path, status: :see_other, alert: "Error al actualizar la cotización: #{e.message}" }
       end
     end
   end
