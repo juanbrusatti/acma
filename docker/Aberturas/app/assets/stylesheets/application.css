@@ -4,6 +4,7 @@
 @import "tailwindcss/utilities";
 @import "dashboard";
 @import "quantity_controls";
+@import "glassplate_inline_edit";
 
 @layer base {
   :root {

@@ -9,6 +9,7 @@ import { setupAllGlassplateSelects } from "glassplate_selects"
 import { setupAllScrapSelects } from "scrap_selects"
 import "delete_confirmation"
 import "quantity_editor"
+import "glassplate_inline_edit"
 
 document.addEventListener("turbo:load", () => {
 	// Inicializar selects dinámicos para glassplates y scraps
