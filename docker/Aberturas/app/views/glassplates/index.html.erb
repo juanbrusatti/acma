@@ -120,24 +120,28 @@
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
                 <% @glassplates&.each do |glassplate| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50">
+                  <tr class="border-b transition-colors hover:bg-muted/50" data-glassplate-id="<%= glassplate.id %>">
                     <td class="px-4 py-2 text-center"><%= glassplate.glass_type %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.thickness %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.color %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.width %></td>
                     <td class="px-4 py-2 text-center"><%= glassplate.height %></td>
-                    <td class="px-4 py-2 text-center"><%= glassplate.quantity.to_i %></td>
                     <td class="px-4 py-2 text-center">
-                      <%= link_to edit_glassplate_path(glassplate), class: "w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center", title: "Editar" do %>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                      <% end %>
-                      <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: '¿Estás seguro?' }, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center", title: "Eliminar" do %>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg>
-                      <% end %>
+                      <span class="text-lg font-medium"><%= glassplate.quantity.to_i %></span>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                      <div class="flex gap-2 justify-center">
+                        <button type="button" class="edit-glassplate-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                        </button>
+                        <%= link_to glassplate_path(glassplate), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: glassplate_path(glassplate), type: "plancha" } do %>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                          </svg>
+                        <% end %>
+                      </div>
                     </td>
                   </tr>
                 <% end %>
@@ -152,7 +156,7 @@
         <div class="p-6">
           <div class="mb-4">
             <h3 class="text-lg font-semibold">Retazos</h3>
-            <p class="text-sm text-muted-foreground">Listado de retazos.</p>
+            <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
           </div>
 
           <div class="relative w-full overflow-auto">
@@ -172,26 +176,32 @@
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
                 <% @scraps&.each do |scrap| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50">
+                  <tr class="border-b transition-colors hover:bg-muted/50" data-scrap-id="<%= scrap.id %>">
                     <td class="px-4 py-2 text-center"><%= scrap.ref_number %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.scrap_type %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.thickness %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.color %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.width %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.height %></td>
-                    <td class="px-4 py-2 text-center"><%= scrap.status %></td>
+                    <td class="px-4 py-2 text-center">
+                      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= scrap.status == "Disponible" ? 'border-transparent bg-green-100 text-green-800' : 'border-transparent bg-yellow-100 text-yellow-800' %>">
+                        <%= scrap.status %>
+                      </span>
+                    </td>
                     <td class="px-4 py-2 text-center"><%= scrap.output_work %></td>
                     <td class="px-4 py-2 text-center">
-                      <%= link_to edit_scrap_path(scrap), class: "w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center", title: "Editar" do %>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                      <% end %>
-                      <%= link_to scrap_path(scrap), method: :delete, data: { confirm: '¿Estás seguro?' }, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center", title: "Eliminar" do %>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg>
-                      <% end %>
+                      <div class="flex gap-2 justify-center">
+                        <button type="button" class="edit-scrap-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                        </button>
+                        <%= link_to scrap_path(scrap), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: scrap_path(scrap), type: "retazo" } do %>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                          </svg>
+                        <% end %>
+                      </div>
                     </td>
                   </tr>
                 <% end %>
@@ -206,16 +216,37 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Función para inicializar el sistema de tabs
+function initializeTabs() {
+  console.log('🚀 Initializing tabs system');
+  
   const tabs = document.querySelectorAll('[data-tab]');
   const tabContents = document.querySelectorAll('.tab-content');
 
+  console.log('🔍 Found tabs:', tabs.length);
+  console.log('🔍 Found tab contents:', tabContents.length);
+
+  if (tabs.length === 0 || tabContents.length === 0) {
+    console.log('❌ Missing required tab elements');
+    return;
+  }
+
+  // Limpiar listeners existentes para evitar duplicados
   tabs.forEach(tab => {
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+  });
+
+  // Obtener los nuevos elementos después del reemplazo
+  const newTabs = document.querySelectorAll('[data-tab]');
+
+  newTabs.forEach(tab => {
     tab.addEventListener('click', function() {
+      console.log('📝 Tab clicked:', this.getAttribute('data-tab'));
       const targetTab = this.getAttribute('data-tab');
 
       // Update tab buttons
-      tabs.forEach(t => {
+      newTabs.forEach(t => {
         t.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
         t.classList.add('bg-background', 'text-muted-foreground');
       });
@@ -226,8 +257,38 @@ document.addEventListener('DOMContentLoaded', function() {
       tabContents.forEach(content => {
         content.classList.add('hidden');
       });
-      document.getElementById(targetTab + '-tab').classList.remove('hidden');
+      const targetContent = document.getElementById(targetTab + '-tab');
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
+        console.log('✅ Switched to tab:', targetTab);
+      } else {
+        console.log('❌ Target content not found:', targetTab + '-tab');
+      }
     });
   });
-});
+
+  console.log('✅ Tabs system initialized');
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeTabs);
+
+// También inicializar cuando se navega con Turbo (para Rails 7+)
+document.addEventListener('turbo:load', initializeTabs);
+</script>
+
+<script>
+// Debug script para verificar que el módulo se carga
+console.log('Glassplates page loaded');
+console.log('Edit buttons found:', document.querySelectorAll('.edit-glassplate-btn').length);
+
+// Verificar si el módulo se inicializó
+setTimeout(() => {
+  console.log('Checking if glassplate editor is initialized...');
+  if (window.glassplateEditor) {
+    console.log('✅ Glassplate editor is initialized');
+  } else {
+    console.log('❌ Glassplate editor not found');
+  }
+}, 1000);
 </script>

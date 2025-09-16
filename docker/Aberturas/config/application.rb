@@ -16,6 +16,9 @@ module Aberturas
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
     config.assets.paths << Rails.root.join("app/assets/builds")
+    
+    # Configuración de will_paginate
+    require 'will_paginate'
 
 
     # Configuration for the application, engines, and railties goes here.

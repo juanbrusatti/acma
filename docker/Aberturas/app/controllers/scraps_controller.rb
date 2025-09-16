@@ -1,14 +1,5 @@
 class ScrapsController < ApplicationController
-  before_action :set_scrap, only: %i[ show edit update destroy ]
-
-  # GET /scraps or /scraps.json
-  def index
-    @scraps = Scrap.all
-  end
-
-  # GET /scraps/1 or /scraps/1.json
-  def show
-  end
+  before_action :set_scrap, only: %i[ edit update destroy ]
 
   # GET /scraps/new
   def new
@@ -25,11 +16,11 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if @scrap.save
-        format.html { redirect_to @scrap, notice: "Scrap was successfully created." }
-        format.json { render :show, status: :created, location: @scrap }
+        format.html { redirect_to glassplates_path, notice: "Retazo agregado exitosamente al stock." }
+        format.json { render json: { status: 'success', message: 'Retazo agregado exitosamente.', scrap: @scrap }, status: :created }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @scrap.errors, status: :unprocessable_entity }
+        format.json { render json: { status: 'error', errors: @scrap.errors }, status: :unprocessable_entity }
       end
     end
   end
@@ -38,11 +29,11 @@ class ScrapsController < ApplicationController
   def update
     respond_to do |format|
       if @scrap.update(scrap_params)
-        format.html { redirect_to @scrap, notice: "Scrap was successfully updated." }
-        format.json { render :show, status: :ok, location: @scrap }
+        format.html { redirect_to glassplates_path, notice: "Retazo actualizado exitosamente." }
+        format.json { render json: { status: 'success', message: 'Retazo actualizado exitosamente.', scrap: @scrap } }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @scrap.errors, status: :unprocessable_entity }
+        format.json { render json: { status: 'error', errors: @scrap.errors }, status: :unprocessable_entity }
       end
     end
   end
@@ -52,7 +43,7 @@ class ScrapsController < ApplicationController
     @scrap.destroy!
 
     respond_to do |format|
-      format.html { redirect_to scraps_path, status: :see_other, notice: "Scrap was successfully destroyed." }
+      format.html { redirect_to glassplates_path, status: :see_other, notice: "Retazo eliminado exitosamente de la base de datos." }
       format.json { head :no_content }
     end
   end
@@ -60,11 +51,11 @@ class ScrapsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_scrap
-      @scrap = Scrap.find(params.expect(:id))
+      @scrap = Scrap.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.expect(scrap: [ :ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status ])
+      params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status)
     end
 end

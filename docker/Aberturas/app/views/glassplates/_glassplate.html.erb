@@ -60,7 +60,7 @@
       </svg>
     <% end %>
 
-    <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
+    <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro de que quieres eliminar esta plancha?\n\nTipo: #{glassplate.glass_type}\nGrosor: #{glassplate.thickness}\nColor: #{glassplate.color}\nDimensiones: #{glassplate.width}mm x #{glassplate.height}mm\nCantidad: #{glassplate.quantity}\n\nEsta acción no se puede deshacer." }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
         <path d="M3 6h18"></path>
         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
