@@ -95,8 +95,8 @@
 
           <!-- Barra de búsqueda -->
           <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-            <%= form_tag glassplates_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full" do %>
-              <%= hidden_field_tag :tab, params[:tab] %>
+            <%= form_tag glassplates_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full", id: "search-form" do %>
+              <%= hidden_field_tag :tab, params[:tab] || 'planchas', id: 'current-tab' %>
               <div class="relative w-full md:w-64">
                 <%= text_field_tag :search, params[:search], 
                     placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...", 
@@ -113,7 +113,7 @@
                   Buscar
                 </button>
                 <% if params[:search].present? %>
-                  <%= link_to "Limpiar", glassplates_path(tab: params[:tab]), class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300 flex-1 text-center" %>
+                  <%= link_to "Limpiar", glassplates_path(tab: params[:tab] || 'planchas'), class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300 flex-1 text-center" %>
                 <% end %>
               </div>
             <% end %>
@@ -281,6 +281,20 @@ function initializeTabs() {
     return;
   }
 
+  // Get active tab from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTabParam = urlParams.get('tab');
+  let initialTab = activeTabParam || 'planchas'; // Default to 'planchas'
+
+  console.log('URL tab parameter:', activeTabParam);
+  console.log('Initial tab:', initialTab);
+
+  // Ensure the initialTab exists, otherwise default to 'planchas'
+  if (!document.getElementById(`${initialTab}-tab`)) {
+    console.log('Tab not found, defaulting to planchas');
+    initialTab = 'planchas';
+  }
+
   // Limpiar listeners existentes para evitar duplicados
   tabs.forEach(tab => {
     const newTab = tab.cloneNode(true);
@@ -289,6 +303,28 @@ function initializeTabs() {
 
   // Obtener los nuevos elementos después del reemplazo
   const newTabs = document.querySelectorAll('[data-tab]');
+
+  // Set initial active tab based on URL parameter
+  newTabs.forEach(tab => {
+    if (tab.getAttribute('data-tab') === initialTab) {
+      tab.classList.add('bg-primary', 'text-primary-foreground', 'shadow-sm');
+      tab.classList.remove('bg-background', 'text-muted-foreground');
+      console.log('✅ Set initial active tab:', initialTab);
+    } else {
+      tab.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
+      tab.classList.add('bg-background', 'text-muted-foreground');
+    }
+  });
+
+  // Set initial tab content visibility
+  tabContents.forEach(content => {
+    if (content.id === `${initialTab}-tab`) {
+      content.classList.remove('hidden');
+      console.log('✅ Show initial content for tab:', initialTab);
+    } else {
+      content.classList.add('hidden');
+    }
+  });
 
   newTabs.forEach(tab => {
     tab.addEventListener('click', function() {
@@ -329,7 +365,7 @@ document.addEventListener('turbo:load', initializeTabs);
 // Función para actualizar el placeholder de búsqueda según el tab activo
 function updateSearchPlaceholder() {
   const searchInput = document.querySelector('input[name="search"]');
-  const activeTab = document.querySelector('.tab-button.active') || document.querySelector('[data-tab="planchas"]');
+  const activeTab = document.querySelector('[data-tab].bg-primary') || document.querySelector('[data-tab="planchas"]');
   
   if (searchInput && activeTab) {
     const tabType = activeTab.getAttribute('data-tab');
@@ -343,13 +379,39 @@ function updateSearchPlaceholder() {
 
 // Actualizar placeholder cuando se cambie de tab
 document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('tab-button')) {
+  if (e.target.hasAttribute('data-tab')) {
     setTimeout(updateSearchPlaceholder, 100); // Pequeño delay para que se actualice el tab
   }
 });
 
 // Inicializar placeholder al cargar
 document.addEventListener('turbo:load', updateSearchPlaceholder);
+
+// Función para actualizar el campo tab del formulario cuando se cambia de tab
+function updateSearchFormTab() {
+  const activeTab = document.querySelector('[data-tab].bg-primary');
+  const tabInput = document.getElementById('current-tab');
+  
+  if (activeTab && tabInput) {
+    const tabValue = activeTab.getAttribute('data-tab');
+    tabInput.value = tabValue;
+    console.log('✅ Updated search form tab to:', tabValue);
+  }
+}
+
+// Actualizar el campo tab cuando se cambie de tab
+document.addEventListener('click', function(e) {
+  if (e.target.hasAttribute('data-tab')) {
+    setTimeout(() => {
+      updateSearchFormTab();
+      updateSearchPlaceholder();
+    }, 100);
+  }
+});
+
+// Inicializar el campo tab al cargar
+document.addEventListener('turbo:load', updateSearchFormTab);
+document.addEventListener('DOMContentLoaded', updateSearchFormTab);
 </script>
 
 <script>
