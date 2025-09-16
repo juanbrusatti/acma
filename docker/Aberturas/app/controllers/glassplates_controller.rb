@@ -3,8 +3,32 @@ class GlassplatesController < ApplicationController
 
   # GET /glassplates or /glassplates.json
   def index
+    # Aplicar filtros si existen
     @glassplates = Glassplate.all
     @scraps = Scrap.all
+    
+    # Búsqueda unificada - busca en ambos tipos según el tab activo
+    if params[:search].present?
+      search_pattern = "%#{params[:search]}%"
+      
+      # Si estamos en tab de scraps, buscar solo en scraps
+      if params[:tab] == 'sobrantes'
+        @scraps = @scraps.where(
+          "scrap_type LIKE ? OR thickness LIKE ? OR color LIKE ? OR ref_number LIKE ?", 
+          search_pattern, search_pattern, search_pattern, search_pattern
+        )
+      else
+        # Si estamos en tab de glassplates o no hay tab específico, buscar solo en glassplates
+        @glassplates = @glassplates.where(
+          "glass_type LIKE ? OR thickness LIKE ? OR color LIKE ?", 
+          search_pattern, search_pattern, search_pattern
+        )
+      end
+    end
+    
+    # Aplicar paginación
+    @glassplates = @glassplates.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
+    @scraps = @scraps.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
   end
 
   # GET /glassplates/1 or /glassplates/1.json
