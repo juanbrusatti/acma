@@ -1,0 +1,7 @@
+Posibles problemas y su respectiva solución:
+
+1. Si al presionar el programa se abre y te aparece una ventana como "Sin conexión" o algo similar, tenes que ejecutar el start_server.bat. 
+2. Si el problema persiste, ejecuta el DockerStop.bat y luego el start_server.bat nuevamente. 
+3. Si el problema persiste, ejecutar el Docker Desktop y luego el start_server.bat nuevamente.
+4. Si el problema persiste, reiniciar la computadora.
+5. Ante cualquier duda comunicate con nosotros.
