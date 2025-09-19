@@ -49,7 +49,7 @@ class AppConfig
 end
 
 # Incluir el helper en el test
-class GlassPricesHelperTest < Minitest::Test
+class SimpleGlassPricesHelperTest < Minitest::Test
   include ActionView::Helpers::NumberHelper
   
   # Copiar el código del helper aquí para testing

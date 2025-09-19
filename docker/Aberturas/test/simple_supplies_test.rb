@@ -46,7 +46,7 @@ class Supply
 end
 
 # Incluir el helper en el test
-class SuppliesHelperTest < Minitest::Test
+class SimpleSuppliesHelperTest < Minitest::Test
   include ActionView::Helpers::NumberHelper
   
   # Copiar el código del helper aquí para testing

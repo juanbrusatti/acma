@@ -2,12 +2,14 @@
 
 one:
   rate: 9.99
-  source: MyString
+  source: TestSource1
+  rate_date: 2025-09-12
   updated_at: 2025-09-12 09:16:32
   manual_update: false
 
 two:
-  rate: 9.99
-  source: MyString
+  rate: 10.50
+  source: TestSource2
+  rate_date: 2025-09-13
   updated_at: 2025-09-12 09:16:32
   manual_update: false

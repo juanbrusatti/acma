@@ -27,7 +27,7 @@ module ActionView
 end
 
 # Incluir el helper en el test
-class CurrencyHelperTest < Minitest::Test
+class SimpleCurrencyHelperTest < Minitest::Test
   include ActionView::Helpers::NumberHelper
   
   # Copiar el código del helper aquí para testing

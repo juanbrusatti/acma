@@ -6,10 +6,8 @@ complete_sheet:
   color: INC
   glass_type: LAM
   thickness: 4+4
-  standard_measures: 600x400mm
-  location: Estante A
-  status: disponible
-  is_scrap: false
+  quantity: 1.0
+  deleted: false
 
 scrap:
   width: 300
@@ -17,10 +15,8 @@ scrap:
   color: INC
   glass_type: LAM
   thickness: 3+3
-  standard_measures: 300x200mm
-  location: Rack de sobrantes
-  status: disponible
-  is_scrap: true
+  quantity: 1.0
+  deleted: false
 
 available:
   width: 500
@@ -28,10 +24,8 @@ available:
   color: GRS
   glass_type: FLO
   thickness: 5mm
-  standard_measures: 500x300mm
-  location: Estante B
-  status: disponible
-  is_scrap: true
+  quantity: 1.0
+  deleted: false
 
 reserved:
   width: 400
@@ -39,10 +33,8 @@ reserved:
   color: BRC
   glass_type: FLO
   thickness: 5mm
-  standard_measures: 400x250mm
-  location: Estante C
-  status: reservado
-  is_scrap: true
+  quantity: 1.0
+  deleted: false
 
 # Legacy fixtures for backward compatibility
 one:
@@ -51,10 +43,8 @@ one:
   color: INC
   glass_type: LAM
   thickness: 3+3
-  standard_measures: 600x400mm
-  location: Estante A
-  status: disponible
-  is_scrap: false
+  quantity: 1.0
+  deleted: false
 
 two:
   width: 800
@@ -62,7 +52,5 @@ two:
   color: STG
   glass_type: COL
   thickness: 4+4
-  standard_measures: 800x600mm
-  location: Estante B
-  status: disponible
-  is_scrap: false
+  quantity: 1.0
+  deleted: false

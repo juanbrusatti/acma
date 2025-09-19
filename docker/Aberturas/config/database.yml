@@ -25,3 +25,8 @@ development:
   primary:
     <<: *default
     database: <%= ENV['DEV_POSTGRES_DB'] %>
+
+test:
+  primary:
+    <<: *default
+    database: <%= ENV['TEST_POSTGRES_DB'] || 'aberturas_test' %>
