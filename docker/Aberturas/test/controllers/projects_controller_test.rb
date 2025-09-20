@@ -10,30 +10,20 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
     GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
     
-    # Crear algunos glasscuttings y dvhs para el proyecto de prueba
-    @project.glasscuttings.create!(
-      glass_type: "FLO",
-      thickness: "5mm",
-      height: 1000,
-      width: 800,           
-      color: "INC",
-      typology: "V1",
-      price: 150.00
-    )
+    # Crear algunos glasscuttings para el proyecto de prueba (solo si no existen)
+    unless @project.glasscuttings.exists?
+      @project.glasscuttings.create!(
+        glass_type: "FLO",
+        thickness: "5mm",
+        height: 1000,
+        width: 800,           
+        color: "INC",
+        typology: "V1",
+        price: 150.00
+      )
+    end
     
-    @project.dvhs.create!(
-      innertube: 6,
-      typology: "V2",
-      height: 2000,
-      width: 900,
-      glasscutting1_type: "FLO",
-      glasscutting1_thickness: "5mm",
-      glasscutting1_color: "INC",
-      glasscutting2_type: "LAM",
-      glasscutting2_thickness: "4+4",
-      glasscutting2_color: "GRS",
-      price: 300.00
-    )
+    # Los DVHs ya están en los fixtures con type_opening configurado
   end
 
   test "should get index" do

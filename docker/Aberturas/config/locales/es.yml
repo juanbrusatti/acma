@@ -51,6 +51,8 @@ es:
         output_work: ""
         ref_number: ""
     errors:
+      messages:
+        record_invalid: "La validación falló: %{errors}"
       models:
         scrap:
           attributes:

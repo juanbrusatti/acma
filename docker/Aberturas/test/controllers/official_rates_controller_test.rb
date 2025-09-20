@@ -2,22 +2,22 @@ require "test_helper"
 
 class OfficialRatesControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
-    get official_rates_index_url
+    get official_rates_url
     assert_response :success
   end
 
   test "should get show" do
-    get official_rates_show_url
+    get official_rate_url(1)
     assert_response :success
   end
 
   test "should get update_manual" do
-    get official_rates_update_manual_url
+    get update_manual_official_rates_url
     assert_response :success
   end
 
   test "should get api_status" do
-    get official_rates_api_status_url
+    get api_status_official_rates_url
     assert_response :success
   end
 end
