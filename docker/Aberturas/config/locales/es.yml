@@ -129,6 +129,29 @@ es:
             status:
               blank: "El estado no puede estar en blanco"
               inclusion: "El estado debe ser uno de: Disponible, Reservado"
+        glassplate:
+          attributes:
+            glass_type:
+              blank: "El tipo de vidrio no puede estar en blanco"
+              inclusion: "El tipo de vidrio debe ser uno de: LAM, FLO, COL"
+            color:
+              blank: "El color no puede estar en blanco"
+              inclusion: "El color debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+            height:
+              blank: "El alto no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            thickness:
+              blank: "El espesor no puede estar en blanco"
+              inclusion: "El espesor debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+            quantity:
+              blank: "La cantidad no puede estar en blanco"
+              not_a_number: "La cantidad debe ser un número"
+              greater_than: "La cantidad debe ser mayor que 0"
     models:
       glasscutting: "Corte de vidrio"
       glasscuttings: "Cortes de vidrio"
