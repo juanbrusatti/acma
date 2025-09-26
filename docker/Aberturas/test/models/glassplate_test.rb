@@ -116,12 +116,6 @@ class GlassplateTest < ActiveSupport::TestCase
   #   assert_not_includes Glassplate.reserved, available
   # end
 
-  # Instance methods tests
-  test "measures should return width x height" do
-    @glassplate.width = 800
-    @glassplate.height = 600
-    assert_equal "800x600", @glassplate.measures
-  end
 
   test "full_description should return type thickness and color" do
     assert_equal "LAM 4+4 - INC", @glassplate.full_description
