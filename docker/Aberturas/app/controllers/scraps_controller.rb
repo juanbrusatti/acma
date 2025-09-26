@@ -19,6 +19,8 @@ class ScrapsController < ApplicationController
         format.html { redirect_to glassplates_path, notice: "Retazo agregado exitosamente al stock." }
         format.json { render json: { status: 'success', message: 'Retazo agregado exitosamente.', scrap: @scrap }, status: :created }
       else
+        # Filtrar mensajes de error para eliminar redundancias
+        filter_duplicate_errors
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: { status: 'error', errors: @scrap.errors }, status: :unprocessable_entity }
       end
@@ -32,6 +34,8 @@ class ScrapsController < ApplicationController
         format.html { redirect_to glassplates_path, notice: "Retazo actualizado exitosamente." }
         format.json { render json: { status: 'success', message: 'Retazo actualizado exitosamente.', scrap: @scrap } }
       else
+        # Filtrar mensajes de error para eliminar redundancias
+        filter_duplicate_errors
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: { status: 'error', errors: @scrap.errors }, status: :unprocessable_entity }
       end
@@ -57,5 +61,16 @@ class ScrapsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def scrap_params
       params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status)
+    end
+    
+    def filter_duplicate_errors
+      # Eliminar mensajes de error de presencia si hay otros errores para el mismo atributo
+      @scrap.errors.messages.each do |attribute, messages|
+        if messages.size > 1
+          # Mantener solo el último mensaje de error para cada atributo
+          @scrap.errors.delete(attribute)
+          @scrap.errors.add(attribute, messages.last)
+        end
+      end
     end
 end
