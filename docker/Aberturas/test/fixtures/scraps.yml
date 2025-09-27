@@ -1,19 +1,32 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Fixtures para Scrap
 
 one:
-  ref_number: MyString
-  scrap_type: MyString
-  thickness: MyString
-  width: 1.5
-  height: 1.5
-  output_work: MyString
-  status: MyString
+  ref_number: "SCR001"
+  output_work: "OBRA TEST 1"
+  scrap_type: "LAM"
+  thickness: "3+3"
+  color: "INC"
+  width: 100
+  height: 100
+  status: "Disponible"
 
-two:
-  ref_number: MyString
-  scrap_type: MyString
-  thickness: MyString
-  width: 1.5
-  height: 1.5
-  output_work: MyString
-  status: MyString
+# Otros ejemplos
+scrap_2:
+  ref_number: "SCR002"
+  output_work: "OBRA TEST 2"
+  scrap_type: "FLO"
+  thickness: "4+4"
+  color: "BRC"
+  width: 150
+  height: 200
+  status: "Disponible"
+
+scrap_3:
+  ref_number: "SCR003"
+  output_work: "OBRA TEST 3"
+  scrap_type: "COL"
+  thickness: "5+5"
+  color: "BLS"
+  width: 80
+  height: 120
+  status: "En uso"
