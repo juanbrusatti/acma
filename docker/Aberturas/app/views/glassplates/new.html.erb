@@ -25,3 +25,107 @@
     </div>
   </main>
 </div>
+
+<script>
+// Función para inicializar los selects de planchas
+function initializeGlassplateSelects() {
+  console.log('🚀 Initializing glassplate selects');
+  
+  const GLASS_OPTIONS = {
+    LAM: {
+      "3+3": ["INC", "BLS"],
+      "4+4": ["INC"],
+      "5+5": ["INC"]
+    },
+    FLO: {
+      "5mm": ["GRS", "BRC", "INC"]
+    },
+    COL: {
+      "4+4": ["STB", "STG", "NTR"]
+    }
+  };
+
+  const typeSelect = document.querySelector('.glassplate-type-select');
+  const thicknessSelect = document.querySelector('.glassplate-thickness-select');
+  const colorSelect = document.querySelector('.glassplate-color-select');
+
+  console.log('🔍 Found selects:', {
+    typeSelect: !!typeSelect,
+    thicknessSelect: !!thicknessSelect,
+    colorSelect: !!colorSelect
+  });
+
+  if (!typeSelect || !thicknessSelect || !colorSelect) {
+    console.log('❌ Missing required selects');
+    return;
+  }
+
+  // Limpiar listeners existentes para evitar duplicados
+  const newTypeSelect = typeSelect.cloneNode(true);
+  const newThicknessSelect = thicknessSelect.cloneNode(true);
+  const newColorSelect = colorSelect.cloneNode(true);
+  
+  typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+  thicknessSelect.parentNode.replaceChild(newThicknessSelect, thicknessSelect);
+  colorSelect.parentNode.replaceChild(newColorSelect, colorSelect);
+
+  function updateThicknessOptions() {
+    const tipo = newTypeSelect.value;
+    console.log('🔄 Updating thickness for type:', tipo);
+    newThicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo]) {
+      const grosores = Object.keys(GLASS_OPTIONS[tipo]);
+      grosores.forEach(grosor => {
+        const opt = document.createElement('option');
+        opt.value = grosor;
+        opt.textContent = grosor;
+        newThicknessSelect.appendChild(opt);
+      });
+      console.log('✅ Added thickness options:', grosores);
+    }
+  }
+
+  function updateColorOptions() {
+    const tipo = newTypeSelect.value;
+    const grosor = newThicknessSelect.value;
+    console.log('🔄 Updating colors for type:', tipo, 'thickness:', grosor);
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
+      GLASS_OPTIONS[tipo][grosor].forEach(color => {
+        const opt = document.createElement('option');
+        opt.value = color;
+        opt.textContent = color;
+        newColorSelect.appendChild(opt);
+      });
+      console.log('✅ Added color options:', GLASS_OPTIONS[tipo][grosor]);
+    }
+  }
+
+  // Inicializar
+  updateThicknessOptions();
+  updateColorOptions();
+
+  // Listeners
+  newTypeSelect.addEventListener('change', () => {
+    console.log('📝 Type changed to:', newTypeSelect.value);
+    updateThicknessOptions();
+    updateColorOptions();
+  });
+
+  newThicknessSelect.addEventListener('change', () => {
+    console.log('📝 Thickness changed to:', newThicknessSelect.value);
+    updateColorOptions();
+  });
+
+  console.log('✅ Glassplate selects initialized');
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeGlassplateSelects);
+
+// También inicializar cuando se navega con Turbo (para Rails 7+)
+document.addEventListener('turbo:load', initializeGlassplateSelects);
+</script>

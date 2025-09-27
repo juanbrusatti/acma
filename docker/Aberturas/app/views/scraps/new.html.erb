@@ -1,6 +1,6 @@
 
 <div class="flex min-h-screen w-full flex-col">
-  <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+  <main class="flex flex-1 flex-col gap-2 p-3 md:gap-4 md:p-4">
     <div class="flex items-center gap-2">
       <h1 class="text-2xl font-semibold">Agregar retazo</h1>
       <%= link_to glassplates_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-black hover:text-white h-9 px-3 ml-auto" do %>
@@ -13,8 +13,8 @@
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg max-w-2xl mx-auto w-full">
-      <div class="p-6">
-        <div class="mb-6">
+      <div class="p-4">
+        <div class="mb-3">
           <h3 class="text-lg font-semibold">Detalles del retazo</h3>
           <p class="text-sm text-muted-foreground">Ingrese los detalles del nuevo retazo para agregarlo al stock.</p>
         </div>
@@ -24,3 +24,107 @@
     </div>
   </main>
 </div>
+
+<script>
+// Función para inicializar los selects de retazos
+function initializeScrapSelects() {
+  console.log('🚀 Initializing scrap selects');
+  
+  const GLASS_OPTIONS = {
+    LAM: {
+      "3+3": ["INC", "BLS"],
+      "4+4": ["INC"],
+      "5+5": ["INC"]
+    },
+    FLO: {
+      "5mm": ["GRS", "BRC", "INC"]
+    },
+    COL: {
+      "4+4": ["STB", "STG", "NTR"]
+    }
+  };
+
+  const typeSelect = document.querySelector('.scrap-type-select');
+  const thicknessSelect = document.querySelector('.scrap-thickness-select');
+  const colorSelect = document.querySelector('.scrap-color-select');
+
+  console.log('🔍 Found scrap selects:', {
+    typeSelect: !!typeSelect,
+    thicknessSelect: !!thicknessSelect,
+    colorSelect: !!colorSelect
+  });
+
+  if (!typeSelect || !thicknessSelect || !colorSelect) {
+    console.log('❌ Missing required scrap selects');
+    return;
+  }
+
+  // Limpiar listeners existentes para evitar duplicados
+  const newTypeSelect = typeSelect.cloneNode(true);
+  const newThicknessSelect = thicknessSelect.cloneNode(true);
+  const newColorSelect = colorSelect.cloneNode(true);
+  
+  typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+  thicknessSelect.parentNode.replaceChild(newThicknessSelect, thicknessSelect);
+  colorSelect.parentNode.replaceChild(newColorSelect, colorSelect);
+
+  function updateThicknessOptions() {
+    const tipo = newTypeSelect.value;
+    console.log('🔄 Updating thickness for scrap type:', tipo);
+    newThicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo]) {
+      const grosores = Object.keys(GLASS_OPTIONS[tipo]);
+      grosores.forEach(grosor => {
+        const opt = document.createElement('option');
+        opt.value = grosor;
+        opt.textContent = grosor;
+        newThicknessSelect.appendChild(opt);
+      });
+      console.log('✅ Added thickness options for scrap:', grosores);
+    }
+  }
+
+  function updateColorOptions() {
+    const tipo = newTypeSelect.value;
+    const grosor = newThicknessSelect.value;
+    console.log('🔄 Updating colors for scrap type:', tipo, 'thickness:', grosor);
+    newColorSelect.innerHTML = '<option value="">Seleccionar</option>';
+
+    if (GLASS_OPTIONS[tipo] && GLASS_OPTIONS[tipo][grosor]) {
+      GLASS_OPTIONS[tipo][grosor].forEach(color => {
+        const opt = document.createElement('option');
+        opt.value = color;
+        opt.textContent = color;
+        newColorSelect.appendChild(opt);
+      });
+      console.log('✅ Added color options for scrap:', GLASS_OPTIONS[tipo][grosor]);
+    }
+  }
+
+  // Inicializar
+  updateThicknessOptions();
+  updateColorOptions();
+
+  // Listeners
+  newTypeSelect.addEventListener('change', () => {
+    console.log('📝 Scrap type changed to:', newTypeSelect.value);
+    updateThicknessOptions();
+    updateColorOptions();
+  });
+
+  newThicknessSelect.addEventListener('change', () => {
+    console.log('📝 Scrap thickness changed to:', newThicknessSelect.value);
+    updateColorOptions();
+  });
+
+  console.log('✅ Scrap selects initialized');
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeScrapSelects);
+
+// También inicializar cuando se navega con Turbo (para Rails 7+)
+document.addEventListener('turbo:load', initializeScrapSelects);
+</script>

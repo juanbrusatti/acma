@@ -38,8 +38,8 @@ class UpdateOfficialRateJob < ApplicationJob
         )
       end
       
-      # Actualizar el MEP rate en AppConfig para mantener compatibilidad
-      AppConfig.set_mep_rate(rate)
+      # Actualizar el dólar oficial en AppConfig para mantener compatibilidad
+      AppConfig.set_mep_rate(rate)  # TODO: Renombrar a set_official_rate para mayor claridad
       
       # Actualizar todos los precios de insumos
       update_supply_prices(rate)

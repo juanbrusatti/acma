@@ -1,11 +1,12 @@
-
-<%= form_with(model: scrap, local: true, class: "space-y-6") do |form| %>
+<%= form_with(model: scrap, local: true, class: "space-y-4") do |form| %>
   <% if scrap.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
       <h2 class="font-bold mb-2">Errores al guardar el retazo:</h2>
       <ul>
-        <% scrap.errors.full_messages.each do |msg| %>
-          <li><%= msg.sub(/^[^ ]+ /, "") %></li>
+        <% scrap.errors.messages.each do |attribute, messages| %>
+          <% messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
         <% end %>
       </ul>
     </div>
@@ -32,26 +33,26 @@
       </select>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
       <label for="scrap_thickness">Espesor</label>
       <select name="scrap[thickness]" id="scrap_thickness" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-thickness-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
         <option value="">Seleccionar</option>
       </select>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
       <label for="scrap_color">Color</label>
       <select name="scrap[color]" id="scrap_color" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-color-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
         <option value="">Seleccionar</option>
       </select>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
       <%= form.label :width, "Ancho (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
       <%= form.number_field :width, step: 0.1, placeholder: "ej: 2500", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
       <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
       <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>

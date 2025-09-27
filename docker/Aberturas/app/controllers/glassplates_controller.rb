@@ -29,6 +29,8 @@ class GlassplatesController < ApplicationController
         format.html { redirect_to glassplates_path, notice: "Material agregado exitosamente al stock." }
         format.json { render :show, status: :created, location: @glassplate }
       else
+        # Filtrar mensajes de error para eliminar redundancias
+        filter_duplicate_errors
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @glassplate.errors, status: :unprocessable_entity }
       end
@@ -42,6 +44,8 @@ class GlassplatesController < ApplicationController
         format.html { redirect_to glassplates_path, notice: "Material actualizado exitosamente." }
         format.json { render json: { success: true, quantity: @glassplate.quantity }, status: :ok }
       else
+        # Filtrar mensajes de error para eliminar redundancias
+        filter_duplicate_errors
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: { success: false, errors: @glassplate.errors }, status: :unprocessable_entity }
       end
@@ -66,6 +70,19 @@ class GlassplatesController < ApplicationController
 
   def glassplate_params
     params.require(:glassplate).permit(:width, :height, :color, :glass_type, :thickness, :quantity)
+  end
+  
+  private
+  
+  def filter_duplicate_errors
+    # Eliminar mensajes de error de presencia si hay otros errores para el mismo atributo
+    @glassplate.errors.messages.each do |attribute, messages|
+      if messages.size > 1
+        # Mantener solo el último mensaje de error para cada atributo
+        @glassplate.errors.delete(attribute)
+        @glassplate.errors.add(attribute, messages.last)
+      end
+    end
   end
 
 end
