@@ -144,4 +144,93 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 1, Project.upcoming.count
     assert_equal 'Próximo', Project.upcoming.first.name
   end
+  
+  # Test para el método iva
+  test "debe calcular el IVA correctamente" do
+    project = Project.new(
+      name: 'Test IVA', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    # 21% de 1000 es 210
+    assert_equal 210.0, project.iva
+    
+    # Sin precio sin IVA guardado (debería ser 0 sin ítems)
+    project.price_without_iva = nil
+    assert_equal 0.0, project.iva
+  end
+  
+  # Test para el método total
+  test "debe calcular el total incluyendo IVA correctamente" do
+    project = Project.new(
+      name: 'Test Total', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    # 1000 + 21% = 1210
+    assert_equal 1210.0, project.total
+    
+    # Sin precio sin IVA guardado (debería ser 0 sin ítems)
+    project.price_without_iva = nil
+    assert_equal 0.0, project.total
+  end
+  
+  # Test para el alias precio_sin_iva
+  test "precio_sin_iva debe ser un alias de subtotal" do
+    project = Project.new(
+      name: 'Test Alias', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    assert_equal project.subtotal, project.precio_sin_iva
+    
+    # Verificar que sea un alias, no solo igualdad de valores
+    project.price_without_iva = 500
+    assert_equal 500, project.precio_sin_iva
+  end
+  
+  # Test para el método status_color
+  test "debe devolver la clase de color correcta según el estado" do
+    project = Project.new(name: 'Test Color', phone: '123')
+    
+    project.status = 'Pendiente'
+    assert_equal 'yellow', project.status_color
+    
+    project.status = 'En Proceso'
+    assert_equal 'blue', project.status_color
+    
+    project.status = 'Terminado'
+    assert_equal 'green', project.status_color
+    
+    # Estado inválido debería devolver 'gray'
+    project.status = 'Invalido'
+    assert_equal 'gray', project.status_color
+    
+    # Estado nulo también debería devolver 'gray'
+    project.status = nil
+    assert_equal 'gray', project.status_color
+  end
+  
+  # Test para verificar que no hay callbacks personalizados definidos
+  test "no debería tener callbacks personalizados definidos" do
+    # Ignorar callbacks estándar de Rails para asociaciones
+    ignored_callbacks = [:autosave_associated_records_for_dvhs, :autosave_associated_records_for_glasscuttings, :around_save_collection_association]
+    
+    # Obtener todos los callbacks y filtrar los ignorados
+    callbacks = Project._save_callbacks.reject do |callback|
+      ignored_callbacks.include?(callback.filter) || 
+      callback.filter.to_s.include?('autosave_associated_records_for_')
+    end
+    
+    # Convertir a nombres para el mensaje de error
+    callback_names = callbacks.map { |c| c.filter.to_s }
+    
+    assert_empty callbacks, "Se encontraron callbacks personalizados inesperados: #{callback_names.join(', ')}"
+  end
 end
