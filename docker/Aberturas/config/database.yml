@@ -25,3 +25,11 @@ development:
   primary:
     <<: *default
     database: <%= ENV['DEV_POSTGRES_DB'] %>
+
+test:
+  primary:
+    <<: *default
+    database: aberturas_test
+    host: localhost
+    username: postgres
+    password: postgres
