@@ -1,5 +1,6 @@
 require 'test_helper'
 
+# Test para Glassplate
 class GlassplateTest < ActiveSupport::TestCase
   test "debe tener atributos requeridos" do
     glassplate = Glassplate.new
@@ -12,6 +13,7 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes glassplate.errors[:quantity], "La cantidad no puede estar en blanco"
   end
 
+  # Test para validar valores de enumeraciones
   test "debe validar valores de enumeraciones" do
     glassplate = Glassplate.new(
       glass_type: "INVALID",
@@ -26,6 +28,7 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes glassplate.errors[:glass_type], "El tipo de vidrio debe ser uno de: LAM, FLO, COL"
   end
 
+  # Test para crear un registro válido
   test "debe crear un registro válido" do
     glassplate = Glassplate.new(
       glass_type: "LAM",

@@ -1,3 +1,17 @@
 one:
   name: Proyecto de prueba
+  phone: '123456789'
+  status: 'Pendiente'
   description: Proyecto inicial
+  delivery_date: <%= 1.week.from_now.to_date %>
+  price: 1000.0
+  price_without_iva: 826.45
+
+completed_project:
+  name: Proyecto completado
+  phone: '987654321'
+  status: 'Terminado'
+  description: Proyecto ya finalizado
+  delivery_date: <%= 1.week.ago.to_date %>
+  price: 2000.0
+  price_without_iva: 1652.89
