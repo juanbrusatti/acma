@@ -85,4 +85,158 @@ class DvhTest < ActiveSupport::TestCase
     
     assert dvh.valid?, dvh.errors.full_messages.join(", ")
   end
+
+  # Pruebas para métodos personalizados
+  
+  test "debe calcular el precio automáticamente si no se proporciona" do
+    # Crear precios de vidrio de prueba
+    glass_price = GlassPrice.create!(
+      glass_type: "LAM",
+      thickness: "3+3",
+      color: "INC",
+      selling_price: 150.0
+    )
+    
+    # Configurar el precio de la cámara directamente
+    def AppConfig.calculate_innertube_total_price(innertube, perimeter_m)
+      50.0 # Valor fijo para la prueba
+    end
+    
+    dvh = Dvh.create!(
+      height: 1000, # 1m
+      width: 1000,  # 1m (área = 1m²)
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project
+    )
+    
+    # Verificar que se calculó el precio correctamente
+    # Precio esperado: (1m² * (150 + 150)) + 50 = 350
+    assert_equal 350.0, dvh.price
+    
+    # Limpiar el método mockeado
+    AppConfig.singleton_class.send(:remove_method, :calculate_innertube_total_price)
+  end
+  
+  test "debe usar el precio proporcionado en lugar de calcularlo" do
+    dvh = Dvh.create!(
+      height: 1000,
+      width: 1000,
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project,
+      price: 500.0
+    )
+    
+    # Verificar que se usó el precio proporcionado
+    assert_equal 500.0, dvh.price
+  end
+  
+  test "debe manejar correctamente la falta de precios de vidrio" do
+    # Asegurarse de que no hay precios de vidrio en la base de datos
+    GlassPrice.destroy_all
+    
+    # Configurar el método calculate_innertube_total_price para esta prueba
+    def AppConfig.calculate_innertube_total_price(innertube, perimeter_m)
+      50.0 # Valor fijo para la prueba
+    end
+    
+    dvh = Dvh.create(
+      height: 1000,
+      width: 1000,
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project
+    )
+    
+    # Verificar que el precio es 0 cuando no hay precios de vidrio
+    assert_equal 50.0, dvh.price  # Solo el precio de la cámara, ya que no hay precios de vidrio
+    
+    # Limpiar el método mockeado
+    AppConfig.singleton_class.send(:remove_method, :calculate_innertube_total_price)
+  end
+  
+  # Prueba de exclusión mutua para los tipos de vidrio
+  test "debe validar que los tipos de vidrio sean válidos" do
+    dvh = Dvh.new(
+      height: 100,
+      width: 100,
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "INVALID",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project
+    )
+    
+    assert_not dvh.valid?
+    assert_includes dvh.errors[:glasscutting1_type], "El tipo de vidrio 1 no es válido"
+  end
+  
+  # Prueba de exclusión mutua para los colores de vidrio
+  test "debe validar que los colores de vidrio sean válidos" do
+    dvh = Dvh.new(
+      height: 100,
+      width: 100,
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "3+3",
+      glasscutting1_color: "INVALID",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project
+    )
+    
+    assert_not dvh.valid?
+    assert_includes dvh.errors[:glasscutting1_color], "El color del vidrio 1 no es válido"
+  end
+  
+  # Prueba de exclusión mutua para los espesores de vidrio
+  test "debe validar que los espesores de vidrio sean válidos" do
+    dvh = Dvh.new(
+      height: 100,
+      width: 100,
+      typology: "Test",
+      innertube: 6,
+      glasscutting1_type: "LAM",
+      glasscutting1_thickness: "INVALID",
+      glasscutting1_color: "INC",
+      glasscutting2_type: "LAM",
+      glasscutting2_thickness: "3+3",
+      glasscutting2_color: "INC",
+      type_opening: "PVC",
+      project: @project
+    )
+    
+    assert_not dvh.valid?
+    assert_includes dvh.errors[:glasscutting1_thickness], "El grosor del vidrio 1 no es válido"
+  end
 end
