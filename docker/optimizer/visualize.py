@@ -1,7 +1,32 @@
+def draw_header(fig, page=1, total_pages=1, title="AR Y ASOCIADOS SRL"):
+
+    from datetime import datetime
+    import matplotlib.patches as patches
+
+    # Recuadro (coordenadas relativas a la figura: [x, y, ancho, alto])
+    rect = patches.Rectangle((0.02, 0.93), 0.96, 0.06, transform=fig.transFigure,
+                             fill=False, linewidth=0.8, edgecolor="black")
+    fig.patches.append(rect)
+
+    # Texto izquierdo
+    fig.text(0.03, 0.955,
+             f"\nPágina {page} / {total_pages}",
+             ha="left", va="center", fontsize=7)
+
+    # Texto central
+    fig.text(0.5, 0.955, title,
+             ha="center", va="center", fontsize=13, weight="bold", fontfamily="sans-serif")
+
+    # Texto derecho (fecha)
+    fig.text(0.97, 0.955, datetime.now().strftime("%d/%m/%Y"),
+             ha="right", va="center", fontsize=7)
+
 def visualize_packing(packed_results, bin_details_map, output_folder='output_visuals'):
     import matplotlib.pyplot as plt
     import matplotlib.patches as patches
     import os
+    from datetime import datetime
+    from matplotlib.backends.backend_pdf import PdfPages
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -18,96 +43,68 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             print(f"[❌] Bin '{bin_id}' no encontrado en bin_details_map")
             continue
 
-        original_bin_info = bin_details_map[bin_id]
-        bin_width = original_bin_info['width']
-        bin_height = original_bin_info['height']
+        bin_width = bin_details_map[bin_id]['width']
+        bin_height = bin_details_map[bin_id]['height']
 
-        fig, ax = plt.subplots(1)
-        ax.set_title(f'Plan de Corte - Placa: {bin_id}')
+        # Crear figura en tamaño A4 horizontal (landscape)
+        fig, ax = plt.subplots(figsize=(8.27, 11.69))  # A4 landscape en pulgadas
+        draw_header(fig, page=1, total_pages=len(pieces_by_bin))
+
+        # Más espacio abajo del plano
+        fig.subplots_adjust(left=0.22, right=0.78, top=0.88, bottom=0.18)  # bottom antes: 0.12
+
+        # Determinar tipo de placa y mostrar texto arriba del plano
+        bin_name = bin_id.lower()
+        if "scrap" in bin_name or "leftover" in bin_name:
+            plano_label = f"Sobrante {bin_width:.0f} x {bin_height:.0f}"
+        else:
+            plano_label = f"Plancha {bin_width:.0f} x {bin_height:.0f}"
+        fig.text(0.5, 0.90, plano_label, ha='center', va='bottom', fontsize=11, weight='bold')
+
+        # Ajustar márgenes para centrar y ampliar el área de dibujo
+        fig.subplots_adjust(left=0.22, right=0.78, top=0.88, bottom=0.12)
+
+        # Área de dibujo
         ax.set_xlim(0, bin_width)
         ax.set_ylim(0, bin_height)
         ax.set_aspect('equal', adjustable='box')
 
-        # Dibujar borde de la placa
-        ax.add_patch(patches.Rectangle((0, 0), bin_width, bin_height, edgecolor='black', facecolor='none', lw=2))
+        # Bordes
+        ax.spines['right'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.xaxis.set_visible(False)  # Quitar eje X
+        ax.yaxis.set_visible(False)  # Quitar eje Y
 
-        # Dibujar piezas y recolectar las coordenadas de los cortes (bordes)
-        x_ticks = {0, bin_width}
-        y_ticks = {0, bin_height}
+        # Dibujar placa
+        ax.add_patch(patches.Rectangle((0, 0), bin_width, bin_height,
+                                       edgecolor='black', facecolor='none', lw=2))
+
         for piece in pieces:
-            x0 = piece['X_Coordinate']
-            y0 = piece['Y_Coordinate']
-            w = piece['Packed_Width']
-            h = piece['Packed_Height']
+            x0, y0 = piece['X_Coordinate'], piece['Y_Coordinate']
+            w, h = piece['Packed_Width'], piece['Packed_Height']
 
-            rect = patches.Rectangle(
-                (x0, y0),
-                w,
-                h,
-                linewidth=1,
-                edgecolor='r',
-                facecolor='skyblue',
-                alpha=0.75
-            )
+            # Dibujar pieza
+            rect = patches.Rectangle((x0, y0), w, h,
+                                     linewidth=1, edgecolor='red',
+                                     facecolor='skyblue', alpha=0.6)
             ax.add_patch(rect)
-            ax.text(
-                x0 + w / 2,
-                y0 + h / 2,
-                piece['Piece_ID'],
-                ha='center',
-                va='center',
-                fontsize=8
-            )
 
-            # Añadir bordes para las escalas: inicio y fin de cada pieza
-            x_ticks.add(int(x0))
-            x_ticks.add(int(x0 + w))
-            y_ticks.add(int(y0))
-            y_ticks.add(int(y0 + h))
+            # Mostrar tipología (usando 'Piece_ID' que es la tipología)
+            typology = piece.get('Piece_ID', '')
+            label = f"{typology}\n{w:.0f} x {h:.0f}"
 
-        # Ordenar ticks y juntar valores muy cercanos/duplicados en uno solo
-        def merge_close(sorted_vals, tol=1e-3):
-            merged = []
-            for v in sorted_vals:
-                if not merged or abs(v - merged[-1]) > tol:
-                    merged.append(v)
-            return merged
+            # Ajuste automático: si es muy chico el rectángulo, poner la etiqueta afuera
+            if w < 60 or h < 40:
+                ax.text(x0 + w/2, y0 + h + 10, label,
+                        ha='center', va='bottom', fontsize=7, color='black')
+            else:
+                ax.text(x0 + w/2, y0 + h/2, label,
+                        ha='center', va='center', fontsize=8, color='black')
 
-        x_ticks_sorted = sorted(x_ticks)
-        y_ticks_sorted = sorted(y_ticks)
-        x_ticks_merged = merge_close(x_ticks_sorted)
-        y_ticks_merged = merge_close(y_ticks_sorted)
+        # Guardar PDF
+        base_pdf = os.path.join(output_folder, f"{bin_id}.pdf")
+        with PdfPages(base_pdf) as pdf:
+            pdf.savefig(fig, bbox_inches='tight')
+        print(f"✅ Guardado PDF: {base_pdf}")
 
-        ax.set_xticks(x_ticks_merged)
-        ax.set_yticks(y_ticks_merged)
-
-        # Preparar etiquetas: si el número es efectivamente entero, mostrar sin decimales
-        def fmt_label(v, tol=1e-3):
-            if abs(v - round(v)) <= tol:
-                return str(int(round(v)))
-            return f"{v:.2f}"
-
-        x_labels = [fmt_label(v) for v in x_ticks_merged]
-        y_labels = [fmt_label(v) for v in y_ticks_merged]
-
-        # Rotar etiquetas del eje X verticalmente para evitar solapamiento
-        ax.set_xticklabels(x_labels, rotation=90, va='center', ha='center', fontsize=8)
-        ax.set_yticklabels(y_labels, fontsize=8)
-
-    # Mostrar líneas de corte/grid sólo en esas posiciones para facilitar lectura
-    ax.grid(True, which='both', linestyle='--', alpha=0.6)
-
-    # Ajustar distancia de las etiquetas del eje X para que no queden pegadas
-    # al gráfico (especialmente la última etiqueta)
-    ax.tick_params(axis='x', which='major', pad=10)
-
-    # Etiquetas numéricas claras
-    ax.set_xlabel("Ancho")
-    ax.set_ylabel("Alto")
-
-    # Ajustes para evitar que las etiquetas queden recortadas al guardar
-    fig.tight_layout(pad=1.0)
-    filepath = os.path.join(output_folder, f"{bin_id}.png")
-    fig.savefig(filepath, bbox_inches='tight', dpi=150)
-    plt.close(fig)
-    print(f"\n✅ Visualizaciones guardadas en la carpeta: '{output_folder}/'")
+        plt.close(fig)

@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
     dvhs = @project.dvhs
     pieces_to_cut += glasscuttings.map do |cut|
       {
-        id: cut.id,
+        id: cut.typology,
         width: cut.width,
         height: cut.height,
         quantity: 1
@@ -191,7 +191,7 @@ class ProjectsController < ApplicationController
 
     pieces_to_cut += dvhs.map do |cut|
       {
-        id: cut.id,
+        id: cut.typology,
         width: cut.width,
         height: cut.height,
         quantity: 2

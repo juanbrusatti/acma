@@ -53,25 +53,23 @@ async def run_optimize(request: Request):
             print("[ERROR] Optimizer failed")
             raise HTTPException(status_code=500, detail='Optimizer failed')
 
-        # Verify images exist
+        # Verify visuals exist
         if not os.path.isdir(OUTPUT_VISUALS_DIR):
             print(f"[ERROR] {OUTPUT_VISUALS_DIR} no existe")
             raise HTTPException(status_code=500, detail='No visuals generated')
 
-        image_files = [f for f in os.listdir(OUTPUT_VISUALS_DIR) if f.lower().endswith('.png')]
-        print(f"[LOG] PNGs generados: {image_files}")
-        if not image_files:
-            print("[ERROR] No PNG images generated")
-            raise HTTPException(status_code=500, detail='No PNG images generated')
-
         # Create in-memory zip
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for img in image_files:
-                full_path = os.path.join(OUTPUT_VISUALS_DIR, img)
-                zf.write(full_path, arcname=img)
+            # Agregar PDFs
+            for file in os.listdir(OUTPUT_VISUALS_DIR):
+                if file.endswith(".pdf"):
+                    full_path = os.path.join(OUTPUT_VISUALS_DIR, file)
+                    zf.write(full_path, arcname=file)
             if os.path.exists(OUTPUT_CSV):
                 zf.write(OUTPUT_CSV, arcname='cutting_plan.csv')
+
+
         zip_buffer.seek(0)
 
         print("[LOG] Respondiendo con ZIP")
