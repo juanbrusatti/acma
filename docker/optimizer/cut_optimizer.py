@@ -1,7 +1,7 @@
 import json
 import os
 from collections import Counter
-from rectpack import newPacker, PackingMode, PackingBin, SORT_AREA, MaxRectsBssf
+from rectpack import newPacker, PackingMode, PackingBin, SORT_AREA, MaxRectsBssf, GuillotineBssfSas
 from visualize import visualize_packing
 from output import save_cutting_plan_to_csv, print_summary
 import argparse
@@ -56,7 +56,7 @@ def run_optimizer(input_data, stock_data):
 
     # ETAPA 1: Intentamos empaquetar primero en los sobrantes
     print("🚀 ETAPA 1: Intentando empaquetar en placas de sobrante...")
-    packer_scraps = newPacker(mode=PackingMode.Offline, rotation=True)
+    packer_scraps = newPacker(mode=PackingMode.Offline, rotation=True, pack_algo=GuillotineBssfSas)
 
     # Añadimos las piezas a cortar al empaquetador
     # Guardamos una lista de las piezas que intentamos agregar para poder
@@ -115,7 +115,7 @@ def run_optimizer(input_data, stock_data):
     if unfitted_counts:
         total_unfitted = sum(unfitted_counts.values())
         print(f"\n✨ {total_unfitted} piezas no cupieron en sobrantes. Pasando a ETAPA 2 (Placas Nuevas)...")
-        packer_glassplates = newPacker(mode=PackingMode.Offline, rotation=True)
+        packer_glassplates = newPacker(mode=PackingMode.Offline, rotation=True, pack_algo=GuillotineBssfSas)
 
         # Añadimos las piezas restantes al empaquetador (respetando cantidades)
         added_rects_glassplates = []

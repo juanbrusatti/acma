@@ -68,6 +68,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         ax.set_xlim(0, bin_width)
         ax.set_ylim(0, bin_height)
         ax.set_aspect('equal', adjustable='box')
+        ax.invert_yaxis()
 
         # Bordes
         ax.spines['right'].set_visible(False)
