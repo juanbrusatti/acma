@@ -177,10 +177,39 @@ class ProjectsController < ApplicationController
     require 'net/http'
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
+    pieces_to_cut = []
+    glasscuttings = @project.glasscuttings
+    dvhs = @project.dvhs
+    pieces_to_cut += glasscuttings.map do |cut|
+      {
+        id: cut.id,
+        width: cut.width,
+        height: cut.height,
+        quantity: 1
+      }
+    end
+
+    pieces_to_cut += dvhs.map do |cut|
+      {
+        id: cut.id,
+        width: cut.width,
+        height: cut.height,
+        quantity: 2
+      }
+    end
+
+    # Cuando diferenciemos entre tipos de vidrio, color y grosor, deberiamos pasarles esos atributos tambien
+
+    pieces_to_cut = pieces_to_cut.as_json
+    stock = {
+      glassplates: Glassplate.all.as_json,
+      scraps: Scrap.all.as_json
+    }
     begin
       http = Net::HTTP.new(uri.host, uri.port)
       http.read_timeout = 180
-      req = Net::HTTP::Post.new(uri.request_uri)
+      req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
+      req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body
       response = http.request(req)
       if response.code.to_i == 200
         data = response.body
