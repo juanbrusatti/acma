@@ -11,8 +11,10 @@
           <h3 class="text-sm font-medium text-destructive">Se encontraron los siguientes errores:</h3>
           <div class="mt-2 text-sm text-destructive">
             <ul class="list-disc space-y-1 pl-5">
-              <% @glassplate.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
+              <% @glassplate.errors.messages.each do |attribute, messages| %>
+                <% messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
               <% end %>
             </ul>
           </div>

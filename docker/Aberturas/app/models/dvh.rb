@@ -11,7 +11,7 @@ class Dvh < ApplicationRecord
 
   validates :innertube, inclusion: {
     in: [6, 9, 12, 20],
-    message: "La camara del vidrio no es valida"
+    message: "La cámara del vidrio no es válida"
   }
 
   validates :glasscutting1_type, presence: { message: "El tipo de vidrio 1 no puede estar en blanco" }
