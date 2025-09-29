@@ -23,7 +23,7 @@ class ProjectsSearchAndFilterTest < ApplicationSystemTestCase
     )
   end
   
-  test "should filter projects by status" do
+  test "filters projects by status" do
     visit projects_path
     
     # Check that all projects are shown initially
@@ -65,7 +65,7 @@ class ProjectsSearchAndFilterTest < ApplicationSystemTestCase
     assert_selector "table tbody tr", count: 4, wait: 5
   end
   
-  test "should search projects by name" do
+  test "searches projects by name" do
     visit projects_path
     
     # Initial count of projects
@@ -90,7 +90,7 @@ class ProjectsSearchAndFilterTest < ApplicationSystemTestCase
     assert_selector "table tbody tr", count: 4, wait: 5
   end
   
-  test "should combine search and status filter" do
+  test "combines search and status filters" do
     # Create an additional project that matches both search and status
     combined_project = Project.create!(
       name: "Proyecto especial en proceso",
@@ -118,7 +118,7 @@ class ProjectsSearchAndFilterTest < ApplicationSystemTestCase
     assert_no_text @project3.name
   end
   
-  test "should show no results message when no projects match search" do
+  test "shows no results message when no projects match search" do
     visit projects_path
     
     # Search for non-existent project

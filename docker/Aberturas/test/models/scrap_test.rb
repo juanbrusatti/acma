@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ScrapTest < ActiveSupport::TestCase
-  test "debe tener atributos requeridos" do
+  test "requires all mandatory attributes" do
     scrap = Scrap.new
     assert_not scrap.valid?
     assert_includes scrap.errors[:ref_number], "El número de referencia no puede estar en blanco"
@@ -13,7 +13,7 @@ class ScrapTest < ActiveSupport::TestCase
     assert_includes scrap.errors[:height], "El alto del retazo no puede estar en blanco"  # Actualizado
   end
 
-  test "debe validar valores de enumeraciones" do
+  test "validates enum values" do
     scrap = Scrap.new(
       ref_number: "TEST001",
       output_work: "OBRA TEST",
@@ -29,7 +29,7 @@ class ScrapTest < ActiveSupport::TestCase
     assert_includes scrap.errors[:scrap_type], "El tipo debe ser uno de: LAM, FLO, COL"
   end
 
-  test "debe crear un registro válido" do
+  test "creates a valid record with all required attributes" do
     scrap = Scrap.new(
       ref_number: "TEST001",
       output_work: "OBRA TEST",

@@ -6,7 +6,7 @@ class DvhTest < ActiveSupport::TestCase
     @project = projects(:one) # Asegúrate de tener un fixture para Project
   end
 
-  test "debe tener atributos requeridos" do
+  test "requires all mandatory attributes" do
     dvh = Dvh.new
     assert_not dvh.valid?
     assert_includes dvh.errors[:height], "El alto del vidrio no puede estar en blanco"
@@ -23,7 +23,7 @@ class DvhTest < ActiveSupport::TestCase
     assert_includes dvh.errors[:project].map(&:to_s).join(" ").downcase, "debe existir"
   end
 
-  test "debe validar valores numéricos" do
+  test "validates numerical values" do
     dvh = Dvh.new(
       height: 0,
       width: 0,
@@ -44,7 +44,7 @@ class DvhTest < ActiveSupport::TestCase
     assert_includes dvh.errors[:width], "El ancho debe ser mayor que 0"
   end
 
-  test "debe validar valores de enumeraciones" do
+  test "validates enum values" do
     dvh = Dvh.new(
       height: 100,
       width: 100,
@@ -67,7 +67,7 @@ class DvhTest < ActiveSupport::TestCase
     assert_includes dvh.errors[:type_opening], "El tipo de abertura no es valido"
   end
 
-  test "debe crear un registro válido" do
+  test "creates a valid record with all required attributes" do
     dvh = Dvh.new(
       height: 100,
       width: 100,
@@ -88,7 +88,7 @@ class DvhTest < ActiveSupport::TestCase
 
   # Pruebas para métodos personalizados
   
-  test "debe calcular el precio automáticamente si no se proporciona" do
+  test "calculates price automatically when not provided" do
     # Crear precios de vidrio de prueba
     glass_price = GlassPrice.create!(
       glass_type: "LAM",
@@ -125,7 +125,7 @@ class DvhTest < ActiveSupport::TestCase
     AppConfig.singleton_class.send(:remove_method, :calculate_innertube_total_price)
   end
   
-  test "debe usar el precio proporcionado en lugar de calcularlo" do
+  test "uses provided price instead of calculating it" do
     dvh = Dvh.create!(
       height: 1000,
       width: 1000,

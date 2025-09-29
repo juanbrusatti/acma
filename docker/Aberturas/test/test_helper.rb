@@ -40,26 +40,4 @@ end
 class ActionDispatch::SystemTestCase
   # Usar el navegador Chrome para pruebas de sistema
   driven_by :selenium, using: :chrome, screen_size: [1400, 1400]
-  
-  # Método de ayuda para iniciar sesión en pruebas de sistema
-  def log_in_as(user, password: 'password')
-    visit new_user_session_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: password
-    click_button 'Iniciar sesión'
-  end
-end
-
-# Configuración para pruebas de integración
-class ActionDispatch::IntegrationTest
-  # Método de ayuda para iniciar sesión en pruebas de integración
-  def log_in_as(user, password: 'password')
-    post user_session_path, params: { 
-      user: { 
-        email: user.email, 
-        password: password 
-      } 
-    }
-    follow_redirect!
-  end
 end

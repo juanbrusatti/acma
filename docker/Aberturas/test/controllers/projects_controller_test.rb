@@ -23,7 +23,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     )
   end
   
-  test "should filter projects by status" do
+  test "filters projects by status" do
     # Test filtering by 'Pendiente' status
     get projects_url, params: { status: "Pendiente" }
     assert_response :success
@@ -52,7 +52,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_match @project2.name, response.body
   end
   
-  test "should search projects by name" do
+  test "searches projects by name" do
     # Test searching by part of the name
     get projects_url, params: { search: "especial" }
     assert_response :success
@@ -73,7 +73,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'table tbody tr td', { text: "No se encontraron proyectos con los filtros aplicados." }
   end
   
-  test "should combine search and status filter" do
+  test "combines search and status filters" do
     # Create a project that would match both filters
     combined_project = Project.create!(
       name: "Proyecto especial en proceso",
@@ -100,7 +100,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match @project3.name, response.body
   end
   
-  test "should paginate results" do
+  test "paginates results when there are many projects" do
     # Create enough projects to trigger pagination
     15.times do |i|
       Project.create!(
