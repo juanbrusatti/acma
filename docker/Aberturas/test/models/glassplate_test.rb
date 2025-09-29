@@ -2,7 +2,7 @@ require 'test_helper'
 
 # Test para Glassplate
 class GlassplateTest < ActiveSupport::TestCase
-  test "debe tener atributos requeridos" do
+  test "requires all mandatory attributes" do
     glassplate = Glassplate.new
     assert_not glassplate.valid?
     assert_includes glassplate.errors[:glass_type], "El tipo de vidrio no puede estar en blanco"
@@ -14,7 +14,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Test para validar valores de enumeraciones
-  test "debe validar valores de enumeraciones" do
+  test "validates enum values" do
     glassplate = Glassplate.new(
       glass_type: "INVALID",
       thickness: "3+3",
@@ -29,7 +29,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Test para crear un registro válido
-  test "debe crear un registro válido" do
+  test "creates a valid record" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -43,7 +43,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Pruebas para el método full_description
-  test "debe devolver la descripción completa del vidrio" do
+  test "returns full glass description" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -57,7 +57,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Pruebas de valores límite para width y height
-  test "debe validar que el ancho sea mayor que 0" do
+  test "must validate that the width is greater than 0" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -71,7 +71,7 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes glassplate.errors[:width], "El ancho debe ser mayor que 0"
   end
 
-  test "debe validar que el alto sea mayor que 0" do
+  test "must validate that the height is greater than 0" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -85,7 +85,7 @@ class GlassplateTest < ActiveSupport::TestCase
     assert_includes glassplate.errors[:height], "El alto debe ser mayor que 0"
   end
 
-  test "debe validar que la cantidad sea mayor o igual a 0" do
+  test "must validate that the quantity is greater than or equal to 0" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -100,7 +100,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Pruebas de inclusión para glass_type
-  test "debe validar que el tipo de vidrio sea LAM, FLO o COL" do
+  test "must validate that the glass type is LAM, FLO or COL" do
     glassplate = Glassplate.new(
       glass_type: "INVALID",
       thickness: "3+3",
@@ -115,7 +115,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Pruebas de inclusión para thickness
-  test "debe validar que el espesor sea válido" do
+  test "must validate that the thickness is valid" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "2+2",  # Inválido
@@ -130,7 +130,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Pruebas de inclusión para color
-  test "debe validar que el color sea válido" do
+  test "must validate that the color is valid" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",
@@ -145,7 +145,7 @@ class GlassplateTest < ActiveSupport::TestCase
   end
 
   # Prueba de borde: valores mínimos válidos
-  test "debe ser válido con valores mínimos" do
+  test "must be valid with minimum values" do
     glassplate = Glassplate.new(
       glass_type: "LAM",
       thickness: "3+3",

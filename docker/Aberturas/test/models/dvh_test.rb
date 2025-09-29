@@ -146,7 +146,7 @@ class DvhTest < ActiveSupport::TestCase
     assert_equal 500.0, dvh.price
   end
   
-  test "debe manejar correctamente la falta de precios de vidrio" do
+  test "handles missing glass prices correctly" do
     # Asegurarse de que no hay precios de vidrio en la base de datos
     GlassPrice.destroy_all
     
@@ -178,7 +178,7 @@ class DvhTest < ActiveSupport::TestCase
   end
   
   # Prueba de exclusión mutua para los tipos de vidrio
-  test "debe validar que los tipos de vidrio sean válidos" do
+  test "validates that glass types are valid" do
     dvh = Dvh.new(
       height: 100,
       width: 100,
@@ -199,7 +199,7 @@ class DvhTest < ActiveSupport::TestCase
   end
   
   # Prueba de exclusión mutua para los colores de vidrio
-  test "debe validar que los colores de vidrio sean válidos" do
+  test "must validate that the glass colors are valid" do
     dvh = Dvh.new(
       height: 100,
       width: 100,
@@ -220,7 +220,7 @@ class DvhTest < ActiveSupport::TestCase
   end
   
   # Prueba de exclusión mutua para los espesores de vidrio
-  test "debe validar que los espesores de vidrio sean válidos" do
+  test "must validate that the glass thicknesses are valid" do
     dvh = Dvh.new(
       height: 100,
       width: 100,
