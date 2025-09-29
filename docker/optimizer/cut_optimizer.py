@@ -132,7 +132,13 @@ def run_optimizer(input_data, stock_data):
                 packer_glassplates.add_bin(width=plate['width'], height=plate['height'], bid=new_plate_id)
                 # Estandarizar tipo a 'New' para coincidir con output.print_summary
                 bin_details_map[new_plate_id] = {
-                    'id': new_plate_id, 'width': plate['width'], 'height': plate['height'], 'type': 'New'
+                    'id': new_plate_id,
+                    'width': plate['width'],
+                    'height': plate['height'],
+                    'type': 'New',
+                    'color': plate.get('color'),
+                    'glass_type': plate.get('glass_type'),
+                    'thickness': plate.get('thickness')
                 }
 
         # Empaquetamos para las piezas nuevas
@@ -181,7 +187,7 @@ if __name__ == "__main__":
             print(f"Error reading JSON from stdin: {e}", file=sys.stderr)
             exit(1)
     else:
-    
+
         if args.inp:
             # primero intentar parsear como JSON literal
             try:

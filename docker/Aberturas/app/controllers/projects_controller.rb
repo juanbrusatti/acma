@@ -177,6 +177,16 @@ class ProjectsController < ApplicationController
     require 'net/http'
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
+
+    pieces_to_cut, stock = create_microservice_params(@project)
+
+    call_microservice_optimizer(uri, pieces_to_cut, stock)
+  end
+
+  private
+
+  def create_microservice_params(project = nil)
+    @project = project || Project.find(params[:id])
     pieces_to_cut = []
     glasscuttings = @project.glasscuttings
     dvhs = @project.dvhs
@@ -185,7 +195,11 @@ class ProjectsController < ApplicationController
         id: cut.typology,
         width: cut.width,
         height: cut.height,
-        quantity: 1
+        quantity: 1,
+        color: cut.color,
+        glass_type: cut.glass_type,
+        thickness: cut.thickness,
+        # type_opening: cut.type_opening
       }
     end
 
@@ -194,37 +208,55 @@ class ProjectsController < ApplicationController
         id: cut.typology,
         width: cut.width,
         height: cut.height,
-        quantity: 2
+        quantity: 2,
+        # For DVHs, we send details of the first glasscutting only
+        color: cut.glasscutting1_color,
+        glass_type: cut.glasscutting1_type,
+        thickness: cut.glasscutting1_thickness,
+        # type_opening: cut.type_opening
       }
     end
 
-    # Cuando diferenciemos entre tipos de vidrio, color y grosor, deberiamos pasarles esos atributos tambien
+    # Nota: Capaz que despues si nos interesa el tipo de abertira, asi que lo dejo por laas duda
 
     pieces_to_cut = pieces_to_cut.as_json
     stock = {
-      glassplates: Glassplate.all.as_json,
-      scraps: Scrap.all.as_json
+      glassplates: Glassplate.all.map { |gp|
+        gp.as_json.merge(
+          color: gp.color,
+          glass_type: gp.glass_type,
+          thickness: gp.thickness
+        )
+      },
+      scraps: Scrap.all.map { |sc|
+        sc.as_json.merge(
+          color: sc.color,
+          glass_type: sc.scrap_type, # We use scrap_type as glass_type for scraps
+          thickness: sc.thickness
+        )
+      }
     }
-    begin
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.read_timeout = 180
-      req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
-      req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body
-      response = http.request(req)
-      if response.code.to_i == 200
-        data = response.body
-        send_data data, filename: "cutting_plan_visuals.zip", type: 'application/zip', disposition: 'attachment'
-      else
-        Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
-        redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
-      end
-    rescue => e
-      Rails.logger.error "Optimizer request error: #{e.message}"
-      redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
-    end
+
+    return pieces_to_cut, stock
   end
 
-  private
+  def call_microservice_optimizer(uri, pieces_to_cut, stock)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.read_timeout = 180
+    req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
+    req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body
+    response = http.request(req)
+    if response.code.to_i == 200
+      data = response.body
+      send_data data, filename: "cutting_plan_visuals.zip", type: 'application/zip', disposition: 'attachment'
+    else
+      Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
+      redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
+    end
+  rescue => e
+    Rails.logger.error "Optimizer request error: #{e.message}"
+    redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
+  end
 
   def project_basic_params
     params.require(:project).permit(:name, :phone, :address, :delivery_date, :description, :status)

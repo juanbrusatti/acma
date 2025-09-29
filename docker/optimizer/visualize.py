@@ -55,10 +55,17 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
         # Determinar tipo de placa y mostrar texto arriba del plano
         bin_name = bin_id.lower()
-        if "scrap" in bin_name or "leftover" in bin_name:
-            plano_label = f"Sobrante {bin_width:.0f} x {bin_height:.0f}"
-        else:
-            plano_label = f"Plancha {bin_width:.0f} x {bin_height:.0f}"
+        prefix = "Sobrante" if ("scrap" in bin_name or "leftover" in bin_name) else "Plancha"
+        # Mostrar alto x ancho
+        dims_text = f"{bin_height:.0f} x {bin_width:.0f}"
+        # Sufijo con glass_type thickness color si estuviesen
+        bdet = bin_details_map.get(bin_id, {})
+        gt = bdet.get('glass_type')
+        th = bdet.get('thickness')
+        co = bdet.get('color')
+        suffix_parts = [p for p in [gt, th, co] if p]
+        suffix = f" - {' '.join(suffix_parts)}" if suffix_parts else ""
+        plano_label = f"{prefix} {dims_text}{suffix}"
         fig.text(0.5, 0.90, plano_label, ha='center', va='bottom', fontsize=11, weight='bold')
 
         # Ajustar márgenes para centrar y ampliar el área de dibujo
@@ -90,9 +97,9 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                                      facecolor='skyblue', alpha=0.6)
             ax.add_patch(rect)
 
-            # Mostrar tipología (usando 'Piece_ID' que es la tipología)
+            # Mostrar tipología (usando 'Piece_ID') y debajo alto x ancho
             typology = piece.get('Piece_ID', '')
-            label = f"{typology}\n{w:.0f} x {h:.0f}"
+            label = f"{typology}\n{h:.0f} x {w:.0f}"
 
             # Ajuste automático: si es muy chico el rectángulo, poner la etiqueta afuera
             if w < 60 or h < 40:
@@ -102,8 +109,19 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                 ax.text(x0 + w/2, y0 + h/2, label,
                         ha='center', va='center', fontsize=8, color='black')
 
-        # Guardar PDF
-        base_pdf = os.path.join(output_folder, f"{bin_id}.pdf")
+        # Guardar PDF en subcarpeta por combinación (glass_type_thickness_color)
+        bdet = bin_details_map.get(bin_id, {})
+        gt = str(bdet.get('glass_type') or '').strip()
+        th = str(bdet.get('thickness') or '').strip()
+        co = str(bdet.get('color') or '').strip()
+        label_parts = [p for p in [gt, th, co] if p]
+        combo_folder = "_".join(label_parts) if label_parts else "unknown"
+        # sanitizar
+        combo_folder = combo_folder.replace(' ', '-').replace('/', '-').replace('\\', '-')
+        out_dir = os.path.join(output_folder, combo_folder)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir, exist_ok=True)
+        base_pdf = os.path.join(out_dir, f"{bin_id}.pdf")
         with PdfPages(base_pdf) as pdf:
             pdf.savefig(fig, bbox_inches='tight')
         print(f"✅ Guardado PDF: {base_pdf}")
