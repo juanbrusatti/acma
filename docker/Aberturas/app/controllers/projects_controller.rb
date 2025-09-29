@@ -245,10 +245,60 @@ class ProjectsController < ApplicationController
     http.read_timeout = 180
     req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
     req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body
+
     response = http.request(req)
+
+    # Manage the response from the optimizer
+    manage_response(response)
+
+  end
+
+  def manage_response(response)
     if response.code.to_i == 200
-      data = response.body
-      send_data data, filename: "cutting_plan_visuals.zip", type: 'application/zip', disposition: 'attachment'
+      content_type = response["content-type"] || response["Content-Type"]
+      body = response.body
+
+      # When the microservice returns (JSON + ZIP),
+      # we save the JSON in @optimizer_summary and send the ZIP as a download.
+      zip_bytes = nil
+      zip_filename = "cutting_plan_visuals.zip"
+      json_text = nil
+
+      parsed_ok = false
+
+      # Try with MIME parser from 'mail' gem (available in Rails)
+      # Si esto no anda fijate de hacerlo manual matute.
+      begin
+        require 'mail'
+        raw_mime = "Content-Type: #{content_type}\r\nMIME-Version: 1.0\r\n\r\n#{body}"
+        mail = Mail.read_from_string(raw_mime)
+        if mail&.multipart?
+          json_part = mail.parts.find { |p| p.mime_type&.include?('application/json') }
+          zip_part  = mail.parts.find { |p| p.mime_type&.include?('application/zip') }
+          json_text = json_part&.decoded
+          if zip_part
+            zip_bytes = zip_part.body.decoded
+            zip_filename = zip_part.filename.presence || zip_filename
+          end
+          parsed_ok = true
+        end
+      rescue LoadError, StandardError => e
+        Rails.logger.warn "Fallo parseo MIME con 'mail': #{e.class} #{e.message}."
+      end
+
+      # Persistir JSON en variable de instancia para uso posterior
+      begin
+        @optimizer_summary = json_text.present? ? JSON.parse(json_text) : nil
+      rescue JSON::ParserError => e
+        Rails.logger.warn "No se pudo parsear JSON de resumen: #{e.message}"
+        @optimizer_summary = json_text # guardar texto crudo como último recurso
+      end
+
+      # Send ZIP as download
+      if zip_bytes
+        send_data zip_bytes, filename: zip_filename, type: 'application/zip', disposition: 'attachment'
+      end
+
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
       redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"

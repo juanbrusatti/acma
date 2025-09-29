@@ -3,8 +3,10 @@ import os
 import io
 import json
 import zipfile
+import csv
+import uuid
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, Response
 import traceback
 from fastapi import Request
 import sys
@@ -41,16 +43,40 @@ async def run_optimize(request: Request):
         # Build combinations for color/thickness/glass_type
         optimization_inputs = create_optimizations_objects(input)
 
+        # Optimize each build and collect CSV summaries
+        csv_summary = {}
         for pieces_to_cut, stock in optimization_inputs:
-            optimize(pieces_to_cut, stock, zip_buffer)
+            combo_label, rows = optimize(pieces_to_cut, stock, zip_buffer)
+            csv_summary[combo_label] = rows
 
-
+        # Build multipart/mixed response with JSON and ZIP as separate parts
         zip_buffer.seek(0)
+        zip_bytes = zip_buffer.getvalue()
 
-        print("[LOG] Respondiendo con ZIP")
-        return StreamingResponse(zip_buffer, media_type='application/zip', headers={
-            'Content-Disposition': 'attachment; filename="cutting_plan_visuals.zip"'
-        })
+        boundary = f"cutplan-{uuid.uuid4().hex}"
+        boundary_bytes = boundary.encode('utf-8')
+        CRLF = b"\r\n"
+
+        json_bytes = json.dumps(csv_summary, ensure_ascii=False).encode('utf-8')
+
+        body = bytearray()
+        # Part 1: JSON summary
+        body.extend(b"--" + boundary_bytes + CRLF)
+        body.extend(b"Content-Type: application/json; charset=utf-8" + CRLF)
+        body.extend(b"Content-Disposition: inline; name=\"summary\"" + CRLF + CRLF)
+        body.extend(json_bytes + CRLF)
+
+        # Part 2: ZIP attachment
+        body.extend(b"--" + boundary_bytes + CRLF)
+        body.extend(b"Content-Type: application/zip" + CRLF)
+        body.extend(b"Content-Disposition: attachment; filename=\"cutting_plan_visuals.zip\"" + CRLF + CRLF)
+        body.extend(zip_bytes + CRLF)
+
+        # End boundary
+        body.extend(b"--" + boundary_bytes + b"--" + CRLF)
+
+        print("[LOG] Respondiendo con multipart (JSON + ZIP)")
+        return Response(content=bytes(body), media_type=f"multipart/mixed; boundary={boundary}")
     except Exception as e:
         print("[ERROR] Excepción en /optimize:")
         print(e)
@@ -76,6 +102,16 @@ def create_optimizations_objects(input_data):
     Only combos that exist in pieces_to_cut are returned.
     """
 
+    # Allow JSON string or dict
+    if isinstance(input_data, str):
+        try:
+            input_data = json.loads(input_data)
+        except Exception:
+            raise HTTPException(status_code=400, detail='Invalid JSON in create_optimizations_objects')
+
+    if not isinstance(input_data, dict):
+        raise HTTPException(status_code=400, detail='Invalid payload for create_optimizations_objects')
+
     pieces = input_data.get('pieces_to_cut') or []
     stock = input_data.get('stock') or {}
     glassplates = stock.get('glassplates') or []
@@ -99,6 +135,17 @@ def create_optimizations_objects(input_data):
             results.append((pcs_combo, { 'glassplates': gps_combo, 'scraps': scs_combo }))
 
     return results
+
+def _parse_csv_rows(csv_path: str):
+    rows = []
+    if not os.path.exists(csv_path):
+        return rows
+    with open(csv_path, 'r', newline='') as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            rows.append(r)
+    return rows
+
 
 def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
     """
@@ -151,13 +198,18 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
 
     # Add PDFs and CSV to the ZIP
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
-        # Generated PDFs
-        for file in os.listdir(OUTPUT_VISUALS_DIR):
-            if file.endswith('.pdf'):
-                full_path = os.path.join(OUTPUT_VISUALS_DIR, file)
-                zf.write(full_path, arcname=file)
+        # Generated PDFs (include subfolders, keep relative paths)
+        for root, _, files in os.walk(OUTPUT_VISUALS_DIR):
+            for file in files:
+                if file.endswith('.pdf'):
+                    full_path = os.path.join(root, file)
+                    arcname = os.path.relpath(full_path, OUTPUT_VISUALS_DIR)
+                    zf.write(full_path, arcname=arcname)
 
         # CSV (if exists)
         if os.path.exists(OUTPUT_CSV):
             csv_name = f"cutting_plan_{combo_label}.csv"
             zf.write(OUTPUT_CSV, arcname=csv_name)
+
+    # Parse and return CSV rows for this combo
+    return combo_label, _parse_csv_rows(OUTPUT_CSV)
