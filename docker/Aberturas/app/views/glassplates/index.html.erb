@@ -84,6 +84,44 @@
       </div>
     </div>
 
+    <!-- Barra de búsqueda unificada -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <div class="px-8 pt-8 pb-4 border-b border-gray-100 rounded-t-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 class="text-3xl font-bold mb-1 text-gray-900">Gestión de Stock</h2>
+            <p class="text-gray-400 text-base mb-2">Planchas completas y retazos de vidrio en el taller.</p>
+          </div>
+
+          <!-- Barra de búsqueda -->
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <%= form_tag glassplates_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full", id: "search-form" do %>
+              <%= hidden_field_tag :tab, params[:tab] || 'planchas', id: 'current-tab' %>
+              <div class="relative w-full md:w-64">
+                <%= text_field_tag :search, params[:search], 
+                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...", 
+                    class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="flex gap-2 w-full md:w-auto">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex-1">
+                  Buscar
+                </button>
+                <% if params[:search].present? %>
+                  <%= link_to "Limpiar", glassplates_path(tab: params[:tab] || 'planchas'), class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300 flex-1 text-center" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tabs -->
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
       <div class="border-b p-4">
@@ -132,15 +170,15 @@
                     <td class="px-4 py-2 text-center">
                       <div class="flex gap-2 justify-center">
                         <button type="button" class="edit-glassplate-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                          </svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
                         </button>
-                        <%= link_to glassplate_path(glassplate), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: glassplate_path(glassplate), type: "plancha" } do %>
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                          </svg>
-                        <% end %>
+                      <%= link_to glassplate_path(glassplate), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: glassplate_path(glassplate), type: "plancha" } do %>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      <% end %>
                       </div>
                     </td>
                   </tr>
@@ -148,6 +186,12 @@
               </tbody>
             </table>
           </div>
+          
+          <!-- Paginación para Glassplates -->
+          <%= pagination_container(@glassplates, "planchas", { 
+            search: params[:search], 
+            tab: params[:tab]
+          }) %>
         </div>
       </div>
 
@@ -192,15 +236,15 @@
                     <td class="px-4 py-2 text-center">
                       <div class="flex gap-2 justify-center">
                         <button type="button" class="edit-scrap-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                          </svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
                         </button>
-                        <%= link_to scrap_path(scrap), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: scrap_path(scrap), type: "retazo" } do %>
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                          </svg>
-                        <% end %>
+                      <%= link_to scrap_path(scrap), method: :delete, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar", data: { url: scrap_path(scrap), type: "retazo" } do %>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      <% end %>
                       </div>
                     </td>
                   </tr>
@@ -208,6 +252,12 @@
               </tbody>
             </table>
           </div>
+          
+          <!-- Paginación para Scraps -->
+          <%= pagination_container(@scraps, "retazos", { 
+            search: params[:search], 
+            tab: params[:tab]
+          }) %>
         </div>
       </div>
 
@@ -231,6 +281,20 @@ function initializeTabs() {
     return;
   }
 
+  // Get active tab from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTabParam = urlParams.get('tab');
+  let initialTab = activeTabParam || 'planchas'; // Default to 'planchas'
+
+  console.log('URL tab parameter:', activeTabParam);
+  console.log('Initial tab:', initialTab);
+
+  // Ensure the initialTab exists, otherwise default to 'planchas'
+  if (!document.getElementById(`${initialTab}-tab`)) {
+    console.log('Tab not found, defaulting to planchas');
+    initialTab = 'planchas';
+  }
+
   // Limpiar listeners existentes para evitar duplicados
   tabs.forEach(tab => {
     const newTab = tab.cloneNode(true);
@@ -239,6 +303,28 @@ function initializeTabs() {
 
   // Obtener los nuevos elementos después del reemplazo
   const newTabs = document.querySelectorAll('[data-tab]');
+
+  // Set initial active tab based on URL parameter
+  newTabs.forEach(tab => {
+    if (tab.getAttribute('data-tab') === initialTab) {
+      tab.classList.add('bg-primary', 'text-primary-foreground', 'shadow-sm');
+      tab.classList.remove('bg-background', 'text-muted-foreground');
+      console.log('✅ Set initial active tab:', initialTab);
+    } else {
+      tab.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
+      tab.classList.add('bg-background', 'text-muted-foreground');
+    }
+  });
+
+  // Set initial tab content visibility
+  tabContents.forEach(content => {
+    if (content.id === `${initialTab}-tab`) {
+      content.classList.remove('hidden');
+      console.log('✅ Show initial content for tab:', initialTab);
+    } else {
+      content.classList.add('hidden');
+    }
+  });
 
   newTabs.forEach(tab => {
     tab.addEventListener('click', function() {
@@ -275,6 +361,57 @@ document.addEventListener('DOMContentLoaded', initializeTabs);
 
 // También inicializar cuando se navega con Turbo (para Rails 7+)
 document.addEventListener('turbo:load', initializeTabs);
+
+// Función para actualizar el placeholder de búsqueda según el tab activo
+function updateSearchPlaceholder() {
+  const searchInput = document.querySelector('input[name="search"]');
+  const activeTab = document.querySelector('[data-tab].bg-primary') || document.querySelector('[data-tab="planchas"]');
+  
+  if (searchInput && activeTab) {
+    const tabType = activeTab.getAttribute('data-tab');
+    if (tabType === 'sobrantes') {
+      searchInput.placeholder = "Buscar retazos por referencia, tipo, grosor, color...";
+    } else {
+      searchInput.placeholder = "Buscar planchas por tipo, grosor, color...";
+    }
+  }
+}
+
+// Actualizar placeholder cuando se cambie de tab
+document.addEventListener('click', function(e) {
+  if (e.target.hasAttribute('data-tab')) {
+    setTimeout(updateSearchPlaceholder, 100); // Pequeño delay para que se actualice el tab
+  }
+});
+
+// Inicializar placeholder al cargar
+document.addEventListener('turbo:load', updateSearchPlaceholder);
+
+// Función para actualizar el campo tab del formulario cuando se cambia de tab
+function updateSearchFormTab() {
+  const activeTab = document.querySelector('[data-tab].bg-primary');
+  const tabInput = document.getElementById('current-tab');
+  
+  if (activeTab && tabInput) {
+    const tabValue = activeTab.getAttribute('data-tab');
+    tabInput.value = tabValue;
+    console.log('✅ Updated search form tab to:', tabValue);
+  }
+}
+
+// Actualizar el campo tab cuando se cambie de tab
+document.addEventListener('click', function(e) {
+  if (e.target.hasAttribute('data-tab')) {
+    setTimeout(() => {
+      updateSearchFormTab();
+      updateSearchPlaceholder();
+    }, 100);
+  }
+});
+
+// Inicializar el campo tab al cargar
+document.addEventListener('turbo:load', updateSearchFormTab);
+document.addEventListener('DOMContentLoaded', updateSearchFormTab);
 </script>
 
 <script>
