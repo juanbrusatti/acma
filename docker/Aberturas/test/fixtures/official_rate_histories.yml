@@ -1,13 +1,8 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  rate: 9.99
-  source: MyString
-  updated_at: 2025-09-12 09:16:32
+  rate: 850.50
+  source: "BCRA"
+  rate_date: 2025-09-30
+  notes: "Fixture inicial"
   manual_update: false
-
-two:
-  rate: 9.99
-  source: MyString
-  updated_at: 2025-09-12 09:16:32
-  manual_update: false
+  previous_rate: 840.00
+  change_percentage: 1.25

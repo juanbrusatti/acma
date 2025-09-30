@@ -103,6 +103,8 @@ es:
             glasscutting2_color:
               blank: "El color del vidrio 2 no puede estar en blanco"
               inclusion: "El color del vidrio 2 no es válido"
+            project:
+              required: "debe existir"
         scrap:
           attributes:
             ref_number:

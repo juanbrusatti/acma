@@ -1,15 +1,17 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  name: Proyecto Test
-  phone: "123456789"
-  address: "Dirección de prueba"
-  description: "Descripción de prueba"
-  status: "Pendiente"
+  name: Proyecto de prueba
+  phone: '123456789'
+  status: 'Pendiente'
+  description: Proyecto inicial
+  delivery_date: <%= 1.week.from_now.to_date %>
+  price: 1000.0
+  price_without_iva: 826.45
 
-two:
-  name: Proyecto Test 2
-  phone: "987654321"
-  address: "Otra dirección"
-  description: "Otra descripción"
-  status: "En Proceso"
+completed_project:
+  name: Proyecto completado
+  phone: '987654321'
+  status: 'Terminado'
+  description: Proyecto ya finalizado
+  delivery_date: <%= 1.week.ago.to_date %>
+  price: 2000.0
+  price_without_iva: 1652.89
