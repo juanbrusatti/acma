@@ -1,0 +1,15 @@
+one:
+  glass_type: "Simple"
+  thickness: 6
+  color: "Blanco"
+  buying_price: 100.0
+  percentage: 50.0
+  selling_price: 150.0
+
+two:
+  glass_type: "DVH"
+  thickness: 8
+  color: "Bronce"
+  buying_price: 200.0
+  percentage: 20.0
+  selling_price: 240.0

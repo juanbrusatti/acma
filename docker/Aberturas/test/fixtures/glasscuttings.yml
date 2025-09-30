@@ -1,0 +1,10 @@
+one:
+  project: one
+  glass_type: "Simple"
+  thickness: 6
+  height: 100
+  width: 80
+  color: "Blanco"
+  typology: "Fijo"
+  type_opening: "Sin apertura"
+  price: 150.0

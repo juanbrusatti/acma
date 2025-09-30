@@ -1,0 +1,8 @@
+one:
+  rate: 850.50
+  source: "BCRA"
+  rate_date: 2025-09-30
+  notes: "Fixture inicial"
+  manual_update: false
+  previous_rate: 840.00
+  change_percentage: 1.25
