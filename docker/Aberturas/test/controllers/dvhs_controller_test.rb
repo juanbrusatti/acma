@@ -4,19 +4,20 @@ require 'test_helper'
 class DvhsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @project = projects(:one)
+    dvh = dvhs(:one)
     @dvh_params = {
-      innertube: 12,               # válido según modelo: [6,9,12,20]
-      typology: "Corrediza",
-      height: 200,
-      width: 100,
-      type_opening: "PVC",        # válido: ["PVC","Aluminio"]
-      glasscutting1_type: "LAM",  # válido: ["LAM","FLO","COL"]
-      glasscutting1_thickness: "5mm", # válido: ["3+3","4+4","5+5","5mm"]
-      glasscutting1_color: "BLS",     # válido: ["INC","STB","GRS","BRC","BLS","STG","NTR"]
-      glasscutting2_type: "FLO",
-      glasscutting2_thickness: "4+4",
-      glasscutting2_color: "INC",
-      price: 300.0
+      innertube: dvh.innertube,
+      typology: dvh.typology,
+      height: dvh.height,
+      width: dvh.width,
+      type_opening: dvh.type_opening,
+      glasscutting1_type: dvh.glasscutting1_type,
+      glasscutting1_thickness: dvh.glasscutting1_thickness,
+      glasscutting1_color: dvh.glasscutting1_color,
+      glasscutting2_type: dvh.glasscutting2_type,
+      glasscutting2_thickness: dvh.glasscutting2_thickness,
+      glasscutting2_color: dvh.glasscutting2_color,
+      price: dvh.price
     }
   end
 

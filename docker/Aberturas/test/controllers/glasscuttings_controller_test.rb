@@ -4,15 +4,16 @@ require 'test_helper'
 class GlasscuttingsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @project = projects(:one)
+    gc = glasscuttings(:one)
     @glasscutting_params = {
-      glass_type: "LAM",      # inclusión válida: ["LAM","FLO","COL"]
-      thickness: "5mm",       # inclusión válida: ["3+3","4+4","5+5","5mm"]
-      height: 100,
-      width: 80,
-      color: "BLS",           # inclusión válida: ["INC","STB","GRS","BRC","BLS","STG","NTR"]
-      typology: "Fijo",
-      price: 150.0,
-      type_opening: "PVC"      # inclusión válida: ["PVC","Aluminio"]
+      glass_type: gc.glass_type,
+      thickness: gc.thickness,
+      height: gc.height,
+      width: gc.width,
+      color: gc.color,
+      typology: gc.typology,
+      price: gc.price,
+      type_opening: gc.type_opening
     }
   end
 

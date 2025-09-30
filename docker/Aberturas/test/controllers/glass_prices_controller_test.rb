@@ -4,13 +4,14 @@ require 'test_helper'
 class GlassPricesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @glass_price = glass_prices(:one)
+    gp = glass_prices(:one)
     @glass_price_params = {
-      glass_type: "Simple",
-      thickness: 6,
-      color: "Blanco",
-      buying_price: 100.0,
-      percentage: 50.0,
-      selling_price: 150.0
+      glass_type: gp.glass_type,
+      thickness: gp.thickness,
+      color: gp.color,
+      buying_price: gp.buying_price,
+      percentage: gp.percentage,
+      selling_price: gp.selling_price
     }
   end
 

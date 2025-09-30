@@ -1,14 +1,14 @@
 one:
   project: one
-  innertube: "24mm"
+  innertube: 12
   typology: "Corrediza"
   height: 200
   width: 100
-  type_opening: "2 Hojas"
-  glasscutting1_type: "DVH"
-  glasscutting1_thickness: 4
-  glasscutting1_color: "Blanco"
-  glasscutting2_type: "DVH"
-  glasscutting2_thickness: 4
-  glasscutting2_color: "Blanco"
+  type_opening: "PVC"
+  glasscutting1_type: "LAM"
+  glasscutting1_thickness: "5mm"
+  glasscutting1_color: "BLS"
+  glasscutting2_type: "FLO"
+  glasscutting2_thickness: "4+4"
+  glasscutting2_color: "INC"
   price: 300.0

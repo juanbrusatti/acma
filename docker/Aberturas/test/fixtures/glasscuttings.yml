@@ -1,10 +1,10 @@
 one:
   project: one
-  glass_type: "Simple"
-  thickness: 6
+  glass_type: "LAM"
+  thickness: "5mm"
   height: 100
   width: 80
-  color: "Blanco"
+  color: "BLS"
   typology: "Fijo"
-  type_opening: "Sin apertura"
+  type_opening: "PVC"
   price: 150.0
