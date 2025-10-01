@@ -203,18 +203,31 @@ class ProjectsController < ApplicationController
       }
     end
 
-    pieces_to_cut += dvhs.map do |cut|
-      {
-        id: cut.typology,
-        width: cut.width,
-        height: cut.height,
-        quantity: 2,
-        # For DVHs, we send details of the first glasscutting only
-        color: cut.glasscutting1_color,
-        glass_type: cut.glasscutting1_type,
-        thickness: cut.glasscutting1_thickness,
-        # type_opening: cut.type_opening
-      }
+    pieces_to_cut += dvhs.map do |dvh|
+      [
+        {
+          id: dvh.typology,
+          width: dvh.width,
+          height: dvh.height,
+          quantity: 1,
+          # For DVHs, we send details of the first glasscutting only
+          color: dvh.glasscutting1_color,
+          glass_type: dvh.glasscutting1_type,
+          thickness: dvh.glasscutting1_thickness,
+          # type_opening: cut.type_opening
+        },
+        {
+          id: dvh.typology,
+          width: dvh.width,
+          height: dvh.height,
+          quantity: 1,
+          # For DVHs, we send details of the first glasscutting only
+          color: dvh.glasscutting2_color,
+          glass_type: dvh.glasscutting2_type,
+          thickness: dvh.glasscutting2_thickness,
+          # type_opening: cut.type_opening
+        }
+      ]
     end
 
     # Nota: Capaz que despues si nos interesa el tipo de abertira, asi que lo dejo por laas duda
