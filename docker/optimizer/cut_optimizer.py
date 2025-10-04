@@ -83,19 +83,21 @@ def run_optimizer(input_data, stock_data):
     # y generamos el plan de corte para las piezas empaquetadas
     for bin_info in scraps:
         bid_str = str(bin_info['id'])
+        sobrante_id = f"Sobrante_{bid_str}"
         # Estandarizar tipo a 'Leftover' para coincidir con output.print_summary
-        details = {**bin_info, 'id': bid_str, 'type': 'Leftover'}
-        bin_details_map[bid_str] = details
+        details = {**bin_info, 'id': sobrante_id, 'type': 'Leftover'}
+        bin_details_map[sobrante_id] = details
 
     # Recorremos las piezas empaquetadas en los sobrantes
     for rect in packer_scraps.rect_list():
         b_idx, x, y, w, h, rid = rect
         bid = str(packer_scraps[b_idx].bid)
+        sobrante_id = f"Sobrante_{bid}"
         original_w, original_h = original_piece_dimensions[rid]
         is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
 
         packed_in_scraps.append({
-            'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': 'Leftover',
+            'Piece_ID': rid, 'Source_Plate_ID': sobrante_id, 'Source_Plate_Type': 'Leftover',
             'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated
         })
 
@@ -128,7 +130,7 @@ def run_optimizer(input_data, stock_data):
         # Añadimos cada plancha nueva según su cantidad
         for plate in glassplates:
             for i in range(int(plate.get('quantity', 1))):
-                new_plate_id = f"NewPlate_{plate['id']}_{i+1}"
+                new_plate_id = f"Plancha_{plate['id']}_{i+1}"
                 packer_glassplates.add_bin(width=plate['width'], height=plate['height'], bid=new_plate_id)
                 # Estandarizar tipo a 'New' para coincidir con output.print_summary
                 bin_details_map[new_plate_id] = {

@@ -69,7 +69,7 @@ async def run_optimize(request: Request):
         # Part 2: ZIP attachment
         body.extend(b"--" + boundary_bytes + CRLF)
         body.extend(b"Content-Type: application/zip" + CRLF)
-        body.extend(b"Content-Disposition: attachment; filename=\"cutting_plan_visuals.zip\"" + CRLF + CRLF)
+        body.extend(b"Content-Disposition: attachment; filename=\"Plan de corte.zip\"" + CRLF + CRLF)
         body.extend(zip_bytes + CRLF)
 
         # End boundary

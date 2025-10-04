@@ -203,7 +203,7 @@ class ProjectsController < ApplicationController
       }
     end
 
-    pieces_to_cut += dvhs.map do |dvh|
+    pieces_to_cut += dvhs.flat_map do |dvh|
       [
         {
           id: dvh.typology,
