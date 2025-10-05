@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+    
+    .plate-container {
+      page-break-after: always;
+      margin-bottom: 40px;
+    }
+    
+    .plate-info {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+    
+    .plate-info h2 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    
+    .plate-info p {
+      margin: 5px 0;
+      font-size: 12px;
+    }
+    
+    .cutting-diagram {
+      border: 1px solid #000;
+      position: relative;
+      margin: 20px auto;
+      background-color: #ffffff;
+    }
+    
+    .cut-piece {
+      position: absolute;
+      border: 1px solid #000;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+      padding: 2px;
+      box-sizing: border-box;
+    }
+    
+    .cut-piece .dimensions {
+      font-size: 9px;
+      line-height: 1.2;
+    }
+    
+    .scrap-reusable {
+      position: absolute;
+      background-color: #d0d0d0;
+      border: 1px solid #000;
+      opacity: 0.5;
+      box-sizing: border-box;
+    }
+    
+    .scrap-waste {
+      position: absolute;
+      background-color: #808080;
+      border: 1px solid #000;
+      opacity: 0.5;
+      box-sizing: border-box;
+    }
+    
+    .legend {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    
+    .legend-item {
+      display: inline-block;
+      margin-right: 20px;
+      margin-bottom: 5px;
+    }
+    
+    .legend-color {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #000;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    
+    .cuts-list {
+      margin-top: 20px;
+    }
+    
+    .cuts-list table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    
+    .cuts-list th,
+    .cuts-list td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    
+    .cuts-list th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .summary {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e3f2fd;
+      border: 2px solid #2196F3;
+      border-radius: 5px;
+    }
+    
+    .summary h3 {
+      margin-top: 0;
+      color: #1976D2;
+    }
+  </style>
+</head>
+<body>
+  <%
+    # Usar variables locales si están disponibles, sino usar variables de instancia (compatibilidad)
+    project = local_assigns[:project] || @project
+    cutting_plans = local_assigns[:cutting_plans] || @cutting_plans
+  %>
+  
+  <div class="header">
+    <h1>Plan de Corte Optimizado</h1>
+    <p><strong>Proyecto:</strong> <%= project.name %></p>
+    <p><strong>Fecha:</strong> <%= Time.current.strftime('%d/%m/%Y %H:%M') %></p>
+    <p><strong>Total de Planchas:</strong> <%= cutting_plans.length %></p>
+  </div>
+
+  <% cutting_plans.each_with_index do |plan, index| %>
+    <div class="plate-container">
+      <div class="plate-info">
+        <h2>Plancha <%= index + 1 %> - <%= plan[:source_ref] %></h2>
+        <p><strong>Tipo:</strong> <%= plan[:glass_type] %> | <strong>Espesor:</strong> <%= plan[:thickness] %> | <strong>Color:</strong> <%= plan[:color] %></p>
+        <p><strong>Dimensiones:</strong> <%= plan[:plate_width].to_i %> x <%= plan[:plate_height].to_i %> mm</p>
+        <p><strong>Origen:</strong> <%= plan[:source_type] == 'scrap' ? 'Sobrante' : 'Plancha Nueva' %></p>
+        <p><strong>Cantidad de cortes:</strong> <%= plan[:cuts].length %></p>
+      </div>
+
+      <%
+        # Calcular escala para que quepa en la página
+        max_width = 700 # px en el PDF
+        max_height = 500
+        
+        scale_x = max_width.to_f / plan[:plate_width]
+        scale_y = max_height.to_f / plan[:plate_height]
+        scale = [scale_x, scale_y].min
+        
+        diagram_width = (plan[:plate_width] * scale).to_i
+        diagram_height = (plan[:plate_height] * scale).to_i
+      %>
+
+      <div class="cutting-diagram" style="width: <%= diagram_width %>px; height: <%= diagram_height %>px;">
+        <!-- Dibujar cortes -->
+        <% plan[:cuts].each do |cut| %>
+          <%
+            cut_x = (cut[:x] * scale).to_i
+            cut_y = (cut[:y] * scale).to_i
+            cut_width = (cut[:width] * scale).to_i
+            cut_height = (cut[:height] * scale).to_i
+          %>
+          <div class="cut-piece" style="left: <%= cut_x %>px; top: <%= cut_y %>px; width: <%= cut_width %>px; height: <%= cut_height %>px;">
+            <div class="dimensions">
+              <%= cut[:id] %><br>
+              <%= cut[:width].to_i %> x <%= cut[:height].to_i %>
+              <% if cut[:rotated] %>
+                <br>(ROT)
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Dibujar sobrantes -->
+        <% if plan[:scraps].present? %>
+          <% plan[:scraps].each do |scrap| %>
+            <%
+              scrap_x = (scrap[:x] * scale).to_i
+              scrap_y = (scrap[:y] * scale).to_i
+              scrap_width = (scrap[:width] * scale).to_i
+              scrap_height = (scrap[:height] * scale).to_i
+              scrap_class = scrap[:reusable] ? 'scrap-reusable' : 'scrap-waste'
+            %>
+            <div class="<%= scrap_class %>" style="left: <%= scrap_x %>px; top: <%= scrap_y %>px; width: <%= scrap_width %>px; height: <%= scrap_height %>px;"></div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="legend">
+        <strong>Leyenda:</strong>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #ffffff; border: 2px solid #000;"></span>
+          Corte de vidrio
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #b0b0b0;"></span>
+          Sobrante reutilizable (≥ 200mm)
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #505050;"></span>
+          Desperdicio (< 200mm)
+        </div>
+      </div>
+
+      <!-- Lista de cortes en esta plancha -->
+      <div class="cuts-list">
+        <h3>Detalle de Cortes</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ancho (mm)</th>
+              <th>Alto (mm)</th>
+              <th>Posición X</th>
+              <th>Posición Y</th>
+              <th>Rotado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% plan[:cuts].each do |cut| %>
+              <tr>
+                <td><%= cut[:id] %></td>
+                <td><%= cut[:width].to_i %></td>
+                <td><%= cut[:height].to_i %></td>
+                <td><%= cut[:x].to_i %></td>
+                <td><%= cut[:y].to_i %></td>
+                <td><%= cut[:rotated] ? 'Sí' : 'No' %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Resumen de sobrantes -->
+      <% if plan[:scraps].present? %>
+        <div class="summary">
+          <h3>Resumen de Sobrantes</h3>
+          <% reusable_scraps = plan[:scraps].select { |s| s[:reusable] } %>
+          <% waste_scraps = plan[:scraps].reject { |s| s[:reusable] } %>
+          
+          <p><strong>Sobrantes reutilizables:</strong> <%= reusable_scraps.length %></p>
+          <% reusable_scraps.each_with_index do |scrap, i| %>
+            <p style="margin-left: 20px;">
+              Sobrante <%= i + 1 %>: <%= scrap[:width].to_i %> x <%= scrap[:height].to_i %> mm
+            </p>
+          <% end %>
+          
+          <p><strong>Desperdicios:</strong> <%= waste_scraps.length %></p>
+          <% total_waste_area = waste_scraps.sum { |s| s[:width] * s[:height] } / 1_000_000.0 %>
+          <p style="margin-left: 20px;">Área total de desperdicio: <%= sprintf('%.2f', total_waste_area) %> m²</p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Resumen general -->
+  <div class="summary" style="page-break-before: always;">
+    <h3>Resumen General del Proyecto</h3>
+    <% 
+      total_cuts = cutting_plans.sum { |p| p[:cuts].length }
+      plates_from_scraps = cutting_plans.count { |p| p[:source_type] == 'scrap' }
+      plates_new = cutting_plans.count { |p| p[:source_type] == 'plate' }
+      
+      total_reusable = cutting_plans.sum { |p| p[:scraps].count { |s| s[:reusable] } }
+      total_waste = cutting_plans.sum { |p| p[:scraps].count { |s| !s[:reusable] } }
+    %>
+    
+    <p><strong>Total de cortes:</strong> <%= total_cuts %></p>
+    <p><strong>Planchas utilizadas:</strong> <%= cutting_plans.length %></p>
+    <p style="margin-left: 20px;">- Desde sobrantes: <%= plates_from_scraps %></p>
+    <p style="margin-left: 20px;">- Planchas nuevas: <%= plates_new %></p>
+    <p><strong>Sobrantes generados reutilizables:</strong> <%= total_reusable %></p>
+    <p><strong>Desperdicios generados:</strong> <%= total_waste %></p>
+    
+    <hr style="margin: 20px 0;">
+    
+    <h4>Eficiencia de corte</h4>
+    <% 
+      total_plate_area = cutting_plans.sum { |p| (p[:plate_width] * p[:plate_height]) / 1_000_000.0 }
+      total_cut_area = cutting_plans.sum { |p| p[:cuts].sum { |c| (c[:width] * c[:height]) / 1_000_000.0 } }
+      efficiency = total_plate_area > 0 ? (total_cut_area / total_plate_area * 100) : 0
+    %>
+    <p><strong>Área total de planchas:</strong> <%= sprintf('%.2f', total_plate_area) %> m²</p>
+    <p><strong>Área total de cortes:</strong> <%= sprintf('%.2f', total_cut_area) %> m²</p>
+    <p><strong>Eficiencia:</strong> <%= sprintf('%.1f', efficiency) %>%</p>
+  </div>
+</body>
+</html>

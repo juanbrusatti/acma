@@ -1,6 +1,7 @@
 WickedPdf.configure do |c|
-  # Path to the wkhtmltopdf executable: Using system wkhtmltopdf
-  c.exe_path = '/usr/local/bin/wkhtmltopdf'
+  # Path to the wkhtmltopdf executable
+  # Use wkhtmltopdf-binary gem
+  c.exe_path = WickedPdfHelper.wkhtmltopdf_path if defined?(WickedPdfHelper)
 
   # Layout file to be used for all PDFs
   # (but can be overridden in `render :pdf` calls)
@@ -9,7 +10,8 @@ WickedPdf.configure do |c|
   # Using wkhtmltopdf without an X server can be achieved by enabling the
   # 'use_xvfb' flag. This will wrap all wkhtmltopdf calls in a 'xvfb-run'
   # command, in order to simulate an X server.
-  c.use_xvfb = true
+  # Set to false for Mac/Windows, true only for headless Linux (Docker)
+  c.use_xvfb = false
 
   # You can specify default options for all PDFs here.
   # These can be overridden in individual calls to `render :pdf`

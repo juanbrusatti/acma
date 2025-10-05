@@ -184,6 +184,80 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def optimize_cutting
+    project = Project.find(params[:id])
+    
+    # Verificar que el proyecto tenga cortes
+    if project.glasscuttings.empty? && project.dvhs.empty?
+      redirect_to project_path(project), alert: "El proyecto no tiene cortes de vidrio para optimizar."
+      return
+    end
+    
+    begin
+      # Ejecutar optimizador
+      optimizer = GlassCuttingOptimizer.new(project)
+      cutting_plans = optimizer.optimize
+      
+      # Verificar que se generaron planes de corte
+      if cutting_plans.empty?
+        redirect_to project_path(project), alert: "No se pudieron generar planes de corte. Verifica que existan planchas disponibles en stock."
+        return
+      end
+      
+      # Crear directorio de optimizaciones si no existe
+      optimize_dir = Rails.root.join('public', 'optimizations', project.id.to_s)
+      FileUtils.mkdir_p(optimize_dir)
+      
+      # Generar PDF usando wicked_pdf
+      pdf_filename = "cortes_optimizados_#{project.id}_#{Time.current.to_i}.pdf"
+      
+      # IMPORTANTE: Resetear sesión para evitar CookieOverflow
+      # La sesión intenta serializar datos grandes incluso con locals
+      reset_session
+      
+      # Renderizar PDF SIN usar variables de instancia para evitar CookieOverflow
+      # Pasar todo como locals
+      pdf_html = render_to_string(
+        template: "projects/cutting_plan",
+        formats: [:pdf],
+        layout: false,
+        locals: { 
+          project: project, 
+          cutting_plans: cutting_plans 
+        }
+      )
+      
+      # Generar PDF
+      pdf = WickedPdf.new.pdf_from_string(
+        pdf_html,
+        page_size: 'A4',
+        orientation: 'Portrait',
+        margin: {
+          top: 10,
+          bottom: 10,
+          left: 10,
+          right: 10
+        },
+        encoding: 'UTF-8'
+      )
+      
+      # Guardar PDF
+      pdf_path = optimize_dir.join(pdf_filename)
+      File.open(pdf_path, 'wb') { |file| file << pdf }
+      
+      # Enviar PDF al navegador sin usar variables de instancia
+      send_data pdf,
+                filename: pdf_filename,
+                type: 'application/pdf',
+                disposition: 'attachment'
+                
+    rescue => e
+      Rails.logger.error "Error optimizando cortes: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      redirect_to project_path(project), alert: "Error al optimizar cortes: #{e.message}"
+    end
+  end
+
   private
 
   def project_basic_params

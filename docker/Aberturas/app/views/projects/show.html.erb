@@ -2,6 +2,12 @@
   <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <h1 class="text-4xl lg:text-5xl font-bold" id="project-name-view"><%= @project.name %></h1>
     <div class="flex gap-2">
+      <%= link_to optimize_cutting_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 h-10 px-4", title: "Optimizar Cortes" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+        </svg>
+        <span class="hidden sm:inline">Optimizar</span>
+      <% end %>
       <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
         <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
       <% end %>

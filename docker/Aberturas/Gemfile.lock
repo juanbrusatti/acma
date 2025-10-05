@@ -376,6 +376,7 @@ GEM
       activesupport
       ostruct
     will_paginate (4.0.1)
+    wkhtmltopdf-binary (0.12.6.10)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.3)
@@ -419,6 +420,7 @@ DEPENDENCIES
   web-console
   wicked_pdf
   will_paginate (~> 4.0)
+  wkhtmltopdf-binary
 
 BUNDLED WITH
    2.6.9

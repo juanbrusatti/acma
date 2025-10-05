@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resources :projects do
     member do
       get :pdf
+      get :optimize_cutting
     end
     collection do
       post :preview_pdf
