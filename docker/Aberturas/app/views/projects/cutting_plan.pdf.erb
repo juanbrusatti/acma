@@ -41,43 +41,38 @@
       border: 1px solid #000;
       position: relative;
       margin: 20px auto;
-      background-color: #ffffff;
+      background-color: #f8f8f8;
+      box-sizing: border-box;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     
     .cut-piece {
       position: absolute;
-      border: 1px solid #000;
-      background-color: #ffffff;
+      border: 1px solid #222;
+      background-color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
-      font-weight: bold;
+      font-size: 9px;
+      font-weight: normal;
       text-align: center;
       padding: 2px;
+      margin: 0;
       box-sizing: border-box;
+      box-shadow: 0 0 0 1px #fff;
     }
     
     .cut-piece .dimensions {
-      font-size: 9px;
+      font-size: 8px;
       line-height: 1.2;
+      padding: 2px;
+      word-break: break-all;
+      overflow: hidden;
+      color: #333;
+      background-color: rgba(255,255,255,0.7);
+      border-radius: 2px;
     }
     
-    .scrap-reusable {
-      position: absolute;
-      background-color: #d0d0d0;
-      border: 1px solid #000;
-      opacity: 0.5;
-      box-sizing: border-box;
-    }
-    
-    .scrap-waste {
-      position: absolute;
-      background-color: #808080;
-      border: 1px solid #000;
-      opacity: 0.5;
-      box-sizing: border-box;
-    }
     
     .legend {
       margin-top: 20px;
@@ -138,12 +133,6 @@
   </style>
 </head>
 <body>
-  <%
-    # Usar variables locales si están disponibles, sino usar variables de instancia (compatibilidad)
-    project = local_assigns[:project] || @project
-    cutting_plans = local_assigns[:cutting_plans] || @cutting_plans
-  %>
-  
   <div class="header">
     <h1>Plan de Corte Optimizado</h1>
     <p><strong>Proyecto:</strong> <%= project.name %></p>
@@ -157,8 +146,7 @@
         <h2>Plancha <%= index + 1 %> - <%= plan[:source_ref] %></h2>
         <p><strong>Tipo:</strong> <%= plan[:glass_type] %> | <strong>Espesor:</strong> <%= plan[:thickness] %> | <strong>Color:</strong> <%= plan[:color] %></p>
         <p><strong>Dimensiones:</strong> <%= plan[:plate_width].to_i %> x <%= plan[:plate_height].to_i %> mm</p>
-        <p><strong>Origen:</strong> <%= plan[:source_type] == 'scrap' ? 'Sobrante' : 'Plancha Nueva' %></p>
-        <p><strong>Cantidad de cortes:</strong> <%= plan[:cuts].length %></p>
+            <p><strong>Cantidad de cortes:</strong> <%= plan[:cuts].length %></p>
       </div>
 
       <%
@@ -188,40 +176,13 @@
               <%= cut[:id] %><br>
               <%= cut[:width].to_i %> x <%= cut[:height].to_i %>
               <% if cut[:rotated] %>
-                <br>(ROT)
               <% end %>
             </div>
           </div>
         <% end %>
 
-        <!-- Dibujar sobrantes -->
-        <% if plan[:scraps].present? %>
-          <% plan[:scraps].each do |scrap| %>
-            <%
-              scrap_x = (scrap[:x] * scale).to_i
-              scrap_y = (scrap[:y] * scale).to_i
-              scrap_width = (scrap[:width] * scale).to_i
-              scrap_height = (scrap[:height] * scale).to_i
-              scrap_class = scrap[:reusable] ? 'scrap-reusable' : 'scrap-waste'
-            %>
-            <div class="<%= scrap_class %>" style="left: <%= scrap_x %>px; top: <%= scrap_y %>px; width: <%= scrap_width %>px; height: <%= scrap_height %>px;"></div>
-          <% end %>
-        <% end %>
       </div>
-
-      <div class="legend">
-        <strong>Leyenda:</strong>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #ffffff; border: 2px solid #000;"></span>
           Corte de vidrio
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #b0b0b0;"></span>
-          Sobrante reutilizable (≥ 200mm)
-        </div>
-        <div class="legend-item">
-          <span class="legend-color" style="background-color: #505050;"></span>
-          Desperdicio (< 200mm)
         </div>
       </div>
 
@@ -254,25 +215,6 @@
         </table>
       </div>
 
-      <!-- Resumen de sobrantes -->
-      <% if plan[:scraps].present? %>
-        <div class="summary">
-          <h3>Resumen de Sobrantes</h3>
-          <% reusable_scraps = plan[:scraps].select { |s| s[:reusable] } %>
-          <% waste_scraps = plan[:scraps].reject { |s| s[:reusable] } %>
-          
-          <p><strong>Sobrantes reutilizables:</strong> <%= reusable_scraps.length %></p>
-          <% reusable_scraps.each_with_index do |scrap, i| %>
-            <p style="margin-left: 20px;">
-              Sobrante <%= i + 1 %>: <%= scrap[:width].to_i %> x <%= scrap[:height].to_i %> mm
-            </p>
-          <% end %>
-          
-          <p><strong>Desperdicios:</strong> <%= waste_scraps.length %></p>
-          <% total_waste_area = waste_scraps.sum { |s| s[:width] * s[:height] } / 1_000_000.0 %>
-          <p style="margin-left: 20px;">Área total de desperdicio: <%= sprintf('%.2f', total_waste_area) %> m²</p>
-        </div>
-      <% end %>
     </div>
   <% end %>
 
@@ -281,19 +223,12 @@
     <h3>Resumen General del Proyecto</h3>
     <% 
       total_cuts = cutting_plans.sum { |p| p[:cuts].length }
-      plates_from_scraps = cutting_plans.count { |p| p[:source_type] == 'scrap' }
       plates_new = cutting_plans.count { |p| p[:source_type] == 'plate' }
-      
-      total_reusable = cutting_plans.sum { |p| p[:scraps].count { |s| s[:reusable] } }
-      total_waste = cutting_plans.sum { |p| p[:scraps].count { |s| !s[:reusable] } }
     %>
     
     <p><strong>Total de cortes:</strong> <%= total_cuts %></p>
     <p><strong>Planchas utilizadas:</strong> <%= cutting_plans.length %></p>
-    <p style="margin-left: 20px;">- Desde sobrantes: <%= plates_from_scraps %></p>
-    <p style="margin-left: 20px;">- Planchas nuevas: <%= plates_new %></p>
-    <p><strong>Sobrantes generados reutilizables:</strong> <%= total_reusable %></p>
-    <p><strong>Desperdicios generados:</strong> <%= total_waste %></p>
+    <p><strong>Planchas nuevas utilizadas:</strong> <%= plates_new %></p>
     
     <hr style="margin: 20px 0;">
     

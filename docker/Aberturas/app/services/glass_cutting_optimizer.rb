@@ -115,15 +115,15 @@ class GlassCuttingOptimizer
   # Verificar si un corte cabe en un sobrante
   def fits_in_scrap?(cut, scrap)
     # Intentar ambas orientaciones
-    (cut[:width] + CUTTING_MARGIN <= scrap.width && cut[:height] + CUTTING_MARGIN <= scrap.height) ||
-    (cut[:height] + CUTTING_MARGIN <= scrap.width && cut[:width] + CUTTING_MARGIN <= scrap.height)
+    (cut[:width] + self.class::CUTTING_MARGIN <= scrap.width && cut[:height] + self.class::CUTTING_MARGIN <= scrap.height) ||
+    (cut[:height] + self.class::CUTTING_MARGIN <= scrap.width && cut[:width] + self.class::CUTTING_MARGIN <= scrap.height)
   end
 
   # Agregar plan de corte para sobrante
   def add_scrap_cutting_plan(cut, scrap)
     # Determinar orientación óptima
     rotated = false
-    if cut[:width] + CUTTING_MARGIN <= scrap.width && cut[:height] + CUTTING_MARGIN <= scrap.height
+    if cut[:width] + self.class::CUTTING_MARGIN <= scrap.width && cut[:height] + self.class::CUTTING_MARGIN <= scrap.height
       # Orientación normal
       placed_width = cut[:width]
       placed_height = cut[:height]
@@ -161,10 +161,10 @@ class GlassCuttingOptimizer
     scraps = []
     
     # Sobrante derecho
-    right_width = plate_width - cut_width - CUTTING_MARGIN
-    if right_width >= MIN_REUSABLE_SCRAP_SIZE
+    right_width = plate_width - cut_width - self.class::CUTTING_MARGIN
+    if right_width >= self.class::MIN_REUSABLE_SCRAP_SIZE
       scraps << {
-        x: cut_width + CUTTING_MARGIN,
+        x: cut_width + self.class::CUTTING_MARGIN,
         y: 0,
         width: right_width,
         height: plate_height,
@@ -173,11 +173,11 @@ class GlassCuttingOptimizer
     end
     
     # Sobrante superior
-    top_height = plate_height - cut_height - CUTTING_MARGIN
-    if top_height >= MIN_REUSABLE_SCRAP_SIZE
+    top_height = plate_height - cut_height - self.class::CUTTING_MARGIN
+    if top_height >= self.class::MIN_REUSABLE_SCRAP_SIZE
       scraps << {
         x: 0,
-        y: cut_height + CUTTING_MARGIN,
+        y: cut_height + self.class::CUTTING_MARGIN,
         width: cut_width,
         height: top_height,
         reusable: true
@@ -353,107 +353,74 @@ class GlassCuttingOptimizer
     }, waste]
   end
 
-  # Empaquetado exacto basado en la imagen de referencia
+  # Empaquetado genérico que se adapta a diferentes configuraciones
   def pack_exact_fit(cuts, plate)
     plate_width = plate.width
     plate_height = plate.height
     
     placed_cuts = []
-    remaining_cuts = []
-    current_y = 0
+    remaining_cuts = cuts.dup
     
-    # 1. Primera fila: 6 piezas de 300x700 (1800mm en total)
-    first_row = cuts.select { |c| (c[:width] == 300 && c[:height] == 700) || (c[:width] == 700 && c[:height] == 300) }.take(6)
+    # Función para verificar si un corte cabe en una posición específica
+    def can_place_cut?(x, y, width, height, plate_width, plate_height, placed_cuts)
+      # Verificar límites de la plancha
+      return false if x + width > plate_width || y + height > plate_height
+      
+      # Verificar superposición con cortes existentes
+      placed_cuts.none? do |pc|
+        x_overlap = [x, pc[:x]].max < [x + width, pc[:x] + pc[:width]].min
+        y_overlap = [y, pc[:y]].max < [y + height, pc[:y] + pc[:height]].min
+        x_overlap && y_overlap
+      end
+    end
     
-    if first_row.size == 6
-      # Colocar las 6 piezas en la primera fila
-      first_row.each_with_index do |cut, index|
-        if cut[:width] == 300 && cut[:height] == 700
-          # Orientación normal
+    # Algoritmo de empaquetado mejorado
+    remaining_cuts.dup.each do |cut|
+      placed = false
+      
+      # Probar con y sin rotación (mejor ajuste primero)
+      [[cut[:width], cut[:height], false], 
+       [cut[:height], cut[:width], true]].each do |width, height, rotated|
+        next if placed
+        
+        # Buscar la mejor posición (esquina inferior izquierda)
+        best_score = Float::INFINITY
+        best_pos = nil
+        
+        # Probar posiciones en la plancha
+        (0..(plate_height - height)).step(10) do |y|
+          (0..(plate_width - width)).step(10) do |x|
+            # Puntuación basada en la distancia al origen (preferir esquina inferior izquierda)
+            score = (x + width) * (y + height)
+            
+            if score < best_score && can_place_cut?(x, y, width, height, plate_width, plate_height, placed_cuts)
+              best_score = score
+              best_pos = [x, y, rotated]
+              break if score == 0  # Mejor puntuación posible
+            end
+          end
+        end
+        
+        # Si encontramos una posición válida, colocar el corte
+        if best_pos
+          x, y, rotated = best_pos
           placed_cuts << {
             id: cut[:id],
-            x: index * 300,
-            y: 0,
-            width: 300,
-            height: 700,
-            rotated: false,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            rotated: rotated,
             original_cut: cut
           }
-        else
-          # Rotar 90 grados
-          placed_cuts << {
-            id: cut[:id],
-            x: index * 300,
-            y: 0,
-            width: 700,
-            height: 300,
-            rotated: true,
-            original_cut: cut
-          }
+          remaining_cuts.delete(cut)
+          placed = true
         end
       end
-      current_y = 700
     end
-    
-    # 2. Segunda fila: 3 piezas de 800x450 (2400mm en total, pero solo 1800mm disponibles)
-    # Vamos a colocar 2 piezas de 800x450 (1600mm) y dejar 200mm de espacio
-    second_row = cuts.reject { |c| (c[:width] == 300 && c[:height] == 700) || (c[:width] == 700 && c[:height] == 300) }
-                     .select { |c| (c[:width] == 800 && c[:height] == 450) || (c[:width] == 450 && c[:height] == 800) }
-                     .take(2)
-    
-    second_row.each_with_index do |cut, index|
-      if cut[:width] == 800 && cut[:height] == 450
-        # Orientación normal
-        placed_cuts << {
-          id: cut[:id],
-          x: index * 800,
-          y: current_y,
-          width: 800,
-          height: 450,
-          rotated: false,
-          original_cut: cut
-        }
-      else
-        # Rotar 90 grados
-        placed_cuts << {
-          id: cut[:id],
-          x: index * 800,
-          y: current_y,
-          width: 450,
-          height: 800,
-          rotated: true,
-          original_cut: cut
-        }
-      end
-    end
-    
-    current_y += [second_row.map { |c| c[:height] }.max || 0, second_row.map { |c| c[:width] }.max || 0].max
-    
-    # 3. Tercera fila: 2 piezas de 500x500 (1000mm en total)
-    third_row = cuts.reject { |c| (c[:width] == 300 && c[:height] == 700) || 
-                                 (c[:width] == 700 && c[:height] == 300) ||
-                                 (c[:width] == 800 && c[:height] == 450) ||
-                                 (c[:width] == 450 && c[:height] == 800) }
-                   .select { |c| (c[:width] == 500 && c[:height] == 500) }
-                   .take(2)
-    
-    third_row.each_with_index do |cut, index|
-      placed_cuts << {
-        id: cut[:id],
-        x: index * 500,
-        y: current_y,
-        width: 500,
-        height: 500,
-        rotated: false,
-        original_cut: cut
-      }
-    end
-    
-    # Calcular cortes restantes
-    placed_ids = placed_cuts.map { |c| c[:original_cut][:id] }
-    remaining_cuts = cuts.reject { |c| placed_ids.include?(c[:id]) }
     
     [placed_cuts, remaining_cuts]
+  end
   end
 
   # Empaquetar cortes usando algoritmo SHELF (estantes horizontales) con diferentes estrategias
@@ -477,8 +444,8 @@ class GlassCuttingOptimizer
       # Intentar colocar en estantes existentes
       shelves.each do |shelf|
         # Probar orientación normal
-        cut_w = cut[:width] + CUTTING_MARGIN
-        cut_h = cut[:height] + CUTTING_MARGIN
+        cut_w = cut[:width] + self.class::CUTTING_MARGIN
+        cut_h = cut[:height] + self.class::CUTTING_MARGIN
         
         if cut_w <= shelf[:remaining_width] && cut_h <= shelf[:height]
           waste = (shelf[:height] - cut_h).abs
@@ -490,8 +457,8 @@ class GlassCuttingOptimizer
         end
         
         # Probar orientación rotada
-        cut_w_rot = cut[:height] + CUTTING_MARGIN
-        cut_h_rot = cut[:width] + CUTTING_MARGIN
+        cut_w_rot = cut[:height] + self.class::CUTTING_MARGIN
+        cut_h_rot = cut[:width] + self.class::CUTTING_MARGIN
         
         if cut_w_rot <= shelf[:remaining_width] && cut_h_rot <= shelf[:height]
           waste = (shelf[:height] - cut_h_rot).abs
@@ -515,7 +482,7 @@ class GlassCuttingOptimizer
             rotated: true,
             original_cut: cut
           }
-          cut_w = cut[:height] + CUTTING_MARGIN
+          cut_w = cut[:height] + self.class::CUTTING_MARGIN
           best_shelf[:current_x] += cut_w
           best_shelf[:remaining_width] -= cut_w
         else
@@ -528,15 +495,15 @@ class GlassCuttingOptimizer
             rotated: false,
             original_cut: cut
           }
-          cut_w = cut[:width] + CUTTING_MARGIN
+          cut_w = cut[:width] + self.class::CUTTING_MARGIN
           best_shelf[:current_x] += cut_w
           best_shelf[:remaining_width] -= cut_w
         end
         placed = true
       else
         # Crear nuevo shelf
-        cut_w = cut[:width] + CUTTING_MARGIN
-        cut_h = cut[:height] + CUTTING_MARGIN
+        cut_w = cut[:width] + self.class::CUTTING_MARGIN
+        cut_h = cut[:height] + self.class::CUTTING_MARGIN
         
         if cut_w <= plate_width && current_y + cut_h <= plate_height
           new_shelf = {
@@ -561,8 +528,8 @@ class GlassCuttingOptimizer
           placed = true
         else
           # Probar rotado
-          cut_w_rot = cut[:height] + CUTTING_MARGIN
-          cut_h_rot = cut[:width] + CUTTING_MARGIN
+          cut_w_rot = cut[:height] + self.class::CUTTING_MARGIN
+          cut_h_rot = cut[:width] + self.class::CUTTING_MARGIN
           
           if cut_w_rot <= plate_width && current_y + cut_h_rot <= plate_height
             new_shelf = {
@@ -614,114 +581,135 @@ class GlassCuttingOptimizer
     }
   end
 
-  # Calcular sobrantes de un layout completo
+  # Calcular sobrantes de un layout completo con algoritmo mejorado
   def calculate_scraps_from_layout(plate_width, plate_height, placed_cuts)
     return [] if placed_cuts.empty?
     
-    # Crear una cuadrícula más fina (5mm) para mejor precisión
-    grid_size = 5
-    grid_cols = (plate_width.to_f / grid_size).ceil
-    grid_rows = (plate_height.to_f / grid_size).ceil
+    # 1. Inicializar la cuadrícula de ocupación
+    grid_size = 5  # Tamaño de celda en mm (más pequeño = más preciso pero más lento)
+    cols = (plate_width.to_f / grid_size).ceil
+    rows = (plate_height.to_f / grid_size).ceil
     
     # Inicializar la cuadrícula como libre (false = libre, true = ocupado)
-    grid = Array.new(grid_cols) { Array.new(grid_rows, false) }
+    grid = Array.new(cols) { Array.new(rows, false) }
     
     # Función para marcar un área como ocupada
     mark_occupied = ->(x1, y1, x2, y2) {
       (x1..x2).each do |x|
         (y1..y2).each do |y|
-          grid[x][y] = true if x < grid_cols && y < grid_rows
+          grid[x][y] = true if x < cols && y < rows
         end
       end
     }
     
-    # Marcar áreas ocupadas por los cortes con un margen
+    # 2. Marcar áreas ocupadas por los cortes con un margen
+    margin = (self.class::CUTTING_MARGIN / grid_size.to_f).ceil
     placed_cuts.each do |cut|
-      # Área del corte
-      x1 = (cut[:x] / grid_size).floor
-      y1 = (cut[:y] / grid_size).floor
-      x2 = ((cut[:x] + cut[:width]) / grid_size).ceil
-      y2 = ((cut[:y] + cut[:height]) / grid_size).ceil
+      # Convertir coordenadas a celdas de la cuadrícula
+      x1 = (cut[:x] / grid_size).floor - margin
+      y1 = (cut[:y] / grid_size).floor - margin
+      x2 = ((cut[:x] + cut[:width]) / grid_size).ceil + margin
+      y2 = ((cut[:y] + cut[:height]) / grid_size).ceil + margin
       
-      # Asegurarse de no salirnos de los límites
+      # Asegurar que no salgamos de los límites
       x1 = [x1, 0].max
       y1 = [y1, 0].max
-      x2 = [x2, grid_cols - 1].min
-      y2 = [y2, grid_rows - 1].min
+      x2 = [x2, cols - 1].min
+      y2 = [y2, rows - 1].min
       
-      # Marcar como ocupado con un pequeño margen para evitar solapamientos
-      margin = 1  # 5mm de margen
-      mark_occupied.call(x1 - margin, y1 - margin, x2 + margin, y2 + margin)
+      mark_occupied.call(x1, y1, x2, y2)
     end
     
-    # Identificar regiones libres (sobrantes) usando un enfoque de barrido
+    # 3. Encontrar regiones libres (sobrantes) usando Flood Fill
     scraps = []
+    visited = Array.new(cols) { Array.new(rows, false) }
     
-    # Primera pasada: identificar regiones horizontales
-    (0...grid_rows).each do |y|
-      x = 0
-      while x < grid_cols
-        next_x = x
-        # Encontrar el siguiente bloque libre
-        if !grid[x][y]
-          start_x = x
-          # Extender horizontalmente lo más posible
-          while next_x < grid_cols && !grid[next_x][y]
-            next_x += 1
+    # Direcciones para el Flood Fill (arriba, derecha, abajo, izquierda)
+    directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+    
+    (0...rows).each do |y|
+      (0...cols).each do |x|
+        next if grid[x][y] || visited[x][y]
+        
+        # Encontramos una celda libre no visitada, iniciar Flood Fill
+        queue = [[x, y]]
+        visited[x][y] = true
+        min_x, max_x = x, x
+        min_y, max_y = y, y
+        
+        # Expandir la región
+        until queue.empty?
+          cx, cy = queue.shift
+          
+          # Actualizar límites de la región
+          min_x = [min_x, cx].min
+          max_x = [max_x, cx].max
+          min_y = [min_y, cy].min
+          max_y = [max_y, cy].max
+          
+          # Explorar vecinos
+          directions.each do |dx, dy|
+            nx, ny = cx + dx, cy + dy
+            
+            # Verificar límites
+            next if nx < 0 || nx >= cols || ny < 0 || ny >= rows
+            next if grid[nx][ny] || visited[nx][ny]
+            
+            visited[nx][ny] = true
+            queue << [nx, ny]
+          end
+        end
+        
+        # Convertir celdas a medidas reales
+        scrap = {
+          x: min_x * grid_size,
+          y: min_y * grid_size,
+          width: (max_x - min_x + 1) * grid_size,
+          height: (max_y - min_y + 1) * grid_size
+        }
+        
+        # Asegurar que no exceda los límites de la plancha
+        scrap[:width] = [scrap[:width], plate_width - scrap[:x]].min
+        scrap[:height] = [scrap[:height], plate_height - scrap[:y]].min
+        
+        # Verificar si es reutilizable (tamaño mínimo)
+        scrap[:reusable] = scrap[:width] >= self.class::MIN_REUSABLE_SCRAP_SIZE && 
+                          scrap[:height] >= self.class::MIN_REUSABLE_SCRAP_SIZE
+        
+        # Verificar que no sea un área negativa o nula
+        if scrap[:width] > 0 && scrap[:height] > 0
+          # Verificar que no se superponga con ningún corte
+          scrap[:reusable] &&= placed_cuts.none? do |cut|
+            scrap[:x] < cut[:x] + cut[:width] && 
+            scrap[:x] + scrap[:width] > cut[:x] &&
+            scrap[:y] < cut[:y] + cut[:height] && 
+            scrap[:y] + scrap[:height] > cut[:y]
           end
           
-          # Verificar si podemos extender verticalmente
-          min_height = 1
-          (start_x...next_x).each do |cx|
-            h = 1
-            while y + h < grid_rows && !grid[cx][y + h]
-              h += 1
-            end
-            min_height = [min_height, h].min
-          end
-          
-          # Crear el sobrante
-          scrap = {
-            x: start_x * grid_size,
-            y: y * grid_size,
-            width: (next_x - start_x) * grid_size,
-            height: min_height * grid_size,
-            reusable: (next_x - start_x) * grid_size >= MIN_REUSABLE_SCRAP_SIZE && 
-                      min_height * grid_size >= MIN_REUSABLE_SCRAP_SIZE
-          }
-          
-          # Marcar como ocupado para no volver a procesar
-          mark_occupied.call(start_x, y, next_x - 1, y + min_height - 1)
-          
-          # Agregar si es lo suficientemente grande
-          if scrap[:width] > 0 && scrap[:height] > 0 && 
-             scrap[:width] >= MIN_REUSABLE_SCRAP_SIZE && 
-             scrap[:height] >= MIN_REUSABLE_SCRAP_SIZE
-            scraps << scrap
-          end
-          
-          x = next_x
-        else
-          x += 1
+          scraps << scrap
         end
       end
     end
     
-    # Segunda pasada: combinar sobrantes adyacentes
+    # 4. Combinar sobrantes adyacentes cuando sea posible
     combined = true
     while combined
       combined = false
+      
       scraps.combination(2).each do |a, b|
-        # Verificar si son adyacentes y se pueden combinar
-        if a[:y] == b[:y] && a[:height] == b[:height] && 
+        # Verificar si son adyacentes y del mismo tipo (reutilizable o no)
+        same_type = (a[:reusable] == b[:reusable])
+        
+        # Combinar horizontalmente
+        if same_type && a[:y] == b[:y] && a[:height] == b[:height] &&
            (a[:x] + a[:width] == b[:x] || b[:x] + b[:width] == a[:x])
-          # Combinar horizontalmente
+          
           combined_rect = {
             x: [a[:x], b[:x]].min,
             y: a[:y],
             width: a[:width] + b[:width],
             height: a[:height],
-            reusable: a[:reusable] || b[:reusable]
+            reusable: a[:reusable]
           }
           
           scraps.delete(a)
@@ -729,15 +717,17 @@ class GlassCuttingOptimizer
           scraps << combined_rect
           combined = true
           break
-        elsif a[:x] == b[:x] && a[:width] == b[:width] && 
+          
+        # Combinar verticalmente
+        elsif same_type && a[:x] == b[:x] && a[:width] == b[:width] &&
               (a[:y] + a[:height] == b[:y] || b[:y] + b[:height] == a[:y])
-          # Combinar verticalmente
+          
           combined_rect = {
             x: a[:x],
             y: [a[:y], b[:y]].min,
             width: a[:width],
             height: a[:height] + b[:height],
-            reusable: a[:reusable] || b[:reusable]
+            reusable: a[:reusable]
           }
           
           scraps.delete(a)
@@ -749,28 +739,6 @@ class GlassCuttingOptimizer
       end
     end
     
-    # Asegurarse de que los sobrantes no se superpongan con los cortes
-    scraps.each do |scrap|
-      scrap[:reusable] = true  # Asumir que es reutilizable
-      
-      placed_cuts.each do |cut|
-        if scrap[:x] < cut[:x] + cut[:width] && 
-           scrap[:x] + scrap[:width] > cut[:x] &&
-           scrap[:y] < cut[:y] + cut[:height] && 
-           scrap[:y] + scrap[:height] > cut[:y]
-          # Hay superposición, marcar como no reutilizable
-          scrap[:reusable] = false
-          break
-        end
-      end
-      
-      # Verificar tamaño mínimo para reutilización
-      if scrap[:width] < MIN_REUSABLE_SCRAP_SIZE || scrap[:height] < MIN_REUSABLE_SCRAP_SIZE
-        scrap[:reusable] = false
-      end
-    end
-    
-    # Ordenar por área descendente
+    # 5. Ordenar por área descendente y devolver
     scraps.sort_by { |s| -s[:width] * s[:height] }
   end
-end
