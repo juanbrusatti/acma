@@ -34,6 +34,41 @@ class GlassCuttingOptimizer
     @cutting_plans
   end
 
+  # Obtener información detallada sobre sobrantes y orden de cortes
+  def get_cutting_summary
+    summary = {
+      total_plates: @cutting_plans.count { |p| p[:source_type] == 'plate' },
+      total_scraps_used: @cutting_plans.count { |p| p[:source_type] == 'scrap' },
+      total_cuts: @cuts.count,
+      cutting_plans: []
+    }
+
+    @cutting_plans.each_with_index do |plan, index|
+      plan_summary = {
+        plan_number: index + 1,
+        source_type: plan[:source_type],
+        source_ref: plan[:source_ref],
+        plate_dimensions: "#{plan[:plate_width]}x#{plan[:plate_height]}",
+        glass_info: "#{plan[:glass_type]} #{plan[:thickness]} #{plan[:color]}",
+        cuts_count: plan[:cuts].count,
+        scraps_count: plan[:total_scraps],
+        reusable_scraps_count: plan[:reusable_scraps],
+        cutting_order: plan[:cutting_order],
+        scraps: plan[:scraps].map do |scrap|
+          {
+            label: scrap[:label],
+            dimensions: "#{scrap[:width]}x#{scrap[:height]}",
+            position: "(#{scrap[:x]}, #{scrap[:y]})",
+            reusable: scrap[:reusable]
+          }
+        end
+      }
+      summary[:cutting_plans] << plan_summary
+    end
+
+    summary
+  end
+
   private
 
   # Recopilar todos los cortes del proyecto
@@ -91,7 +126,10 @@ class GlassCuttingOptimizer
         scrap_type: cut[:glass_type],
         thickness: cut[:thickness],
         color: cut[:color]
-      ).order(width: :desc, height: :desc) # Ordenar por tamaño descendente
+      )
+      
+      # Ordenar por tamaño descendente si hay sobrantes
+      compatible_scraps = compatible_scraps.order(width: :desc, height: :desc) if compatible_scraps.respond_to?(:order)
       
       fitted = false
       
@@ -134,6 +172,30 @@ class GlassCuttingOptimizer
       rotated = true
     end
 
+    placed_cuts = [{
+      id: cut[:id],
+      x: 0,
+      y: 0,
+      width: placed_width,
+      height: placed_height,
+      rotated: rotated,
+      original_cut: cut
+    }]
+
+    # Calcular sobrantes del sobrante reutilizado
+    scraps = calculate_scraps_from_single_cut(scrap.width, scrap.height, placed_width, placed_height)
+    
+    # Para sobrantes reutilizados, el orden de corte es más simple
+    cutting_order = [
+      {
+        order: 1,
+        color: 'celeste',
+        type: 'horizontal',
+        position: placed_height,
+        description: "Corte horizontal a #{placed_height}mm desde arriba"
+      }
+    ]
+
     @cutting_plans << {
       source_type: 'scrap',
       source_id: scrap.id,
@@ -143,16 +205,11 @@ class GlassCuttingOptimizer
       glass_type: scrap.scrap_type,
       thickness: scrap.thickness,
       color: scrap.color,
-      cuts: [{
-        id: cut[:id],
-        x: 0,
-        y: 0,
-        width: placed_width,
-        height: placed_height,
-        rotated: rotated,
-        original_cut: cut
-      }],
-      scraps: calculate_scraps_from_single_cut(scrap.width, scrap.height, placed_width, placed_height)
+      cuts: placed_cuts,
+      scraps: scraps,
+      cutting_order: cutting_order,
+      total_scraps: scraps.count,
+      reusable_scraps: scraps.count { |s| s[:reusable] }
     }
   end
 
@@ -168,7 +225,8 @@ class GlassCuttingOptimizer
         y: 0,
         width: right_width,
         height: plate_height,
-        reusable: true
+        reusable: true,
+        label: "Sobrante Derecho #{right_width}x#{plate_height}"
       }
     end
     
@@ -180,7 +238,8 @@ class GlassCuttingOptimizer
         y: cut_height + self.class::CUTTING_MARGIN,
         width: cut_width,
         height: top_height,
-        reusable: true
+        reusable: true,
+        label: "Sobrante Superior #{cut_width}x#{top_height}"
       }
     end
     
@@ -423,7 +482,7 @@ class GlassCuttingOptimizer
   end
   end
 
-  # Empaquetar cortes usando algoritmo SHELF (estantes horizontales) con diferentes estrategias
+  # Empaquetar cortes usando algoritmo SHELF mejorado con diferentes estrategias
   def pack_cuts_in_plate(cuts, plate, strategy = :default)
     plate_width = plate.width
     plate_height = plate.height
@@ -435,7 +494,25 @@ class GlassCuttingOptimizer
     shelves = []
     current_y = 0
     
-    cuts.each do |cut|
+    # Ordenar cortes por estrategia
+    sorted_cuts = case strategy
+    when :height_desc
+      cuts.sort_by { |c| -[c[:height], c[:width]].max }
+    when :width_desc
+      cuts.sort_by { |c| -[c[:width], c[:height]].max }
+    when :area_desc
+      cuts.sort_by { |c| -c[:width] * c[:height] }
+    when :height_buckets
+      # Agrupar por altura objetivo
+      cuts.sort_by do |c| 
+        target = [700, 500, 450].min_by { |h| (h - [c[:height], c[:width]].max).abs }
+        [-target, -c[:width] * c[:height]]
+      end
+    else
+      cuts
+    end
+    
+    sorted_cuts.each do |cut|
       placed = false
       best_shelf = nil
       best_rotated = false
@@ -444,8 +521,8 @@ class GlassCuttingOptimizer
       # Intentar colocar en estantes existentes
       shelves.each do |shelf|
         # Probar orientación normal
-        cut_w = cut[:width] + self.class::CUTTING_MARGIN
-        cut_h = cut[:height] + self.class::CUTTING_MARGIN
+        cut_w = cut[:width]
+        cut_h = cut[:height]
         
         if cut_w <= shelf[:remaining_width] && cut_h <= shelf[:height]
           waste = (shelf[:height] - cut_h).abs
@@ -457,8 +534,8 @@ class GlassCuttingOptimizer
         end
         
         # Probar orientación rotada
-        cut_w_rot = cut[:height] + self.class::CUTTING_MARGIN
-        cut_h_rot = cut[:width] + self.class::CUTTING_MARGIN
+        cut_w_rot = cut[:height]
+        cut_h_rot = cut[:width]
         
         if cut_w_rot <= shelf[:remaining_width] && cut_h_rot <= shelf[:height]
           waste = (shelf[:height] - cut_h_rot).abs
@@ -482,7 +559,7 @@ class GlassCuttingOptimizer
             rotated: true,
             original_cut: cut
           }
-          cut_w = cut[:height] + self.class::CUTTING_MARGIN
+          cut_w = cut[:height]
           best_shelf[:current_x] += cut_w
           best_shelf[:remaining_width] -= cut_w
         else
@@ -495,15 +572,15 @@ class GlassCuttingOptimizer
             rotated: false,
             original_cut: cut
           }
-          cut_w = cut[:width] + self.class::CUTTING_MARGIN
+          cut_w = cut[:width]
           best_shelf[:current_x] += cut_w
           best_shelf[:remaining_width] -= cut_w
         end
         placed = true
       else
         # Crear nuevo shelf
-        cut_w = cut[:width] + self.class::CUTTING_MARGIN
-        cut_h = cut[:height] + self.class::CUTTING_MARGIN
+        cut_w = cut[:width]
+        cut_h = cut[:height]
         
         if cut_w <= plate_width && current_y + cut_h <= plate_height
           new_shelf = {
@@ -528,8 +605,8 @@ class GlassCuttingOptimizer
           placed = true
         else
           # Probar rotado
-          cut_w_rot = cut[:height] + self.class::CUTTING_MARGIN
-          cut_h_rot = cut[:width] + self.class::CUTTING_MARGIN
+          cut_w_rot = cut[:height]
+          cut_h_rot = cut[:width]
           
           if cut_w_rot <= plate_width && current_y + cut_h_rot <= plate_height
             new_shelf = {
@@ -564,8 +641,11 @@ class GlassCuttingOptimizer
 
   # Crear plan de corte para una plancha
   def create_plate_cutting_plan(plate, placed_cuts)
-    # Calcular sobrantes
+    # Calcular sobrantes con orden de cortes
     scraps = calculate_scraps_from_layout(plate.width, plate.height, placed_cuts)
+    
+    # Extraer el orden de cortes de los sobrantes (todos tienen la misma información)
+    cutting_order = scraps.first&.dig(:cutting_order) || []
     
     @cutting_plans << {
       source_type: 'plate',
@@ -577,7 +657,10 @@ class GlassCuttingOptimizer
       thickness: plate.thickness,
       color: plate.color,
       cuts: placed_cuts,
-      scraps: scraps
+      scraps: scraps,
+      cutting_order: cutting_order,
+      total_scraps: scraps.count,
+      reusable_scraps: scraps.count { |s| s[:reusable] }
     }
   end
 
@@ -585,73 +668,63 @@ class GlassCuttingOptimizer
   def calculate_scraps_from_layout(plate_width, plate_height, placed_cuts)
     return [] if placed_cuts.empty?
     
-    # 1. Inicializar la cuadrícula de ocupación
-    grid_size = 5  # Tamaño de celda en mm (más pequeño = más preciso pero más lento)
+    # Usar algoritmo de cuadrícula más preciso
+    grid_size = 5  # Tamaño de celda más pequeño para mayor precisión
     cols = (plate_width.to_f / grid_size).ceil
     rows = (plate_height.to_f / grid_size).ceil
     
-    # Inicializar la cuadrícula como libre (false = libre, true = ocupado)
+    # Inicializar cuadrícula
     grid = Array.new(cols) { Array.new(rows, false) }
     
-    # Función para marcar un área como ocupada
-    mark_occupied = ->(x1, y1, x2, y2) {
-      (x1..x2).each do |x|
-        (y1..y2).each do |y|
-          grid[x][y] = true if x < cols && y < rows
-        end
-      end
-    }
-    
-    # 2. Marcar áreas ocupadas por los cortes con un margen
-    margin = (self.class::CUTTING_MARGIN / grid_size.to_f).ceil
+    # Marcar celdas ocupadas por cortes
     placed_cuts.each do |cut|
-      # Convertir coordenadas a celdas de la cuadrícula
-      x1 = (cut[:x] / grid_size).floor - margin
-      y1 = (cut[:y] / grid_size).floor - margin
-      x2 = ((cut[:x] + cut[:width]) / grid_size).ceil + margin
-      y2 = ((cut[:y] + cut[:height]) / grid_size).ceil + margin
+      x1 = (cut[:x] / grid_size).floor
+      y1 = (cut[:y] / grid_size).floor
+      x2 = ((cut[:x] + cut[:width]) / grid_size).ceil - 1
+      y2 = ((cut[:y] + cut[:height]) / grid_size).ceil - 1
       
-      # Asegurar que no salgamos de los límites
+      # Asegurar límites
       x1 = [x1, 0].max
       y1 = [y1, 0].max
       x2 = [x2, cols - 1].min
       y2 = [y2, rows - 1].min
       
-      mark_occupied.call(x1, y1, x2, y2)
+      # Marcar como ocupado
+      (x1..x2).each do |x|
+        (y1..y2).each do |y|
+          grid[x][y] = true if x < cols && y < rows
+        end
+      end
     end
     
-    # 3. Encontrar regiones libres (sobrantes) usando Flood Fill
+    # Encontrar regiones libres usando Flood Fill mejorado
     scraps = []
     visited = Array.new(cols) { Array.new(rows, false) }
-    
-    # Direcciones para el Flood Fill (arriba, derecha, abajo, izquierda)
     directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+    
     
     (0...rows).each do |y|
       (0...cols).each do |x|
         next if grid[x][y] || visited[x][y]
         
-        # Encontramos una celda libre no visitada, iniciar Flood Fill
+        # Iniciar Flood Fill
         queue = [[x, y]]
         visited[x][y] = true
         min_x, max_x = x, x
         min_y, max_y = y, y
         
-        # Expandir la región
+        # Expandir región
         until queue.empty?
           cx, cy = queue.shift
           
-          # Actualizar límites de la región
           min_x = [min_x, cx].min
           max_x = [max_x, cx].max
           min_y = [min_y, cy].min
           max_y = [max_y, cy].max
           
-          # Explorar vecinos
           directions.each do |dx, dy|
             nx, ny = cx + dx, cy + dy
             
-            # Verificar límites
             next if nx < 0 || nx >= cols || ny < 0 || ny >= rows
             next if grid[nx][ny] || visited[nx][ny]
             
@@ -660,7 +733,7 @@ class GlassCuttingOptimizer
           end
         end
         
-        # Convertir celdas a medidas reales
+        # Convertir a medidas reales
         scrap = {
           x: min_x * grid_size,
           y: min_y * grid_size,
@@ -668,36 +741,48 @@ class GlassCuttingOptimizer
           height: (max_y - min_y + 1) * grid_size
         }
         
-        # Asegurar que no exceda los límites de la plancha
+        # Ajustar a límites de la plancha
         scrap[:width] = [scrap[:width], plate_width - scrap[:x]].min
         scrap[:height] = [scrap[:height], plate_height - scrap[:y]].min
         
-        # Verificar si es reutilizable (tamaño mínimo)
-        scrap[:reusable] = scrap[:width] >= self.class::MIN_REUSABLE_SCRAP_SIZE && 
-                          scrap[:height] >= self.class::MIN_REUSABLE_SCRAP_SIZE
-        
-        # Verificar que no sea un área negativa o nula
+        # Verificar si es válido
         if scrap[:width] > 0 && scrap[:height] > 0
-          # Verificar que no se superponga con ningún corte
-          scrap[:reusable] &&= placed_cuts.none? do |cut|
-            scrap[:x] < cut[:x] + cut[:width] && 
-            scrap[:x] + scrap[:width] > cut[:x] &&
-            scrap[:y] < cut[:y] + cut[:height] && 
-            scrap[:y] + scrap[:height] > cut[:y]
-          end
-          
+          # Los sobrantes encontrados por Flood Fill ya no se superponen con cortes
+          # porque se basan en celdas libres de la cuadrícula
+          scrap[:reusable] = scrap[:width] >= self.class::MIN_REUSABLE_SCRAP_SIZE && 
+                            scrap[:height] >= self.class::MIN_REUSABLE_SCRAP_SIZE
+          scrap[:label] = "Sobrante #{scrap[:width]}x#{scrap[:height]}"
           scraps << scrap
         end
       end
     end
     
-    # 4. Combinar sobrantes adyacentes cuando sea posible
+    # Combinar sobrantes adyacentes
+    combined_scraps = combine_adjacent_scraps(scraps)
+    
+    # Calcular el orden de cortes
+    cutting_order = calculate_cutting_order(plate_width, plate_height, placed_cuts, combined_scraps)
+    
+    # Ordenar por área descendente
+    combined_scraps.sort_by { |s| -s[:width] * s[:height] }.map do |scrap|
+      scrap.merge({
+        cutting_order: cutting_order
+      })
+    end
+  end
+
+  # Combinar sobrantes adyacentes para formar rectángulos más grandes
+  def combine_adjacent_scraps(scraps)
+    return scraps if scraps.empty?
+    
     combined = true
+    result = scraps.dup
+    
     while combined
       combined = false
       
-      scraps.combination(2).each do |a, b|
-        # Verificar si son adyacentes y del mismo tipo (reutilizable o no)
+      result.combination(2).each do |a, b|
+        # Verificar si son adyacentes y del mismo tipo
         same_type = (a[:reusable] == b[:reusable])
         
         # Combinar horizontalmente
@@ -709,12 +794,13 @@ class GlassCuttingOptimizer
             y: a[:y],
             width: a[:width] + b[:width],
             height: a[:height],
-            reusable: a[:reusable]
+            reusable: a[:reusable],
+            label: "Sobrante #{a[:width] + b[:width]}x#{a[:height]}"
           }
           
-          scraps.delete(a)
-          scraps.delete(b)
-          scraps << combined_rect
+          result.delete(a)
+          result.delete(b)
+          result << combined_rect
           combined = true
           break
           
@@ -727,18 +813,79 @@ class GlassCuttingOptimizer
             y: [a[:y], b[:y]].min,
             width: a[:width],
             height: a[:height] + b[:height],
-            reusable: a[:reusable]
+            reusable: a[:reusable],
+            label: "Sobrante #{a[:width]}x#{a[:height] + b[:height]}"
           }
           
-          scraps.delete(a)
-          scraps.delete(b)
-          scraps << combined_rect
+          result.delete(a)
+          result.delete(b)
+          result << combined_rect
           combined = true
           break
         end
       end
     end
     
-    # 5. Ordenar por área descendente y devolver
-    scraps.sort_by { |s| -s[:width] * s[:height] }
+    result
+  end
+
+  # Calcular el orden de cortes basado en la estrategia de guillotina genérica
+  def calculate_cutting_order(plate_width, plate_height, placed_cuts, scraps)
+    cutting_steps = []
+    
+    # Ordenar cortes por posición (de izquierda a derecha, de abajo hacia arriba)
+    sorted_cuts = placed_cuts.sort_by { |c| [c[:y], c[:x]] }
+    
+    # 1. Primer corte: Celeste (horizontal que separa las filas principales)
+    # Buscar el corte más alto que esté en la fila superior
+    top_row_cuts = sorted_cuts.select { |c| c[:y] < plate_height / 2 }
+    if top_row_cuts.any?
+      max_y = top_row_cuts.map { |c| c[:y] + c[:height] }.max
+      cutting_steps << {
+        order: 1,
+        color: 'celeste',
+        type: 'horizontal',
+        position: max_y,
+        description: "Corte horizontal a #{max_y}mm desde arriba"
+      }
+    end
+    
+    # 2-5. Asignar colores a los sobrantes en orden de tamaño (de mayor a menor)
+    colors = ['verde', 'violeta', 'naranja', 'rojo']
+    sorted_scraps = scraps.sort_by { |s| -s[:width] * s[:height] }
+    
+    sorted_scraps.each_with_index do |scrap, index|
+      next if index >= colors.length
+      
+      # Determinar el tipo de corte basado en la posición del sobrante
+      cut_type = if scrap[:x] > plate_width * 0.7
+        'vertical'
+      elsif scrap[:y] > plate_height * 0.5
+        'horizontal'
+      else
+        'vertical'
+      end
+      
+      position = cut_type == 'horizontal' ? scrap[:y] : scrap[:x]
+      description = cut_type == 'horizontal' ? 
+        "Corte horizontal a #{position}mm desde arriba" : 
+        "Corte vertical a #{position}mm desde la izquierda"
+      
+      cutting_steps << {
+        order: index + 2,
+        color: colors[index],
+        type: cut_type,
+        position: position,
+        description: description,
+        scrap: {
+          x: scrap[:x],
+          y: scrap[:y],
+          width: scrap[:width],
+          height: scrap[:height],
+          label: "Sobrante #{colors[index].capitalize} #{scrap[:width]}x#{scrap[:height]}"
+        }
+      }
+    end
+    
+    cutting_steps.sort_by { |s| s[:order] }
   end

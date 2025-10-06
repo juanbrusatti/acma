@@ -62,6 +62,34 @@
       box-shadow: 0 0 0 1px #fff;
     }
     
+    .scrap-piece {
+      position: absolute;
+      border: 2px solid #ff6b6b;
+      background-color: rgba(255, 107, 107, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      text-align: center;
+      padding: 2px;
+      margin: 0;
+      box-sizing: border-box;
+      color: #d63031;
+    }
+    
+    .scrap-piece .dimensions {
+      font-size: 7px;
+      line-height: 1.1;
+      padding: 1px;
+      word-break: break-all;
+      overflow: hidden;
+      color: #d63031;
+      background-color: rgba(255,255,255,0.9);
+      border-radius: 2px;
+      font-weight: bold;
+    }
+    
     .cut-piece .dimensions {
       font-size: 8px;
       line-height: 1.2;
@@ -181,6 +209,24 @@
           </div>
         <% end %>
 
+        <!-- Dibujar sobrantes -->
+        <% if plan[:scraps] && plan[:scraps].any? %>
+          <% plan[:scraps].each do |scrap| %>
+            <%
+              scrap_x = (scrap[:x] * scale).to_i
+              scrap_y = (scrap[:y] * scale).to_i
+              scrap_width = (scrap[:width] * scale).to_i
+              scrap_height = (scrap[:height] * scale).to_i
+            %>
+            <div class="scrap-piece" style="left: <%= scrap_x %>px; top: <%= scrap_y %>px; width: <%= scrap_width %>px; height: <%= scrap_height %>px;">
+              <div class="dimensions">
+                SOBRANTE<br>
+                <%= scrap[:width].to_i %> x <%= scrap[:height].to_i %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
       </div>
           Corte de vidrio
         </div>
@@ -215,6 +261,64 @@
         </table>
       </div>
 
+      <!-- Información de sobrantes -->
+      <% if plan[:scraps] && plan[:scraps].any? %>
+        <div class="cuts-list">
+          <h3>Sobrantes Generados</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dimensiones</th>
+                <th>Posición X</th>
+                <th>Posición Y</th>
+                <th>Reutilizable</th>
+                <th>Área (m²)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% plan[:scraps].each do |scrap| %>
+                <tr>
+                  <td><%= scrap[:width].to_i %> x <%= scrap[:height].to_i %></td>
+                  <td><%= scrap[:x].to_i %></td>
+                  <td><%= scrap[:y].to_i %></td>
+                  <td><%= scrap[:reusable] ? 'Sí' : 'No' %></td>
+                  <td><%= sprintf('%.4f', (scrap[:width] * scrap[:height]) / 1_000_000.0) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+
+      <!-- Orden de cortes -->
+      <% if plan[:cutting_order] && plan[:cutting_order].any? %>
+        <div class="cuts-list">
+          <h3>Orden de Cortes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Orden</th>
+                <th>Color</th>
+                <th>Tipo</th>
+                <th>Posición</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% plan[:cutting_order].each do |step| %>
+                <tr>
+                  <td><%= step[:order] %></td>
+                  <td style="text-transform: capitalize; font-weight: bold;"><%= step[:color] %></td>
+                  <td><%= step[:type] == 'horizontal' ? 'Horizontal' : 'Vertical' %></td>
+                  <td><%= step[:position].to_i %> mm</td>
+                  <td><%= step[:description] %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+
     </div>
   <% end %>
 
@@ -224,11 +328,15 @@
     <% 
       total_cuts = cutting_plans.sum { |p| p[:cuts].length }
       plates_new = cutting_plans.count { |p| p[:source_type] == 'plate' }
+      total_scraps = cutting_plans.sum { |p| p[:scraps]&.length || 0 }
+      reusable_scraps = cutting_plans.sum { |p| p[:scraps]&.count { |s| s[:reusable] } || 0 }
     %>
     
     <p><strong>Total de cortes:</strong> <%= total_cuts %></p>
     <p><strong>Planchas utilizadas:</strong> <%= cutting_plans.length %></p>
     <p><strong>Planchas nuevas utilizadas:</strong> <%= plates_new %></p>
+    <p><strong>Total de sobrantes generados:</strong> <%= total_scraps %></p>
+    <p><strong>Sobrantes reutilizables:</strong> <%= reusable_scraps %></p>
     
     <hr style="margin: 20px 0;">
     
@@ -236,11 +344,27 @@
     <% 
       total_plate_area = cutting_plans.sum { |p| (p[:plate_width] * p[:plate_height]) / 1_000_000.0 }
       total_cut_area = cutting_plans.sum { |p| p[:cuts].sum { |c| (c[:width] * c[:height]) / 1_000_000.0 } }
+      total_scrap_area = cutting_plans.sum { |p| (p[:scraps] || []).sum { |s| (s[:width] * s[:height]) / 1_000_000.0 } }
       efficiency = total_plate_area > 0 ? (total_cut_area / total_plate_area * 100) : 0
     %>
     <p><strong>Área total de planchas:</strong> <%= sprintf('%.2f', total_plate_area) %> m²</p>
     <p><strong>Área total de cortes:</strong> <%= sprintf('%.2f', total_cut_area) %> m²</p>
+    <p><strong>Área total de sobrantes:</strong> <%= sprintf('%.2f', total_scrap_area) %> m²</p>
     <p><strong>Eficiencia:</strong> <%= sprintf('%.1f', efficiency) %>%</p>
+    
+    <hr style="margin: 20px 0;">
+    
+    <h4>Leyenda</h4>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #fff; border: 1px solid #222;"></div>
+        <span>Cortes de vidrio</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: rgba(255, 107, 107, 0.1); border: 2px solid #ff6b6b;"></div>
+        <span>Sobrantes</span>
+      </div>
+    </div>
   </div>
 </body>
 </html>
