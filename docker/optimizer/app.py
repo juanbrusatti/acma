@@ -11,7 +11,6 @@ import traceback
 from fastapi import Request
 import sys
 
-
 app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -163,19 +162,22 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
             [sys.executable, OPTIMIZER_SCRIPT, '--stdin'],
             cwd=BASE_DIR,
             input=optimizer_input.encode('utf-8'),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=120
         )
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=500, detail='Optimizer timed out')
 
     if result.returncode != 0:
+        stdout_tail = (result.stdout or b"").decode('utf-8', errors='replace')[-2000:]
+        stderr_tail = (result.stderr or b"").decode('utf-8', errors='replace')[-4000:]
+        print("[ERROR] Optimizer process failed")
+        if stdout_tail.strip():
+            print(f"[ERROR] Optimizer stdout (tail):\n{stdout_tail}")
+        if stderr_tail.strip():
+            print(f"[ERROR] Optimizer stderr (tail):\n{stderr_tail}")
         raise HTTPException(status_code=500, detail='Optimizer failed')
-
-    # Verify the outputs and append them to the zip
-    if not os.path.isdir(OUTPUT_VISUALS_DIR):
-        raise HTTPException(status_code=500, detail='No visuals generated')
 
     # Helper to derive a label from the combination (color, glass_type, thickness) for csv name
     def _combo_label(pcs):
