@@ -228,6 +228,49 @@ def run_optimizer(input_data, stock_data):
             })
             used_rids_after_scraps.append(rid)
 
+            for abin in best_packer:
+                bid = str(abin.bid)
+                sobrante_id = f"Sobrante_{bid}"
+                bin_w, bin_h = abin.width, abin.height
+
+                # obtener todas las piezas colocadas en este bin
+                pieces_in_bin = [
+                    r for r in res_scraps['best_result']
+                    if str(best_packer[r[0]].bid) == bid
+                ]
+
+                waste_rects = []
+
+                # líneas de corte (simples)
+                for b_idx, x, y, w, h, rid in pieces_in_bin:
+                    # derecha del corte
+                    if x + w < bin_w:
+                        waste_rects.append((x + w, y, bin_w - (x + w), h))
+                    # abajo del corte
+                    if y + h < bin_h:
+                        waste_rects.append((x, y + h, w, bin_h - (y + h)))
+                    # esquina diagonal (opcional, completa)
+                    if x + w < bin_w and y + h < bin_h:
+                        waste_rects.append((x + w, y + h, bin_w - (x + w), bin_h - (y + h)))
+
+                # evitar duplicados y filtrar rectángulos mínimos
+                seen = set()
+                for wx, wy, ww, wh in waste_rects:
+                    key = (round(wx), round(wy), round(ww), round(wh))
+                    if key not in seen and ww > 2 and wh > 2:
+                        seen.add(key)
+                        packed_in_scraps.append({
+                            'Piece_ID': f"{sobrante_id}",
+                            'Source_Plate_ID': sobrante_id,
+                            'Source_Plate_Type': 'Leftover',
+                            'X_Coordinate': wx,
+                            'Y_Coordinate': wy,
+                            'Packed_Width': ww,
+                            'Packed_Height': wh,
+                            'Is_Rotated': False,
+                            'Is_Waste': True
+                        })
+                
     else:
         print("[ETAPA1] Ninguna heurística colocó piezas en los sobrantes.")
 
@@ -452,7 +495,16 @@ if __name__ == "__main__":
             pass
 
         print_summary(final_plan, unpacked_items, bin_details, piece_area)
-        save_cutting_plan_to_csv(final_plan)
+        # --- Filtrar campos extra antes de guardar el CSV ---
+        allowed_keys = [
+            'Piece_ID', 'Source_Plate_ID', 'Source_Plate_Type',
+            'X_Coordinate', 'Y_Coordinate', 'Packed_Width', 'Packed_Height', 'Is_Rotated'
+        ]
+        final_plan_for_csv = [
+            {k: v for k, v in item.items() if k in allowed_keys}
+            for item in final_plan
+        ]
+        save_cutting_plan_to_csv(final_plan_for_csv)
         # Asegurarse de que las coordenadas que pasamos a la visualización sean ints
         for item in final_plan:
             for k in ('X_Coordinate','Y_Coordinate','Packed_Width','Packed_Height'):

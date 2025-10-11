@@ -43,15 +43,20 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         bdet = bin_details_map[bin_id]
         bin_width, bin_height = bdet['width'], bdet['height']
 
-        # --- FIGURA A4 EN PULGADAS (landscape) ---
-        fig, ax = plt.subplots(figsize=(8.27, 11.69))  # A4 horizontal
+        # --- FIGURA A4 EN PULGADAS (VERTICAL / PORTRAIT) ---
+        fig_width, fig_height = 8.27, 11.69
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         draw_header(fig, page=1, total_pages=len(pieces_by_bin))
 
-        # --- Configurar área de dibujo centrada ---
-        margin_x = 0.5  # pulgadas
-        margin_y = 1.0  # pulgadas (más espacio arriba)
-        usable_width = 11.69 - 2 * margin_x
-        usable_height = 8.27 - 2 * margin_y
+        # --- Márgenes en pulgadas ---
+        margin_x = 0.5
+        margin_y = 1.0  # deja espacio arriba y abajo
+
+        usable_width = fig_width - 2 * margin_x
+        usable_height = fig_height - 2 * margin_y
+
+        if bin_width > bin_height:
+            bin_width, bin_height = bin_height, bin_width
 
         # Escalar bin para que quepa dentro del A4 manteniendo aspecto
         scale_x = usable_width / bin_width
@@ -62,11 +67,11 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         scaled_height = bin_height * scale
 
         # Coordenadas base para centrar dentro de la hoja
-        offset_x = (11.69 - scaled_width) / 2
-        offset_y = (8.27 - scaled_height) / 2
+        offset_x = (fig_width - scaled_width) / 2
+        offset_y = (fig_height - scaled_height) / 2
 
-        ax.set_xlim(0, 11.69)
-        ax.set_ylim(0, 8.27)
+        ax.set_xlim(0, fig_width)
+        ax.set_ylim(0, fig_height)
         ax.set_aspect('equal')
         ax.axis('off')
 
@@ -86,16 +91,26 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             sw = w * scale
             sh = h * scale
 
+            color = 'grey' if piece.get('Is_Waste', False) else 'skyblue'
+
             rect = patches.Rectangle((sx, sy), sw, sh,
-                                     linewidth=0.6, edgecolor='red',
-                                     facecolor='skyblue', alpha=0.6)
+                                     linewidth=0.6, edgecolor='black',
+                                     facecolor=color, alpha=0.6)
             ax.add_patch(rect)
 
-            # Etiquetas
-            label = f"{piece.get('Piece_ID', '')}\n{h:.0f}x{w:.0f}"
-            fontsize = 6 if min(sw, sh) < 0.7 else 8
-            ax.text(sx + sw/2, sy + sh/2, label,
-                    ha='center', va='center', fontsize=fontsize, color='black')
+            # Dimensiones dentro del corte
+            # Ancho arriba, dentro del rectángulo
+            ax.text(sx + sw/2, sy + sh - 0.08, f"{w:.0f}", ha='center', va='top', fontsize=8, weight='light')
+            # Alto a la izquierda, dentro del rectángulo, rotado
+            ax.text(sx + 0.08, sy + sh/2, f"{h:.0f}", ha='left', va='center', fontsize=8, weight='light', rotation=90)
+
+            # Etiqueta solo el ID en el centro (sin dimensiones)
+            if not piece.get('Is_Waste', False):
+                ax.text(sx + sw/2, sy + sh/2, f"{piece.get('Piece_ID', '')}",
+                        ha='center', va='center', fontsize=6, color='black', weight='bold')
+            else:
+                ax.text(sx + sw/2, sy + sh/2, "Sobrante",
+                        ha='center', va='center', fontsize=6, color='black', weight='bold')
 
         # Título debajo del encabezado
         dims_text = f"{bin_height:.0f} x {bin_width:.0f}"
@@ -108,7 +123,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         fig.text(0.5, 0.91, f"{prefix} {dims_text}{suffix}",
                  ha='center', va='bottom', fontsize=11, weight='bold')
 
-        # --- Guardar PDF exacto A4 sin recortes ---
+        # --- Guardar PDF exacto A4 ---
         combo_folder = "_".join([p for p in [gt, th, co] if p]) or "unknown"
         combo_folder = combo_folder.replace(' ', '-').replace('/', '-').replace('\\', '-')
         out_dir = os.path.join(output_folder, combo_folder)
@@ -116,7 +131,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
         base_pdf = os.path.join(out_dir, f"{bin_id}.pdf")
         with PdfPages(base_pdf) as pdf:
-            pdf.savefig(fig)  # sin bbox_inches='tight' para mantener A4 exacto
+            pdf.savefig(fig)
 
         plt.close(fig)
-        print(f"✅ Guardado PDF A4: {base_pdf}")
+        print(f"✅ Guardado PDF A4 vertical: {base_pdf}")
