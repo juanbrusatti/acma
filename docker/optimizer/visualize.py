@@ -87,7 +87,15 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             sw = w * scale
             sh = h * scale
 
-            color = 'grey' if piece.get('Is_Waste', False) else 'skyblue'
+            # Determinar color según el tipo de pieza
+            if piece.get('Is_Unused', False):
+                color = 'lightcoral'              # Sobrante inútil (pequeño)
+            elif piece.get('Is_Waste', False):
+                color = 'grey'             # Sobrante útil (reutilizable)
+            else:
+                color = 'lightblue'        # Pieza real del pedido
+            # color = 'grey' if piece.get('Is_Waste', False) else 'red' if piece.get('Is_Unused', False) else 'lightblue'
+            
             rect = patches.Rectangle((sx, sy), sw, sh,
                                      linewidth=0.6, edgecolor='black',
                                      facecolor=color, alpha=0.6)
@@ -123,23 +131,26 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
             else:
                 # Sobrante
-                if not show_dims:
-                    virtual_id = f"C{virtual_counter}"
-                    virtual_counter += 1
-                    ax.text(sx + sw/2, sy + sh/2, virtual_id,
-                        ha='center', va='center', fontsize=6, color='black', weight='bold')
-                    resumen.append({
-                        "virtual_id": virtual_id,
-                        "piece_id": "Sobrante",
-                        "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)"
-                    })
+                if not piece.get('Is_Unused', False):
+                    if not show_dims:
+                        virtual_id = f"C{virtual_counter}"
+                        virtual_counter += 1
+                        ax.text(sx + sw/2, sy + sh/2, virtual_id,
+                            ha='center', va='center', fontsize=6, color='black', weight='bold')
+                        resumen.append({
+                            "virtual_id": virtual_id,
+                            "piece_id": "Sobrante",
+                            "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)"
+                        })
+                    else:
+                        ax.text(sx + sw/2, sy + sh/2, "Sobrante",
+                            ha='center', va='center', fontsize=6, color='black', weight='bold')
+                        ax.text(sx + sw/2, sy + sh - 0.08, f"{w:.0f}",
+                                ha='center', va='top', fontsize=8, weight='light')
+                        ax.text(sx + 0.08, sy + sh/2, f"{h:.0f}",
+                                ha='left', va='center', fontsize=8, weight='light', rotation=90)
                 else:
-                    ax.text(sx + sw/2, sy + sh/2, "Sobrante",
-                        ha='center', va='center', fontsize=6, color='black', weight='bold')
-                    ax.text(sx + sw/2, sy + sh - 0.08, f"{w:.0f}",
-                            ha='center', va='top', fontsize=8, weight='light')
-                    ax.text(sx + 0.08, sy + sh/2, f"{h:.0f}",
-                            ha='left', va='center', fontsize=8, weight='light', rotation=90)
+                    pass
 
         # --- Título del plano ---
         dims_text = f"{bin_height:.0f} x {bin_width:.0f}"
@@ -184,9 +195,9 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                     y_pos = y_start - (i * line_height)
                     
                     if r["piece_id"] == "Sobrante":
-                        text = f"• {r['virtual_id']}: Sobrante {r['dims']}"
+                        text = f"• {r['virtual_id']}: Sobrante, {r['dims']}"
                     else:
-                        text = f"• {r['virtual_id']}: {r['piece_id']} ({r['dims']})"
+                        text = f"• {r['virtual_id']}: {r['piece_id']}, {r['dims']}"
                     
                     fig2.text(0.1, y_pos, text, ha='left', va='top', fontsize=9)
                     

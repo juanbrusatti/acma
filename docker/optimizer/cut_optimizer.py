@@ -89,69 +89,66 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
 
     # 🔹 lista para guardar los rectángulos sobrantes de cada intento
     all_free_rects = []
+    all_unused_rects = []
 
     def get_free_rects_from_packer(packer):
-        """Extrae los free rects de un packer, si están disponibles."""
         free_rects = []
-        for b in packer:
-            # Intentar diferentes métodos para obtener free rects
-            try:
-                # Método 1: free_rect_list()
-                rects = b.free_rect_list()
-            except AttributeError:
-                try:
-                    # Método 2: atributo free_rects
-                    rects = getattr(b, "free_rects", [])
-                except:
-                    rects = []
-            
-            # Si no se obtuvieron free rects, calcular manualmente los sobrantes
-            if not rects:
-                try:
-                    # Calcular área ocupada vs área total
-                    bin_area = b.width * b.height
-                    # Buscar el índice del bin de forma segura
-                    bin_index = None
-                    for i, bin_item in enumerate(packer):
-                        if bin_item.bid == b.bid:
-                            bin_index = i
-                            break
-                    
-                    if bin_index is not None:
-                        occupied_rects = [r for r in packer.rect_list() if r[0] == bin_index]
-                        occupied_area = sum(r[3] * r[4] for r in occupied_rects)
-                        
-                        # Si hay área libre, crear un free rect simple
-                        if occupied_area < bin_area:
-                            # Buscar el rectángulo libre más grande (simplificado)
-                            max_x = max([r[1] + r[3] for r in occupied_rects] + [0])
-                            max_y = max([r[2] + r[4] for r in occupied_rects] + [0])
-                            
-                            # Crear free rects para las áreas no ocupadas (solo si son significativas)
-                            if max_x < b.width and (b.width - max_x) > 50:  # Al menos 50mm de ancho
-                                free_rects.append((b.bid, max_x, 0, b.width - max_x, b.height))
-                            if max_y < b.height and (b.height - max_y) > 50:  # Al menos 50mm de alto
-                                free_rects.append((b.bid, 0, max_y, max_x, b.height - max_y))
-                except Exception as e:
-                    # Si hay error, continuar sin free rects
-                    continue
-            else:
-                # Procesar free rects existentes
-                for fr in rects:
-                    if isinstance(fr, (list, tuple)) and len(fr) >= 4:
-                        fx, fy, fw, fh = fr[:4]
-                        # Filtrar rectángulos muy pequeños
-                        if fw > 10 and fh > 10:  # Mínimo 10mm x 10mm
-                            free_rects.append((b.bid, fx, fy, fw, fh))
-        return free_rects
+        unused_rects = []
+
+        for b_idx, b in enumerate(packer):
+            bin_w, bin_h = b.width, b.height
+            bid = b.bid
+
+            # Lista de piezas colocadas (en esta plancha)
+            placed = [r for r in packer.rect_list() if r[0] == b_idx]
+            if not placed:
+                free_rects.append((bid, 0, 0, bin_w, bin_h))
+                continue
+
+            # Espacios libres iniciales: toda la plancha
+            spaces = [(0, 0, bin_w, bin_h)]
+
+            for _, x, y, w, h, _ in placed:
+                new_spaces = []
+                for sx, sy, sw, sh in spaces:
+                    # Si no hay intersección, se conserva
+                    if x + w <= sx or x >= sx + sw or y + h <= sy or y >= sy + sh:
+                        new_spaces.append((sx, sy, sw, sh))
+                        continue
+
+                    # Corte guillotina — subdividimos el espacio
+                    # Arriba del rectángulo
+                    if y > sy:
+                        new_spaces.append((sx, sy, sw, y - sy))
+                    # Abajo del rectángulo
+                    if y + h < sy + sh:
+                        new_spaces.append((sx, y + h, sw, (sy + sh) - (y + h)))
+                    # Izquierda del rectángulo
+                    if x > sx:
+                        new_spaces.append((sx, y, x - sx, h))
+                    # Derecha del rectángulo
+                    if x + w < sx + sw:
+                        new_spaces.append((x + w, y, (sx + sw) - (x + w), h))
+
+                spaces = new_spaces
+
+            # Filtrar sobrantes mínimos y guardar
+            for sx, sy, sw, sh in spaces:
+                if sw < 200 or sh < 200:
+                    unused_rects.append((bid, sx, sy, sw, sh))
+                else: 
+                    free_rects.append((bid, sx, sy, sw, sh))
+
+        return free_rects, unused_rects
 
     # 🔸 Función para evaluar una heurística y guardar sus free_rects
     def evaluate_variant(packer, algo, sort_used, bin_algo):
-        nonlocal best_score, best_data, all_free_rects
+        nonlocal best_score, best_data, all_free_rects, all_unused_rects
         placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
         waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
         metrics = (placed_count, -waste, -len(bins_used))
-        free_rects = get_free_rects_from_packer(packer)
+        free_rects, unused_rects = get_free_rects_from_packer(packer)
+        all_unused_rects.extend(unused_rects)
         all_free_rects.extend(free_rects)  # guardamos todos los sobrantes
 
         if best_score is None or metrics > best_score:
@@ -161,7 +158,8 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                 'best_result': packer.rect_list(),
                 'metrics': (placed_count, placed_area, bin_area_used, bins_used, waste),
                 'heuristic': (algo, sort_used, bin_algo),
-                'free_rects': free_rects  # 🔸 agregamos aquí los sobrantes de la mejor heurística
+                'free_rects': free_rects,  # 🔸 agregamos aquí los sobrantes de la mejor heurística
+                'unused_rects': unused_rects
             }
 
     # ---------------------
@@ -225,6 +223,8 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
     # 🔹 devolvemos los free_rects acumulados y los de la mejor heurística
     if best_data is not None:
         best_data['all_free_rects'] = all_free_rects
+        best_data['all_unused_rects'] = all_unused_rects
+        #best_data['free_rects'] = get_free_rects_from_packer(best_data['best_packer'])
         return best_data
     else:
         # Si no se encontró ninguna solución, devolver estructura vacía
@@ -234,7 +234,9 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
             'metrics': (0, 0, 0, set(), float('inf')),
             'heuristic': (None, None, None),
             'free_rects': [],
-            'all_free_rects': all_free_rects
+            'unused_rects': [],
+            'all_free_rects': all_free_rects,
+            'all_unused_rects': all_unused_rects
         }
 
 def run_optimizer(input_data, stock_data):
@@ -369,10 +371,12 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             'best_packer': None,
             'metrics': (0, 0, 0, set(), float('inf')),
             'heuristic': (None, None, None),
-            'free_rects': []
+            'free_rects': [],
+            'unused_rects': []
         }
     
     best_free_rects = res.get('free_rects', [])
+    best_unused_rects = res.get('unused_rects', [])
 
     if res and res['best_result']:
         algo, sort, bin_algo = res['heuristic']
@@ -389,7 +393,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
 
             final_cutting_plan.append({
                 'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
-                'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False
+                'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False,
+                'Is_Unused': False
 
             })
 
@@ -406,7 +411,22 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'Packed_Width': fw,
                 'Packed_Height': fh,
                 'Is_Rotated': False,
-                'Is_Waste': True
+                'Is_Waste': True,
+                'Is_Unused': False
+            })
+        
+        for i, (bid, fx, fy, fw, fh) in enumerate(best_unused_rects):
+            final_cutting_plan.append({
+                'Piece_ID': f"SobranteInutil_{str(bid)}_{fx}_{fy}", 
+                'Source_Plate_ID': str(bid),
+                'Source_Plate_Type': plate_type,
+                'X_Coordinate': fx,
+                'Y_Coordinate': fy,
+                'Packed_Width': fw,
+                'Packed_Height': fh,
+                'Is_Rotated': False,
+                'Is_Waste': True,
+                'Is_Unused': True
             })
         
         print(f"[{etapa_name}] Sobrantes agregados al plan: {len(best_free_rects)}")
