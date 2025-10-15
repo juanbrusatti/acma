@@ -74,18 +74,99 @@ def _evaluate_packer(packer, bins_map):
 # Este metodo recibe las piezas a cortar y el stock (sobrantes y planchas nuevas).
 # bins_to_add es basicamente los sobrantes que se estan usando y en bins_map tenemos los mismos sobrantes pero sirve para calcular las metricas
 def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True):
+    import random
+    from rectpack import newPacker, PackingMode, PackingBin
+    from rectpack.guillotine import GuillotineBssfSlas
+    from rectpack.packer import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE
 
-    # Definimos los algoritmos y variantes a probar
-    guillotine_algos = [GuillotineBssfSlas] # Un solo algortimo Guillotina
-    sort_algos_builtin = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE] # Diferentes formas de ordenar las piezas antes de colocarlas
-    custom_sorts = ["BY_WIDTH", "BY_HEIGHT", "BY_AREA_DESC", "SHUFFLE"] # Sorts personalizados que no estan en la libreria
-    bin_algos = [PackingBin.BFF, PackingBin.BBF] # Diferentes formas de elegir las planchas, Best Fit o Best Better Fit
+    guillotine_algos = [GuillotineBssfSlas]
+    sort_algos_builtin = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE]
+    custom_sorts = ["BY_WIDTH", "BY_HEIGHT", "BY_AREA_DESC", "SHUFFLE"]
+    bin_algos = [PackingBin.BFF, PackingBin.BBF]
 
-    # Variables usadas para guardar la mejor heurística y sus resultados
     best_score = None
     best_data = None
 
-    # Probar todas las combinaciones de algoritmos y variantes
+    # 🔹 lista para guardar los rectángulos sobrantes de cada intento
+    all_free_rects = []
+
+    def get_free_rects_from_packer(packer):
+        """Extrae los free rects de un packer, si están disponibles."""
+        free_rects = []
+        for b in packer:
+            # Intentar diferentes métodos para obtener free rects
+            try:
+                # Método 1: free_rect_list()
+                rects = b.free_rect_list()
+            except AttributeError:
+                try:
+                    # Método 2: atributo free_rects
+                    rects = getattr(b, "free_rects", [])
+                except:
+                    rects = []
+            
+            # Si no se obtuvieron free rects, calcular manualmente los sobrantes
+            if not rects:
+                try:
+                    # Calcular área ocupada vs área total
+                    bin_area = b.width * b.height
+                    # Buscar el índice del bin de forma segura
+                    bin_index = None
+                    for i, bin_item in enumerate(packer):
+                        if bin_item.bid == b.bid:
+                            bin_index = i
+                            break
+                    
+                    if bin_index is not None:
+                        occupied_rects = [r for r in packer.rect_list() if r[0] == bin_index]
+                        occupied_area = sum(r[3] * r[4] for r in occupied_rects)
+                        
+                        # Si hay área libre, crear un free rect simple
+                        if occupied_area < bin_area:
+                            # Buscar el rectángulo libre más grande (simplificado)
+                            max_x = max([r[1] + r[3] for r in occupied_rects] + [0])
+                            max_y = max([r[2] + r[4] for r in occupied_rects] + [0])
+                            
+                            # Crear free rects para las áreas no ocupadas (solo si son significativas)
+                            if max_x < b.width and (b.width - max_x) > 50:  # Al menos 50mm de ancho
+                                free_rects.append((b.bid, max_x, 0, b.width - max_x, b.height))
+                            if max_y < b.height and (b.height - max_y) > 50:  # Al menos 50mm de alto
+                                free_rects.append((b.bid, 0, max_y, max_x, b.height - max_y))
+                except Exception as e:
+                    # Si hay error, continuar sin free rects
+                    continue
+            else:
+                # Procesar free rects existentes
+                for fr in rects:
+                    if isinstance(fr, (list, tuple)) and len(fr) >= 4:
+                        fx, fy, fw, fh = fr[:4]
+                        # Filtrar rectángulos muy pequeños
+                        if fw > 10 and fh > 10:  # Mínimo 10mm x 10mm
+                            free_rects.append((b.bid, fx, fy, fw, fh))
+        return free_rects
+
+    # 🔸 Función para evaluar una heurística y guardar sus free_rects
+    def evaluate_variant(packer, algo, sort_used, bin_algo):
+        nonlocal best_score, best_data, all_free_rects
+        placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
+        waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
+        metrics = (placed_count, -waste, -len(bins_used))
+        free_rects = get_free_rects_from_packer(packer)
+        all_free_rects.extend(free_rects)  # guardamos todos los sobrantes
+
+        if best_score is None or metrics > best_score:
+            best_score = metrics
+            best_data = {
+                'best_packer': packer,
+                'best_result': packer.rect_list(),
+                'metrics': (placed_count, placed_area, bin_area_used, bins_used, waste),
+                'heuristic': (algo, sort_used, bin_algo),
+                'free_rects': free_rects  # 🔸 agregamos aquí los sobrantes de la mejor heurística
+            }
+
+    # ---------------------
+    # Heurísticas de rectpack
+    # ---------------------
     for algo in guillotine_algos:
         for bin_algo in bin_algos:
             for sort in sort_algos_builtin:
@@ -96,32 +177,19 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                     sort_algo=sort,
                     bin_algo=bin_algo
                 )
-                # Le decimos al packer las piezas y planchas a usar
                 for (w, h, rid) in rects_to_add:
                     packer.add_rect(width=w, height=h, rid=rid)
                 for (bw, bh, bid) in bins_to_add:
                     packer.add_bin(width=bw, height=bh, bid=bid)
                 try:
                     packer.pack()
+                    evaluate_variant(packer, algo, sort, bin_algo)
                 except Exception:
                     continue
-                # Guardamos las siguientes metricas: cantidad de piezas colocadas, area colocada, area de las planchas usadas, ids de las planchas usadas
-                placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
-                # Dejamos en waste el area que quedo "desperciada" en las planchas usadas
-                waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
-                # Dejamos como metricas la cantidad de cortes colocados, el area desperdiciada (negativa para maximizar) y la cantidad de planchas usadas (negativa para maximizar)
-                metrics = (placed_count, -waste, -len(bins_used))
-                # Vamos guardando la mejor heurística
-                if best_score is None or metrics > best_score:
-                    best_score = metrics
-                    best_data = {
-                        'best_packer': packer,
-                        'best_result': packer.rect_list(),
-                        'metrics': (placed_count, placed_area, bin_area_used, bins_used, waste),
-                        'heuristic': (algo, sort, bin_algo)
-                    }
 
-            # Arriba usabamos los algoritmos que trae la libreria, ahora usamos los nuestros
+            # ---------------------
+            # Heurísticas personalizadas
+            # ---------------------
             for sort_tag in custom_sorts:
                 packer = newPacker(
                     mode=PackingMode.Offline,
@@ -131,7 +199,6 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                     bin_algo=bin_algo
                 )
 
-                # Dejamos el sort_algo en NONE y hacemos el ordenamiento nosotros
                 if sort_tag == "BY_WIDTH":
                     rects_iter = sorted(rects_to_add, key=lambda r: r[0], reverse=True)
                 elif sort_tag == "BY_HEIGHT":
@@ -148,23 +215,27 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                     packer.add_rect(width=w, height=h, rid=rid)
                 for (bw, bh, bid) in bins_to_add:
                     packer.add_bin(width=bw, height=bh, bid=bid)
+
                 try:
                     packer.pack()
+                    evaluate_variant(packer, algo, sort_tag, bin_algo)
                 except Exception:
                     continue
-                placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
-                waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
-                metrics = (placed_count, -waste, -len(bins_used))
-                if best_score is None or metrics > best_score:
-                    best_score = metrics
-                    best_data = {
-                        'best_packer': packer,
-                        'best_result': packer.rect_list(),
-                        'metrics': (placed_count, placed_area, bin_area_used, bins_used, waste),
-                        'heuristic': (algo, sort_tag, bin_algo)
-                    }
 
-    return best_data
+    # 🔹 devolvemos los free_rects acumulados y los de la mejor heurística
+    if best_data is not None:
+        best_data['all_free_rects'] = all_free_rects
+        return best_data
+    else:
+        # Si no se encontró ninguna solución, devolver estructura vacía
+        return {
+            'best_result': None,
+            'best_packer': None,
+            'metrics': (0, 0, 0, set(), float('inf')),
+            'heuristic': (None, None, None),
+            'free_rects': [],
+            'all_free_rects': all_free_rects
+        }
 
 def run_optimizer(input_data, stock_data):
     
@@ -182,234 +253,176 @@ def run_optimizer(input_data, stock_data):
     for piece in pieces_to_cut:
         rects_all.append((piece['width'], piece['height'], piece['id']))
 
-    # bins_map para consultar áreas por bid (strings)
-    scraps_map = {str(s['id']): {'width': s['width'], 'height': s['height']} for s in scraps}
-
     print("ETAPA 1: Intentando empaquetar en placas sobrantes...")
 
-    # Guardamos en bins_to_add_scraps las dimensiones y ids de los sobrantes del stock
-    bins_to_add_scraps = [(s['width'], s['height'], str(s['id'])) for s in scraps]
+    # Convertir scraps al formato esperado por pack_plates
+    scraps_as_plates = []
+    for scrap in scraps:
+        scraps_as_plates.append({
+            'id': str(scrap['id']),
+            'width': scrap['width'],
+            'height': scrap['height'],
+            'quantity': 1,
+            'color': scrap.get('color'),
+            'glass_type': scrap.get('glass_type'),
+            'thickness': scrap.get('thickness')
+        })
 
-    # Guardamos en res_scraps el mejor resultado de probar todas las heurísticas con los sobrantes
-    res_scraps = _try_guillotine_variants(rects_all, bins_to_add_scraps, scraps_map, rotation=True)
-
-    packed_in_scraps = [] # Lista de piezas que se lograron empaquetar en los sobrantes
-    bin_details_map = {} # Mapa de detalles de las planchas usadas (sobrantes y nuevas)
-    used_rids_after_scraps = [] # Lista de ids de piezas que se lograron empaquetar en los sobrantes
-
-    # mapeo de detalles de sobrantes en formato esperado
-    for bin_info in scraps:
-        bid_str = str(bin_info['id'])
-        sobrante_id = f"Sobrante_{bid_str}"
-        details = {**bin_info, 'id': sobrante_id, 'type': 'Leftover'}
-        bin_details_map[sobrante_id] = details
-
-    # Si se logró empaquetar algo en los sobrantes, reconstruimos el plan de corte, primero guardamos la heurística ganadora y sus métricas
-    # luego 
-    if res_scraps and res_scraps['best_result']:
-        algo, sort, bin_algo = res_scraps['heuristic']
-        placed_count, placed_area, bin_area_used, bins_used, waste = res_scraps['metrics']
-        print(f"[ETAPA1] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
-        print(f"[ETAPA1] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
-
-        # recorremos todas las piezas colocadas en los sobrantes
-        best_packer = res_scraps['best_packer']
-        for rect in res_scraps['best_result']:
-            b_idx, x, y, w, h, rid = rect # obtenemos el id, dimensiones y posicion de cada pieza colocada
-            bid = str(best_packer[b_idx].bid) # obtenemos el id del sobrante usado
-            sobrante_id = f"Sobrante_{bid}"
-            original_w, original_h = original_piece_dimensions[rid] # dimensiones originales de la pieza
-            is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h) # si las dimensiones no coinciden, la pieza fue rotada
-
-            # Guardamos toda la informacion de la pieza
-            packed_in_scraps.append({
-                'Piece_ID': rid, 'Source_Plate_ID': sobrante_id, 'Source_Plate_Type': 'Leftover',
-                'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated
-            })
-            used_rids_after_scraps.append(rid)
-
-            for abin in best_packer:
-                bid = str(abin.bid)
-                sobrante_id = f"Sobrante_{bid}"
-                bin_w, bin_h = abin.width, abin.height
-
-                # obtener todas las piezas colocadas en este bin
-                pieces_in_bin = [
-                    r for r in res_scraps['best_result']
-                    if str(best_packer[r[0]].bid) == bid
-                ]
-
-                waste_rects = []
-
-                # líneas de corte (simples)
-                for b_idx, x, y, w, h, rid in pieces_in_bin:
-                    # derecha del corte
-                    if x + w < bin_w:
-                        waste_rects.append((x + w, y, bin_w - (x + w), h))
-                    # abajo del corte
-                    if y + h < bin_h:
-                        waste_rects.append((x, y + h, w, bin_h - (y + h)))
-                    # esquina diagonal (opcional, completa)
-                    if x + w < bin_w and y + h < bin_h:
-                        waste_rects.append((x + w, y + h, bin_w - (x + w), bin_h - (y + h)))
-
-                # evitar duplicados y filtrar rectángulos mínimos
-                seen = set()
-                for wx, wy, ww, wh in waste_rects:
-                    key = (round(wx), round(wy), round(ww), round(wh))
-                    if key not in seen and ww > 2 and wh > 2:
-                        seen.add(key)
-                        packed_in_scraps.append({
-                            'Piece_ID': f"{sobrante_id}",
-                            'Source_Plate_ID': sobrante_id,
-                            'Source_Plate_Type': 'Leftover',
-                            'X_Coordinate': wx,
-                            'Y_Coordinate': wy,
-                            'Packed_Width': ww,
-                            'Packed_Height': wh,
-                            'Is_Rotated': False,
-                            'Is_Waste': True
-                        })
-                
-    else:
-        print("[ETAPA1] Ninguna heurística colocó piezas en los sobrantes.")
-
-    # Calcular piezas que quedaron sin colocar, comparando las que intentamos colocar con las que se lograron colocar
+    bin_details_map = {} # Mapa de detalles de las planchas usadas
+    final_cutting_plan = [] # Lista final del plan de corte
+    
+    # Usar pack_plates para sobrantes
     added_counts = Counter([r[2] for r in rects_all])
-    placed_counts = Counter(used_rids_after_scraps)
-    unfitted_counts = added_counts - placed_counts
-
-    # Esta es la lista final de cortes que se lograron empaquetar en sobrantes
-    final_cutting_plan = packed_in_scraps.copy()
-    unpacked_final_list = []
+    unfitted_counts = added_counts.copy()  # Inicialmente todas están sin empacar
+    
+    unpacked_final_list = pack_plates(
+        scraps_as_plates, bin_details_map, rects_all, final_cutting_plan, 
+        original_piece_dimensions, unfitted_counts, 'Leftover', 'ETAPA1'
+    )
 
     # ETAPA 2: Empaquetar piezas restantes en placas nuevas
-    if unfitted_counts:
-        total_unfitted = sum(unfitted_counts.values())
+    if unpacked_final_list:
+        total_unfitted = sum(item['quantity_unpacked'] for item in unpacked_final_list)
         print(f"\n✨ {total_unfitted} piezas no cupieron en sobrantes. Pasando a ETAPA 2 (planchas del stock)...")
 
         # Preparar rects para los no empacados
         rects_unfitted = []
-        for rid, count in unfitted_counts.items():
+        for item in unpacked_final_list:
+            rid = item['id']
+            quantity = item['quantity_unpacked']
             original_w, original_h = original_piece_dimensions[rid]
-            for _ in range(count):
+            for _ in range(quantity):
                 rects_unfitted.append((original_w, original_h, rid))
-        # Preparar bins y bins_map para las planchas nuevas
-        bins_to_add_new = []
-        bins_map_new = {}
-        for plate in glassplates:
-            for i in range(int(plate.get('quantity', 1))):
-                new_plate_id = f"Plancha_{plate['id']}_{i+1}"
-                bins_to_add_new.append((plate['width'], plate['height'], new_plate_id))
-                bins_map_new[new_plate_id] = {'width': plate['width'], 'height': plate['height']}
+        
+        # Calcular unfitted_counts para ETAPA 2
+        unfitted_counts = Counter([r[2] for r in rects_unfitted])
+        unpacked_final_list = pack_plates(glassplates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2')
 
-                # guardar detalles en bin_details_map (tipo New)
-                bin_details_map[new_plate_id] = {
-                    'id': new_plate_id,
-                    'width': plate['width'],
-                    'height': plate['height'],
-                    'type': 'New',
-                    'color': plate.get('color'),
-                    'glass_type': plate.get('glass_type'),
-                    'thickness': plate.get('thickness')
-                }
-
-        # Probamos heuristicas para las planchas nuevas
-        res_new = _try_guillotine_variants(rects_unfitted, bins_to_add_new, bins_map_new, rotation=True)
-
-        if res_new and res_new['best_result']:
-            algo, sort, bin_algo = res_new['heuristic']
-            placed_count, placed_area, bin_area_used, bins_used, waste = res_new['metrics']
-            print(f"[ETAPA2] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
-            print(f"[ETAPA2] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
-
-            best_packer_new = res_new['best_packer']
-            for rect in res_new['best_result']:
-                b_idx, x, y, w, h, rid = rect
-                bid = str(best_packer_new[b_idx].bid)
-                original_w, original_h = original_piece_dimensions[rid]
-                is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
-
-                final_cutting_plan.append({
-                    'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': 'New',
-                    'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated
-                })
-
-            # calcular restantes no empacados
-            placed_rids_new = [r[5] for r in res_new['best_result']]
-            added_counts_glassplates = Counter([r[2] for r in rects_unfitted])
-            placed_counts_new = Counter(placed_rids_new)
-            remaining_unfitted = added_counts_glassplates - placed_counts_new
-            unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in remaining_unfitted.items()]
-
-        else:
-            print("[ETAPA2] Ninguna heurística pudo colocar piezas en las planchas del stock.")
-            # Si no se pudo colocar nada, marcar todo como sin empacar
-            unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in unfitted_counts.items()]
-
+        # ETAPA 3: Planchas de emergencia 3600x2500
         count = 0        
-        while len(unpacked_final_list) > 0:
-
+        while unpacked_final_list:
             print(f"\nQuedaron {len(unpacked_final_list)} piezas sin colocar. Intentando en plancha nueva 3600x2500...")
 
             # Preparar rects para los no empacados
             rects_unfitted_final = []
             for item in unpacked_final_list:
                 rid = item['id']
+                quantity = item['quantity_unpacked']
                 original_w, original_h = original_piece_dimensions[rid]
-                rects_unfitted_final.append((original_w, original_h, rid))
+                for _ in range(quantity):
+                    rects_unfitted_final.append((original_w, original_h, rid))
 
-            # Crear una sola plancha nueva de 3600x2500
-            emergency_plate_id =  f"Plancha_3600x2500_{count}"
-            count = count + 1
-            bins_to_add_emergency = [(3600, 2500, emergency_plate_id)]
-            bins_map_emergency = {emergency_plate_id: {'width': 3600, 'height': 2500}}
-
-            # Obtengo los detalles de la plancha de emergencia por medio del primer corte de la lista
-            piece = pieces_to_cut[0]
-            bin_details_map[emergency_plate_id] = {
-                'id': emergency_plate_id,
+            # Crear plancha de emergencia
+            first_piece = pieces_to_cut[0]
+            plate = {
+                'id': f"3600x2500",
                 'width': 3600,
                 'height': 2500,
-                'type': 'New',
-                'color': piece.get('color'),
-                'glass_type': piece.get('glass_type'),
-                'thickness': piece.get('thickness')
+                'color': first_piece.get('color'),
+                'glass_type': first_piece.get('glass_type'),
+                'thickness': first_piece.get('thickness'),
+                'quantity': 1
             }
 
-            # Intentar ubicar las piezas restantes en la plancha nueva
-            res_emergency = _try_guillotine_variants(rects_unfitted_final, bins_to_add_emergency, bins_map_emergency, rotation=True)
-
-            if res_emergency and res_emergency['best_result']:
-                algo, sort, bin_algo = res_emergency['heuristic']
-                placed_count, placed_area, bin_area_used, bins_used, waste = res_emergency['metrics']
-                print(f"[ETAPA3] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
-                print(f"[ETAPA3] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
-
-                best_packer_emergency = res_emergency['best_packer']
-                placed_rids_emergency = []
-                for rect in res_emergency['best_result']:
-                    b_idx, x, y, w, h, rid = rect
-                    bid = str(best_packer_emergency[b_idx].bid)
-                    original_w, original_h = original_piece_dimensions[rid]
-                    is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
-
-                    final_cutting_plan.append({
-                        'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': 'Emergency',
-                        'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated
-                    })
-                    placed_rids_emergency.append(rid)
-
-                # Actualizar la lista de piezas no empacadas
-                added_counts_emergency = Counter([r[2] for r in rects_unfitted_final])
-                placed_counts_emergency = Counter(placed_rids_emergency)
-                remaining_unfitted_emergency = added_counts_emergency - placed_counts_emergency
-                unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in remaining_unfitted_emergency.items()]
-
+            # Calcular unfitted_counts para ETAPA 3
+            unfitted_counts = Counter([r[2] for r in rects_unfitted_final])
+            unpacked_final_list = pack_plates([plate], bin_details_map, rects_unfitted_final, final_cutting_plan, original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}')
     else:
         print("\n✅ ¡Todas las piezas cupieron en las placas de sobrante!")
 
     return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area
+
+def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, plate_type='New', etapa_name='ETAPA'):
+
+    bins_to_add = []
+    bins_map = {}
+    
+    for plate in plates:
+        for i in range(int(plate.get('quantity', 1))):
+            # Generar ID según el tipo
+            if plate_type == 'Leftover':
+                plate_id = f"Sobrante_{plate['id']}"
+            else:
+                plate_id = f"Plancha_{plate['id']}_{i+1}"
+            
+            bins_to_add.append((plate['width'], plate['height'], plate_id))
+            bins_map[plate_id] = {'width': plate['width'], 'height': plate['height']}
+
+            # Guardar detalles en bin_details_map
+            bin_details_map[plate_id] = {
+                'id': plate_id,
+                'width': plate['width'],
+                'height': plate['height'],
+                'type': plate_type,
+                'color': plate.get('color'),
+                'glass_type': plate.get('glass_type'),
+                'thickness': plate.get('thickness')
+            }
+    
+    # Probamos heurísticas
+    res = _try_guillotine_variants(rects_unfitted, bins_to_add, bins_map, rotation=True)
+    
+    # Verificar que res no sea None
+    if res is None:
+        res = {
+            'best_result': None,
+            'best_packer': None,
+            'metrics': (0, 0, 0, set(), float('inf')),
+            'heuristic': (None, None, None),
+            'free_rects': []
+        }
+    
+    best_free_rects = res.get('free_rects', [])
+
+    if res and res['best_result']:
+        algo, sort, bin_algo = res['heuristic']
+        placed_count, placed_area, bin_area_used, bins_used, waste = res['metrics']
+        print(f"[{etapa_name}] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
+        print(f"[{etapa_name}] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
+
+        best_packer = res['best_packer']
+        for rect in res['best_result']:
+            b_idx, x, y, w, h, rid = rect
+            bid = str(best_packer[b_idx].bid)
+            original_w, original_h = original_piece_dimensions[rid]
+            is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
+
+            final_cutting_plan.append({
+                'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
+                'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False
+
+            })
+
+        # Agregar los free rects (sobrantes) al plan de corte
+        print(f"[{etapa_name}] DEBUG: Free rects encontrados: {len(best_free_rects)}")
+        for i, (bid, fx, fy, fw, fh) in enumerate(best_free_rects):
+            print(f"[{etapa_name}] Sobrante {i+1}: Plancha={bid}, Pos=({fx},{fy}), Dim=({fw}x{fh})")
+            final_cutting_plan.append({
+                'Piece_ID': f"Sobrante_{str(bid)}_{fx}_{fy}",  # ID único para el sobrante
+                'Source_Plate_ID': str(bid),
+                'Source_Plate_Type': plate_type,
+                'X_Coordinate': fx,
+                'Y_Coordinate': fy,
+                'Packed_Width': fw,
+                'Packed_Height': fh,
+                'Is_Rotated': False,
+                'Is_Waste': True
+            })
+        
+        print(f"[{etapa_name}] Sobrantes agregados al plan: {len(best_free_rects)}")
+
+        # Calcular restantes no empacados
+        placed_rids = [r[5] for r in res['best_result']]
+        added_counts = Counter([r[2] for r in rects_unfitted])
+        placed_counts = Counter(placed_rids)
+        remaining_unfitted = added_counts - placed_counts
+        unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in remaining_unfitted.items()]
+    else:
+        print(f"[{etapa_name}] Ninguna heurística pudo colocar piezas en las placas.")
+        # Si no se pudo colocar nada, marcar todo como sin empacar
+        unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in unfitted_counts.items()]
+    
+    return unpacked_final_list
 
 # Metodo que usamos para borrar la carpeta output_visuals vieja
 def cleanup_previous_outputs():
