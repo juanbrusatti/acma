@@ -317,9 +317,9 @@ def run_optimizer(input_data, stock_data):
             # Crear plancha de emergencia
             first_piece = pieces_to_cut[0]
             plate = {
-                'id': f"3600x2500",
-                'width': 3600,
-                'height': 2500,
+                'id': f"3600x2500_{count}",
+                'width': 2500,
+                'height': 3600,
                 'color': first_piece.get('color'),
                 'glass_type': first_piece.get('glass_type'),
                 'thickness': first_piece.get('thickness'),
