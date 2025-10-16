@@ -44,6 +44,78 @@ def get_unfitted_rects(packer):
             # Si ninguno funciona, retorna una lista vacía
             print("Empty list: No unfitted rectangles found.")
             return []
+
+def merge_adjacent_rects(rects):
+    """
+    Fusiona rectángulos adyacentes de manera conservadora, respetando el corte guillotina.
+    Solo fusiona rectángulos que comparten exactamente un borde completo.
+    """
+    if not rects or len(rects) <= 1:
+        return rects
+    
+    # Ordenar por posición para procesamiento más eficiente
+    rects = sorted(rects, key=lambda r: (r[0], r[1]))  # ordenar por x, luego y
+    
+    merged = True
+    iteration = 0
+    max_iterations = 10  # Evitar ciclos infinitos
+    
+    while merged and iteration < max_iterations:
+        merged = False
+        iteration += 1
+        new_rects = []
+        used = set()
+        
+        for i, (bx, by, bw, bh) in enumerate(rects):
+            if i in used:
+                continue
+            
+            merged_this = False
+            
+            for j, (bx2, by2, bw2, bh2) in enumerate(rects):
+                if i >= j or j in used:
+                    continue
+                
+                # FUSIÓN VERTICAL: rectángulos uno encima del otro
+                # Deben tener el mismo X, mismo ancho, y ser adyacentes en Y
+                if bx == bx2 and bw == bw2:
+                    # Verificar que son exactamente adyacentes (sin gap ni overlap)
+                    if by + bh == by2:
+                        # Rect i está arriba de rect j
+                        new_rects.append((bx, by, bw, bh + bh2))
+                        used.update([i, j])
+                        merged = merged_this = True
+                        break
+                    elif by2 + bh2 == by:
+                        # Rect j está arriba de rect i
+                        new_rects.append((bx, by2, bw, bh + bh2))
+                        used.update([i, j])
+                        merged = merged_this = True
+                        break
+                
+                # FUSIÓN HORIZONTAL: rectángulos lado a lado
+                # Deben tener el mismo Y, misma altura, y ser adyacentes en X
+                elif by == by2 and bh == bh2:
+                    # Verificar que son exactamente adyacentes (sin gap ni overlap)
+                    if bx + bw == bx2:
+                        # Rect i está a la izquierda de rect j
+                        new_rects.append((bx, by, bw + bw2, bh))
+                        used.update([i, j])
+                        merged = merged_this = True
+                        break
+                    elif bx2 + bw2 == bx:
+                        # Rect j está a la izquierda de rect i
+                        new_rects.append((bx2, by, bw + bw2, bh))
+                        used.update([i, j])
+                        merged = merged_this = True
+                        break
+            
+            if not merged_this:
+                new_rects.append((bx, by, bw, bh))
+        
+        rects = new_rects
+    
+    return rects
         
 # Es metodo que permite asignarle un valor a nuestro empaquetado o plan de corte
 def _evaluate_packer(packer, bins_map):
@@ -132,6 +204,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
 
                 spaces = new_spaces
 
+            spaces = merge_adjacent_rects(spaces)
             # Filtrar sobrantes mínimos y guardar
             for sx, sy, sw, sh in spaces:
                 if sw < 200 or sh < 200:

@@ -4,7 +4,7 @@ class GlassplatesController < ApplicationController
   # GET /glassplates or /glassplates.json
   def index
     @glassplates = Glassplate.all
-    @scraps = Scrap.all
+    @scraps = Scrap.order(created_at: :desc)
   end
 
   # GET /glassplates/1 or /glassplates/1.json
