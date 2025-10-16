@@ -340,7 +340,8 @@ def run_optimizer(input_data, stock_data):
             'quantity': 1,
             'color': scrap.get('color'),
             'glass_type': scrap.get('glass_type'),
-            'thickness': scrap.get('thickness')
+            'thickness': scrap.get('thickness'),
+            'ref_number': scrap.get('ref_number')
         })
 
     bin_details_map = {} # Mapa de detalles de las planchas usadas
@@ -431,7 +432,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'type': plate_type,
                 'color': plate.get('color'),
                 'glass_type': plate.get('glass_type'),
-                'thickness': plate.get('thickness')
+                'thickness': plate.get('thickness'),
+                'ref_number': plate.get('ref_number')  # Preservar número de referencia para trazabilidad
             }
     
     # Probamos heurísticas

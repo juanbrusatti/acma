@@ -40,7 +40,7 @@ async def run_optimize(request: Request):
         })
 
         # Build combinations for color/thickness/glass_type
-        optimization_inputs = create_optimizations_objects(input)
+        optimization_inputs, flo = create_optimizations_objects(input)
 
         # Optimize each build and collect CSV summaries
         csv_summary = {}
@@ -120,9 +120,16 @@ def create_optimizations_objects(input_data):
     results = []
 
     for (color, glass_type, thickness) in combos:
+
         # Filter pieces by combo
-        pcs_combo = [p for p in pieces
-                     if p.get('color') == color and p.get('glass_type') == glass_type and p.get('thickness') == thickness]
+        flo = []
+        pcs_combo = []
+        for p in pieces:
+            if p.get('color') == color and p.get('glass_type') == glass_type and p.get('thickness') == thickness:
+                if p.get('glass_type') == 'FLO' and p.get('type_opening') == 'Aluminio' and ((p.get('width') <= 500 and p.get('height') <= 1800) or (p.get('height') <= 1800 and p.get('width') <= 500)):
+                    flo += [p]
+                else: 
+                    pcs_combo += [p]
 
         # Filter stock by the same combo
         gps_combo = [g for g in glassplates
@@ -133,7 +140,7 @@ def create_optimizations_objects(input_data):
         if pcs_combo:
             results.append((pcs_combo, { 'glassplates': gps_combo, 'scraps': scs_combo }))
 
-    return results
+    return results, flo
 
 def _parse_csv_rows(csv_path: str):
     rows = []

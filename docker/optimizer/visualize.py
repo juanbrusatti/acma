@@ -154,14 +154,26 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
         # --- Título del plano ---
         dims_text = f"{bin_height:.0f} x {bin_width:.0f}"
-        prefix = "Sobrante" if ("scrap" in bin_id.lower() or "leftover" in bin_id.lower()) else "Plancha"
+        
+        # Determinar si es sobrante o plancha (chequear tanto bin_id como type en bin_details_map)
+        bin_type = str(bdet.get('type') or '').lower()
+        is_scrap = (
+            "scrap" in bin_id.lower() or 
+            "leftover" in bin_id.lower() or 
+            "sobrante" in bin_id.lower() or
+            bin_type == 'leftover'
+        )
+        
+        prefix = "Sobrante" if is_scrap else "Plancha"
+        number_ref = str(bdet.get('ref_number') or '').strip()
+
         gt = str(bdet.get('glass_type') or '').strip()
         th = str(bdet.get('thickness') or '').strip()
         co = str(bdet.get('color') or '').strip()
         suffix_parts = [p for p in [gt, th, co] if p]
         suffix = f" - {' '.join(suffix_parts)}" if suffix_parts else ""
 
-        fig.text(0.5, 0.85, f"{prefix} {dims_text}{suffix}",
+        fig.text(0.5, 0.85, f"{prefix}{ number_ref}, {dims_text}{suffix}",
                  ha='center', va='bottom', fontsize=11, weight='bold')
 
         combo_folder = "_".join([p for p in [gt, th, co] if p]) or "unknown"

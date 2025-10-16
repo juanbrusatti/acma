@@ -199,7 +199,7 @@ class ProjectsController < ApplicationController
         color: cut.color,
         glass_type: cut.glass_type,
         thickness: cut.thickness,
-        # type_opening: cut.type_opening
+        type_opening: cut.type_opening
       }
     end
 
@@ -214,7 +214,7 @@ class ProjectsController < ApplicationController
           color: dvh.glasscutting1_color,
           glass_type: dvh.glasscutting1_type,
           thickness: dvh.glasscutting1_thickness,
-          # type_opening: cut.type_opening
+          type_opening: cut.type_opening
         },
         {
           id: dvh.typology,
@@ -225,7 +225,7 @@ class ProjectsController < ApplicationController
           color: dvh.glasscutting2_color,
           glass_type: dvh.glasscutting2_type,
           thickness: dvh.glasscutting2_thickness,
-          # type_opening: cut.type_opening
+          type_opening: cut.type_opening
         }
       ]
     end
