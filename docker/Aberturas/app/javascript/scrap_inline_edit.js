@@ -31,7 +31,7 @@ class ScrapInlineEditor {
     document.addEventListener('turbo:load', () => {
       this.bindEditButtons();
     });
-    
+
     // También bindear inmediatamente si ya está cargado
     this.bindEditButtons();
   }
@@ -48,15 +48,15 @@ class ScrapInlineEditor {
     e.preventDefault();
     e.stopPropagation(); // Evitar que otros sistemas capturen el evento
     console.log('🎯 Scrap edit button clicked - OUR SYSTEM'); // Debug
-    
+
     const row = e.target.closest('tr');
     console.log('Row found:', row); // Debug
-    
+
     if (!row) {
       console.error('❌ No se pudo encontrar la fila (tr)');
       return;
     }
-    
+
     this.startEdit(row);
   }
 
@@ -69,12 +69,12 @@ class ScrapInlineEditor {
     this.editingRow = row;
     this.originalData = this.extractRowData(row);
     console.log('Original data:', this.originalData); // Debug
-    
+
     if (!this.originalData) {
       console.error('❌ No se pudo extraer los datos de la fila');
       return;
     }
-    
+
     this.convertToEditMode(row);
   }
 
@@ -83,15 +83,15 @@ class ScrapInlineEditor {
       console.error('❌ extractRowData: row es null');
       return null;
     }
-    
+
     const cells = row.querySelectorAll('td');
     console.log('Cells found:', cells.length); // Debug
-    
+
     if (cells.length < 8) {
       console.error('❌ extractRowData: No hay suficientes celdas (td)');
       return null;
     }
-    
+
     return {
       id: row.dataset.scrapId,
       ref_number: cells[0].textContent.trim(),
@@ -100,41 +100,37 @@ class ScrapInlineEditor {
       color: cells[3].textContent.trim(),
       width: parseFloat(cells[4].textContent.trim()),
       height: parseFloat(cells[5].textContent.trim()),
-      status: cells[6].textContent.trim(),
-      output_work: cells[7].textContent.trim()
+      input_work: cells[7].textContent.trim()
     };
   }
 
   convertToEditMode(row) {
     const cells = row.querySelectorAll('td');
-    
+
     // Referencia
     this.createTextInputInCell(cells[0], 'ref_number', this.originalData.ref_number);
-    
+
     // Tipo de retazo
     this.createScrapTypeSelectInCell(cells[1], this.originalData.scrap_type);
-    
+
     // Grosor
     this.createThicknessSelectInCell(cells[2], this.originalData.thickness, this.originalData.scrap_type);
-    
+
     // Color
     this.createColorSelectInCell(cells[3], this.originalData.color, this.originalData.scrap_type, this.originalData.thickness);
-    
+
     // Ancho
     this.createNumberInputInCell(cells[4], 'width', this.originalData.width);
-    
+
     // Alto
     this.createNumberInputInCell(cells[5], 'height', this.originalData.height);
-    
-    // Estado
-    this.createStatusSelectInCell(cells[6], this.originalData.status);
-    
+
     // Obra
-    this.createTextInputInCell(cells[7], 'output_work', this.originalData.output_work);
-    
+    this.createTextInputInCell(cells[7], 'input_work', this.originalData.output_work);
+
     // Acciones
     cells[8].innerHTML = this.createActionButtons();
-    
+
     this.setupDependentSelects(row);
     this.bindActionButtons(row);
   }
@@ -156,10 +152,10 @@ class ScrapInlineEditor {
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 scrap-type-select';
     select.name = 'scrap_type';
-    
+
     // Usar las opciones de GLASS_OPTIONS
     const glassTypes = Object.keys(this.glassOptions);
-    
+
     glassTypes.forEach(type => {
       const optionElement = document.createElement('option');
       optionElement.value = type;
@@ -169,7 +165,7 @@ class ScrapInlineEditor {
       }
       select.appendChild(optionElement);
     });
-    
+
     cell.appendChild(select);
   }
 
@@ -179,11 +175,11 @@ class ScrapInlineEditor {
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 scrap-thickness-select';
     select.name = 'thickness';
-    
+
     // Obtener grosores disponibles para el tipo actual
     const availableThicknesses = Object.keys(this.glassOptions[currentType] || {});
     console.log('Available thicknesses for', currentType, ':', availableThicknesses); // Debug
-    
+
     availableThicknesses.forEach(thickness => {
       const optionElement = document.createElement('option');
       optionElement.value = thickness;
@@ -193,7 +189,7 @@ class ScrapInlineEditor {
       }
       select.appendChild(optionElement);
     });
-    
+
     cell.appendChild(select);
   }
 
@@ -203,11 +199,11 @@ class ScrapInlineEditor {
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 scrap-color-select';
     select.name = 'color';
-    
+
     // Obtener colores disponibles para el tipo y grosor actual
     const availableColors = this.glassOptions[currentType]?.[currentThickness] || [];
     console.log('Available colors for', currentType, currentThickness, ':', availableColors); // Debug
-    
+
     availableColors.forEach(color => {
       const optionElement = document.createElement('option');
       optionElement.value = color;
@@ -217,7 +213,7 @@ class ScrapInlineEditor {
       }
       select.appendChild(optionElement);
     });
-    
+
     cell.appendChild(select);
   }
 
@@ -234,57 +230,31 @@ class ScrapInlineEditor {
     cell.appendChild(input);
   }
 
-  createStatusSelectInCell(cell, currentValue) {
-    console.log('Creating status select in cell:', currentValue); // Debug
-    cell.innerHTML = ''; // Clear cell content
-    const select = document.createElement('select');
-    select.className = 'w-full border rounded px-2 py-1 scrap-status-select';
-    select.name = 'status';
-    
-    const options = [
-      { value: 'Disponible', text: 'Disponible' },
-      { value: 'En uso', text: 'En uso' },
-      { value: 'Reservado', text: 'Reservado' }
-    ];
-    
-    options.forEach(option => {
-      const optionElement = document.createElement('option');
-      optionElement.value = option.value;
-      optionElement.textContent = option.text;
-      if (option.value === currentValue) {
-        optionElement.selected = true;
-      }
-      select.appendChild(optionElement);
-    });
-    
-    cell.appendChild(select);
-  }
-
   setupDependentSelects(row) {
     const typeSelect = row.querySelector('.scrap-type-select');
     const thicknessSelect = row.querySelector('.scrap-thickness-select');
     const colorSelect = row.querySelector('.scrap-color-select');
-    
+
     if (typeSelect) {
       typeSelect.addEventListener('change', () => {
         const selectedType = typeSelect.value;
         console.log('Type changed to:', selectedType); // Debug
-        
+
         // Actualizar grosor
         this.updateThicknessOptions(thicknessSelect, selectedType);
-        
+
         // Actualizar color
         const currentThickness = thicknessSelect.value;
         this.updateColorOptions(colorSelect, selectedType, currentThickness);
       });
     }
-    
+
     if (thicknessSelect) {
       thicknessSelect.addEventListener('change', () => {
         const selectedType = typeSelect.value;
         const selectedThickness = thicknessSelect.value;
         console.log('Thickness changed to:', selectedThickness); // Debug
-        
+
         // Actualizar color
         this.updateColorOptions(colorSelect, selectedType, selectedThickness);
       });
@@ -293,13 +263,13 @@ class ScrapInlineEditor {
 
   updateThicknessOptions(thicknessSelect, glassType) {
     if (!thicknessSelect) return;
-    
+
     const availableThicknesses = Object.keys(this.glassOptions[glassType] || {});
     console.log('Updating thickness options for', glassType, ':', availableThicknesses); // Debug
-    
+
     // Limpiar opciones existentes
     thicknessSelect.innerHTML = '';
-    
+
     // Agregar nuevas opciones
     availableThicknesses.forEach(thickness => {
       const optionElement = document.createElement('option');
@@ -311,13 +281,13 @@ class ScrapInlineEditor {
 
   updateColorOptions(colorSelect, glassType, thickness) {
     if (!colorSelect) return;
-    
+
     const availableColors = this.glassOptions[glassType]?.[thickness] || [];
     console.log('Updating color options for', glassType, thickness, ':', availableColors); // Debug
-    
+
     // Limpiar opciones existentes
     colorSelect.innerHTML = '';
-    
+
     // Agregar nuevas opciones
     availableColors.forEach(color => {
       const optionElement = document.createElement('option');
@@ -347,11 +317,11 @@ class ScrapInlineEditor {
   bindActionButtons(row) {
     const saveBtn = row.querySelector('.save-scrap-btn');
     const cancelBtn = row.querySelector('.cancel-scrap-btn');
-    
+
     if (saveBtn) {
       saveBtn.addEventListener('click', () => this.saveEdit(row));
     }
-    
+
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => this.cancelEdit());
     }
@@ -359,10 +329,10 @@ class ScrapInlineEditor {
 
   saveEdit(row) {
     console.log('Saving scrap edit'); // Debug
-    
+
     const formData = new FormData();
     formData.append('scrap[id]', this.originalData.id);
-    
+
     // Recopilar datos de los campos editables
     const inputs = row.querySelectorAll('input, select');
     inputs.forEach(input => {
@@ -371,13 +341,13 @@ class ScrapInlineEditor {
         formData.append(`scrap[${input.name}]`, input.value);
       }
     });
-    
+
     // Log de todos los datos que se van a enviar
     console.log('FormData contents:');
     for (let [key, value] of formData.entries()) {
       console.log(key, ':', value);
     }
-    
+
     // Enviar datos al servidor
     fetch(`/scraps/${this.originalData.id}`, {
       method: 'PATCH',
@@ -425,9 +395,9 @@ class ScrapInlineEditor {
       type === 'success' ? 'bg-green-500' : 'bg-red-500'
     }`;
     messageDiv.textContent = message;
-    
+
     document.body.appendChild(messageDiv);
-    
+
     // Remover después de 3 segundos
     setTimeout(() => {
       if (messageDiv.parentNode) {

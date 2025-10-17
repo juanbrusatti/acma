@@ -19,8 +19,8 @@
     </div>
 
     <div class="space-y-4">
-      <%= form.label :output_work, "Obra de salida", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-      <%= form.text_field :output_work, placeholder: "ej: Obra ABC", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+      <%= form.label :input_work, "Obra de procedencia", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.text_field :input_work, placeholder: "ej: Obra ABC", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>
 
     <div class="space-y-4">
@@ -55,11 +55,6 @@
     <div class="space-y-2">
       <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
       <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
-    </div>
-
-    <div class="space-y-4">
-      <%= form.label :status, "Estado", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
-      <%= form.select :status, options_for_select([["Disponible", "Disponible"], ["Reservado", "Reservado"]], scrap.status), {}, class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
     </div>
   </div>
 

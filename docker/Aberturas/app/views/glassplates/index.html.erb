@@ -65,21 +65,8 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Disponible" }.count %></div>
+          <div class="text-2xl font-bold"><%= @scraps.count %></div>
           <p class="text-xs text-muted-foreground">Retazos disponibles</p>
-        </div>
-      </div>
-
-      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
-        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Reservados</h3>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @scraps.select { |s| s.status == "Reservado" }.count %></div>
-          <p class="text-xs text-muted-foreground">Retazos reservados</p>
         </div>
       </div>
     </div>
@@ -98,8 +85,8 @@
             <%= form_tag glassplates_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full", id: "search-form" do %>
               <%= hidden_field_tag :tab, params[:tab] || 'planchas', id: 'current-tab' %>
               <div class="relative w-full md:w-64">
-                <%= text_field_tag :search, params[:search], 
-                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...", 
+                <%= text_field_tag :search, params[:search],
+                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...",
                     class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,10 +173,10 @@
               </tbody>
             </table>
           </div>
-          
+
           <!-- Paginación para Glassplates -->
-          <%= pagination_container(@glassplates, "planchas", { 
-            search: params[:search], 
+          <%= pagination_container(@glassplates, "planchas", {
+            search: params[:search],
             tab: params[:tab]
           }) %>
         </div>
@@ -213,8 +200,7 @@
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Color</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Estado</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Obra</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Obra de procedencia</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
@@ -227,12 +213,7 @@
                     <td class="px-4 py-2 text-center"><%= scrap.color %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.width %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.height %></td>
-                    <td class="px-4 py-2 text-center">
-                      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= scrap.status == "Disponible" ? 'border-transparent bg-green-100 text-green-800' : 'border-transparent bg-yellow-100 text-yellow-800' %>">
-                        <%= scrap.status %>
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center"><%= scrap.output_work %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.input_work %></td>
                     <td class="px-4 py-2 text-center">
                       <div class="flex gap-2 justify-center">
                         <button type="button" class="edit-scrap-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
@@ -252,10 +233,10 @@
               </tbody>
             </table>
           </div>
-          
+
           <!-- Paginación para Scraps -->
-          <%= pagination_container(@scraps, "retazos", { 
-            search: params[:search], 
+          <%= pagination_container(@scraps, "retazos", {
+            search: params[:search],
             tab: params[:tab]
           }) %>
         </div>
@@ -269,7 +250,7 @@
 // Función para inicializar el sistema de tabs
 function initializeTabs() {
   console.log('🚀 Initializing tabs system');
-  
+
   const tabs = document.querySelectorAll('[data-tab]');
   const tabContents = document.querySelectorAll('.tab-content');
 
@@ -366,7 +347,7 @@ document.addEventListener('turbo:load', initializeTabs);
 function updateSearchPlaceholder() {
   const searchInput = document.querySelector('input[name="search"]');
   const activeTab = document.querySelector('[data-tab].bg-primary') || document.querySelector('[data-tab="planchas"]');
-  
+
   if (searchInput && activeTab) {
     const tabType = activeTab.getAttribute('data-tab');
     if (tabType === 'sobrantes') {
@@ -391,7 +372,7 @@ document.addEventListener('turbo:load', updateSearchPlaceholder);
 function updateSearchFormTab() {
   const activeTab = document.querySelector('[data-tab].bg-primary');
   const tabInput = document.getElementById('current-tab');
-  
+
   if (activeTab && tabInput) {
     const tabValue = activeTab.getAttribute('data-tab');
     tabInput.value = tabValue;
