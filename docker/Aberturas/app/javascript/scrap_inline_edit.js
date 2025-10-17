@@ -100,7 +100,7 @@ class ScrapInlineEditor {
       color: cells[3].textContent.trim(),
       width: parseFloat(cells[4].textContent.trim()),
       height: parseFloat(cells[5].textContent.trim()),
-      input_work: cells[7].textContent.trim()
+      input_work: cells[6].textContent.trim()
     };
   }
 
@@ -126,7 +126,7 @@ class ScrapInlineEditor {
     this.createNumberInputInCell(cells[5], 'height', this.originalData.height);
 
     // Obra
-    this.createTextInputInCell(cells[7], 'input_work', this.originalData.output_work);
+    this.createTextInputInCell(cells[6], 'input_work', this.originalData.output_work);
 
     // Acciones
     cells[8].innerHTML = this.createActionButtons();
