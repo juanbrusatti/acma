@@ -94,6 +94,8 @@ cd C:\acma\docker
       - Luego, abrimos la terminal de windows como administrador y escribimos el siguiente comando: 
             ``` icacls "C:\Users\TuUsuario\AppData\Roaming\postgresql\pgpass.conf" /inheritance:r /grant:r "username:R" ```
             Si no sabemos cual es nuestro username hacemos lo siguiente para obtenerlo: ```echo username ```
+   Importante: copiar las tareas como las tengo yo
+
 
 ### **Paso 7: Comprobar que todo anda correctamente**
 1. Verificar que el contenedor esté corriendo:

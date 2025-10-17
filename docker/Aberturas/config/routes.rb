@@ -6,8 +6,6 @@ Rails.application.routes.draw do
       get :api_status
     end
   end
-  resources :scraps
-
   resources :scraps, except: [:show, :index]
 
   resources :supplies

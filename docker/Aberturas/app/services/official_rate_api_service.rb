@@ -51,7 +51,7 @@ class OfficialRateApiService
         
         if response.success?
           data = response.parsed_response
-          rate = data['compra'] || data['venta']
+          rate = data['venta']
           
           if rate && rate > 0
             Rails.logger.info "DolarAPI exitosa: ARS $#{rate}"

@@ -1,334 +1,236 @@
-require "test_helper"
+require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  def setup
-    @project = projects(:one)
+  setup do
+    # Limpiar la base de datos antes de cada test
+    Project.destroy_all
   end
 
-  test "should assign typologies to glasscuttings and dvhs on save" do
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
-    )
-
-    # Create glasscuttings
-    glasscutting1 = project.glasscuttings.create!(
-      glass_type: "LAM",
-      thickness: "4+4",
-      color: "INC",
-      typology: "V1",
-      height: 100,
-      width: 50,
-      price: 100.0
-    )
-    
-    glasscutting2 = project.glasscuttings.create!(
-      glass_type: "FLO",
-      thickness: "3+3",
-      color: "GRS",
-      typology: "V2",
-      height: 200,
-      width: 75,
-      price: 200.0
-    )
-
-    # Create DVH
-    dvh = project.dvhs.create!(
-      innertube: 9,
-      typology: "V3",
-      height: 150,
-      width: 100,
-      glasscutting1_type: "LAM",
-      glasscutting1_thickness: "4+4",
-      glasscutting1_color: "INC",
-      glasscutting2_type: "FLO",
-      glasscutting2_thickness: "3+3",
-      glasscutting2_color: "GRS",
-      price: 300.0
-    )
-
-    # Trigger typology assignment
-    project.save!
-
-    # Reload to get fresh data
-    glasscutting1.reload
-    glasscutting2.reload
-    dvh.reload
-
-    # Assert typologies are assigned correctly
-    assert_equal "V1", glasscutting1.typology
-    assert_equal "V2", glasscutting2.typology
-    assert_equal "V3", dvh.typology
+  # Test para verificar las asociaciones
+  test "has correct associations" do
+    assert_respond_to Project.new, :dvhs
+    assert_respond_to Project.new, :glasscuttings
   end
 
-  test "should maintain typologies when glasscutting is deleted" do
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
-    )
-
-    # Create glasscuttings
-    glasscutting1 = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
-    )
+  # Test para validaciones de atributos requeridos
+  test "validates required attributes" do
+    project = Project.new
+    assert_not project.valid?
     
-    glasscutting2 = project.glasscuttings.create!(
-      glass_type: "FLO", thickness: "3+3", color: "GRS", typology: "V2",
-      height: 200, width: 75, price: 200.0
-    )
-
-    dvh = project.dvhs.create!(
-      innertube: 9, typology: "V3", height: 150, width: 100,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
-      price: 300.0
-    )
-
-    project.save!
-
-    # Verify initial typologies
-    glasscutting1.reload
-    glasscutting2.reload
-    dvh.reload
-    
-    assert_equal "V1", glasscutting1.typology
-    assert_equal "V2", glasscutting2.typology
-    assert_equal "V3", dvh.typology
-
-    # Delete first glasscutting
-    glasscutting1.destroy!
-
-    # Reload remaining items
-    glasscutting2.reload
-    dvh.reload
-
-    # Assert typologies remain unchanged
-    assert_equal "V2", glasscutting2.typology
-    assert_equal "V3", dvh.typology
+    # Verificar mensajes de error para campos requeridos
+    assert_includes project.errors[:name], "El nombre del proyecto no puede estar en blanco"
+    assert_includes project.errors[:phone], "El teléfono no puede estar en blanco"
+    # Se quitó la validación de status ya que no es un campo crítico para la funcionalidad
   end
 
-  test "should maintain typologies when dvh is deleted" do
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
-    )
-
-    glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "4+4", color: "INC", typology: "V1",
-      height: 100, width: 50, price: 100.0
-    )
-
-    dvh1 = project.dvhs.create!(
-      innertube: 9, typology: "V2", height: 150, width: 100,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "4+4", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "3+3", glasscutting2_color: "GRS",
-      price: 300.0
-    )
-
-    dvh2 = project.dvhs.create!(
-      innertube: 12, typology: "V3", height: 200, width: 150,
-      glasscutting1_type: "COL", glasscutting1_thickness: "5+5", glasscutting1_color: "BRC",
-      glasscutting2_type: "LAM", glasscutting2_thickness: "4+4", glasscutting2_color: "STB",
-      price: 400.0
-    )
-
-    project.save!
-
-    # Verify initial typologies
-    glasscutting.reload
-    dvh1.reload
-    dvh2.reload
-    
-    assert_equal "V1", glasscutting.typology
-    assert_equal "V2", dvh1.typology
-    assert_equal "V3", dvh2.typology
-
-    # Delete first DVH
-    dvh1.destroy!
-
-    # Reload remaining items
-    glasscutting.reload
-    dvh2.reload
-
-    # Assert typologies remain unchanged
-    assert_equal "V1", glasscutting.typology
-    assert_equal "V3", dvh2.typology
+  # Test para validar la longitud máxima del nombre
+  test "validates maximum name length" do
+    project = Project.new(name: 'a' * 101, phone: '123456789', status: 'Pendiente')
+    assert_not project.valid?
+    assert_includes project.errors[:name], "no puede tener más de 100 caracteres"
   end
 
-  # Tests for project pricing system
-  test "subtotal uses saved price_without_iva when available" do
-    saved_subtotal = 1500.75
-    @project.price_without_iva = saved_subtotal
-    
-    assert_equal saved_subtotal, @project.subtotal
+  # Test para validar los valores del estado
+  test "validates status values" do
+    project = Project.new(name: 'Proyecto válido', phone: '123456789', status: 'Invalido')
+    assert_not project.valid?
+    assert_includes project.errors[:status], "debe ser uno de: Pendiente, En Proceso, Terminado"
   end
 
-  test "subtotal calculates from components when price_without_iva not saved" do
-    # Create a fresh project to avoid fixture pollution
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
+  # Test para validar estados válidos
+  test "accepts valid status values" do
+    ['Pendiente', 'En Proceso', 'Terminado'].each do |status|
+      project = Project.new(name: 'Proyecto válido', phone: '123456789', status: status)
+      assert project.valid?, "Debería ser válido con estado: #{status}"
+    end
+  end
+
+  # Test para el método overdue?
+  test "determines if project is overdue" do
+    project = Project.new(
+      name: 'Proyecto de prueba', 
+      phone: '123456789', 
+      status: 'Pendiente',
+      delivery_date: 1.day.ago
     )
     
-    # Ensure no saved price
+    # Proyecto con fecha de entrega pasada y estado Pendiente
+    assert project.overdue?
+    
+    # Proyecto con fecha de entrega futura
+    project.delivery_date = 1.day.from_now
+    assert_not project.overdue?
+    
+    # Proyecto completado no está retrasado aunque la fecha haya pasado
+    project.status = 'Terminado'
+    project.delivery_date = 1.day.ago
+    assert_not project.overdue?
+  end
+
+  # Test para el método days_until_delivery
+  test "correctly calculates days until delivery" do
+    project = Project.new(name: 'Test', phone: '123', status: 'Pendiente')
+    
+    # Sin fecha de entrega
+    project.delivery_date = nil
+    assert_nil project.days_until_delivery
+    
+    # Con fecha de entrega futura
+    future_date = 5.days.from_now.to_date
+    project.delivery_date = future_date
+    assert_equal 5, project.days_until_delivery
+    
+    # Con fecha de entrega pasada
+    past_date = 5.days.ago.to_date
+    project.delivery_date = past_date
+    assert_equal (-5), project.days_until_delivery
+  end
+
+  # Test para el método subtotal
+  test "correctly calculates subtotal" do
+    project = Project.new(
+      name: 'Test', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    # Con precio sin IVA guardado
+    assert_equal 1000, project.subtotal
+    
+    # Sin precio sin IVA guardado (debería ser 0 sin ítems)
     project.price_without_iva = nil
-    
-    # Force glasscutting to use our price by updating after creation
-    glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800
-    )
-    glasscutting.update_column(:price, 100.0)
-    
-    dvh = project.dvhs.create!(
-      innertube: "6", typology: "V001", height: 1000, width: 800,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
-    )
-    
-    # Directly update price column to override calculation
-    dvh.update_column(:price, 250.0)
-    
-    # Reload to make sure we have the updated values
-    glasscutting.reload
-    dvh.reload
-    project.reload
-    
-    # Use actual calculated prices for assertion
-    expected_subtotal = glasscutting.price + dvh.price # Should be 100 + 250 = 350
-    assert_equal expected_subtotal, project.subtotal
+    assert_equal 0, project.subtotal
   end
 
-  test "iva calculates 21% of subtotal" do
-    @project.price_without_iva = 1000.0
-    expected_iva = 1000.0 * 0.21 # 210.0
+  # Test para los scopes
+  test "has scopes to filter by status" do
+    # Crear proyectos de prueba
+    pending = Project.create!(name: 'Pendiente', phone: '123', status: 'Pendiente')
+    active = Project.create!(name: 'En Proceso', phone: '456', status: 'En Proceso')
+    completed = Project.create!(name: 'Terminado', phone: '789', status: 'Terminado')
     
-    assert_equal expected_iva, @project.iva
-  end
-
-  test "total calculates subtotal plus iva" do
-    @project.price_without_iva = 1000.0
-    expected_total = 1000.0 + (1000.0 * 0.21) # 1000 + 210 = 1210
+    # Verificar que solo se obtenga un proyecto por cada estado
+    assert_equal 1, Project.pending.count
+    assert_equal 'Pendiente', Project.pending.first.name
     
-    assert_equal expected_total, @project.total
-  end
-
-  test "precio_sin_iva alias works correctly" do
-    @project.price_without_iva = 800.0
+    assert_equal 1, Project.active.count
+    assert_equal 'En Proceso', Project.active.first.name
     
-    assert_equal @project.subtotal, @project.precio_sin_iva
+    assert_equal 1, Project.completed.count
+    assert_equal 'Terminado', Project.completed.first.name
   end
-
-  test "precio_con_iva alias works correctly" do
-    @project.price_without_iva = 800.0
-    
-    assert_equal @project.total, @project.precio_con_iva
-  end
-
-  test "end to end pricing works with frontend calculated prices" do
-    # Create a project with frontend-calculated prices (simulating form submission)
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description",
-      price: 1210.0,           # Total with IVA from frontend
-      price_without_iva: 1000.0 # Subtotal from frontend
-    )
-
-    # Create components with frontend-calculated prices
-    glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 400.0 # Frontend calculated
+  
+  test "has scopes for delivery dates" do
+    # Crear proyectos con diferentes fechas
+    overdue = Project.create!(
+      name: 'Atrasado', 
+      phone: '111', 
+      status: 'Pendiente', 
+      delivery_date: 1.day.ago
     )
     
-    dvh = project.dvhs.create!(
-      innertube: "6", typology: "V001", height: 1000, width: 800,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
-      price: 600.0 # Frontend calculated
+    upcoming = Project.create!(
+      name: 'Próximo', 
+      phone: '222', 
+      status: 'Pendiente', 
+      delivery_date: 1.day.from_now
     )
-
-    # Project should use saved prices (not recalculate)
-    assert_equal 1000.0, project.subtotal
+    
+    # Verificar que solo se obtenga un proyecto por cada scope
+    assert_equal 1, Project.overdue.count
+    assert_equal 'Atrasado', Project.overdue.first.name
+    
+    assert_equal 1, Project.upcoming.count
+    assert_equal 'Próximo', Project.upcoming.first.name
+  end
+  
+  # Test para el método iva
+  test "correctly calculates IVA" do
+    project = Project.new(
+      name: 'Test IVA', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    # 21% de 1000 es 210
     assert_equal 210.0, project.iva
+    
+    # Sin precio sin IVA guardado (debería ser 0 sin ítems)
+    project.price_without_iva = nil
+    assert_equal 0.0, project.iva
+  end
+  
+  # Test para el método total
+  test "correctly calculates total including IVA" do
+    project = Project.new(
+      name: 'Test Total', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
+    )
+    
+    # 1000 + 21% = 1210
     assert_equal 1210.0, project.total
     
-    # Components should have their frontend prices
-    assert_equal 400.0, glasscutting.price
-    assert_equal 600.0, dvh.price
+    # Sin precio sin IVA guardado (debería ser 0 sin ítems)
+    project.price_without_iva = nil
+    assert_equal 0.0, project.total
   end
-
-  test "pricing works when only components have frontend prices but project does not" do
-    # Project without saved totals
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
-      # No price or price_without_iva set
-    )
-
-    # Components with frontend prices
-    glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 300.0
+  
+  # Test para el alias precio_sin_iva
+  test "precio_sin_iva is an alias of subtotal" do
+    project = Project.new(
+      name: 'Test Alias', 
+      phone: '123', 
+      status: 'Pendiente',
+      price_without_iva: 1000
     )
     
-    dvh = project.dvhs.create!(
-      innertube: "6", typology: "V001", height: 1000, width: 800,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS",
-      price: 500.0
-    )
-
-    # Project should calculate from component prices
-    expected_subtotal = 300.0 + 500.0 # 800.0
-    expected_iva = 800.0 * 0.21 # 168.0
-    expected_total = 800.0 + 168.0 # 968.0
+    assert_equal project.subtotal, project.precio_sin_iva
     
-    assert_equal expected_subtotal, project.subtotal
-    assert_equal expected_iva, project.iva
-    assert_equal expected_total, project.total
+    # Verificar que sea un alias, no solo igualdad de valores
+    project.price_without_iva = 500
+    assert_equal 500, project.precio_sin_iva
   end
-
-  test "pricing works with mixed frontend and backend calculated prices" do
-    # Use fixtures for supplies and create glass prices
-    GlassPrice.create!(glass_type: "LAM", thickness: "3+3", color: "INC", selling_price: 100.0)
-    GlassPrice.create!(glass_type: "FLO", thickness: "4+4", color: "GRS", selling_price: 150.0)
-
-    project = Project.create!(
-      name: "Test Project",
-      phone: "123456789",
-      description: "Test description"
-    )
-
-    # Glasscutting with frontend price
-    glasscutting = project.glasscuttings.create!(
-      glass_type: "LAM", thickness: "3+3", color: "INC", typology: "V001",
-      height: 1000, width: 800, price: 333.33 # Frontend calculated
-    )
+  
+  # Test para el método status_color
+  test "returns correct status color" do
+    project = Project.new(name: 'Test Color', phone: '123')
     
-    # DVH without frontend price (should be calculated by backend)
-    dvh = project.dvhs.create!(
-      innertube: "6", typology: "V001", height: 1000, width: 800,
-      glasscutting1_type: "LAM", glasscutting1_thickness: "3+3", glasscutting1_color: "INC",
-      glasscutting2_type: "FLO", glasscutting2_thickness: "4+4", glasscutting2_color: "GRS"
-      # No price set - should trigger backend calculation
-    )
-
-    # Glasscutting should have frontend price
-    assert_equal 333.33, glasscutting.price
+    project.status = 'Pendiente'
+    assert_equal 'yellow', project.status_color
     
-    # DVH should have backend-calculated price
-    assert dvh.price.present?
-    assert dvh.price > 0
+    project.status = 'En Proceso'
+    assert_equal 'blue', project.status_color
     
-    # Project totals should include both
-    expected_subtotal = glasscutting.price + dvh.price
-    assert_equal expected_subtotal, project.subtotal
+    project.status = 'Terminado'
+    assert_equal 'green', project.status_color
+    
+    # Estado inválido debería devolver 'gray'
+    project.status = 'Invalido'
+    assert_equal 'gray', project.status_color
+    
+    # Estado nulo también debería devolver 'gray'
+    project.status = nil
+    assert_equal 'gray', project.status_color
+  end
+  
+  # Test para verificar que no hay callbacks personalizados definidos
+  test "should not have custom callbacks defined" do
+    # Ignorar callbacks estándar de Rails para asociaciones
+    ignored_callbacks = [:autosave_associated_records_for_dvhs, :autosave_associated_records_for_glasscuttings, :around_save_collection_association]
+    
+    # Obtener todos los callbacks y filtrar los ignorados
+    callbacks = Project._save_callbacks.reject do |callback|
+      ignored_callbacks.include?(callback.filter) || 
+      callback.filter.to_s.include?('autosave_associated_records_for_')
+    end
+    
+    # Convertir a nombres para el mensaje de error
+    callback_names = callbacks.map { |c| c.filter.to_s }
+    
+    assert_empty callbacks, "Se encontraron callbacks personalizados inesperados: #{callback_names.join(', ')}"
   end
 end

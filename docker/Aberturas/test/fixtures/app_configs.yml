@@ -1,9 +1,0 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-mep_rate:
-  key: mep_rate
-  value: "1200.00"
-
-other_config:
-  key: other_setting
-  value: "test_value"

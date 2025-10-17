@@ -1,9 +1,18 @@
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "dashboard";
-@import "quantity_controls";
+/*
+ *= require dashboard
+ *= require quantity_controls
+ *= require glassplate_inline_edit
+ *= require scrap_inline_edit
+ */
+
+/* NOTE:
+  This file is served directly by the asset pipeline. Avoid using CSS @import
+  for Tailwind layers or other local stylesheets here because the browser
+  will try to fetch /assets/... URLs that do not exist, resulting in 404s.
+  Tailwind directives live in `application.tailwind.css` and are compiled
+  into the Tailwind bundle included in the layout via `stylesheet_link_tag "tailwind"`.
+*/
 
 @layer base {
   :root {
@@ -71,10 +80,11 @@
 @layer base {
   /* Scoped border application */
   .bordered-elements {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: Arial, Helvetica, sans-serif;
   }
 }

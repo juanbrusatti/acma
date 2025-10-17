@@ -76,13 +76,26 @@ class ProjectsController < ApplicationController
       end
     else
       Rails.logger.error "Project update failed: #{@project.errors.full_messages}"
+
+      # Obtener mensajes de error traducidos
+      error_messages = @project.errors.messages.map do |attribute, messages|
+        # Si el mensaje ya está en español, usarlo tal cual, de lo contrario traducir el atributo
+        if messages.first.is_a?(String) && messages.first.include?(' ')
+          messages.first
+        else
+          attribute_name = @project.class.human_attribute_name(attribute)
+          "#{attribute_name} #{messages.first}"
+        end
+      end
+
       respond_to do |format|
         format.html {
-          # Redirect back to edit form with errors
-          redirect_to new_project_path(project_id: @project.id), alert: "Error al actualizar: #{@project.errors.full_messages.join(', ')}"
+          redirect_to new_project_path(project_id: @project.id),
+                      alert: error_messages.join(', ')
         }
         format.json {
-          render json: { success: false, errors: @project.errors.full_messages }, status: :unprocessable_entity
+          render json: { success: false, errors: error_messages },
+                 status: :unprocessable_entity
         }
       end
     end

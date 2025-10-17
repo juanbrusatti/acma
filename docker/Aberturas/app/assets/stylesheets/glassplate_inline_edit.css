@@ -1,0 +1,158 @@
+/* glassplate_inline_edit.css */
+/* Estilos para la edición inline de planchas de vidrio */
+
+/* Estilos para los campos de edición */
+.glassplate-type-select,
+.glassplate-thickness-select,
+.glassplate-color-select {
+  min-width: 80px;
+  font-size: 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+.glassplate-type-select:focus,
+.glassplate-thickness-select:focus,
+.glassplate-color-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: #fefefe;
+}
+
+/* Estilos para inputs numéricos */
+input[name="width"],
+input[name="height"],
+input[name="quantity"] {
+  min-width: 70px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  text-align: center;
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+input[name="width"]:focus,
+input[name="height"]:focus,
+input[name="quantity"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: #fefefe;
+}
+
+/* Estilos para botones de acción */
+.save-glassplate-btn,
+.cancel-glassplate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+  min-width: 28px;
+  height: 28px;
+}
+
+.save-glassplate-btn {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  border-color: #86efac;
+}
+
+.save-glassplate-btn:hover {
+  background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%);
+  color: #14532d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-glassplate-btn {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.cancel-glassplate-btn:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
+  color: #991b1b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para el botón de editar */
+.edit-glassplate-btn {
+  transition: all 0.2s ease;
+}
+
+.edit-glassplate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Animación para mensajes */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.success-message,
+.error-message {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .glassplate-type-select,
+  .glassplate-thickness-select,
+  .glassplate-color-select {
+    min-width: 60px;
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+  
+  input[name="width"],
+  input[name="height"],
+  input[name="quantity"] {
+    min-width: 50px;
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+  
+  .save-glassplate-btn,
+  .cancel-glassplate-btn {
+    padding: 4px 6px;
+    font-size: 10px;
+    min-width: 24px;
+    height: 24px;
+  }
+}
+
+/* Estados de validación */
+.glassplate-field-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.glassplate-field-success {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1) !important;
+}

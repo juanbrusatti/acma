@@ -5,27 +5,27 @@
 // Function to initialize the PDF button with event listeners
 function initializePdfButton() {
   console.log('Inicializando botón PDF...');
-  
+
   const pdfBtn = document.getElementById('preview-pdf-btn');
 
-  // Early return if PDF button doesn't exist in DOM
+  // Early return if PDF button doesn't exist in DOM.
+  // Keep console quiet on pages without the button.
   if (!pdfBtn) {
-    console.warn('Botón PDF no encontrado');
     return;
   }
 
-  
+
   // Prevent duplicate initialization by checking data attribute
   if (pdfBtn.hasAttribute('data-pdf-initialized')) {
     console.log('Botón PDF ya inicializado');
     return;
   }
-  
+
   console.log('Agregando event listener al botón PDF...');
-  
+
   // Mark button as initialized to prevent duplicate listeners
   pdfBtn.setAttribute('data-pdf-initialized', 'true');
-  
+
   // Add click event listener for PDF generation
   pdfBtn.addEventListener('click', function(e) {
     console.log('=== PDF Button Clicked ===');
@@ -136,7 +136,7 @@ function initializePdfButton() {
       pdfBtn.textContent = 'Guardar PDF';
     });
   });
-  
+
   console.log('Event listener PDF agregado exitosamente');
 }
 

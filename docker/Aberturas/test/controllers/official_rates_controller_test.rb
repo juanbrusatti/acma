@@ -1,23 +1,18 @@
-require "test_helper"
+# test/controllers/official_rates_controller_test.rb
+require 'test_helper'
 
 class OfficialRatesControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @official_rate = official_rate_histories(:one)
+  end
+
   test "should get index" do
-    get official_rates_index_url
+    get official_rates_url
     assert_response :success
   end
 
-  test "should get show" do
-    get official_rates_show_url
-    assert_response :success
-  end
-
-  test "should get update_manual" do
-    get official_rates_update_manual_url
-    assert_response :success
-  end
-
-  test "should get api_status" do
-    get official_rates_api_status_url
+  test "should show official_rate" do
+    get official_rate_url(@official_rate)
     assert_response :success
   end
 end
