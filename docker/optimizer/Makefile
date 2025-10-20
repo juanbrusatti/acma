@@ -24,15 +24,15 @@ test-all:
 
 test-unit:
 	@echo "🧪 Ejecutando tests unitarios..."
-	@python test/test_optimizer.py
+	@python3 test/test_optimizer.py
 
 test-cases:
 	@echo "📋 Ejecutando casos predefinidos (generando PDFs)..."
-	@python test/run_test_cases.py
+	@python3 test/run_test_cases.py
 
 test-with-pdfs:
 	@echo "🧪 Ejecutando tests unitarios con PDFs..."
-	@SAVE_TEST_ARTIFACTS=true python test/test_optimizer.py
+	@SAVE_TEST_ARTIFACTS=true python3 test/test_optimizer.py
 
 test-docker:
 	@echo "🐳 Ejecutando tests en Docker..."
