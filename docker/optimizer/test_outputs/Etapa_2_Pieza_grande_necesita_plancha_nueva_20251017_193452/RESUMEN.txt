@@ -1,0 +1,27 @@
+======================================================================
+RESUMEN DEL TEST: Etapa_2_Pieza_grande_necesita_plancha_nueva
+======================================================================
+
+📊 ESTADÍSTICAS:
+  • Piezas cortadas: 1
+  • Piezas sin colocar: 0
+  • Planchas usadas: 1
+  • Sobrantes útiles: 2
+  • Sobrantes inútiles: 0
+
+🔨 PLANCHAS USADAS:
+  • Plancha_plate1_1: 2000x2000
+    - Tipo: New
+    - Piezas: 1
+
+♻️  SOBRANTES ÚTILES (reutilizables):
+  1. 2000x1400 mm (Área: 2,800,000 mm²)
+  2. 1400x600 mm (Área: 840,000 mm²)
+
+✅ CRITERIOS DE VALIDACIÓN:
+  • pieces_placed: 1
+  • plates_used: 1
+  • should_use_scrap: False
+  • plate_type: New
+
+======================================================================

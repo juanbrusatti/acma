@@ -1,0 +1,28 @@
+======================================================================
+RESUMEN DEL TEST: Simple_1_pieza_pequeña_en_sobrante_grande
+======================================================================
+
+📊 ESTADÍSTICAS:
+  • Piezas cortadas: 1
+  • Piezas sin colocar: 0
+  • Planchas usadas: 1
+  • Sobrantes útiles: 2
+  • Sobrantes inútiles: 0
+
+🔨 PLANCHAS USADAS:
+  • Sobrante_scrap1: 1000x1000
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: REF001
+
+♻️  SOBRANTES ÚTILES (reutilizables):
+  1. 1000x800 mm (Área: 800,000 mm²)
+  2. 800x200 mm (Área: 160,000 mm²)
+
+✅ CRITERIOS DE VALIDACIÓN:
+  • pieces_placed: 1
+  • plates_used: 1
+  • should_use_scrap: True
+  • max_waste_percent: 90
+
+======================================================================

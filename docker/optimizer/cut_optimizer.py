@@ -171,45 +171,51 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
             bin_w, bin_h = b.width, b.height
             bid = b.bid
 
-            # Lista de piezas colocadas (en esta plancha)
             placed = [r for r in packer.rect_list() if r[0] == b_idx]
             if not placed:
                 free_rects.append((bid, 0, 0, bin_w, bin_h))
                 continue
 
-            # Espacios libres iniciales: toda la plancha
             spaces = [(0, 0, bin_w, bin_h)]
 
             for _, x, y, w, h, _ in placed:
                 new_spaces = []
                 for sx, sy, sw, sh in spaces:
-                    # Si no hay intersección, se conserva
-                    if x + w <= sx or x >= sx + sw or y + h <= sy or y >= sy + sh:
+                    # Si no hay intersección → conservar
+                    if x >= sx + sw or x + w <= sx or y >= sy + sh or y + h <= sy:
                         new_spaces.append((sx, sy, sw, sh))
                         continue
 
-                    # Corte guillotina — subdividimos el espacio
-                    # Arriba del rectángulo
-                    if y > sy:
-                        new_spaces.append((sx, sy, sw, y - sy))
-                    # Abajo del rectángulo
-                    if y + h < sy + sh:
-                        new_spaces.append((sx, y + h, sw, (sy + sh) - (y + h)))
-                    # Izquierda del rectángulo
-                    if x > sx:
-                        new_spaces.append((sx, y, x - sx, h))
-                    # Derecha del rectángulo
-                    if x + w < sx + sw:
-                        new_spaces.append((x + w, y, (sx + sw) - (x + w), h))
+                    # --- Corte exacto por geometría rectangular ---
+                    ix0 = max(sx, x)
+                    iy0 = max(sy, y)
+                    ix1 = min(sx + sw, x + w)
+                    iy1 = min(sy + sh, y + h)
+
+                    # Arriba
+                    if iy0 > sy:
+                        new_spaces.append((sx, sy, sw, iy0 - sy))
+                    # Abajo
+                    if iy1 < sy + sh:
+                        new_spaces.append((sx, iy1, sw, (sy + sh) - iy1))
+                    # Izquierda
+                    if ix0 > sx:
+                        new_spaces.append((sx, iy0, ix0 - sx, iy1 - iy0))
+                    # Derecha
+                    if ix1 < sx + sw:
+                        new_spaces.append((ix1, iy0, (sx + sw) - ix1, iy1 - iy0))
 
                 spaces = new_spaces
 
+            # Limpiar espacios inválidos
+            spaces = [(sx, sy, sw, sh) for (sx, sy, sw, sh) in spaces if sw > 1 and sh > 1]
             spaces = merge_adjacent_rects(spaces)
-            # Filtrar sobrantes mínimos y guardar
+
+            # Clasificar según tamaño mínimo
             for sx, sy, sw, sh in spaces:
                 if sw < 200 or sh < 200:
                     unused_rects.append((bid, sx, sy, sw, sh))
-                else: 
+                else:
                     free_rects.append((bid, sx, sy, sw, sh))
 
         return free_rects, unused_rects
@@ -219,20 +225,49 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
         nonlocal best_score, best_data, all_free_rects, all_unused_rects
         placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
         waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
-        metrics = (placed_count, -waste, -len(bins_used))
         free_rects, unused_rects = get_free_rects_from_packer(packer)
         all_unused_rects.extend(unused_rects)
         all_free_rects.extend(free_rects)  # guardamos todos los sobrantes
 
-        if best_score is None or metrics > best_score:
-            best_score = metrics
+        # Calcular métricas de calidad de sobrantes
+        # Área total de sobrantes útiles (grandes, reutilizables)
+        usable_waste_area = sum(fw * fh for _, _, _, fw, fh in free_rects)
+        # Cantidad de sobrantes inútiles (pequeños, no reutilizables)
+        unusable_count = len(unused_rects)
+        # Área promedio de sobrantes útiles (preferir pocos y grandes vs muchos pequeños)
+        avg_usable_size = (usable_waste_area / len(free_rects)) if free_rects else 0
+        
+        # Siempre elegir usar menos planchas y todas las piezas colocadas
+        score = (
+            placed_count * 100000000 +        # Prioridad 0: piezas colocadas (máxima)
+            (-len(bins_used) * 10000000) +    # Prioridad 1: MENOS PLANCHAS (crítico)
+            (-waste) +                         # Prioridad 2: menos desperdicio
+            (avg_usable_size * 10) +          # Prioridad 3: sobrantes grandes
+            (-unusable_count * 50000)         # Prioridad 4: penalizar sobrantes inútiles
+        )
+        
+        # Mostrar métricas de cada variante prometedora
+        if placed_count > 0:
+            print(f"  [{algo.__name__}/{sort_used}/{bin_algo}] "
+                  f"Planchas:{len(bins_used)}, Piezas:{placed_count}, Waste:{waste:.0f}, "
+                  f"AvgSobrante:{avg_usable_size:.0f}, Inútiles:{unusable_count}, "
+                  f"Score:{score:.0f}")
+
+        if best_score is None or score > best_score:
+            best_score = score
             best_data = {
                 'best_packer': packer,
                 'best_result': packer.rect_list(),
                 'metrics': (placed_count, placed_area, bin_area_used, bins_used, waste),
                 'heuristic': (algo, sort_used, bin_algo),
-                'free_rects': free_rects,  # 🔸 agregamos aquí los sobrantes de la mejor heurística
-                'unused_rects': unused_rects
+                'free_rects': free_rects,
+                'unused_rects': unused_rects,
+                'quality_metrics': {
+                    'usable_waste_area': usable_waste_area,
+                    'unusable_count': unusable_count,
+                    'avg_usable_size': avg_usable_size,
+                    'score': score
+                }
             }
 
     # ---------------------
@@ -293,7 +328,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                 except Exception:
                     continue
 
-    # 🔹 devolvemos los free_rects acumulados y los de la mejor heurística
+    # devolvemos los free_rects acumulados y los de la mejor heurística
     if best_data is not None:
         best_data['all_free_rects'] = all_free_rects
         best_data['all_unused_rects'] = all_unused_rects
@@ -458,6 +493,12 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         placed_count, placed_area, bin_area_used, bins_used, waste = res['metrics']
         print(f"[{etapa_name}] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
         print(f"[{etapa_name}] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
+        
+        # Mostrar métricas de calidad
+        if 'quality_metrics' in res:
+            qm = res['quality_metrics']
+            print(f"[{etapa_name}] 📊 Calidad: Sobrantes útiles área={qm['usable_waste_area']:.0f}, "
+                  f"Avg={qm['avg_usable_size']:.0f}, Inútiles={qm['unusable_count']}, Score={qm['score']:.0f}")
 
         best_packer = res['best_packer']
         for rect in res['best_result']:

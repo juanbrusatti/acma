@@ -52,9 +52,9 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         usable_width = fig_width - 2 * margin_x
         usable_height = fig_height - 2 * margin_y
 
-        if bin_width > bin_height:
+        """ if bin_width > bin_height:
             bin_width, bin_height = bin_height, bin_width
-
+ """
         scale_x = usable_width / bin_width
         scale_y = usable_height / bin_height
         scale = min(scale_x, scale_y)
@@ -166,6 +166,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         
         prefix = "Sobrante" if is_scrap else "Plancha"
         number_ref = str(bdet.get('ref_number') or '').strip()
+        prefix += f" {number_ref}" if number_ref else ""
 
         gt = str(bdet.get('glass_type') or '').strip()
         th = str(bdet.get('thickness') or '').strip()
@@ -173,7 +174,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         suffix_parts = [p for p in [gt, th, co] if p]
         suffix = f" - {' '.join(suffix_parts)}" if suffix_parts else ""
 
-        fig.text(0.5, 0.85, f"{prefix}{ number_ref}, {dims_text}{suffix}",
+        fig.text(0.5, 0.85, f"{prefix}, {dims_text}{suffix}",
                  ha='center', va='bottom', fontsize=11, weight='bold')
 
         combo_folder = "_".join([p for p in [gt, th, co] if p]) or "unknown"

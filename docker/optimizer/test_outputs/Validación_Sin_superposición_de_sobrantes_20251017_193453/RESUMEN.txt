@@ -1,0 +1,31 @@
+======================================================================
+RESUMEN DEL TEST: Validación_Sin_superposición_de_sobrantes
+======================================================================
+
+📊 ESTADÍSTICAS:
+  • Piezas cortadas: 3
+  • Piezas sin colocar: 0
+  • Planchas usadas: 1
+  • Sobrantes útiles: 2
+  • Sobrantes inútiles: 2
+
+🔨 PLANCHAS USADAS:
+  • Sobrante_scrap1: 1000x1000
+    - Tipo: Leftover
+    - Piezas: 3
+    - Ref: Bachigay1090
+
+♻️  SOBRANTES ÚTILES (reutilizables):
+  1. 1000x461 mm (Área: 461,000 mm²)
+  2. 600x400 mm (Área: 240,000 mm²)
+
+🗑️  SOBRANTES INÚTILES (< 200mm):
+  1. 850x40 mm
+  2. 751x99 mm
+
+✅ CRITERIOS DE VALIDACIÓN:
+  • pieces_placed: 11
+  • no_overlaps: True
+  • all_within_bounds: True
+
+======================================================================

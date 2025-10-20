@@ -1,0 +1,233 @@
+======================================================================
+RESUMEN DEL TEST: Stock_Masivo_60_piezas_con_40_sobrantes_disponibles
+======================================================================
+
+📊 ESTADÍSTICAS:
+  • Piezas cortadas: 60
+  • Piezas sin colocar: 0
+  • Planchas usadas: 33
+  • Sobrantes útiles: 10
+  • Sobrantes inútiles: 67
+
+🔨 PLANCHAS USADAS:
+  • Sobrante_stock_1: 830x925
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-001
+  • Sobrante_stock_10: 1100x1150
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-010
+  • Sobrante_stock_11: 1130x1175
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-011
+  • Sobrante_stock_12: 1160x1200
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-012
+  • Sobrante_stock_13: 1190x1225
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-013
+  • Sobrante_stock_14: 1220x1250
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-014
+  • Sobrante_stock_15: 1250x1275
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-015
+  • Sobrante_stock_16: 1280x1300
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-016
+  • Sobrante_stock_17: 1310x1325
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-017
+  • Sobrante_stock_18: 1340x1350
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-018
+  • Sobrante_stock_19: 1370x1375
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-019
+  • Sobrante_stock_2: 860x950
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-002
+  • Sobrante_stock_20: 1400x1400
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-020
+  • Sobrante_stock_21: 1430x1425
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-021
+  • Sobrante_stock_22: 1460x1450
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-022
+  • Sobrante_stock_23: 1490x1475
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-023
+  • Sobrante_stock_24: 1520x1500
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-024
+  • Sobrante_stock_25: 1550x1525
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-025
+  • Sobrante_stock_26: 1580x1550
+    - Tipo: Leftover
+    - Piezas: 3
+    - Ref: STOCK-026
+  • Sobrante_stock_27: 1610x1575
+    - Tipo: Leftover
+    - Piezas: 3
+    - Ref: STOCK-027
+  • Sobrante_stock_28: 1640x1600
+    - Tipo: Leftover
+    - Piezas: 5
+    - Ref: STOCK-028
+  • Sobrante_stock_29: 1670x1625
+    - Tipo: Leftover
+    - Piezas: 4
+    - Ref: STOCK-029
+  • Sobrante_stock_3: 890x975
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-003
+  • Sobrante_stock_30: 1700x1650
+    - Tipo: Leftover
+    - Piezas: 4
+    - Ref: STOCK-030
+  • Sobrante_stock_31: 1730x1675
+    - Tipo: Leftover
+    - Piezas: 4
+    - Ref: STOCK-031
+  • Sobrante_stock_32: 1760x1700
+    - Tipo: Leftover
+    - Piezas: 4
+    - Ref: STOCK-032
+  • Sobrante_stock_33: 1790x1725
+    - Tipo: Leftover
+    - Piezas: 8
+    - Ref: STOCK-033
+  • Sobrante_stock_4: 920x1000
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-004
+  • Sobrante_stock_5: 950x1025
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-005
+  • Sobrante_stock_6: 980x1050
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-006
+  • Sobrante_stock_7: 1010x1075
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-007
+  • Sobrante_stock_8: 1040x1100
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-008
+  • Sobrante_stock_9: 1070x1125
+    - Tipo: Leftover
+    - Piezas: 1
+    - Ref: STOCK-009
+
+♻️  SOBRANTES ÚTILES (reutilizables):
+  1. 220x1500 mm (Área: 330,000 mm²)
+  2. 295x1440 mm (Área: 424,800 mm²)
+  3. 370x505 mm (Área: 186,850 mm²)
+  4. 1610x295 mm (Área: 474,950 mm²)
+  5. 475x500 mm (Área: 237,500 mm²)
+  6. 830x390 mm (Área: 323,700 mm²)
+  7. 405x260 mm (Área: 105,300 mm²)
+  8. 1090x280 mm (Área: 305,200 mm²)
+  9. 270x545 mm (Área: 147,150 mm²)
+  10. 700x350 mm (Área: 245,000 mm²)
+
+🗑️  SOBRANTES INÚTILES (< 200mm):
+  1. 1490x190 mm
+  2. 10x1285 mm
+  3. 1460x180 mm
+  4. 1550x85 mm
+  5. 1430x5 mm
+  6. 190x1420 mm
+  7. 1400x175 mm
+  8. 1580x170 mm
+  9. 30x430 mm
+  10. 10x445 mm
+  11. 1370x180 mm
+  12. 10x1195 mm
+  13. 1340x170 mm
+  14. 1310x5 mm
+  15. 145x1320 mm
+  16. 130x1300 mm
+  17. 15x380 mm
+  18. 1250x15 mm
+  19. 130x1260 mm
+  20. 1220x10 mm
+  21. 115x1240 mm
+  22. 1190x5 mm
+  23. 100x1220 mm
+  24. 85x1200 mm
+  25. 1150x5 mm
+  26. 250x25 mm
+  27. 20x595 mm
+  28. 1130x15 mm
+  29. 85x1160 mm
+  30. 1100x10 mm
+  31. 70x1140 mm
+  32. 1070x5 mm
+  33. 55x1120 mm
+  34. 40x1100 mm
+  35. 1670x5 mm
+  36. 15x660 mm
+  37. 1010x15 mm
+  38. 40x1060 mm
+  39. 980x10 mm
+  40. 25x1040 mm
+  41. 950x5 mm
+  42. 10x1020 mm
+  43. 1700x10 mm
+  44. 1045x95 mm
+  45. 15x745 mm
+  46. 920x20 mm
+  47. 10x980 mm
+  48. 175x710 mm
+  49. 1010x5 mm
+  50. 15x790 mm
+  51. 890x35 mm
+  52. 10x940 mm
+  53. 105x720 mm
+  54. 1000x60 mm
+  55. 165x740 mm
+  56. 45x900 mm
+  57. 830x65 mm
+  58. 10x860 mm
+  59. 860x145 mm
+  60. 20x805 mm
+  61. 1790x55 mm
+  62. 60x620 mm
+  63. 590x70 mm
+  64. 465x95 mm
+  65. 65x520 mm
+  66. 55x480 mm
+  67. 25x505 mm
+
+✅ CRITERIOS DE VALIDACIÓN:
+  • pieces_placed: 60
+  • max_plates_used: 20
+  • min_efficiency: 55
+  • should_use_scrap: True
+
+======================================================================

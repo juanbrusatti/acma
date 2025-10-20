@@ -1,0 +1,27 @@
+======================================================================
+RESUMEN DEL TEST: Rotación_Aprovechar_mejor_el_espacio
+======================================================================
+
+📊 ESTADÍSTICAS:
+  • Piezas cortadas: 2
+  • Piezas sin colocar: 0
+  • Planchas usadas: 1
+  • Sobrantes útiles: 3
+  • Sobrantes inútiles: 0
+
+🔨 PLANCHAS USADAS:
+  • Plancha_plate1_1: 2000x2000
+    - Tipo: New
+    - Piezas: 2
+
+♻️  SOBRANTES ÚTILES (reutilizables):
+  1. 2000x500 mm (Área: 1,000,000 mm²)
+  2. 1700x1200 mm (Área: 2,040,000 mm²)
+  3. 200x300 mm (Área: 60,000 mm²)
+
+✅ CRITERIOS DE VALIDACIÓN:
+  • pieces_placed: 2
+  • plates_used: 1
+  • allow_rotation: True
+
+======================================================================
