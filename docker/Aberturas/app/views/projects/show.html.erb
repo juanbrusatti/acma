@@ -5,10 +5,10 @@
       <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
         <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
       <% end %>
-      <%= button_to project_path(@project), 
-                  method: :delete, 
-                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2", 
-                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.", 
+      <%= button_to project_path(@project),
+                  method: :delete,
+                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2",
+                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.",
                           turbo_method: :delete },
                   title: "Eliminar proyecto" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,6 +42,10 @@
       <option value="Terminado" <%= 'selected' if @project.status == 'Terminado' %>>Terminado</option>
     </select>
   </div>
+  <% if @project.date_of_optimization.present? && @project.status == 'Terminado' %>
+    <p class="mb-2"><strong>Fecha de optimización:</strong> <span id="project-optimization-date-view"><%= @project.date_of_optimization.strftime('%Y-%m-%d') %></span></p>
+    <input type="date" id="project-optimization-date-edit" value="<%= @project.date_of_optimization.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
+  <% end %>
   <% if @project.delivery_date.present? %>
     <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%Y-%m-%d') %></span></p>
     <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
