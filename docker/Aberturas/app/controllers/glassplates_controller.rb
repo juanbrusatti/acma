@@ -14,8 +14,8 @@ class GlassplatesController < ApplicationController
       # Si estamos en tab de scraps, buscar solo en scraps
       if params[:tab] == 'sobrantes'
         @scraps = @scraps.where(
-          "scrap_type LIKE ? OR thickness LIKE ? OR color LIKE ? OR ref_number LIKE ?",
-          search_pattern, search_pattern, search_pattern, search_pattern
+          "scrap_type LIKE ? OR thickness LIKE ? OR color LIKE ? OR ref_number LIKE ? OR input_work LIKE ?",
+          search_pattern, search_pattern, search_pattern, search_pattern, search_pattern
         )
       else
         # Si estamos en tab de glassplates o no hay tab específico, buscar solo en glassplates

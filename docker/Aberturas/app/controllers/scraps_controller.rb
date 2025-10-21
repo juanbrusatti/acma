@@ -60,9 +60,9 @@ class ScrapsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :output_work, :status)
+      params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :input_work)
     end
-    
+
     def filter_duplicate_errors
       # Eliminar mensajes de error de presencia si hay otros errores para el mismo atributo
       @scrap.errors.messages.each do |attribute, messages|

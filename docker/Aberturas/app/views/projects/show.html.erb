@@ -42,6 +42,10 @@
       <option value="Terminado" <%= 'selected' if @project.status == 'Terminado' %>>Terminado</option>
     </select>
   </div>
+  <% if @project.date_of_optimization.present? && @project.status == 'Terminado' %>
+    <p class="mb-2"><strong>Fecha de optimización:</strong> <span id="project-optimization-date-view"><%= @project.date_of_optimization.strftime('%Y-%m-%d') %></span></p>
+    <input type="date" id="project-optimization-date-edit" value="<%= @project.date_of_optimization.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
+  <% end %>
   <% if @project.delivery_date.present? %>
     <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%Y-%m-%d') %></span></p>
     <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />

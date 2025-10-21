@@ -6,8 +6,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./Aberturas/storage:/app/storage
-      - ./Aberturas/tmp:/app/tmp
+      - ./Aberturas:/app
     ports:
       - "${RAILS_PORT:-3000}:3000"
     environment:
