@@ -191,18 +191,23 @@ class ProjectsController < ApplicationController
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
 
-    pieces_to_cut, stock = create_microservice_params(@project)
+    pieces_to_cut, stock = create_microservice_params(@project, stock_flag: params[:stock], scraps_flag: params[:scraps])
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
   end
 
   private
 
-  def create_microservice_params(project = nil)
+  def create_microservice_params(project = nil, stock_flag = false, scraps_flag = false)
     @project = project || Project.find(params[:id])
     pieces_to_cut = []
     glasscuttings = @project.glasscuttings
     dvhs = @project.dvhs
+
+    # Convertir string params a boolean si es necesario
+    stock_flag = stock_flag.to_s == 'true' || stock_flag == true
+    scraps_flag = scraps_flag.to_s == 'true' || scraps_flag == true
+
     pieces_to_cut += glasscuttings.map do |cut|
       {
         id: cut.typology,
@@ -223,45 +228,58 @@ class ProjectsController < ApplicationController
           width: dvh.width,
           height: dvh.height,
           quantity: 1,
-          # For DVHs, we send details of the first glasscutting only
+          # For DVHs, we send details of the first glasscutting
           color: dvh.glasscutting1_color,
           glass_type: dvh.glasscutting1_type,
           thickness: dvh.glasscutting1_thickness,
-          type_opening: cut.type_opening
+          type_opening: dvh.type_opening
         },
         {
           id: dvh.typology,
           width: dvh.width,
           height: dvh.height,
           quantity: 1,
-          # For DVHs, we send details of the first glasscutting only
+          # For DVHs, we send details of the second glasscutting
           color: dvh.glasscutting2_color,
           glass_type: dvh.glasscutting2_type,
           thickness: dvh.glasscutting2_thickness,
-          type_opening: cut.type_opening
+          type_opening: dvh.type_opening
         }
       ]
     end
 
-    # Nota: Capaz que despues si nos interesa el tipo de abertira, asi que lo dejo por laas duda
-
     pieces_to_cut = pieces_to_cut.as_json
-    stock = {
-      glassplates: Glassplate.all.map { |gp|
+
+    # Si ningún flag está activado, retornar sin stock
+    if !stock_flag && !scraps_flag
+      return pieces_to_cut, {}
+    end
+
+    stock = {}
+
+    # Agregar glassplates si el flag está activado
+    if stock_flag
+      glassplates = Glassplate.all.map do |gp|
         gp.as_json.merge(
           color: gp.color,
           glass_type: gp.glass_type,
           thickness: gp.thickness
         )
-      },
-      scraps: Scrap.all.map { |sc|
+      end
+      stock[:glassplates] = glassplates
+    end
+
+    # Agregar scraps si el flag está activado
+    if scraps_flag
+      scraps = Scrap.all.map do |sc|
         sc.as_json.merge(
           color: sc.color,
-          glass_type: sc.scrap_type, # We use scrap_type as glass_type for scraps
+          glass_type: sc.scrap_type,
           thickness: sc.thickness
         )
-      }
-    }
+      end
+      stock[:scraps] = scraps
+    end
 
     return pieces_to_cut, stock
   end

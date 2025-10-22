@@ -11,12 +11,13 @@ import "delete_confirmation"
 import "quantity_editor"
 import "glassplate_inline_edit"
 import "scrap_inline_edit"
+import "optimize_modal"
 
 document.addEventListener("turbo:load", () => {
 	// Inicializar selects dinámicos para glassplates y scraps
 	setupAllGlassplateSelects();
 	setupAllScrapSelects();
-	
+
 	// Exponer funciones para depuración manual
 	window.setupAllScrapSelects = setupAllScrapSelects;
 	window.setupAllGlassplateSelects = setupAllGlassplateSelects;

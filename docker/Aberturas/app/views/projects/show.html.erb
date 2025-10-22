@@ -83,11 +83,103 @@
 
   <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-between" id="project-actions-view">
     <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
-    <%= button_to "Optimizar Corte", optimize_project_path(@project), method: :post, data: { turbo: false }, class: "btn-optimize text-primary-foreground" %>
+    <button id="open-optimize-modal" class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
+      Optimizar Corte
+    </button>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
   <div class="mt-8 flex flex-col sm:flex-row gap-4" id="project-actions-edit" style="display:none;">
     <%= button_tag "Confirmar", id: "confirm-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-green-600 text-white h-10 px-6" %>
     <%= button_tag "Cancelar", id: "cancel-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
+  </div>
+</div>
+
+<!-- Modal de Optimización -->
+<div id="optimize-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4" style="display: none;">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-900">Opciones de Optimización</h2>
+      <button id="close-optimize-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <p class="text-gray-600 mb-6">Selecciona qué elementos quieres incluir en la optimización del corte:</p>
+
+      <div class="space-y-4">
+        <!-- Checkbox Stock -->
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="optimize-stock-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="optimize-stock-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Usar planchas de stock
+            </label>
+            <p class="text-sm text-gray-500">Incluir planchas completas disponibles en el taller</p>
+          </div>
+        </div>
+
+        <!-- Checkbox Scraps -->
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="optimize-scraps-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="optimize-scraps-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Usar retazos
+            </label>
+            <p class="text-sm text-gray-500">Incluir retazos de vidrio disponibles en el taller</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="flex items-start">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm text-blue-700">
+            Puedes seleccionar una, ambas o ninguna opción. Si no seleccionas ninguna, se optimizará sin considerar el inventario existente.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex gap-3 p-6 border-t border-gray-200">
+      <button
+        id="cancel-optimize-btn"
+        class="flex-1 inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-gray-300 bg-white hover:bg-gray-50 h-10 px-6 transition-colors"
+      >
+        Cancelar
+      </button>
+      <%= form_with url: optimize_project_path(@project), method: :post, id: "optimize-form", class: "flex-1", data: { turbo: false } do |f| %>
+        <input type="hidden" name="stock" id="optimize-stock-input" value="false">
+        <input type="hidden" name="scraps" id="optimize-scraps-input" value="false">
+        <button
+          type="submit"
+          class="w-full inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Comenzar Optimización
+        </button>
+      <% end %>
+    </div>
   </div>
 </div>
