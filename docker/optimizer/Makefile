@@ -1,3 +1,6 @@
+test-case-UNITY-with-PDF:
+	@echo "🧪 Ejecutando caso unitario con PDFs..."
+	@python3 test/run_case_unity.py
 # Makefile para facilitar la ejecución de tests del optimizador
 
 .PHONY: help test test-unit test-cases test-all test-with-pdfs clean clean-outputs

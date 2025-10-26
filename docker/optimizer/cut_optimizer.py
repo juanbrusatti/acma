@@ -1,9 +1,10 @@
 import json
 import os
 from collections import Counter
-from rectpack import GuillotineBssfSas, GuillotineBafSas, GuillotineBssfSlas
+import random
 from rectpack import newPacker, PackingMode, PackingBin
-from rectpack import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE
+from rectpack.guillotine import GuillotineBssfSlas
+from rectpack.packer import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE
 from visualize import visualize_packing
 from output import save_cutting_plan_to_csv, print_summary
 import argparse
@@ -46,10 +47,7 @@ def get_unfitted_rects(packer):
             return []
 
 def merge_adjacent_rects(rects):
-    """
-    Fusiona rectángulos adyacentes de manera conservadora, respetando el corte guillotina.
-    Solo fusiona rectángulos que comparten exactamente un borde completo.
-    """
+    
     if not rects or len(rects) <= 1:
         return rects
     
@@ -143,14 +141,74 @@ def _evaluate_packer(packer, bins_map):
 
     return placed_count, placed_area, bin_area_used, bins_used
 
+def get_free_rects_from_packer(packer):
+    free_rects = []
+    unused_rects = []
+
+    # recorremos las planchas usadas para obtener los sobrantes
+    for b_idx, b in enumerate(packer):
+        # guardamos las dimensiones de la plancha y su id
+        bin_w, bin_h = b.width, b.height
+        bid = b.bid
+
+        # obtenemos las piezas colocadas en esta plancha
+        placed = [r for r in packer.rect_list() if r[0] == b_idx]
+        if not placed:
+            # si ningun rect fue colocado, toda la plancha es sobrante
+            free_rects.append((bid, 0, 0, bin_w, bin_h))
+            continue
+
+        # en spaces vamos a guardar los espacios libres que van quedando, incialmente es toda la plancha
+        spaces = [(0, 0, bin_w, bin_h)]
+
+        # recorremos las piezas colocadas para ir cortando los espacios
+        for _, x, y, w, h, _ in placed:
+            new_spaces = []
+            # recorremos los espacios actuales
+            for sx, sy, sw, sh in spaces:
+                # Si no hay intersección → conservar, es decir que 
+                if x >= sx + sw or x + w <= sx or y >= sy + sh or y + h <= sy:
+                    new_spaces.append((sx, sy, sw, sh))
+                    continue
+
+                # --- Corte exacto por geometría rectangular ---
+                ix0 = max(sx, x)
+                iy0 = max(sy, y)
+                ix1 = min(sx + sw, x + w)
+                iy1 = min(sy + sh, y + h)
+
+                # Arriba
+                if iy0 > sy:
+                    new_spaces.append((sx, sy, sw, iy0 - sy))
+                # Abajo
+                if iy1 < sy + sh:
+                    new_spaces.append((sx, iy1, sw, (sy + sh) - iy1))
+                # Izquierda
+                if ix0 > sx:
+                    new_spaces.append((sx, iy0, ix0 - sx, iy1 - iy0))
+                # Derecha
+                if ix1 < sx + sw:
+                    new_spaces.append((ix1, iy0, (sx + sw) - ix1, iy1 - iy0))
+
+            spaces = new_spaces
+
+        # Limpiar espacios inválidos
+        spaces = [(sx, sy, sw, sh) for (sx, sy, sw, sh) in spaces if sw > 1 and sh > 1]
+        spaces = merge_adjacent_rects(spaces)
+
+        # Clasificar según tamaño mínimo
+        for sx, sy, sw, sh in spaces:
+            if sw < 200 or sh < 200:
+                unused_rects.append((bid, sx, sy, sw, sh))
+            else:
+                free_rects.append((bid, sx, sy, sw, sh))
+
+    return free_rects, unused_rects
+
+
 # Este metodo recibe las piezas a cortar y el stock (sobrantes y planchas nuevas).
 # bins_to_add es basicamente los sobrantes que se estan usando y en bins_map tenemos los mismos sobrantes pero sirve para calcular las metricas
 def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True):
-    import random
-    from rectpack import newPacker, PackingMode, PackingBin
-    from rectpack.guillotine import GuillotineBssfSlas
-    from rectpack.packer import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE
-
     guillotine_algos = [GuillotineBssfSlas]
     sort_algos_builtin = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO, SORT_NONE]
     custom_sorts = ["BY_WIDTH", "BY_HEIGHT", "BY_AREA_DESC", "SHUFFLE"]
@@ -159,75 +217,22 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
     best_score = None
     best_data = None
 
-    # 🔹 lista para guardar los rectángulos sobrantes de cada intento
+    # lista para guardar los rectángulos sobrantes de cada intento
     all_free_rects = []
     all_unused_rects = []
 
-    def get_free_rects_from_packer(packer):
-        free_rects = []
-        unused_rects = []
-
-        for b_idx, b in enumerate(packer):
-            bin_w, bin_h = b.width, b.height
-            bid = b.bid
-
-            placed = [r for r in packer.rect_list() if r[0] == b_idx]
-            if not placed:
-                free_rects.append((bid, 0, 0, bin_w, bin_h))
-                continue
-
-            spaces = [(0, 0, bin_w, bin_h)]
-
-            for _, x, y, w, h, _ in placed:
-                new_spaces = []
-                for sx, sy, sw, sh in spaces:
-                    # Si no hay intersección → conservar
-                    if x >= sx + sw or x + w <= sx or y >= sy + sh or y + h <= sy:
-                        new_spaces.append((sx, sy, sw, sh))
-                        continue
-
-                    # --- Corte exacto por geometría rectangular ---
-                    ix0 = max(sx, x)
-                    iy0 = max(sy, y)
-                    ix1 = min(sx + sw, x + w)
-                    iy1 = min(sy + sh, y + h)
-
-                    # Arriba
-                    if iy0 > sy:
-                        new_spaces.append((sx, sy, sw, iy0 - sy))
-                    # Abajo
-                    if iy1 < sy + sh:
-                        new_spaces.append((sx, iy1, sw, (sy + sh) - iy1))
-                    # Izquierda
-                    if ix0 > sx:
-                        new_spaces.append((sx, iy0, ix0 - sx, iy1 - iy0))
-                    # Derecha
-                    if ix1 < sx + sw:
-                        new_spaces.append((ix1, iy0, (sx + sw) - ix1, iy1 - iy0))
-
-                spaces = new_spaces
-
-            # Limpiar espacios inválidos
-            spaces = [(sx, sy, sw, sh) for (sx, sy, sw, sh) in spaces if sw > 1 and sh > 1]
-            spaces = merge_adjacent_rects(spaces)
-
-            # Clasificar según tamaño mínimo
-            for sx, sy, sw, sh in spaces:
-                if sw < 200 or sh < 200:
-                    unused_rects.append((bid, sx, sy, sw, sh))
-                else:
-                    free_rects.append((bid, sx, sy, sw, sh))
-
-        return free_rects, unused_rects
-
-    # 🔸 Función para evaluar una heurística y guardar sus free_rects
+    # Función para evaluar una heurística y guardar sus free_rects
     def evaluate_variant(packer, algo, sort_used, bin_algo):
+
         nonlocal best_score, best_data, all_free_rects, all_unused_rects
         placed_count, placed_area, bin_area_used, bins_used = _evaluate_packer(packer, bins_map)
         waste = (bin_area_used - placed_area) if bin_area_used > 0 else float('inf')
+        # Obtenemos los sobrantes de este intento
         free_rects, unused_rects = get_free_rects_from_packer(packer)
-        all_unused_rects.extend(unused_rects)
-        all_free_rects.extend(free_rects)  # guardamos todos los sobrantes
+        all_unused_rects = unused_rects
+        all_free_rects = free_rects
+
+        # IMPORTANTE DEFINIR BUENAS METRICAS, PARA ELEGIR LA MEJOR HEURISTICA
 
         # Calcular métricas de calidad de sobrantes
         # Área total de sobrantes útiles (grandes, reutilizables)
@@ -270,9 +275,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                 }
             }
 
-    # ---------------------
-    # Heurísticas de rectpack
-    # ---------------------
+    # Heuristicas de la libreria
     for algo in guillotine_algos:
         for bin_algo in bin_algos:
             for sort in sort_algos_builtin:
@@ -293,9 +296,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
                 except Exception:
                     continue
 
-            # ---------------------
             # Heurísticas personalizadas
-            # ---------------------
             for sort_tag in custom_sorts:
                 packer = newPacker(
                     mode=PackingMode.Offline,
@@ -356,6 +357,7 @@ def run_optimizer(input_data, stock_data):
 
     # Para cada una de las piezas guardamos sus dimensiones originales
     original_piece_dimensions = {p['id']: (p['width'], p['height']) for p in pieces_to_cut}
+    # Esto se usa para calcular metricas
     total_piece_area = sum(p['width'] * p['height'] * p['quantity'] for p in pieces_to_cut)
 
     rects_all = [] # Lista de todas las piezas a cortar
@@ -382,10 +384,10 @@ def run_optimizer(input_data, stock_data):
     bin_details_map = {} # Mapa de detalles de las planchas usadas
     final_cutting_plan = [] # Lista final del plan de corte
     
-    # Usar pack_plates para sobrantes
-    added_counts = Counter([r[2] for r in rects_all])
-    unfitted_counts = added_counts.copy()  # Inicialmente todas están sin empacar
+    added_counts = Counter([r[2] for r in rects_all]) # Se cuentan las piezas a cortar
+    unfitted_counts = added_counts.copy()  # Inicialmente ningun corte está empacado
     
+    # Usar pack_plates para sobrantes, le pasamos los sobrantes, el mapa de detalles, las piezas a cortar, el plan de corte final y las dimensiones originales
     unpacked_final_list = pack_plates(
         scraps_as_plates, bin_details_map, rects_all, final_cutting_plan, 
         original_piece_dimensions, unfitted_counts, 'Leftover', 'ETAPA1'
@@ -399,17 +401,22 @@ def run_optimizer(input_data, stock_data):
         # Preparar rects para los no empacados
         rects_unfitted = []
         for item in unpacked_final_list:
+            # Por cada pieza no empacada se queda con el id, luego busca ese id en original_piece_dimensions para obtener sus dimensiones
             rid = item['id']
             quantity = item['quantity_unpacked']
             original_w, original_h = original_piece_dimensions[rid]
+            # Si tenemos 10 piezas V5 va a agregar las 10
             for _ in range(quantity):
                 rects_unfitted.append((original_w, original_h, rid))
         
         # Calcular unfitted_counts para ETAPA 2
         unfitted_counts = Counter([r[2] for r in rects_unfitted])
-        unpacked_final_list = pack_plates(glassplates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2')
+        unpacked_final_list = pack_plates(
+            glassplates, bin_details_map, rects_unfitted, final_cutting_plan, 
+            original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2'
+        )
 
-        # ETAPA 3: Planchas de emergencia 3600x2500
+        # ETAPA 3: Planchas de proveedor 3600x2500
         count = 0        
         while unpacked_final_list:
             print(f"\nQuedaron {len(unpacked_final_list)} piezas sin colocar. Intentando en plancha nueva 3600x2500...")
@@ -423,7 +430,9 @@ def run_optimizer(input_data, stock_data):
                 for _ in range(quantity):
                     rects_unfitted_final.append((original_w, original_h, rid))
 
-            # Crear plancha de emergencia
+            # Como se llama al optimizador por cada grupo de cortes, todos los cortes de pieces_to_cut van a tener
+            # el mismo color, glass_type y thickness, por lo que podemos tomar el primero
+            # Luego creamos la plancha 3600x2500 con esos atributos
             first_piece = pieces_to_cut[0]
             plate = {
                 'id': f"3600x2500_{count}",
@@ -438,7 +447,10 @@ def run_optimizer(input_data, stock_data):
 
             # Calcular unfitted_counts para ETAPA 3
             unfitted_counts = Counter([r[2] for r in rects_unfitted_final])
-            unpacked_final_list = pack_plates([plate], bin_details_map, rects_unfitted_final, final_cutting_plan, original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}')
+            unpacked_final_list = pack_plates(
+                [plate], bin_details_map, rects_unfitted_final, final_cutting_plan, 
+                original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}'
+            )
     else:
         print("\n✅ ¡Todas las piezas cupieron en las placas de sobrante!")
 
@@ -469,13 +481,13 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'color': plate.get('color'),
                 'glass_type': plate.get('glass_type'),
                 'thickness': plate.get('thickness'),
-                'ref_number': plate.get('ref_number')  # Preservar número de referencia para trazabilidad
+                'ref_number': plate.get('ref_number')
             }
     
     # Probamos heurísticas
     res = _try_guillotine_variants(rects_unfitted, bins_to_add, bins_map, rotation=True)
     
-    # Verificar que res no sea None
+    # Si res es None, inicializamos con valores por defecto, en res vamos a guardar la mejor heurística
     if res is None:
         res = {
             'best_result': None,
@@ -486,6 +498,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             'unused_rects': []
         }
     
+    # Se obtienen los sobrantes (reutlizable e inutiles) de la mejor heurística
     best_free_rects = res.get('free_rects', [])
     best_unused_rects = res.get('unused_rects', [])
 
@@ -529,7 +542,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'Packed_Height': fh,
                 'Is_Rotated': False,
                 'Is_Waste': True,
-                'Is_Unused': False
+                'Is_Unused': False # Es un sobrante utilizable
             })
         
         for i, (bid, fx, fy, fw, fh) in enumerate(best_unused_rects):
@@ -543,18 +556,23 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'Packed_Height': fh,
                 'Is_Rotated': False,
                 'Is_Waste': True,
-                'Is_Unused': True
+                'Is_Unused': True # Es un sobrante inutilizable
             })
         
         print(f"[{etapa_name}] Sobrantes agregados al plan: {len(best_free_rects)}")
 
         # Calcular restantes no empacados
-        placed_rids = [r[5] for r in res['best_result']]
-        added_counts = Counter([r[2] for r in rects_unfitted])
+        placed_rids = [piece[5] for piece in res['best_result']]
         placed_counts = Counter(placed_rids)
+        # Obtenemos la cantidad de piezas que deberian haberse empaquetado en esta etapa
+        added_counts = Counter([r[2] for r in rects_unfitted])
+        # Hacemos la diferencia para ver si quedaron piezas sin empacar
         remaining_unfitted = added_counts - placed_counts
+        # Si queda alguna pieza sin empacar, la guardamos en unpacked_final_list, donde vamos a guardar 
+        # el id (tipologia) de la pieza y la cantidad que no se pudo empacar
         unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in remaining_unfitted.items()]
     else:
+        # Entra por aca si ninguna heurística pudo colocar piezas, pero no deberia pasar nunca
         print(f"[{etapa_name}] Ninguna heurística pudo colocar piezas en las placas.")
         # Si no se pudo colocar nada, marcar todo como sin empacar
         unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in unfitted_counts.items()]

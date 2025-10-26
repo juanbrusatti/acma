@@ -8,7 +8,7 @@ CASE_SIMPLE_SCRAP = {
     "name": "Simple: 1 pieza pequeña en sobrante grande",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 200, "height": 200, "quantity": 1}
+            {"id": "v1", "width": 200, "height": 200, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -31,8 +31,11 @@ CASE_MULTIPLE_PIECES = {
     "name": "Múltiples piezas en una plancha",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 150, "height": 139, "quantity": 9},
-            {"id": "v2", "width": 400, "height": 400, "quantity": 1}
+            *[
+                {"id": "v1", "width": 150, "height": 139, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
+                for _ in range(9)
+            ],
+            {"id": "v2", "width": 400, "height": 400, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
         ]
     },
     "stock": {
@@ -55,7 +58,7 @@ CASE_NEW_PLATE = {
     "name": "Etapa 2: Pieza grande necesita plancha nueva",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 600, "height": 600, "quantity": 1}
+            {"id": "v1", "width": 600, "height": 600, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -81,8 +84,8 @@ CASE_ROTATION = {
     "name": "Rotación: Aprovechar mejor el espacio",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 300, "height": 1500, "quantity": 1},
-            {"id": "v2", "width": 300, "height": 1500, "quantity": 1}
+            {"id": "v1", "width": 300, "height": 1500, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"},
+            {"id": "v2", "width": 300, "height": 1500, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -104,7 +107,7 @@ CASE_WASTE_QUALITY = {
     "name": "Calidad de sobrantes: Preferir pocos sobrantes grandes",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 400, "height": 400, "quantity": 1}
+            {"id": "v1", "width": 400, "height": 400, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -127,7 +130,7 @@ CASE_EMERGENCY_PLATE = {
     "name": "Plancha de emergencia: Pieza muy grande",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 3000, "height": 2000, "quantity": 1}
+            {"id": "v1", "width": 3000, "height": 2000, "quantity": 1, "glass_type": "FLO", "thickness": "8mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -149,8 +152,8 @@ CASE_FEWER_PLATES_PRIORITY = {
     "name": "Prioridad: Usar menos planchas",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 200, "height": 200, "quantity": 1},
-            {"id": "v2", "width": 200, "height": 200, "quantity": 1}
+            {"id": "v1", "width": 200, "height": 200, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"},
+            {"id": "v2", "width": 200, "height": 200, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -174,7 +177,7 @@ CASE_MANY_SMALL_PIECES = {
     "name": "Stress test: 50 piezas pequeñas",
     "input": {
         "pieces_to_cut": [
-            {"id": f"v{i}", "width": 100, "height": 100, "quantity": 1}
+            {"id": f"v{i}", "width": 100, "height": 100, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
             for i in range(1, 51)
         ]
     },
@@ -197,9 +200,12 @@ CASE_NO_OVERLAP = {
     "name": "Validación: Sin superposición de sobrantes",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 150, "height": 139, "quantity": 1},
-            {"id": "v2", "width": 400, "height": 400, "quantity": 1},
-            {"id": "v3", "width": 99, "height": 99, "quantity": 9}
+            {"id": "v1", "width": 150, "height": 139, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"},
+            {"id": "v2", "width": 400, "height": 400, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"},
+            *[
+                {"id": "v3", "width": 99, "height": 99, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
+                for _ in range(9)
+            ]
         ]
     },
     "stock": {
@@ -221,7 +227,7 @@ CASE_REF_NUMBER_PRESERVATION = {
     "name": "Trazabilidad: Preservar ref_number",
     "input": {
         "pieces_to_cut": [
-            {"id": "v1", "width": 200, "height": 200, "quantity": 1}
+            {"id": "v1", "width": 200, "height": 200, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
         ]
     },
     "stock": {
@@ -246,17 +252,44 @@ CASE_HIGH_PRODUCTION = {
     "input": {
         "pieces_to_cut": [
             # Piezas grandes
-            {"id": "v1", "width": 800, "height": 1200, "quantity": 5},
-            {"id": "v2", "width": 1000, "height": 1000, "quantity": 3},
-            {"id": "v3", "width": 900, "height": 1500, "quantity": 4},
+            *[
+                {"id": "v1", "width": 800, "height": 1200, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(5)
+            ],
+            *[
+                {"id": "v2", "width": 1000, "height": 1000, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(3)
+            ],
+            *[
+                {"id": "v3", "width": 900, "height": 1500, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(4)
+            ],
             # Piezas medianas
-            {"id": "v4", "width": 500, "height": 600, "quantity": 15},
-            {"id": "v5", "width": 400, "height": 700, "quantity": 12},
-            {"id": "v6", "width": 600, "height": 500, "quantity": 10},
+            *[
+                {"id": "v4", "width": 500, "height": 600, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(15)
+            ],
+            *[
+                {"id": "v5", "width": 400, "height": 700, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(12)
+            ],
+            *[
+                {"id": "v6", "width": 600, "height": 500, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(10)
+            ],
             # Piezas pequeñas
-            {"id": "v7", "width": 250, "height": 300, "quantity": 20},
-            {"id": "v8", "width": 200, "height": 400, "quantity": 18},
-            {"id": "v9", "width": 300, "height": 350, "quantity": 13}
+            *[
+                {"id": "v7", "width": 250, "height": 300, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(20)
+            ],
+            *[
+                {"id": "v8", "width": 200, "height": 400, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(18)
+            ],
+            *[
+                {"id": "v9", "width": 300, "height": 350, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(13)
+            ]
         ]
     },
     "stock": {
@@ -304,17 +337,41 @@ CASE_MULTI_GLASS_TYPES = {
     "input": {
         "pieces_to_cut": [
             # FLO 4mm
-            {"id": "f1", "width": 700, "height": 900, "quantity": 8},
-            {"id": "f2", "width": 500, "height": 600, "quantity": 12},
+            *[
+                {"id": "f1", "width": 700, "height": 900, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(8)
+            ],
+            *[
+                {"id": "f2", "width": 500, "height": 600, "quantity": 1, "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(12)
+            ],
             # LAM 3+3
-            {"id": "l1", "width": 800, "height": 1000, "quantity": 6},
-            {"id": "l2", "width": 400, "height": 500, "quantity": 15},
+            *[
+                {"id": "l1", "width": 800, "height": 1000, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
+                for _ in range(6)
+            ],
+            *[
+                {"id": "l2", "width": 400, "height": 500, "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
+                for _ in range(15)
+            ],
             # FLO 6mm
-            {"id": "f6_1", "width": 900, "height": 1200, "quantity": 5},
-            {"id": "f6_2", "width": 600, "height": 800, "quantity": 10},
+            *[
+                {"id": "f6_1", "width": 900, "height": 1200, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(5)
+            ],
+            *[
+                {"id": "f6_2", "width": 600, "height": 800, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(10)
+            ],
             # LAM 4+4
-            {"id": "l4_1", "width": 1000, "height": 1000, "quantity": 4},
-            {"id": "l4_2", "width": 300, "height": 400, "quantity": 20}
+            *[
+                {"id": "l4_1", "width": 1000, "height": 1000, "quantity": 1, "glass_type": "LAM", "thickness": "4+4", "color": "INC"}
+                for _ in range(4)
+            ],
+            *[
+                {"id": "l4_2", "width": 300, "height": 400, "quantity": 1, "glass_type": "LAM", "thickness": "4+4", "color": "INC"}
+                for _ in range(20)
+            ]
         ]
     },
     "stock": {
@@ -359,18 +416,41 @@ CASE_STANDARD_WINDOWS = {
     "name": "Pedido Real: 120 piezas de ventanas estándar con 25 sobrantes",
     "input": {
         "pieces_to_cut": [
-            # Ventanas 120x150 (muy común)
-            {"id": "vent_120x150", "width": 1200, "height": 1500, "quantity": 30},
-            # Ventanas 100x120
-            {"id": "vent_100x120", "width": 1000, "height": 1200, "quantity": 25},
-            # Ventanas 80x100
-            {"id": "vent_80x100", "width": 800, "height": 1000, "quantity": 20},
-            # Puertas grandes
-            {"id": "puerta_1", "width": 900, "height": 2000, "quantity": 8},
-            {"id": "puerta_2", "width": 800, "height": 2100, "quantity": 7},
-            # Ventanas pequeñas
-            {"id": "vent_60x80", "width": 600, "height": 800, "quantity": 15},
-            {"id": "vent_50x60", "width": 500, "height": 600, "quantity": 15}
+            *[
+                {"id": "vent_120x150", "width": 1200, "height": 1500, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(30)
+            ],
+            *[
+                {"id": "vent_100x120", "width": 1000, "height": 1200, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(25)
+            ],
+            *[
+                {"id": "vent_80x100", "width": 800, "height": 1000, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(20)
+            ],
+            *[
+                {"id": "puerta_1", "width": 900, "height": 2000, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(8)
+            ],
+            *[
+                {"id": "puerta_2", "width": 800, "height": 2100, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(7)
+            ],
+            *[
+                {"id": "vent_60x80", "width": 600, "height": 800, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(15)
+            ],
+            *[
+                {"id": "vent_50x60", "width": 500, "height": 600, "quantity": 1,
+                 "glass_type": "FLO", "thickness": "4mm", "color": "INC"}
+                for _ in range(15)
+            ]
         ]
     },
     "stock": {
@@ -398,7 +478,7 @@ CASE_MASSIVE_STOCK = {
     "name": "Stock Masivo: 60 piezas con 40 sobrantes disponibles",
     "input": {
         "pieces_to_cut": [
-            {"id": f"pieza_{i}", "width": 300 + (i * 20), "height": 400 + (i * 15), "quantity": 1}
+            {"id": f"pieza_{i}", "width": 300 + (i * 20), "height": 400 + (i * 15), "quantity": 1, "glass_type": "LAM", "thickness": "3+3", "color": "INC"}
             for i in range(1, 61)  # 60 piezas de tamaños progresivos
         ]
     },
@@ -431,19 +511,49 @@ CASE_EXTREME_OPTIMIZATION = {
     "input": {
         "pieces_to_cut": [
             # Piezas muy grandes
-            {"id": "xl1", "width": 1500, "height": 1800, "quantity": 3},
-            {"id": "xl2", "width": 1400, "height": 1700, "quantity": 3},
+            *[
+                {"id": "xl1", "width": 1500, "height": 1800, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(3)
+            ],
+            *[
+                {"id": "xl2", "width": 1400, "height": 1700, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(3)
+            ],
             # Piezas grandes
-            {"id": "l1", "width": 1000, "height": 1200, "quantity": 10},
-            {"id": "l2", "width": 900, "height": 1100, "quantity": 12},
-            {"id": "l3", "width": 800, "height": 1000, "quantity": 15},
+            *[
+                {"id": "l1", "width": 1000, "height": 1200, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(10)
+            ],
+            *[
+                {"id": "l2", "width": 900, "height": 1100, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(12)
+            ],
+            *[
+                {"id": "l3", "width": 800, "height": 1000, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(15)
+            ],
             # Piezas medianas
-            {"id": "m1", "width": 600, "height": 800, "quantity": 20},
-            {"id": "m2", "width": 500, "height": 700, "quantity": 22},
-            {"id": "m3", "width": 550, "height": 650, "quantity": 18},
+            *[
+                {"id": "m1", "width": 600, "height": 800, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(20)
+            ],
+            *[
+                {"id": "m2", "width": 500, "height": 700, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(22)
+            ],
+            *[
+                {"id": "m3", "width": 550, "height": 650, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(18)
+            ],
             # Piezas pequeñas
-            {"id": "s1", "width": 300, "height": 400, "quantity": 25},
-            {"id": "s2", "width": 250, "height": 350, "quantity": 22}
+            *[
+                {"id": "s1", "width": 300, "height": 400, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(25)
+            ],
+            *[
+                {"id": "s2", "width": 250, "height": 350, "quantity": 1, "glass_type": "FLO", "thickness": "6mm", "color": "INC"}
+                for _ in range(22)
+            ]
         ]
     },
     "stock": {
