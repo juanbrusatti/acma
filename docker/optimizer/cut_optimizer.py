@@ -434,6 +434,7 @@ def run_optimizer(input_data, stock_data):
                 'thickness': first_piece.get('thickness'),
                 'quantity': 1
             }
+            count += 1
 
             # Calcular unfitted_counts para ETAPA 3
             unfitted_counts = Counter([r[2] for r in rects_unfitted_final])
