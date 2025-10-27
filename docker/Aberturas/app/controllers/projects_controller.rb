@@ -196,6 +196,67 @@ class ProjectsController < ApplicationController
     call_microservice_optimizer(uri, pieces_to_cut, stock)
   end
 
+  # View to confirm optimization results
+  def confirm_optimization
+    @project = Project.find(params[:id])
+    # Pull optimization data from session
+    @optimization_data = session[:optimization_data]
+
+    if @optimization_data.nil?
+      redirect_to project_path(@project), alert: "No hay datos de optimización disponibles."
+    end
+  end
+
+  def accept_optimize
+    @project = Project.find(params[:id])
+    optimization_data = session[:optimization_data]
+
+    if optimization_data.nil?
+      redirect_to project_path(@project), alert: "No hay datos de optimización disponibles."
+      return
+    end
+
+    new_scraps = optimization_data['new_scraps'] || []
+    used_scraps = optimization_data['deleted_scraps'] || []
+    used_stock = optimization_data['deleted_stock'] || []
+
+    create_scraps(new_scraps) if new_scraps.any?
+    delete_used_scraps(used_scraps) if used_scraps.any?
+    delete_used_stock(used_stock) if used_stock.any?
+
+    @project.update(date_of_optimization: Date.today)
+
+    # Clean up session data
+    session.delete(:optimization_data)
+    session.delete(:zip_data)
+    session.delete(:zip_filename)
+
+    redirect_to project_path(@project), notice: "Optimización aceptada y stock actualizado!!"
+  end
+
+  # Cancel optimization process
+  def cancel_optimize
+    @project = Project.find(params[:id])
+    # Clean up session data
+    session.delete(:optimization_data)
+    session.delete(:zip_data)
+    session.delete(:zip_filename)
+    redirect_to project_path(@project), notice: "Optimización cancelada."
+  end
+
+  # Download optimization ZIP file
+  def download_optimization_zip
+    @project = Project.find(params[:id])
+    zip_data = session[:zip_data]
+    zip_filename = session[:zip_filename] || "cutting_plan_visuals.zip"
+
+    if zip_data
+      send_data Base64.decode64(zip_data), filename: zip_filename, type: 'application/zip', disposition: 'attachment'
+    else
+      redirect_to project_path(@project), alert: "No hay archivo ZIP disponible."
+    end
+  end
+
   private
 
   def create_microservice_params(project = nil, stock_flag = false, scraps_flag = false)
@@ -338,10 +399,13 @@ class ProjectsController < ApplicationController
         @optimizer_summary = json_text # guardar texto crudo como último recurso
       end
 
-      # Send ZIP as download
-      if zip_bytes
-        send_data zip_bytes, filename: zip_filename, type: 'application/zip', disposition: 'attachment'
-      end
+      # Guardar los datos de optimización en la sesión
+      session[:optimization_data] = @optimizer_summary
+      session[:zip_data] = Base64.encode64(zip_bytes) if zip_bytes
+      session[:zip_filename] = zip_filename
+
+      # Redirigir a la vista de confirmación
+      redirect_to confirm_optimization_project_path(@project)
 
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
@@ -350,6 +414,33 @@ class ProjectsController < ApplicationController
   rescue => e
     Rails.logger.error "Optimizer request error: #{e.message}"
     redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
+  end
+
+  # Private methods for scraps creation post optimization
+  def create_scraps(new_scraps_data)
+    for scrap_data in new_scraps_data
+      Scrap.create!(
+        width: scrap_data['width'],
+        height: scrap_data['height'],
+        thickness: scrap_data['thickness'],
+        scrap_type: scrap_data['glass_type'],
+        color: scrap_data['color']
+      )
+    end
+  end
+
+  def delete_used_scraps(used_scraps_data)
+    for scrap_data in used_scraps_data
+      scrap = Scrap.find_by(scrap_data["id"])
+      scrap.destroy if scrap
+    end
+  end
+
+  def delete_used_stock(used_stock_data)
+    for stock_data in used_stock_data
+      glassplate = Glassplate.find_by(stock_data["id"])
+      glassplate.destroy if glassplate
+    end
   end
 
   def project_basic_params
