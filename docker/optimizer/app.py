@@ -149,17 +149,6 @@ def create_optimizations_objects(input_data):
 
     return results
 
-def _parse_csv_rows(csv_path: str):
-    rows = []
-    if not os.path.exists(csv_path):
-        return rows
-    with open(csv_path, 'r', newline='') as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            rows.append(r)
-    return rows
-
-
 def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
     """
     Execute the optimizer and add to the zip the CSV and the pdf

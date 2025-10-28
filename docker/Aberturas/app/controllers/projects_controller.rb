@@ -191,7 +191,7 @@ class ProjectsController < ApplicationController
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
 
-    pieces_to_cut, stock = create_microservice_params(params[:stock], params[:scraps])
+    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps])
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
   end
