@@ -486,7 +486,7 @@ def build_new_scraps_dict(final_cutting_plan):
     scraps = get_usable_waste_pieces(final_cutting_plan)
     new_scraps = {}
     for idx, scrap in enumerate(scraps, 1):
-        scrap_key = f"scrap_{idx}"
+        scrap_key = f"scrap_{idx}_{scrap.get("glass_type")}"
         new_scraps[scrap_key] = {
             "width": scrap.get("Packed_Width"),
             "height": scrap.get("Packed_Height"),
@@ -580,6 +580,9 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'Y_Coordinate': fy,
                 'Packed_Width': fw,
                 'Packed_Height': fh,
+                'color': bin_details_map[bid].get('color'),
+                'thickness': bin_details_map[bid].get('thickness'),
+                'glass_type': bin_details_map[bid].get('glass_type'),
                 'Is_Rotated': False,
                 'Is_Waste': True,
                 'Is_Unused': False # Es un sobrante utilizable
@@ -697,14 +700,7 @@ if __name__ == "__main__":
         "deleted_scrap": id_stock_used["deleted_scrap"]
     }
 
-    try:
-        with open("result.json", "w", encoding="utf-8") as f:
-            json.dump(result, f, indent=2, ensure_ascii=False)
-        print("[LOG] Resultado guardado en result.json")
-    except Exception as e:
-        print(f"[ERROR] No se pudo guardar result.json: {e}")
-
-    
+    print(json.dumps(result))
     if final_plan:
         # Asegurar que existan los directorios de salida
         try:
@@ -735,16 +731,17 @@ if __name__ == "__main__":
                     except Exception:
                         pass
 
-        # Limpiar imágenes viejas de los bins usados para evitar confusión
+        # Limpiar PDFs viejos si ya no hay imágenes PNG en output_visuals
         try:
             output_folder = 'output_visuals'
             if os.path.exists(output_folder):
-                used_bins = set(p['Source_Plate_ID'] for p in final_plan)
-                for b in used_bins:
-                    pth = os.path.join(output_folder, f"{b}.png")
-                    if os.path.exists(pth):
+                png_files = [f for f in os.listdir(output_folder) if f.endswith('.png')]
+                if not png_files:
+                    pdf_files = [f for f in os.listdir(output_folder) if f.endswith('.pdf')]
+                    for pdf in pdf_files:
+                        pdf_path = os.path.join(output_folder, pdf)
                         try:
-                            os.remove(pth)
+                            os.remove(pdf_path)
                         except Exception:
                             pass
         except Exception:

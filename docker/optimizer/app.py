@@ -40,13 +40,28 @@ async def run_optimize(request: Request):
         })
 
         # Build combinations for color/thickness/glass_type
-        optimization_inputs, flo = create_optimizations_objects(input)
+        optimization_inputs = create_optimizations_objects(input)
 
         # Optimize each build and collect CSV summaries
-        csv_summary = {}
+        global_result = {
+            "new_scraps": {},
+            "deleted_stock": [],
+            "deleted_scrap": []
+        }
         for pieces_to_cut, stock in optimization_inputs:
-            combo_label, rows = optimize(pieces_to_cut, stock, zip_buffer)
-            csv_summary[combo_label] = rows
+            optimizer_result = optimize(pieces_to_cut, stock, zip_buffer)
+
+            # Acumulamos resultados
+            global_result["new_scraps"].update(optimizer_result.get("new_scraps", {}))
+            global_result["deleted_stock"].extend(optimizer_result.get("deleted_stock", []))
+            global_result["deleted_scrap"].extend(optimizer_result.get("deleted_scrap", []))
+
+        # Esto es solo para verificar, hay que sacarlo después
+        with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr(
+                "result.json",
+                json.dumps(global_result, indent=2, ensure_ascii=False)
+            )
 
         # Build multipart/mixed response with JSON and ZIP as separate parts
         zip_buffer.seek(0)
@@ -56,26 +71,25 @@ async def run_optimize(request: Request):
         boundary_bytes = boundary.encode('utf-8')
         CRLF = b"\r\n"
 
-        json_bytes = json.dumps(csv_summary, ensure_ascii=False).encode('utf-8')
+        json_bytes = json.dumps(global_result, ensure_ascii=False).encode('utf-8')
 
         body = bytearray()
-        # Part 1: JSON summary
-        body.extend(b"--" + boundary_bytes + CRLF)
+        body.extend(b"--" + boundary.encode() + CRLF)
         body.extend(b"Content-Type: application/json; charset=utf-8" + CRLF)
-        body.extend(b"Content-Disposition: inline; name=\"summary\"" + CRLF + CRLF)
+        body.extend(b"Content-Disposition: inline; name=\"result\"" + CRLF + CRLF)
         body.extend(json_bytes + CRLF)
 
-        # Part 2: ZIP attachment
-        body.extend(b"--" + boundary_bytes + CRLF)
+        body.extend(b"--" + boundary.encode() + CRLF)
         body.extend(b"Content-Type: application/zip" + CRLF)
         body.extend(b"Content-Disposition: attachment; filename=\"Plan de corte.zip\"" + CRLF + CRLF)
         body.extend(zip_bytes + CRLF)
-
+        body.extend(b"--" + boundary.encode() + b"--" + CRLF)
         # End boundary
         body.extend(b"--" + boundary_bytes + b"--" + CRLF)
 
         print("[LOG] Respondiendo con multipart (JSON + ZIP)")
         return Response(content=bytes(body), media_type=f"multipart/mixed; boundary={boundary}")
+    
     except Exception as e:
         print("[ERROR] Excepción en /optimize:")
         print(e)
@@ -121,15 +135,8 @@ def create_optimizations_objects(input_data):
 
     for (color, glass_type, thickness) in combos:
 
-        # Filter pieces by combo
-        flo = []
-        pcs_combo = []
-        for p in pieces:
-            if p.get('color') == color and p.get('glass_type') == glass_type and p.get('thickness') == thickness:
-                if p.get('glass_type') == 'FLO' and p.get('type_opening') == 'Aluminio' and ((p.get('width') <= 500 and p.get('height') <= 1800) or (p.get('height') <= 1800 and p.get('width') <= 500)):
-                    flo += [p]
-                else: 
-                    pcs_combo += [p]
+        pcs_combo = [p for p in pieces
+                     if p.get('color') == color and p.get('glass_type') == glass_type and p.get('thickness') == thickness]
 
         # Filter stock by the same combo
         gps_combo = [g for g in glassplates
@@ -140,7 +147,7 @@ def create_optimizations_objects(input_data):
         if pcs_combo:
             results.append((pcs_combo, { 'glassplates': gps_combo, 'scraps': scs_combo }))
 
-    return results, flo
+    return results
 
 def _parse_csv_rows(csv_path: str):
     rows = []
@@ -186,28 +193,34 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
             print(f"[ERROR] Optimizer stderr (tail):\n{stderr_tail}")
         raise HTTPException(status_code=500, detail='Optimizer failed')
 
-    # Helper to derive a label from the combination (color, glass_type, thickness) for csv name
-    def _combo_label(pcs):
-        if not pcs:
-            return 'unknown'
-        sample = pcs[0] or {}
-        color = str(sample.get('color') or 'NA')
-        gtype = str(sample.get('glass_type') or 'NA')
-        thick = str(sample.get('thickness') or 'NA')
-        label = f"{gtype}_{thick}_{color}"
-        # Sanitize for file names
-        return (
-            label.replace(' ', '-')
-                 .replace('/', '-')
-                 .replace('\\', '-')
-                 .replace('__', '_')
-        )
+    stdout_data = result.stdout.decode('utf-8', errors='replace').strip()
+    print("[DEBUG] STDOUT completo del optimizador:")
+    print(stdout_data)
+    try:
+        # Buscar la última línea JSON válida en el output
+        lines = stdout_data.splitlines()
+        json_line = None
+        for line in reversed(lines):
+            line = line.strip()
+            if line.startswith('{') and line.endswith('}'): # encontramos el json que nos interesa
+                json_line = line
+                break
+        if json_line:
+            print("[DEBUG] Última línea JSON encontrada:")
+            print(json_line)
+            optimizer_result = json.loads(json_line)
+        else:
+            optimizer_result = {}
+    except Exception as e:
+        print(f"[WARN] No se pudo parsear JSON del optimizador: {e}")
+        optimizer_result = {}
+            
+    except Exception as e:
+        print(f"[WARN] No se pudo parsear JSON del optimizador: {e}")
+        optimizer_result = {}
 
-    combo_label = _combo_label(pieces_to_cut)
-
-    # Add PDFs and CSV to the ZIP
+    # Agregar PDFs y CSV al ZIP
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
-        # Generated PDFs (include subfolders, keep relative paths)
         for root, _, files in os.walk(OUTPUT_VISUALS_DIR):
             for file in files:
                 if file.endswith('.pdf'):
@@ -215,10 +228,8 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
                     arcname = os.path.relpath(full_path, OUTPUT_VISUALS_DIR)
                     zf.write(full_path, arcname=arcname)
 
-        # CSV (if exists)
         if os.path.exists(OUTPUT_CSV):
-            csv_name = f"cutting_plan_{combo_label}.csv"
-            zf.write(OUTPUT_CSV, arcname=csv_name)
+            zf.write(OUTPUT_CSV, arcname="cutting_plan.csv")
 
-    # Parse and return CSV rows for this combo
-    return combo_label, _parse_csv_rows(OUTPUT_CSV)
+    # Retornamos solo el resultado JSON
+    return optimizer_result
