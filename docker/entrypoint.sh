@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+rm -f /app/tmp/pids/server.pid
+
+exec "$@"
+
 APP_ROOT="/app"
 SETUP_DONE_FILE="$APP_ROOT/tmp/db_setup_done"
 

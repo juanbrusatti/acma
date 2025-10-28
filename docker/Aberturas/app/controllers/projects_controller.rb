@@ -191,7 +191,7 @@ class ProjectsController < ApplicationController
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
 
-    pieces_to_cut, stock = create_microservice_params(@project, stock_flag: params[:stock], scraps_flag: params[:scraps])
+    pieces_to_cut, stock = create_microservice_params(params[:stock], params[:scraps])
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
   end
@@ -259,8 +259,7 @@ class ProjectsController < ApplicationController
 
   private
 
-  def create_microservice_params(project = nil, stock_flag = false, scraps_flag = false)
-    @project = project || Project.find(params[:id])
+  def create_microservice_params(stock_flag = false, scraps_flag = false)
     pieces_to_cut = []
     glasscuttings = @project.glasscuttings
     dvhs = @project.dvhs
@@ -424,7 +423,8 @@ class ProjectsController < ApplicationController
         height: scrap_data['height'],
         thickness: scrap_data['thickness'],
         scrap_type: scrap_data['glass_type'],
-        color: scrap_data['color']
+        color: scrap_data['color'],
+        input_work: @project.name
       )
     end
   end
