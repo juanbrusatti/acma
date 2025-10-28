@@ -416,6 +416,9 @@ def run_optimizer(input_data, stock_data):
             original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2'
         )
 
+        # save plates and scraps ids used
+        id_stock_used = get_plate_and_scrap_ids_from_bin_details(bin_details_map)
+
         # ETAPA 3: Planchas de proveedor 3600x2500
         count = 0        
         while unpacked_final_list:
@@ -454,7 +457,44 @@ def run_optimizer(input_data, stock_data):
     else:
         print("\n✅ ¡Todas las piezas cupieron en las placas de sobrante!")
 
-    return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area
+    scraps_to_create = build_new_scraps_dict(final_cutting_plan)
+    return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area, id_stock_used, scraps_to_create
+
+# method to get used plate and scrap ids from bin_details_map
+def get_plate_and_scrap_ids_from_bin_details(bin_details_map):
+    plate_ids = []
+    scrap_ids = []
+    for details in bin_details_map.values():
+        plate_id = details['id']
+        if plate_id.startswith("Plancha_"):
+            # Extraer el número entre "Plancha_" y el siguiente "_"
+            parts = plate_id.split("_")
+            if len(parts) >= 3:
+                plate_ids.append(parts[1])
+        elif plate_id.startswith("Sobrante_"):
+            # Extraer el id del sobrante
+            parts = plate_id.split("_")
+            if len(parts) >= 2:
+                scrap_ids.append(parts[1])
+    return {"deleted_stock": plate_ids, "deleted_scrap": scrap_ids}
+
+# method to get usable waste pieces
+def get_usable_waste_pieces(final_cutting_plan):
+    return [item for item in final_cutting_plan if item.get('Is_Waste', False) and not item.get('Is_Unused', False)]
+
+def build_new_scraps_dict(final_cutting_plan):
+    scraps = get_usable_waste_pieces(final_cutting_plan)
+    new_scraps = {}
+    for idx, scrap in enumerate(scraps, 1):
+        scrap_key = f"scrap_{idx}"
+        new_scraps[scrap_key] = {
+            "width": scrap.get("Packed_Width"),
+            "height": scrap.get("Packed_Height"),
+            "color": scrap.get("color"),
+            "thickness": scrap.get("thickness"),
+            "glass_type": scrap.get("glass_type")
+        }
+    return {"new_scraps": new_scraps}
 
 def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, plate_type='New', etapa_name='ETAPA'):
 
@@ -650,8 +690,21 @@ if __name__ == "__main__":
     cleanup_previous_outputs()
 
     # Llamamos al optimizador y guardamos los resultados: los cortes que no entraron en ningun lado, etc
-    final_plan, unpacked_items, bin_details, piece_area = run_optimizer(input_data, stock_data)
+    final_plan, unpacked_items, bin_details, piece_area, id_stock_used, scraps_to_create = run_optimizer(input_data, stock_data)
+    result = {
+        "new_scraps": scraps_to_create["new_scraps"],
+        "deleted_stock": id_stock_used["deleted_stock"],
+        "deleted_scrap": id_stock_used["deleted_scrap"]
+    }
 
+    try:
+        with open("result.json", "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print("[LOG] Resultado guardado en result.json")
+    except Exception as e:
+        print(f"[ERROR] No se pudo guardar result.json: {e}")
+
+    
     if final_plan:
         # Asegurar que existan los directorios de salida
         try:
