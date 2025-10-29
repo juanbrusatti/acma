@@ -120,7 +120,7 @@ def _evaluate_packer(packer, bins_map):
     rects = packer.rect_list()
     placed_count = len(rects)
     placed_area = sum((r[3] * r[4]) for r in rects)  # w*h
-    bins_used = set()
+    bins_used = []
     # Se recorre la lista de rects para obtener los ids de las planchas usadas
     for r in rects:
         b_idx = r[0]
@@ -130,7 +130,8 @@ def _evaluate_packer(packer, bins_map):
         except Exception:
             # Fallback: si la API difiere, intentar extraer de r
             bid = str(r[0])
-        bins_used.add(bid)
+        if bid not in bins_used:
+            bins_used.append(bid)
 
     # bin_area_used: suma de área de las planchas usadas según bins_map (si no está, lo ignoramos)
     bin_area_used = 0
@@ -340,7 +341,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
         return {
             'best_result': None,
             'best_packer': None,
-            'metrics': (0, 0, 0, set(), float('inf')),
+            'metrics': (0, 0, 0, [], float('inf')),
             'heuristic': (None, None, None),
             'free_rects': [],
             'unused_rects': [],
@@ -389,12 +390,15 @@ def run_optimizer(input_data, stock_data):
     
     added_counts = Counter([r[2] for r in rects_all]) # Se cuentan las piezas a cortar
     unfitted_counts = added_counts.copy()  # Inicialmente ningun corte está empacado
-    
+    bins_used = []
+
     # Usar pack_plates para sobrantes, le pasamos los sobrantes, el mapa de detalles, las piezas a cortar, el plan de corte final y las dimensiones originales
-    unpacked_final_list = pack_plates(
+    unpacked_final_list, bins_used = pack_plates(
         scraps_as_plates, bin_details_map, rects_all, final_cutting_plan, 
         original_piece_dimensions, unfitted_counts, 'Leftover', 'ETAPA1'
     )
+    
+    id_stock_used = get_plate_and_scrap_ids_from_bin_details(bins_used)
 
     # ETAPA 2: Empaquetar piezas restantes en placas nuevas
     if unpacked_final_list:
@@ -414,12 +418,14 @@ def run_optimizer(input_data, stock_data):
         
         # Calcular unfitted_counts para ETAPA 2
         unfitted_counts = Counter([r[2] for r in rects_unfitted])
-        unpacked_final_list = pack_plates(
+        unpacked_final_list, bins_used = pack_plates(
             glassplates, bin_details_map, rects_unfitted, final_cutting_plan, 
             original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2'
         )
 
-        id_stock_used = get_plate_and_scrap_ids_from_bin_details(bin_details_map)
+        id_stock_used_aux = get_plate_and_scrap_ids_from_bin_details(bins_used)
+        id_stock_used["deleted_stock"] += id_stock_used_aux.get("deleted_stock", [])
+        id_stock_used["deleted_scrap"] += id_stock_used_aux.get("deleted_scrap", [])
 
         # ETAPA 3: Planchas de proveedor 3600x2500
         count = 0        
@@ -452,7 +458,7 @@ def run_optimizer(input_data, stock_data):
 
             # Calcular unfitted_counts para ETAPA 3
             unfitted_counts = Counter([r[2] for r in rects_unfitted_final])
-            unpacked_final_list = pack_plates(
+            unpacked_final_list, bins_used = pack_plates(
                 [plate], bin_details_map, rects_unfitted_final, final_cutting_plan, 
                 original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}'
             )
@@ -463,21 +469,22 @@ def run_optimizer(input_data, stock_data):
     return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area, id_stock_used, scraps_to_create
 
 # method to get used plate and scrap ids from bin_details_map
-def get_plate_and_scrap_ids_from_bin_details(bin_details_map):
+def get_plate_and_scrap_ids_from_bin_details(bins_used):
     plate_ids = []
     scrap_ids = []
-    for details in bin_details_map.values():
-        plate_id = details['id']
+    for plate_id in bins_used:
         if plate_id.startswith("Plancha_"):
             # Extraer el número entre "Plancha_" y el siguiente "_"
             parts = plate_id.split("_")
             if len(parts) >= 3:
                 plate_ids.append(parts[1])
         elif plate_id.startswith("Sobrante_"):
+            print(f"DEBUG: Found leftover plate_id: {plate_id}")
             # Extraer el id del sobrante
             parts = plate_id.split("_")
             if len(parts) >= 2:
                 scrap_ids.append(parts[1])
+    print(f"DEBUG: Used scrap IDs: {scrap_ids}")
     return {"deleted_stock": plate_ids, "deleted_scrap": scrap_ids}
 
 # method to get usable waste pieces
@@ -501,6 +508,7 @@ def build_new_scraps_dict(final_cutting_plan):
 def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, plate_type='New', etapa_name='ETAPA'):
 
     bins_to_add = []
+    bins_used = []
     bins_map = {}
     
     for plate in plates:
@@ -534,7 +542,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         res = {
             'best_result': None,
             'best_packer': None,
-            'metrics': (0, 0, 0, set(), float('inf')),
+            'metrics': (0, 0, 0, [], float('inf')),
             'heuristic': (None, None, None),
             'free_rects': [],
             'unused_rects': []
@@ -622,7 +630,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         # Si no se pudo colocar nada, marcar todo como sin empacar
         unpacked_final_list = [{'id': pid, 'quantity_unpacked': count} for pid, count in unfitted_counts.items()]
     
-    return unpacked_final_list
+    return unpacked_final_list, bins_used
 
 # Metodo que usamos para borrar la carpeta output_visuals vieja
 def cleanup_previous_outputs():

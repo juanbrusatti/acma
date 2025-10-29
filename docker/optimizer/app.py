@@ -38,7 +38,7 @@ async def run_optimize(request: Request):
             'pieces_to_cut': body['pieces_to_cut'],
             'stock': body['stock']
         })
-
+        
         # Build combinations for color/thickness/glass_type
         optimization_inputs = create_optimizations_objects(input)
 

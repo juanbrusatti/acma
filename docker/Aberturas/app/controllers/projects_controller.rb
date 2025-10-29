@@ -233,10 +233,6 @@ class ProjectsController < ApplicationController
 
     @project.update(date_of_optimization: Date.today)
 
-    # Eliminar archivo ZIP de optimización si existe
-    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
-    File.delete(zip_path) if File.exist?(zip_path)
-
     # Clean up session data
     session.delete(:optimization_data)
     zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
@@ -257,7 +253,6 @@ class ProjectsController < ApplicationController
 
   def download_optimization_zip
     @project = Project.find(params[:id])
-
     zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
 
     send_file zip_path, 
@@ -267,6 +262,16 @@ class ProjectsController < ApplicationController
   end
 
   private
+
+  def clean_optimizations_dir(optimizations_dir)
+    if Dir.exist?(optimizations_dir)
+        Dir.foreach(optimizations_dir) do |f|
+          next if f == '.' || f == '..'
+          file_path = File.join(optimizations_dir, f)
+          File.delete(file_path) if File.file?(file_path)
+        end
+    end 
+  end
 
   def create_microservice_params(stock_flag = false, scraps_flag = false)
     pieces_to_cut = []
@@ -385,6 +390,8 @@ class ProjectsController < ApplicationController
           zip_part  = mail.parts.find { |p| p.mime_type&.include?('application/zip') }
           json_text = json_part&.decoded
           if zip_part
+            optimizations_dir = Rails.root.join("tmp", "optimizations")
+            clean_optimizations_dir(optimizations_dir)
             zip_bytes = zip_part.body.decoded
             zip_filename = zip_part.filename.presence || zip_filename
             if zip_bytes
