@@ -430,10 +430,9 @@ class ProjectsController < ApplicationController
 
   # Private methods for scraps creation post optimization
   def create_scraps(new_scraps_data)
-    i = 0
     new_scraps_data.each do |scrap_data|
       Scrap.create!(
-        ref_number: i,
+        ref_number: define_number_ref(scrap_data['glass_type'], scrap_data['thickness'], scrap_data['color']),
         width: scrap_data['width'],
         height: scrap_data['height'],
         thickness: scrap_data['thickness'],
@@ -441,8 +440,19 @@ class ProjectsController < ApplicationController
         color: scrap_data['color'],
         input_work: @project.name
       )
-      i += 1
     end
+  end
+
+  def define_number_ref(type, thickness, color)
+    last_scrap = Scrap.where(scrap_type: type, thickness: thickness, color: color).order(ref_number: :desc).first
+    if last_scrap
+      last_scrap_ref_number_int = last_scrap.ref_number.to_i
+      last_scrap_ref_number_int += 1
+      return last_scrap_ref_number_int.to_s
+    else
+      return 1
+    end
+    
   end
 
   def delete_used_scraps(used_scraps_data)
