@@ -194,42 +194,53 @@ class ProjectsController < ApplicationController
     pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps])
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
+    redirect_to confirm_optimization_project_path(@project)
   end
 
   # View to confirm optimization results
-  def confirm_optimization
+  def confirm_optimization  
     @project = Project.find(params[:id])
     # Pull optimization data from session
     @optimization_data = session[:optimization_data]
 
     if @optimization_data.nil?
-      redirect_to project_path(@project), alert: "No hay datos de optimización disponibles."
+      redirect_to project_path(@project), alert: "No hay datos de optimización disponibles....."
     end
   end
 
   def accept_optimize
     @project = Project.find(params[:id])
     optimization_data = session[:optimization_data]
+    Rails.logger.info "accept_optimize: optimization_data = #{optimization_data.inspect}"
 
-    if optimization_data.nil?
+    if optimization_data.nil? || optimization_data.empty?
       redirect_to project_path(@project), alert: "No hay datos de optimización disponibles."
       return
     end
 
-    new_scraps = optimization_data['new_scraps'] || []
-    used_scraps = optimization_data['deleted_scraps'] || []
-    used_stock = optimization_data['deleted_stock'] || []
+    # Usar las claves correctas y tolerar variantes
+    new_scraps = optimization_data['new_scraps'] || optimization_data[:new_scraps] || {}
+    used_scraps = optimization_data['deleted_scraps'] || optimization_data['deleted_scrap'] || optimization_data[:deleted_scraps] || []
+    used_stock = optimization_data['deleted_stock'] || optimization_data[:deleted_stock] || []
 
-    create_scraps(new_scraps) if new_scraps.any?
+    Rails.logger.info "accept_optimize: new_scraps = #{new_scraps.inspect}"
+    Rails.logger.info "accept_optimize: used_scraps = #{used_scraps.inspect}"
+    Rails.logger.info "accept_optimize: used_stock = #{used_stock.inspect}"
+
+    create_scraps(new_scraps.is_a?(Hash) ? new_scraps.values : Array(new_scraps)) if new_scraps.any?
     delete_used_scraps(used_scraps) if used_scraps.any?
     delete_used_stock(used_stock) if used_stock.any?
 
     @project.update(date_of_optimization: Date.today)
 
+    # Eliminar archivo ZIP de optimización si existe
+    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+    File.delete(zip_path) if File.exist?(zip_path)
+
     # Clean up session data
     session.delete(:optimization_data)
-    session.delete(:zip_data)
-    session.delete(:zip_filename)
+    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+    File.delete(zip_path) if File.exist?(zip_path)
 
     redirect_to project_path(@project), notice: "Optimización aceptada y stock actualizado!!"
   end
@@ -239,22 +250,20 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     # Clean up session data
     session.delete(:optimization_data)
-    session.delete(:zip_data)
-    session.delete(:zip_filename)
+    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+    File.delete(zip_path) if File.exist?(zip_path)
     redirect_to project_path(@project), notice: "Optimización cancelada."
   end
 
-  # Download optimization ZIP file
   def download_optimization_zip
     @project = Project.find(params[:id])
-    zip_data = session[:zip_data]
-    zip_filename = session[:zip_filename] || "cutting_plan_visuals.zip"
 
-    if zip_data
-      send_data Base64.decode64(zip_data), filename: zip_filename, type: 'application/zip', disposition: 'attachment'
-    else
-      redirect_to project_path(@project), alert: "No hay archivo ZIP disponible."
-    end
+    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+
+    send_file zip_path, 
+              type: "application/zip", 
+              disposition: "attachment", 
+              filename: "optimizacion_proyecto_#{@project.id}.zip"
   end
 
   private
@@ -309,11 +318,6 @@ class ProjectsController < ApplicationController
     end
 
     pieces_to_cut = pieces_to_cut.as_json
-
-    # Si ningún flag está activado, retornar sin stock
-    if !stock_flag && !scraps_flag
-      return pieces_to_cut, {}
-    end
 
     stock = {}
 
@@ -383,6 +387,12 @@ class ProjectsController < ApplicationController
           if zip_part
             zip_bytes = zip_part.body.decoded
             zip_filename = zip_part.filename.presence || zip_filename
+            if zip_bytes
+              zip_dir = Rails.root.join("tmp", "optimizations")
+              FileUtils.mkdir_p(zip_dir) unless Dir.exist?(zip_dir)
+              zip_path = zip_dir.join("project_#{@project.id}.zip")
+              File.binwrite(zip_path, zip_bytes)
+            end
           end
           parsed_ok = true
         end
@@ -400,12 +410,8 @@ class ProjectsController < ApplicationController
 
       # Guardar los datos de optimización en la sesión
       session[:optimization_data] = @optimizer_summary
-      session[:zip_data] = Base64.encode64(zip_bytes) if zip_bytes
-      session[:zip_filename] = zip_filename
-
-      # Redirigir a la vista de confirmación
-      redirect_to confirm_optimization_project_path(@project)
-
+      
+      return
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
       redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
@@ -417,8 +423,10 @@ class ProjectsController < ApplicationController
 
   # Private methods for scraps creation post optimization
   def create_scraps(new_scraps_data)
-    for scrap_data in new_scraps_data
+    i = 0
+    new_scraps_data.each do |scrap_data|
       Scrap.create!(
+        ref_number: i,
         width: scrap_data['width'],
         height: scrap_data['height'],
         thickness: scrap_data['thickness'],
@@ -426,19 +434,20 @@ class ProjectsController < ApplicationController
         color: scrap_data['color'],
         input_work: @project.name
       )
+      i += 1
     end
   end
 
   def delete_used_scraps(used_scraps_data)
     for scrap_data in used_scraps_data
-      scrap = Scrap.find_by(scrap_data["id"])
+      scrap = Scrap.find_by(id: scrap_data)
       scrap.destroy if scrap
     end
   end
 
   def delete_used_stock(used_stock_data)
     for stock_data in used_stock_data
-      glassplate = Glassplate.find_by(stock_data["id"])
+      glassplate = Glassplate.find_by(id: stock_data)
       glassplate.destroy if glassplate
     end
   end

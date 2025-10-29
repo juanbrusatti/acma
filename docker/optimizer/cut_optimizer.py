@@ -355,6 +355,9 @@ def run_optimizer(input_data, stock_data):
     scraps = stock_data['scraps']
     glassplates = stock_data['glassplates']
 
+    id_stock_used = {"deleted_stock": [], "deleted_scrap": []}
+    scraps_to_create = {}
+
     # Para cada una de las piezas guardamos sus dimensiones originales
     original_piece_dimensions = {p['id']: (p['width'], p['height']) for p in pieces_to_cut}
     # Esto se usa para calcular metricas
@@ -416,7 +419,6 @@ def run_optimizer(input_data, stock_data):
             original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2'
         )
 
-        # save plates and scraps ids used
         id_stock_used = get_plate_and_scrap_ids_from_bin_details(bin_details_map)
 
         # ETAPA 3: Planchas de proveedor 3600x2500
