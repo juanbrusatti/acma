@@ -1,4 +1,5 @@
 class ScrapsController < ApplicationController
+  include ScrapsHelper
   before_action :set_scrap, only: %i[ edit update destroy ]
 
   # GET /scraps/new
@@ -13,6 +14,7 @@ class ScrapsController < ApplicationController
   # POST /scraps or /scraps.json
   def create
     @scrap = Scrap.new(scrap_params)
+    @scrap.ref_number = define_number_ref(@scrap.scrap_type, @scrap.thickness, @scrap.color)
 
     respond_to do |format|
       if @scrap.save
@@ -60,7 +62,7 @@ class ScrapsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.require(:scrap).permit(:ref_number, :scrap_type, :color, :thickness, :width, :height, :input_work)
+      params.require(:scrap).permit(:scrap_type, :color, :thickness, :width, :height, :input_work)
     end
 
     def filter_duplicate_errors
