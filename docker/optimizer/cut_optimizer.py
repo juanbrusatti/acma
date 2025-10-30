@@ -244,13 +244,16 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
         avg_usable_size = (usable_waste_area / len(free_rects)) if free_rects else 0
         
         # Siempre elegir usar menos planchas y todas las piezas colocadas
-        score = (
-            placed_count * 100000000 +        # Prioridad 0: piezas colocadas (máxima)
-            (-len(bins_used) * 10000000) +    # Prioridad 1: MENOS PLANCHAS (crítico)
-            (-waste) +                         # Prioridad 2: menos desperdicio
-            (avg_usable_size * 10) +          # Prioridad 3: sobrantes grandes
-            (-unusable_count * 50000)         # Prioridad 4: penalizar sobrantes inútiles
-        )
+        if waste == 0:
+            score = float('inf')
+        else:
+            score = (
+                placed_count * 100000000 +        # Prioridad 0: piezas colocadas (máxima)
+                (-len(bins_used) * 10000000) +    # Prioridad 1: MENOS PLANCHAS (crítico)
+                (-waste) +                         # Prioridad 2: menos desperdicio
+                (avg_usable_size * 10) +          # Prioridad 3: sobrantes grandes
+                (-unusable_count * 50000)         # Prioridad 4: penalizar sobrantes inútiles
+            )
         
         # Mostrar métricas de cada variante prometedora
         if placed_count > 0:
@@ -372,9 +375,9 @@ def run_optimizer(input_data, stock_data):
     print("ETAPA 1: Intentando empaquetar en placas sobrantes...")
 
     # Convertir scraps al formato esperado por pack_plates
-    scraps_as_plates = []
+    scraps_as_plates_base = []
     for scrap in scraps:
-        scraps_as_plates.append({
+        scraps_as_plates_base.append({
             'id': str(scrap['id']),
             'width': scrap['width'],
             'height': scrap['height'],
@@ -385,18 +388,41 @@ def run_optimizer(input_data, stock_data):
             'ref_number': scrap.get('ref_number')
         })
 
-    bin_details_map = {} # Mapa de detalles de las planchas usadas
-    final_cutting_plan = [] # Lista final del plan de corte
-    
-    added_counts = Counter([r[2] for r in rects_all]) # Se cuentan las piezas a cortar
-    unfitted_counts = added_counts.copy()  # Inicialmente ningun corte está empacado
-    bins_used = []
+    # Definir las formas de ordenamiento
+    orderings = [
+        ('area_asc', lambda x: x['width'] * x['height']),
+        ('area_desc', lambda x: -(x['width'] * x['height'])),
+        ('width_asc', lambda x: x['width']),
+        ('width_desc', lambda x: -x['width']),
+        ('height_asc', lambda x: x['height']),
+        ('height_desc', lambda x: -x['height']),
+    ]
 
-    # Usar pack_plates para sobrantes, le pasamos los sobrantes, el mapa de detalles, las piezas a cortar, el plan de corte final y las dimensiones originales
-    unpacked_final_list, bins_used = pack_plates(
-        scraps_as_plates, bin_details_map, rects_all, final_cutting_plan, 
-        original_piece_dimensions, unfitted_counts, 'Leftover', 'ETAPA1'
-    )
+    best_score = None
+    best_result = None
+
+    for order_name, key_func in orderings:
+        scraps_as_plates = sorted(scraps_as_plates_base, key=key_func)
+        bin_details_map = {}
+        final_cutting_plan = []
+        added_counts = Counter([r[2] for r in rects_all])
+        unfitted_counts = added_counts.copy()
+        bins_used = []
+        unpacked_final_list, bins_used = pack_plates(
+            scraps_as_plates, bin_details_map, rects_all, final_cutting_plan,
+            original_piece_dimensions, unfitted_counts, 'Leftover', f'ETAPA1_{order_name}'
+        )
+        # Obtener score de la heurística elegida
+        score = None
+        if 'quality_metrics' in bin_details_map:
+            score = bin_details_map['quality_metrics'].get('score')
+        placed_count = sum(1 for item in final_cutting_plan if not item.get('Is_Waste', False))
+        if best_score is None or placed_count > best_score:
+            best_score = placed_count
+            best_result = (unpacked_final_list, bins_used, bin_details_map, final_cutting_plan)
+
+    # Usar el mejor resultado encontrado
+    unpacked_final_list, bins_used, bin_details_map, final_cutting_plan = best_result
     
     id_stock_used = get_plate_and_scrap_ids_from_bin_details(bins_used)
 

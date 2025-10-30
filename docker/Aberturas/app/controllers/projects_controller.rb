@@ -328,7 +328,7 @@ class ProjectsController < ApplicationController
 
     # Agregar glassplates si el flag está activado
     if stock_flag
-      glassplates = Glassplate.all.map do |gp|
+        glassplates = Glassplate.all.sort_by { |gp| gp.width.to_f * gp.height.to_f }.map do |gp|
         gp.as_json.merge(
           color: gp.color,
           glass_type: gp.glass_type,
@@ -448,7 +448,7 @@ class ProjectsController < ApplicationController
     if last_scrap
       last_scrap_ref_number_int = last_scrap.ref_number.to_i
       last_scrap_ref_number_int += 1
-      return last_scrap_ref_number_int.to_s
+      return last_scrap_ref_number_int.to
     else
       return 1
     end
