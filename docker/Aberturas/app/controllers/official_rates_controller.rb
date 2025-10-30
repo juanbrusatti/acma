@@ -37,17 +37,17 @@ class OfficialRatesController < ApplicationController
 
       respond_to do |format|
             # HTML y JSON: establecen flash; en Turbo usamos solo redirect sin duplicar flash.
-      format.html { redirect_to glass_prices_path, notice: "Cotización oficial actualizada manualmente." }
-      format.json { render json: { success: true, message: "Cotización oficial actualizada manualmente." } }
-      format.turbo_stream { redirect_to glass_prices_path, status: :see_other, notice: "Cotización oficial actualizada manualmente." }
+        format.html { redirect_to glass_prices_path, notice: "Cotización oficial actualizada manualmente." }
+        format.json { render json: { success: true, message: "Cotización oficial actualizada manualmente." } }
+        format.turbo_stream { redirect_to glass_prices_path, status: :see_other, notice: "Cotización oficial actualizada manualmente." }
       end
     rescue => e
       Rails.logger.error "Error en actualización manual: #{e.message}"
 
       respond_to do |format|
-  format.html { redirect_to glass_prices_path, alert: "Error al actualizar la cotización: #{e.message}" }
-  format.json { render json: { success: false, message: "Error al actualizar la cotización: #{e.message}" } }
-  format.turbo_stream { redirect_to glass_prices_path, status: :see_other, alert: "Error al actualizar la cotización: #{e.message}" }
+        format.html { redirect_to glass_prices_path, alert: "Error al actualizar la cotización: #{e.message}" }
+        format.json { render json: { success: false, message: "Error al actualizar la cotización: #{e.message}" } }
+        format.turbo_stream { redirect_to glass_prices_path, status: :see_other, alert: "Error al actualizar la cotización: #{e.message}" }
       end
     end
   end
