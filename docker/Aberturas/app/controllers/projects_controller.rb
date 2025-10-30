@@ -448,7 +448,7 @@ class ProjectsController < ApplicationController
     if last_scrap
       last_scrap_ref_number_int = last_scrap.ref_number.to_i
       last_scrap_ref_number_int += 1
-      return last_scrap_ref_number_int.to
+      return last_scrap_ref_number_int.to_s
     else
       return 1
     end
