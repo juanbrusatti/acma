@@ -22,6 +22,11 @@ Rails.application.routes.draw do
   resources :projects do
     member do
       get :pdf
+      post :optimize
+      get :confirm_optimization
+      post :accept_optimize
+      get :cancel_optimize
+      get :download_optimization_zip
     end
     collection do
       post :preview_pdf

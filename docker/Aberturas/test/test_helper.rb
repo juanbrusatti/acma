@@ -38,6 +38,5 @@ end
 
 # Configuración para System Tests
 class ActionDispatch::SystemTestCase
-  # Usar el navegador Chrome para pruebas de sistema
-  driven_by :selenium, using: :chrome, screen_size: [1400, 1400]
+  driven_by :rack_test
 end

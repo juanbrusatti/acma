@@ -42,6 +42,11 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        optigray: {
+          DEFAULT: '#4a4f55',
+          dark: '#3c4045',
+          light: '#5a6067'
+        },
         sidebar: {
           background: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
