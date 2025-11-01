@@ -126,10 +126,10 @@ class ScrapInlineEditor {
     this.createNumberInputInCell(cells[5], 'height', this.originalData.height);
 
     // Obra
-    this.createTextInputInCell(cells[6], 'input_work', this.originalData.output_work);
+    this.createTextInputInCell(cells[6], 'input_work', this.originalData.input_work);
 
     // Acciones
-    cells[8].innerHTML = this.createActionButtons();
+    cells[7].innerHTML = this.createActionButtons();
 
     this.setupDependentSelects(row);
     this.bindActionButtons(row);
