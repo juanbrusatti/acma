@@ -30,7 +30,7 @@
 // Función para inicializar los selects de planchas
 function initializeGlassplateSelects() {
   console.log('🚀 Initializing glassplate selects');
-  
+
   const GLASS_OPTIONS = {
     LAM: {
       "3+3": ["INC", "BLS"],
@@ -56,7 +56,7 @@ function initializeGlassplateSelects() {
   });
 
   if (!typeSelect || !thicknessSelect || !colorSelect) {
-    console.log('❌ Missing required selects');
+    console.log('Missing required selects');
     return;
   }
 
@@ -64,7 +64,7 @@ function initializeGlassplateSelects() {
   const newTypeSelect = typeSelect.cloneNode(true);
   const newThicknessSelect = thicknessSelect.cloneNode(true);
   const newColorSelect = colorSelect.cloneNode(true);
-  
+
   typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
   thicknessSelect.parentNode.replaceChild(newThicknessSelect, thicknessSelect);
   colorSelect.parentNode.replaceChild(newColorSelect, colorSelect);
@@ -123,9 +123,99 @@ function initializeGlassplateSelects() {
   console.log('✅ Glassplate selects initialized');
 }
 
+// Función para validar el formulario antes de enviarlo
+function validateGlassplateForm() {
+  const form = document.querySelector('.glassplate-fields').closest('form');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    const errors = [];
+
+    // Obtener valores del formulario
+    const glassType = document.querySelector('#glassplate_glass_type')?.value;
+    const thickness = document.querySelector('#glassplate_thickness')?.value;
+    const color = document.querySelector('#glassplate_color')?.value;
+    const width = parseFloat(document.querySelector('#glassplate_width')?.value);
+    const height = parseFloat(document.querySelector('#glassplate_height')?.value);
+    const quantity = parseFloat(document.querySelector('#glassplate_quantity')?.value);
+
+    // Validaciones
+    if (!glassType || glassType === '') {
+      errors.push('Tipo de vidrio es requerido');
+    } else if (!['LAM', 'FLO', 'COL'].includes(glassType)) {
+      errors.push('Tipo de vidrio inválido (debe ser LAM, FLO o COL)');
+    }
+
+    if (!thickness || thickness === '') {
+      errors.push('Grosor es requerido');
+    } else if (!['3+3', '4+4', '5+5', '5mm'].includes(thickness)) {
+      errors.push('Grosor inválido (debe ser 3+3, 4+4, 5+5 o 5mm)');
+    }
+
+    if (!color || color === '') {
+      errors.push('Color es requerido');
+    } else if (!['INC', 'STB', 'GRS', 'BRC', 'BLS', 'STG', 'NTR'].includes(color)) {
+      errors.push('Color inválido');
+    }
+
+    if (!width || isNaN(width)) {
+      errors.push('Ancho es requerido y debe ser un número');
+    } else if (width <= 0) {
+      errors.push('Ancho debe ser mayor a 0');
+    }
+
+    if (!height || isNaN(height)) {
+      errors.push('Alto es requerido y debe ser un número');
+    } else if (height <= 0) {
+      errors.push('Alto debe ser mayor a 0');
+    }
+
+    if (isNaN(quantity)) {
+      errors.push('Cantidad debe ser un número');
+    } else if (quantity < 0) {
+      errors.push('Cantidad no puede ser negativa');
+    }
+
+    // Si hay errores, prevenir el envío y mostrar alerta
+    if (errors.length > 0) {
+      e.preventDefault();
+      showValidationSwal(errors);
+      return false;
+    }
+
+    return true;
+  });
+}
+
+// Función para mostrar validación con SweetAlert2
+function showValidationSwal(errors) {
+  const errorList = errors.map(err => `• ${err}`).join('<br>');
+
+  if (window.Swal) {
+    window.Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Errores de validación',
+      html: errorList,
+      showConfirmButton: false,
+      timer: 5000,
+      timerProgressBar: true
+    });
+  } else {
+    alert('Errores de validación:\n' + errors.join('\n'));
+  }
+}
+
 // Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', initializeGlassplateSelects);
+document.addEventListener('DOMContentLoaded', function() {
+  initializeGlassplateSelects();
+  validateGlassplateForm();
+});
 
 // También inicializar cuando se navega con Turbo (para Rails 7+)
-document.addEventListener('turbo:load', initializeGlassplateSelects);
+document.addEventListener('turbo:load', function() {
+  initializeGlassplateSelects();
+  validateGlassplateForm();
+});
 </script>

@@ -30,7 +30,7 @@ class GlassplateInlineEditor {
     document.addEventListener('turbo:load', () => {
       this.bindEditButtons();
     });
-    
+
     // También bindear inmediatamente si ya está cargado
     this.bindEditButtons();
   }
@@ -47,15 +47,15 @@ class GlassplateInlineEditor {
     e.preventDefault();
     e.stopPropagation(); // Evitar que otros sistemas capturen el evento
     console.log('🎯 Glassplate edit button clicked - OUR SYSTEM'); // Debug
-    
+
     const row = e.target.closest('tr');
     console.log('Row found:', row); // Debug
-    
+
     if (!row) {
-      console.error('❌ No se pudo encontrar la fila (tr)');
+      console.error('No se pudo encontrar la fila (tr)');
       return;
     }
-    
+
     this.startEdit(row);
   }
 
@@ -68,29 +68,29 @@ class GlassplateInlineEditor {
     this.editingRow = row;
     this.originalData = this.extractRowData(row);
     console.log('Original data:', this.originalData); // Debug
-    
+
     if (!this.originalData) {
-      console.error('❌ No se pudo extraer los datos de la fila');
+      console.error('No se pudo extraer los datos de la fila');
       return;
     }
-    
+
     this.convertToEditMode(row);
   }
 
   extractRowData(row) {
     if (!row) {
-      console.error('❌ extractRowData: row es null');
+      console.error('extractRowData: row es null');
       return null;
     }
-    
+
     const cells = row.querySelectorAll('td');
     console.log('Cells found:', cells.length); // Debug
-    
+
     if (cells.length < 6) {
-      console.error('❌ extractRowData: No hay suficientes celdas (td)');
+      console.error('extractRowData: No hay suficientes celdas (td)');
       return null;
     }
-    
+
     return {
       id: row.dataset.glassplateId,
       glass_type: cells[0].textContent.trim(),
@@ -104,28 +104,28 @@ class GlassplateInlineEditor {
 
   convertToEditMode(row) {
     const cells = row.querySelectorAll('td');
-    
+
     // Tipo de vidrio
     this.createTypeSelectInCell(cells[0], this.originalData.glass_type);
-    
+
     // Grosor
     this.createThicknessSelectInCell(cells[1], this.originalData.thickness, this.originalData.glass_type);
-    
+
     // Color
     this.createColorSelectInCell(cells[2], this.originalData.color, this.originalData.glass_type, this.originalData.thickness);
-    
+
     // Ancho
     this.createNumberInputInCell(cells[3], 'width', this.originalData.width);
-    
+
     // Alto
     this.createNumberInputInCell(cells[4], 'height', this.originalData.height);
-    
+
     // Cantidad
     this.createNumberInputInCell(cells[5], 'quantity', this.originalData.quantity, 0);
-    
+
     // Acciones
     cells[6].innerHTML = this.createActionButtons();
-    
+
     // Configurar selects dependientes
     this.setupDependentSelects(row);
   }
@@ -133,16 +133,16 @@ class GlassplateInlineEditor {
   createTypeSelectInCell(cell, currentValue) {
     console.log('Creating type select in cell:', currentValue); // Debug
     cell.innerHTML = '';
-    
+
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-type-select';
     select.name = 'glass_type';
-    
+
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Seleccionar';
     select.appendChild(defaultOption);
-    
+
     Object.keys(this.glassOptions).forEach(type => {
       const option = document.createElement('option');
       option.value = type;
@@ -150,23 +150,23 @@ class GlassplateInlineEditor {
       option.selected = type === currentValue;
       select.appendChild(option);
     });
-    
+
     cell.appendChild(select);
   }
 
   createThicknessSelectInCell(cell, currentValue, currentType) {
     console.log('Creating thickness select in cell:', { currentValue, currentType }); // Debug
     cell.innerHTML = '';
-    
+
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-thickness-select';
     select.name = 'thickness';
-    
+
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Seleccionar';
     select.appendChild(defaultOption);
-    
+
     // Llenar con opciones disponibles para el tipo actual
     if (this.glassOptions[currentType]) {
       const grosores = Object.keys(this.glassOptions[currentType]);
@@ -181,23 +181,23 @@ class GlassplateInlineEditor {
     } else {
       console.log('No glass options found for type:', currentType); // Debug
     }
-    
+
     cell.appendChild(select);
   }
 
   createColorSelectInCell(cell, currentValue, currentType, currentThickness) {
     console.log('Creating color select in cell:', { currentValue, currentType, currentThickness }); // Debug
     cell.innerHTML = '';
-    
+
     const select = document.createElement('select');
     select.className = 'w-full border rounded px-2 py-1 glassplate-color-select';
     select.name = 'color';
-    
+
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Seleccionar';
     select.appendChild(defaultOption);
-    
+
     // Llenar con opciones disponibles para el tipo y grosor actuales
     if (this.glassOptions[currentType] && this.glassOptions[currentType][currentThickness]) {
       const colores = this.glassOptions[currentType][currentThickness];
@@ -212,14 +212,14 @@ class GlassplateInlineEditor {
     } else {
       console.log('No color options found for:', currentType, currentThickness); // Debug
     }
-    
+
     cell.appendChild(select);
   }
 
   createNumberInputInCell(cell, name, value, min = 0.01) {
     console.log('Creating number input in cell:', { name, value }); // Debug
     cell.innerHTML = '';
-    
+
     const input = document.createElement('input');
     input.type = 'number';
     input.name = name;
@@ -227,7 +227,7 @@ class GlassplateInlineEditor {
     input.min = min;
     input.step = name === 'quantity' ? '1' : '0.01';
     input.className = 'w-full border rounded px-2 py-1 text-center';
-    
+
     cell.appendChild(input);
   }
 
@@ -263,18 +263,18 @@ class GlassplateInlineEditor {
     const typeSelect = row.querySelector('.glassplate-type-select');
     const thicknessSelect = row.querySelector('.glassplate-thickness-select');
     const colorSelect = row.querySelector('.glassplate-color-select');
-    
+
     if (!typeSelect || !thicknessSelect || !colorSelect) return;
-    
+
     // Función para actualizar grosores cuando cambia el tipo
     const updateThicknessOptions = () => {
       const tipo = typeSelect.value;
       const currentThickness = thicknessSelect.value;
       const currentColor = colorSelect.value;
-      
+
       thicknessSelect.innerHTML = '<option value="">Seleccionar</option>';
       colorSelect.innerHTML = '<option value="">Seleccionar</option>';
-      
+
       if (this.glassOptions[tipo]) {
         const grosores = Object.keys(this.glassOptions[tipo]);
         grosores.forEach(grosor => {
@@ -285,25 +285,25 @@ class GlassplateInlineEditor {
           opt.selected = grosor === currentThickness;
           thicknessSelect.appendChild(opt);
         });
-        
+
         // Si el grosor actual no está disponible en el nuevo tipo, seleccionar el primero
         if (!grosores.includes(currentThickness) && grosores.length > 0) {
           thicknessSelect.value = grosores[0];
         }
-        
+
         // Actualizar colores después de cambiar grosor
         updateColorOptions();
       }
     };
-    
+
     // Función para actualizar colores cuando cambia el grosor
     const updateColorOptions = () => {
       const tipo = typeSelect.value;
       const grosor = thicknessSelect.value;
       const currentColor = colorSelect.value;
-      
+
       colorSelect.innerHTML = '<option value="">Seleccionar</option>';
-      
+
       if (this.glassOptions[tipo] && this.glassOptions[tipo][grosor]) {
         const colores = this.glassOptions[tipo][grosor];
         colores.forEach(color => {
@@ -314,18 +314,18 @@ class GlassplateInlineEditor {
           opt.selected = color === currentColor;
           colorSelect.appendChild(opt);
         });
-        
+
         // Si el color actual no está disponible para el nuevo grosor, seleccionar el primero
         if (!colores.includes(currentColor) && colores.length > 0) {
           colorSelect.value = colores[0];
         }
       }
     };
-    
+
     // Event listeners
     typeSelect.addEventListener('change', updateThicknessOptions);
     thicknessSelect.addEventListener('change', updateColorOptions);
-    
+
     // Bind save and cancel buttons
     this.bindActionButtons(row);
   }
@@ -333,7 +333,7 @@ class GlassplateInlineEditor {
   bindActionButtons(row) {
     const saveBtn = row.querySelector('.save-glassplate-btn');
     const cancelBtn = row.querySelector('.cancel-glassplate-btn');
-    
+
     if (saveBtn) {
       saveBtn.addEventListener('click', () => this.saveEdit(row));
     }
@@ -345,14 +345,14 @@ class GlassplateInlineEditor {
   async saveEdit(row) {
     console.log('Saving edit'); // Debug
     const formData = this.extractFormData(row);
-    
+
     if (!this.validateFormData(formData)) {
       return;
     }
-    
+
     try {
       const response = await this.updateGlassplate(formData);
-      
+
       if (response.success) {
         this.convertToViewMode(row, formData);
         this.showSuccessMessage('Plancha actualizada exitosamente');
@@ -376,31 +376,84 @@ class GlassplateInlineEditor {
       height: parseFloat(row.querySelector('input[name="height"]').value),
       quantity: parseInt(row.querySelector('input[name="quantity"]').value)
     };
-    
+
     return formData;
   }
 
   validateFormData(data) {
     const errors = [];
-    
-    if (!data.glass_type) errors.push('Tipo de vidrio es requerido');
-    if (!data.thickness) errors.push('Grosor es requerido');
-    if (!data.color) errors.push('Color es requerido');
-    if (!data.width || data.width <= 0) errors.push('Ancho debe ser mayor a 0');
-    if (!data.height || data.height <= 0) errors.push('Alto debe ser mayor a 0');
-    if (data.quantity < 0) errors.push('Cantidad no puede ser negativa');
-    
+
+    // Validar tipo de vidrio
+    if (!data.glass_type || data.glass_type === '') {
+      errors.push('Tipo de vidrio es requerido');
+    } else if (!['LAM', 'FLO', 'COL'].includes(data.glass_type)) {
+      errors.push('Tipo de vidrio inválido (debe ser LAM, FLO o COL)');
+    }
+
+    // Validar grosor
+    if (!data.thickness || data.thickness === '') {
+      errors.push('Grosor es requerido');
+    } else if (!['3+3', '4+4', '5+5', '5mm'].includes(data.thickness)) {
+      errors.push('Grosor inválido (debe ser 3+3, 4+4, 5+5 o 5mm)');
+    }
+
+    // Validar color
+    if (!data.color || data.color === '') {
+      errors.push('Color es requerido');
+    } else if (!['INC', 'STB', 'GRS', 'BRC', 'BLS', 'STG', 'NTR'].includes(data.color)) {
+      errors.push('Color inválido');
+    }
+
+    // Validar ancho
+    if (!data.width || isNaN(data.width)) {
+      errors.push('Ancho es requerido y debe ser un número');
+    } else if (data.width <= 0) {
+      errors.push('Ancho debe ser mayor a 0');
+    }
+
+    // Validar alto
+    if (!data.height || isNaN(data.height)) {
+      errors.push('Alto es requerido y debe ser un número');
+    } else if (data.height <= 0) {
+      errors.push('Alto debe ser mayor a 0');
+    }
+
+    // Validar cantidad
+    if (isNaN(data.quantity)) {
+      errors.push('Cantidad debe ser un número');
+    } else if (data.quantity < 0) {
+      errors.push('Cantidad no puede ser negativa');
+    }
+
     if (errors.length > 0) {
-      this.showErrorMessage(errors.join(', '));
+      this.showValidationErrors(errors);
       return false;
     }
-    
+
     return true;
+  }
+
+  showValidationErrors(errors) {
+    const errorList = errors.map(err => `• ${err}`).join('<br>');
+    if (window.Swal) {
+      window.Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Errores de validación',
+        html: errorList,
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true
+      });
+    } else {
+      alert('Errores de validación:\n' + errors.join('\n'));
+    }
   }
 
   async updateGlassplate(data) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
+
     const response = await fetch(`/glassplates/${data.id}`, {
       method: 'PATCH',
       headers: {
@@ -412,13 +465,13 @@ class GlassplateInlineEditor {
         glassplate: data
       })
     });
-    
+
     return await response.json();
   }
 
   convertToViewMode(row, data) {
     const cells = row.querySelectorAll('td');
-    
+
     cells[0].textContent = data.glass_type;
     cells[1].textContent = data.thickness;
     cells[2].textContent = data.color;
@@ -426,7 +479,7 @@ class GlassplateInlineEditor {
     cells[4].textContent = data.height;
     cells[5].textContent = data.quantity;
     cells[6].innerHTML = this.createViewModeActions();
-    
+
     // Rebind edit button
     this.bindEditButtons();
   }
@@ -457,29 +510,35 @@ class GlassplateInlineEditor {
   }
 
   showSuccessMessage(message) {
-    this.showMessage(message, 'success');
+    if (window.Swal) {
+      window.Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+      });
+    } else {
+      alert(message);
+    }
   }
 
   showErrorMessage(message) {
-    this.showMessage(message, 'error');
-  }
-
-  showMessage(message, type) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `fixed top-4 right-4 px-4 py-2 rounded shadow-lg z-50 ${
-      type === 'success' 
-        ? 'bg-green-100 border border-green-400 text-green-700' 
-        : 'bg-red-100 border border-red-400 text-red-700'
-    }`;
-    messageDiv.textContent = message;
-    
-    document.body.appendChild(messageDiv);
-    
-    setTimeout(() => {
-      if (messageDiv.parentNode) {
-        messageDiv.parentNode.removeChild(messageDiv);
-      }
-    }, 3000);
+    if (window.Swal) {
+      window.Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: message,
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true
+      });
+    } else {
+      alert(message);
+    }
   }
 }
 
