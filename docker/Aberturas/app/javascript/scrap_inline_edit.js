@@ -126,10 +126,10 @@ class ScrapInlineEditor {
     this.createNumberInputInCell(cells[5], 'height', this.originalData.height);
 
     // Obra
-    this.createTextInputInCell(cells[6], 'input_work', this.originalData.output_work);
+    this.createTextInputInCell(cells[6], 'input_work', this.originalData.input_work);
 
     // Acciones
-    cells[8].innerHTML = this.createActionButtons();
+    cells[7].innerHTML = this.createActionButtons();
 
     this.setupDependentSelects(row);
     this.bindActionButtons(row);
@@ -330,15 +330,22 @@ class ScrapInlineEditor {
   saveEdit(row) {
     console.log('Saving scrap edit'); // Debug
 
+    // Extraer datos del formulario
+    const data = this.extractFormData(row);
+
+    // Validar datos antes de enviar
+    if (!this.validateFormData(data)) {
+      return; // No continuar si hay errores de validación
+    }
+
     const formData = new FormData();
     formData.append('scrap[id]', this.originalData.id);
 
-    // Recopilar datos de los campos editables
-    const inputs = row.querySelectorAll('input, select');
-    inputs.forEach(input => {
-      if (input.name && input.value !== '') {
-        console.log('Adding field:', input.name, '=', input.value); // Debug
-        formData.append(`scrap[${input.name}]`, input.value);
+    // Agregar datos validados al FormData
+    Object.keys(data).forEach(key => {
+      if (key !== 'id' && data[key] !== null && data[key] !== undefined && data[key] !== '') {
+        console.log('Adding field:', key, '=', data[key]); // Debug
+        formData.append(`scrap[${key}]`, data[key]);
       }
     });
 
@@ -380,6 +387,88 @@ class ScrapInlineEditor {
     });
   }
 
+  extractFormData(row) {
+    return {
+      id: this.originalData.id,
+      ref_number: row.querySelector('input[name="ref_number"]')?.value || '',
+      scrap_type: row.querySelector('.scrap-type-select')?.value || '',
+      thickness: row.querySelector('.scrap-thickness-select')?.value || '',
+      color: row.querySelector('.scrap-color-select')?.value || '',
+      width: parseFloat(row.querySelector('input[name="width"]')?.value) || 0,
+      height: parseFloat(row.querySelector('input[name="height"]')?.value) || 0,
+      input_work: row.querySelector('input[name="input_work"]')?.value || ''
+    };
+  }
+
+  validateFormData(data) {
+    const errors = [];
+
+    // Validar referencia
+    if (!data.ref_number || data.ref_number.trim() === '') {
+      errors.push('Referencia es requerida');
+    }
+
+    // Validar tipo de retazo
+    if (!data.scrap_type || data.scrap_type === '') {
+      errors.push('Tipo de retazo es requerido');
+    } else if (!['LAM', 'FLO', 'COL'].includes(data.scrap_type)) {
+      errors.push('Tipo de retazo inválido (debe ser LAM, FLO o COL)');
+    }
+
+    // Validar grosor
+    if (!data.thickness || data.thickness === '') {
+      errors.push('Grosor es requerido');
+    } else if (!['3+3', '4+4', '5+5', '5mm'].includes(data.thickness)) {
+      errors.push('Grosor inválido (debe ser 3+3, 4+4, 5+5 o 5mm)');
+    }
+
+    // Validar color
+    if (!data.color || data.color === '') {
+      errors.push('Color es requerido');
+    } else if (!['INC', 'STB', 'GRS', 'BRC', 'BLS', 'STG', 'NTR'].includes(data.color)) {
+      errors.push('Color inválido');
+    }
+
+    // Validar ancho
+    if (!data.width || isNaN(data.width)) {
+      errors.push('Ancho es requerido y debe ser un número');
+    } else if (data.width <= 0) {
+      errors.push('Ancho debe ser mayor a 0');
+    }
+
+    // Validar alto
+    if (!data.height || isNaN(data.height)) {
+      errors.push('Alto es requerido y debe ser un número');
+    } else if (data.height <= 0) {
+      errors.push('Alto debe ser mayor a 0');
+    }
+
+    if (errors.length > 0) {
+      this.showValidationErrors(errors);
+      return false;
+    }
+
+    return true;
+  }
+
+  showValidationErrors(errors) {
+    const errorList = errors.map(err => `• ${err}`).join('<br>');
+    if (window.Swal) {
+      window.Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Errores de validación',
+        html: errorList,
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true
+      });
+    } else {
+      alert('Errores de validación:\n' + errors.join('\n'));
+    }
+  }
+
   cancelEdit() {
     if (this.editingRow) {
       console.log('Cancelling edit'); // Debug
@@ -389,21 +478,19 @@ class ScrapInlineEditor {
   }
 
   showMessage(message, type) {
-    // Crear elemento de mensaje temporal
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `fixed top-4 right-4 px-4 py-2 rounded-md text-white z-50 ${
-      type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
-    messageDiv.textContent = message;
-
-    document.body.appendChild(messageDiv);
-
-    // Remover después de 3 segundos
-    setTimeout(() => {
-      if (messageDiv.parentNode) {
-        messageDiv.parentNode.removeChild(messageDiv);
-      }
-    }, 3000);
+    if (window.Swal) {
+      window.Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type === 'success' ? 'success' : 'error',
+        title: message,
+        showConfirmButton: false,
+        timer: type === 'success' ? 3000 : 4000,
+        timerProgressBar: true
+      });
+    } else {
+      alert(message);
+    }
   }
 }
 

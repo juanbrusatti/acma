@@ -43,17 +43,6 @@
           Proyectos
         <% end %>
 
-        <!-- Optimizer Section - Enabled styling but non-functional -->
-        <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-            <path d="M6 8L2 12L6 16"></path>
-            <path d="M22 12L18 8L22 12L18 16"></path>
-            <path d="M22 4L12 14L2 24"></path>
-            <path d="M2 4L12 14L22 24"></path>
-          </svg>
-          Optimizador
-        </div>
-
         <%= link_to glass_prices_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{current_page?(glass_prices_path) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
