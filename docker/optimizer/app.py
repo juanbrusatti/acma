@@ -200,6 +200,7 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
             optimizer_result = json.loads(json_line)
         else:
             optimizer_result = {}
+            
     except Exception as e:
         print(f"[WARN] No se pudo parsear JSON del optimizador: {e}")
         optimizer_result = {}
