@@ -471,15 +471,26 @@ def run_optimizer(input_data, stock_data):
             # el mismo color, glass_type y thickness, por lo que podemos tomar el primero
             # Luego creamos la plancha 3600x2500 con esos atributos
             first_piece = pieces_to_cut[0]
-            plate = {
-                'id': f"3600x2500_{count}",
-                'width': 2500,
-                'height': 3600,
-                'color': first_piece.get('color'),
-                'glass_type': first_piece.get('glass_type'),
-                'thickness': first_piece.get('thickness'),
-                'quantity': 1
-            }
+            if first_piece.get('glass_type') == 'COL':
+                plate = {
+                    'id': f"3210x2400_{count}",
+                    'width': 2400,
+                    'height': 3210,
+                    'color': first_piece.get('color'),
+                    'glass_type': first_piece.get('glass_type'),
+                    'thickness': first_piece.get('thickness'),
+                    'quantity': 1
+                }
+            else:
+                plate = {
+                    'id': f"3600x2500_{count}",
+                    'width': 2500,
+                    'height': 3600,
+                    'color': first_piece.get('color'),
+                    'glass_type': first_piece.get('glass_type'),
+                    'thickness': first_piece.get('thickness'),
+                    'quantity': 1
+                }
             count += 1
 
             # Calcular unfitted_counts para ETAPA 3
