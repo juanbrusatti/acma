@@ -128,7 +128,7 @@ class ProjectsController < ApplicationController
       Rails.logger.info "Datos recibidos: glasscuttings=#{data['glasscuttings_attributes']&.count || 0}, dvhs=#{data['dvhs_attributes']&.count || 0}"
 
       # Asegurar valores por defecto para campos obligatorios
-      data['name'] ||= 'Proyecto Sin Nombre'
+      data['name'] ||= 'Proyecto sin nombre'
       data['description'] ||= ''
       data['phone'] ||= ''
       data['address'] ||= ''
