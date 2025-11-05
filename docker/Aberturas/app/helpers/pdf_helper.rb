@@ -246,4 +246,59 @@ module PdfHelper
       ].join.html_safe
     end
   end
+  def render_labels_glasscuttings(name, glasscuttings)
+    return "" if glasscuttings.blank?
+    labels = glasscuttings.map do |glass|
+    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; border: 1px solid #333; border-radius: 3px; padding: 10px; box-sizing: border-box; background: #fff;" do
+        [
+          content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
+            [
+              content_tag(:div, name.upcase, style: "font-weight: bold; font-size: 15px; color: #333;"),
+              content_tag(:div, 'Simple', style: "font-size: 15px; color: #666;")
+            ].join.html_safe
+          end,
+          content_tag(:div, glass.typology, style: "font-size: 15px; color: #000; margin-bottom: 5px;"),
+          content_tag(:div, "#{[glass.glass_type, glass.thickness, glass.color].compact.join(' ')}", style: "font-size: 15px; line-height: 1.3; margin-bottom: 8px;"),
+          content_tag(:div, "#{glass.width.to_s.rjust(4, '0')} x #{glass.height.to_s.rjust(4, '0')}", style: "font-size: 15px; color: #000; margin-bottom: 10px;"),
+          image_tag("file://#{Rails.root.join('public', 'logo-ar-transparente.png')}", alt: "Logo AR", style: "height: 90px; width: auto; float: right; margin-top: -20px;")
+        ].join.html_safe
+      end
+    end
+
+    html = "<div style=\"page-break-before: always;\"></div>"
+    labels.each_slice(8).with_index do |group, idx|
+      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%;")
+      html << '<div style="page-break-after: always;"></div>' unless idx == (labels.size / 8)
+    end
+    html.html_safe
+  end
+
+  def render_labels_dvh(name, dvhs)
+    return "" if dvhs.blank?
+    labels = dvhs.map do |dvh|
+    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; border: 1px solid #333; border-radius: 3px; padding: 10px; box-sizing: border-box; background: #fff;" do
+        [
+          content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
+            [
+              content_tag(:div, name.upcase, style: "font-weight: bold; font-size: 15px; color: #333;"),
+              content_tag(:div, "DVH", style: "font-size: 15px; color: #666;")
+            ].join.html_safe
+          end,
+          content_tag(:div, dvh.typology, style: "font-size: 15px; color: #000; margin-bottom: 5px;"),
+          content_tag(:div, "#{[dvh.glasscutting1_type, dvh.glasscutting1_thickness, dvh.glasscutting1_color].compact.join(' ')} / #{dvh.innertube} / #{[dvh.glasscutting2_type, dvh.glasscutting2_thickness, dvh.glasscutting2_color].compact.join(' ')}", style: "font-size: 15px; line-height: 1.3; margin-bottom: 8px;"),
+          content_tag(:div, "#{dvh.width.to_s.rjust(4, '0')} x #{dvh.height.to_s.rjust(4, '0')}", style: "font-size: 15px; color: #000; margin-bottom: 10px;"),
+          image_tag("file://#{Rails.root.join('public', 'logo-ar-transparente.png')}", alt: "Logo AR", style: "height: 90px; width: auto; float: right; margin-top: -20px;")        
+        ].join.html_safe
+      end
+    end
+
+    html = "<div style=\"page-break-before: always;\"></div>"
+    labels.each_slice(8).with_index do |group, idx|
+      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%;")
+      html << '<div style="page-break-after: always;"></div>' unless idx == (labels.size / 8)
+    end
+    html.html_safe
+  end
+
 end
+
