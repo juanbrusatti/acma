@@ -290,7 +290,7 @@ class ProjectsController < ApplicationController
       final_thickness = cut.thickness
 
       # Si la flag está activada y cumple las condiciones, convertir a LAM 3+3
-      if flo_lam_flag && cut.glass_type == "FLO" && cut.thickness == "5mm" && cut.color == "INC"
+      if flo_lam_flag && cut.glass_type == "FLO" && cut.thickness == "5mm" && cut.color == "INC" && cut.type_opening == "Aluminio"
         if (cut.width < 500 && cut.height < 1800) || (cut.width < 1800 && cut.height < 500)
           final_glass_type = "LAM"
           final_thickness = "3+3"
@@ -316,18 +316,17 @@ class ProjectsController < ApplicationController
       glass1_type = dvh.glasscutting1_type
       glass1_thickness = dvh.glasscutting1_thickness
 
-      if flo_lam_flag && dvh.glasscutting1_type == "FLO" && dvh.glasscutting1_thickness == "5mm" && dvh.glasscutting1_color == "INC"
+      if flo_lam_flag && dvh.glasscutting1_type == "FLO" && dvh.glasscutting1_thickness == "5mm" && dvh.glasscutting1_color == "INC" && dvh.type_opening == "Aluminio"
         if (dvh.width < 500 && dvh.height < 1800) || (dvh.width < 1800 && dvh.height < 500)
           glass1_type = "LAM"
           glass1_thickness = "3+3"
         end
       end
 
-      # Analizo el segundo
       glass2_type = dvh.glasscutting2_type
       glass2_thickness = dvh.glasscutting2_thickness
 
-      if flo_lam_flag && dvh.glasscutting2_type == "FLO" && dvh.glasscutting2_thickness == "5mm" && dvh.glasscutting2_color == "INC"
+      if flo_lam_flag && dvh.glasscutting2_type == "FLO" && dvh.glasscutting2_thickness == "5mm" && dvh.glasscutting2_color == "INC" && dvh.type_opening == "Aluminio"
         if (dvh.width < 500 && dvh.height < 1800) || (dvh.width < 1800 && dvh.height < 500)
           glass2_type = "LAM"
           glass2_thickness = "3+3"

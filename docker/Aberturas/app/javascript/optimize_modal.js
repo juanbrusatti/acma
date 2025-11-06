@@ -12,6 +12,8 @@ class OptimizeModal {
     this.scrapsCheckbox = null;
     this.stockInput = null;
     this.scrapsInput = null;
+    this.floLamCheckbox = null;
+    this.floLamInput = null;
 
     this.init();
   }
@@ -39,6 +41,8 @@ class OptimizeModal {
     this.scrapsCheckbox = document.getElementById('optimize-scraps-checkbox');
     this.stockInput = document.getElementById('optimize-stock-input');
     this.scrapsInput = document.getElementById('optimize-scraps-input');
+    this.floLamCheckbox = document.getElementById('flo-lam-checkbox');
+    this.floLamInput = document.getElementById('flo-lam-input');
 
     // Verificar que todos los elementos existen
     if (!this.modal || !this.openBtn) {
@@ -74,6 +78,7 @@ class OptimizeModal {
       this.cancelBtn.parentNode.replaceChild(newCancelBtn, this.cancelBtn);
       this.cancelBtn = newCancelBtn;
     }
+
   }
 
   setupListeners() {
@@ -125,6 +130,12 @@ class OptimizeModal {
         console.log('Scraps checkbox changed:', this.scrapsCheckbox.checked);
       });
     }
+    if (this.floLamCheckbox && this.floLamInput) {
+      this.floLamCheckbox.addEventListener('change', () => {
+        this.floLamInput.value = this.floLamCheckbox.checked ? 'true' : 'false';
+        console.log('FLO-LAM checkbox changed:', this.floLamCheckbox.checked);
+      });
+    }
 
     // Manejar el submit del formulario
     if (this.form) {
@@ -146,6 +157,8 @@ class OptimizeModal {
       if (this.scrapsCheckbox) this.scrapsCheckbox.checked = false;
       if (this.stockInput) this.stockInput.value = 'false';
       if (this.scrapsInput) this.scrapsInput.value = 'false';
+      if (this.floLamCheckbox) this.floLamCheckbox.checked = false;
+      if (this.floLamInput) this.floLamInput.value = 'false';
 
       // Prevenir scroll del body
       document.body.style.overflow = 'hidden';
