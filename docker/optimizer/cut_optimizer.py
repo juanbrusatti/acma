@@ -12,6 +12,8 @@ import sys
 import random
 import shutil
 
+pieces_flo = []
+
 # funcion para parsear args
 def parse_args():
     """
@@ -455,6 +457,29 @@ def run_optimizer(input_data, stock_data):
 
         # ETAPA 3: Planchas de proveedor 3600x2500
         count = 0        
+
+        # guardamos en una estructura de datos global los cortes FLO 5mm INC que no entraron en ETAPA 2 y cumplan con type_opening == "Aluminio" y menor a 1800x500 (500x1800)
+
+        if pieces_to_cut[0].get('glass_type') == 'FLO' and pieces_to_cut[0].get('thickness') == '5mm' and pieces_to_cut[0].get('color') == 'INC':
+            for cut in unpacked_final_list:
+                # Buscar la pieza original en pieces_to_cut para obtener type_opening
+                original_piece = next((p for p in pieces_to_cut if p['id'] == cut['id']), None)
+                if original_piece and original_piece.get('type_opening') == 'Aluminio':
+                    w, h = original_piece_dimensions[cut['id']]
+                    if (w <= 1800 and h <= 500) or (w <= 500 and h <= 1800):
+                        global pieces_flo
+                        pieces_flo.append({
+                            'id': cut['id'],
+                            'width': w,
+                            'height': h,
+                            'quantity': cut['quantity_unpacked'],
+                            'type_opening': original_piece.get('type_opening'),
+                            'glass_type': original_piece.get('glass_type'),
+                            'thickness': original_piece.get('thickness'),
+                            'color': original_piece.get('color')
+                        })
+
+
         while unpacked_final_list:
             print(f"\nQuedaron {len(unpacked_final_list)} piezas sin colocar. Intentando en plancha nueva 3600x2500...")
 
@@ -471,15 +496,26 @@ def run_optimizer(input_data, stock_data):
             # el mismo color, glass_type y thickness, por lo que podemos tomar el primero
             # Luego creamos la plancha 3600x2500 con esos atributos
             first_piece = pieces_to_cut[0]
-            plate = {
-                'id': f"3600x2500_{count}",
-                'width': 2500,
-                'height': 3600,
-                'color': first_piece.get('color'),
-                'glass_type': first_piece.get('glass_type'),
-                'thickness': first_piece.get('thickness'),
-                'quantity': 1
-            }
+            if first_piece.get('glass_type') == 'COL':
+                plate = {
+                    'id': f"3210x2400_{count}",
+                    'width': 2400,
+                    'height': 3210,
+                    'color': first_piece.get('color'),
+                    'glass_type': first_piece.get('glass_type'),
+                    'thickness': first_piece.get('thickness'),
+                    'quantity': 1
+                }
+            else:
+                plate = {
+                    'id': f"3600x2500_{count}",
+                    'width': 2500,
+                    'height': 3600,
+                    'color': first_piece.get('color'),
+                    'glass_type': first_piece.get('glass_type'),
+                    'thickness': first_piece.get('thickness'),
+                    'quantity': 1
+                }
             count += 1
 
             # Calcular unfitted_counts para ETAPA 3
@@ -737,6 +773,13 @@ if __name__ == "__main__":
     }
 
     print(json.dumps(result))
+    if len(pieces_flo) > 0:
+        print("\n⚠️ Piezas FLO 5mm INC que no entraron en el plan de corte y cumplen con type_opening == 'Aluminio' y dimensiones menores a 1800x500 (500x1800):")
+        for pf in pieces_flo:
+            print(f" - ID: {pf['id']}, Dimensiones: {pf['width']}x{pf['height']}, Cantidad: {pf['quantity']}")
+
+    
+
     if final_plan:
         # Asegurar que existan los directorios de salida
         try:
