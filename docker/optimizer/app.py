@@ -184,7 +184,7 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
 
     stdout_data = result.stdout.decode('utf-8', errors='replace').strip()
     print("[DEBUG] STDOUT completo del optimizador:")
-    print(stdout_data)
+    #print(stdout_data)
     try:
         # Buscar la última línea JSON válida en el output
         lines = stdout_data.splitlines()
