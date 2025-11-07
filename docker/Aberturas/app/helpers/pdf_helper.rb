@@ -248,8 +248,8 @@ module PdfHelper
   end
   def render_labels_glasscuttings(name, glasscuttings)
     return "" if glasscuttings.blank?
-    labels = glasscuttings.map do |glass|
-    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; border: 1px solid #333; border-radius: 3px; padding: 10px; box-sizing: border-box; background: #fff;" do
+  labels = glasscuttings.map do |glass|
+  content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
         [
           content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
             [
@@ -266,17 +266,18 @@ module PdfHelper
     end
 
     html = "<div style=\"page-break-before: always;\"></div>"
-    labels.each_slice(8).with_index do |group, idx|
-      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%;")
-      html << '<div style="page-break-after: always;"></div>' unless idx == (labels.size / 8)
+    total_pages = (labels.size / 4.0).ceil
+    labels.each_slice(4).with_index do |group, idx|
+      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%; text-align: center;")
+      html << '<div style="page-break-after: always;"></div>' unless idx == (total_pages - 1)
     end
     html.html_safe
   end
 
   def render_labels_dvh(name, dvhs)
     return "" if dvhs.blank?
-    labels = dvhs.map do |dvh|
-    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; border: 1px solid #333; border-radius: 3px; padding: 10px; box-sizing: border-box; background: #fff;" do
+  labels = dvhs.map do |dvh|
+  content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
         [
           content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
             [
@@ -293,9 +294,10 @@ module PdfHelper
     end
 
     html = "<div style=\"page-break-before: always;\"></div>"
-    labels.each_slice(8).with_index do |group, idx|
-      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%;")
-      html << '<div style="page-break-after: always;"></div>' unless idx == (labels.size / 8)
+    total_pages = (labels.size / 4.0).ceil
+    labels.each_slice(4).with_index do |group, idx|
+      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%; text-align: center;")
+      html << '<div style="page-break-after: always;"></div>' unless idx == (total_pages - 1)
     end
     html.html_safe
   end
