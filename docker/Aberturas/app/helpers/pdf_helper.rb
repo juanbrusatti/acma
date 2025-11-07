@@ -4,7 +4,7 @@ module PdfHelper
     {
       layout: "pdf",
       enable_local_file_access: true,
-      margin: { top: 10, bottom: 10, left: 10, right: 10 },
+      margin: { top: 2, bottom: 10, left: 12, right: 10 },
       disable_smart_shrinking: true,
       page_size: 'A4',
       print_media_type: true,
@@ -248,9 +248,9 @@ module PdfHelper
   end
   def render_labels_glasscuttings(name, glasscuttings)
     return "" if glasscuttings.blank?
-  labels = glasscuttings.map do |glass|
-  content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
-        [
+    labels = glasscuttings.map do |glass|
+    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
+          [
           content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
             [
               content_tag(:div, name.upcase, style: "font-weight: bold; font-size: 15px; color: #333;"),
@@ -276,8 +276,8 @@ module PdfHelper
 
   def render_labels_dvh(name, dvhs)
     return "" if dvhs.blank?
-  labels = dvhs.map do |dvh|
-  content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
+    labels = dvhs.map do |dvh|
+    content_tag :div, style: "width: 72mm; height: 50mm; display: inline-block; vertical-align: top; margin: 1%; box-sizing: border-box; background: #fff; text-align: left;" do
         [
           content_tag(:div, style: "display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;") do
             [
