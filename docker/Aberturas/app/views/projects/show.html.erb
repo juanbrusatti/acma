@@ -149,7 +149,7 @@
         </div>
       </div>
 
-      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div class="mt-6 mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <div class="flex items-start">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -159,9 +159,29 @@
           </p>
         </div>
       </div>
+
+    <div class="space-y-4">
+      <!-- Checkbox FLO<->LAM -->
+        <p class="text-gray-600 mb-6">Tratamiento diferencial:</p>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="flo-lam-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="flo-lam-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Considerar transformación FLO por LAM
+            </label>
+            <p class="text-sm text-gray-500">Tratar a las piezas FLO 5mm INC, de aberturas de Aluminio, menores a 1800x500, como piezas LAM 3+3 INC</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Footer -->
+    <!-- Modal footer -->
     <div class="flex gap-3 p-6 border-t border-gray-200">
       <button
         id="cancel-optimize-btn"
@@ -172,6 +192,7 @@
       <%= form_with url: optimize_project_path(@project), method: :post, id: "optimize-form", class: "flex-1", data: { turbo: false } do |f| %>
         <input type="hidden" name="stock" id="optimize-stock-input" value="false">
         <input type="hidden" name="scraps" id="optimize-scraps-input" value="false">
+        <input type="hidden" name="flo_lam" id="flo-lam-input" value="false">
         <button
           type="submit"
           class="w-full inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 transition-colors"

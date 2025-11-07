@@ -92,6 +92,8 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                 color = 'lightcoral'              # Sobrante inútil (pequeño)
             elif piece.get('Is_Waste', False):
                 color = 'grey'             # Sobrante útil (reutilizable)
+            elif piece.get('Is_Transformed', False):
+                color = 'orange'           # Pieza transformada (LAM 3+3 INC)
             else:
                 color = 'lightblue'        # Pieza real del pedido
             # color = 'grey' if piece.get('Is_Waste', False) else 'red' if piece.get('Is_Unused', False) else 'lightblue'
@@ -103,7 +105,11 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
             # Calcular si hay espacio suficiente para mostrar dimensiones
             # Usar un porcentaje del tamaño total de la plancha
-            min_percentage = 0.05  # 8% del tamaño de la plancha
+            if bin_width > bin_height:
+                min_percentage = 0.08  # % del tamaño de la plancha
+            else: 
+                min_percentage = 0.05
+
             min_w = bin_width * min_percentage
             min_h = bin_height * min_percentage
             show_dims = (w >= min_w and h >= min_h)
@@ -113,6 +119,9 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                 if show_dims:
                     ax.text(sx + sw/2, sy + sh/2, piece.get('Piece_ID', ''),
                         ha='center', va='center', fontsize=8, color='black', weight='bold')
+                    if piece.get('Is_Transformed'):
+                        ax.text(sx + sw/2, sy + sh/2 - 0.18, 'FLO',
+                        ha='center', va='center', fontsize=7, color='black')
                     ax.text(sx + sw/2, sy + sh - 0.08, f"{w:.0f}",
                             ha='center', va='top', fontsize=8, weight='light')
                     ax.text(sx + 0.08, sy + sh/2, f"{h:.0f}",
@@ -126,7 +135,8 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                     resumen.append({
                         "virtual_id": virtual_id,
                         "piece_id": piece.get('Piece_ID', ''),
-                        "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)"
+                        "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)",
+                        "is_transformed": piece.get('Is_Transformed')
                     })
 
             else:
@@ -209,6 +219,8 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                     
                     if r["piece_id"] == "Sobrante":
                         text = f"• {r['virtual_id']}: Sobrante, {r['dims']}"
+                    elif r['is_transformed']:
+                        text = f"• {r['virtual_id']}: {r['piece_id']} (FLO), {r['dims']}"
                     else:
                         text = f"• {r['virtual_id']}: {r['piece_id']}, {r['dims']}"
                     

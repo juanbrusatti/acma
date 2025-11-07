@@ -12,8 +12,6 @@ import sys
 import random
 import shutil
 
-pieces_flo = []
-
 # funcion para parsear args
 def parse_args():
     """
@@ -258,11 +256,11 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
             )
         
         # Mostrar métricas de cada variante prometedora
-        if placed_count > 0:
-            print(f"  [{algo.__name__}/{sort_used}/{bin_algo}] "
-                  f"Planchas:{len(bins_used)}, Piezas:{placed_count}, Waste:{waste:.0f}, "
-                  f"AvgSobrante:{avg_usable_size:.0f}, Inútiles:{unusable_count}, "
-                  f"Score:{score:.0f}")
+        #if placed_count > 0:
+        #    print(f"  [{algo.__name__}/{sort_used}/{bin_algo}] "
+        #          f"Planchas:{len(bins_used)}, Piezas:{placed_count}, Waste:{waste:.0f}, "
+        #          f"AvgSobrante:{avg_usable_size:.0f}, Inútiles:{unusable_count}, "
+        #          f"Score:{score:.0f}")
 
         if best_score is None or score > best_score:
             best_score = score
@@ -412,7 +410,7 @@ def run_optimizer(input_data, stock_data):
         bins_used = []
         unpacked_final_list, bins_used = pack_plates(
             scraps_as_plates, bin_details_map, rects_all, final_cutting_plan,
-            original_piece_dimensions, unfitted_counts, 'Leftover', f'ETAPA1_{order_name}'
+            original_piece_dimensions, unfitted_counts, 'Leftover', f'ETAPA1_{order_name}', pieces_to_cut=pieces_to_cut
         )
         # Obtener score de la heurística elegida
         score = None
@@ -448,7 +446,7 @@ def run_optimizer(input_data, stock_data):
         unfitted_counts = Counter([r[2] for r in rects_unfitted])
         unpacked_final_list, bins_used = pack_plates(
             glassplates, bin_details_map, rects_unfitted, final_cutting_plan, 
-            original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2'
+            original_piece_dimensions, unfitted_counts, 'New', 'ETAPA2', pieces_to_cut=pieces_to_cut
         )
 
         id_stock_used_aux = get_plate_and_scrap_ids_from_bin_details(bins_used)
@@ -457,29 +455,6 @@ def run_optimizer(input_data, stock_data):
 
         # ETAPA 3: Planchas de proveedor 3600x2500
         count = 0        
-
-        # guardamos en una estructura de datos global los cortes FLO 5mm INC que no entraron en ETAPA 2 y cumplan con type_opening == "Aluminio" y menor a 1800x500 (500x1800)
-
-        if pieces_to_cut[0].get('glass_type') == 'FLO' and pieces_to_cut[0].get('thickness') == '5mm' and pieces_to_cut[0].get('color') == 'INC':
-            for cut in unpacked_final_list:
-                # Buscar la pieza original en pieces_to_cut para obtener type_opening
-                original_piece = next((p for p in pieces_to_cut if p['id'] == cut['id']), None)
-                if original_piece and original_piece.get('type_opening') == 'Aluminio':
-                    w, h = original_piece_dimensions[cut['id']]
-                    if (w <= 1800 and h <= 500) or (w <= 500 and h <= 1800):
-                        global pieces_flo
-                        pieces_flo.append({
-                            'id': cut['id'],
-                            'width': w,
-                            'height': h,
-                            'quantity': cut['quantity_unpacked'],
-                            'type_opening': original_piece.get('type_opening'),
-                            'glass_type': original_piece.get('glass_type'),
-                            'thickness': original_piece.get('thickness'),
-                            'color': original_piece.get('color')
-                        })
-
-
         while unpacked_final_list:
             print(f"\nQuedaron {len(unpacked_final_list)} piezas sin colocar. Intentando en plancha nueva 3600x2500...")
 
@@ -522,7 +497,7 @@ def run_optimizer(input_data, stock_data):
             unfitted_counts = Counter([r[2] for r in rects_unfitted_final])
             unpacked_final_list, bins_used = pack_plates(
                 [plate], bin_details_map, rects_unfitted_final, final_cutting_plan, 
-                original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}'
+                original_piece_dimensions, unfitted_counts, 'New', f'ETAPA3_{count}', pieces_to_cut=pieces_to_cut
             )
     else:
         print("\n✅ ¡Todas las piezas cupieron en las placas de sobrante!")
@@ -541,12 +516,10 @@ def get_plate_and_scrap_ids_from_bin_details(bins_used):
             if len(parts) >= 3:
                 plate_ids.append(parts[1])
         elif plate_id.startswith("Sobrante_"):
-            print(f"DEBUG: Found leftover plate_id: {plate_id}")
             # Extraer el id del sobrante
             parts = plate_id.split("_")
             if len(parts) >= 2:
                 scrap_ids.append(parts[1])
-    print(f"DEBUG: Used scrap IDs: {scrap_ids}")
     return {"deleted_stock": plate_ids, "deleted_scrap": scrap_ids}
 
 # method to get usable waste pieces
@@ -567,7 +540,7 @@ def build_new_scraps_dict(final_cutting_plan):
         }
     return {"new_scraps": new_scraps}
 
-def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, plate_type='New', etapa_name='ETAPA'):
+def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, original_piece_dimensions, unfitted_counts, plate_type='New', etapa_name='ETAPA', pieces_to_cut=None):
 
     bins_to_add = []
     bins_used = []
@@ -617,14 +590,14 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
     if res and res['best_result']:
         algo, sort, bin_algo = res['heuristic']
         placed_count, placed_area, bin_area_used, bins_used, waste = res['metrics']
-        print(f"[{etapa_name}] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
-        print(f"[{etapa_name}] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
+        #print(f"[{etapa_name}] Mejor heurística: Algoritmo - {algo.__name__}, Ordenamiento - {sort}, BinAlgo: {bin_algo}.")
+        #print(f"[{etapa_name}] Colocadas: {placed_count}, Área colocada: {placed_area}, Área bins usados: {bin_area_used}, Desperdicio: {waste}")
         
         # Mostrar métricas de calidad
         if 'quality_metrics' in res:
             qm = res['quality_metrics']
-            print(f"[{etapa_name}] 📊 Calidad: Sobrantes útiles área={qm['usable_waste_area']:.0f}, "
-                  f"Avg={qm['avg_usable_size']:.0f}, Inútiles={qm['unusable_count']}, Score={qm['score']:.0f}")
+            #print(f"[{etapa_name}] 📊 Calidad: Sobrantes útiles área={qm['usable_waste_area']:.0f}, "
+            #      f"Avg={qm['avg_usable_size']:.0f}, Inútiles={qm['unusable_count']}, Score={qm['score']:.0f}")
 
         best_packer = res['best_packer']
         for rect in res['best_result']:
@@ -632,12 +605,22 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             bid = str(best_packer[b_idx].bid)
             original_w, original_h = original_piece_dimensions[rid]
             is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
+            
+            is_transformed = False
+            if plate['glass_type'] == 'LAM' and plate['thickness'] == '3+3' and plate['color'] == 'INC':
+                pieza = next(
+                    (p for p in pieces_to_cut
+                    if p['id'] == rid and p['type_opening'] == 'Aluminio' and (p['width'] == original_w and p['height'] == original_h or p['width'] == original_h and p['height'] == original_w)
+                    ),
+                    None
+                )                
+                if pieza and pieza.get('is_transformed'):
+                    is_transformed = True
 
             final_cutting_plan.append({
                 'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
                 'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False,
-                'Is_Unused': False
-
+                'Is_Unused': False, 'Is_Transformed': is_transformed,
             })
 
         # Agregar los free rects (sobrantes) al plan de corte
@@ -657,7 +640,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'glass_type': bin_details_map[bid].get('glass_type'),
                 'Is_Rotated': False,
                 'Is_Waste': True,
-                'Is_Unused': False # Es un sobrante utilizable
+                'Is_Unused': False, # Es un sobrante utilizable
+                'Is_Transformed': False
             })
         
         for i, (bid, fx, fy, fw, fh) in enumerate(best_unused_rects):
@@ -671,7 +655,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
                 'Packed_Height': fh,
                 'Is_Rotated': False,
                 'Is_Waste': True,
-                'Is_Unused': True # Es un sobrante inutilizable
+                'Is_Unused': True, # Es un sobrante inutilizable
+                'Is_Transformed': False
             })
         
         print(f"[{etapa_name}] Sobrantes agregados al plan: {len(best_free_rects)}")
@@ -773,13 +758,6 @@ if __name__ == "__main__":
     }
 
     print(json.dumps(result))
-    if len(pieces_flo) > 0:
-        print("\n⚠️ Piezas FLO 5mm INC que no entraron en el plan de corte y cumplen con type_opening == 'Aluminio' y dimensiones menores a 1800x500 (500x1800):")
-        for pf in pieces_flo:
-            print(f" - ID: {pf['id']}, Dimensiones: {pf['width']}x{pf['height']}, Cantidad: {pf['quantity']}")
-
-    
-
     if final_plan:
         # Asegurar que existan los directorios de salida
         try:

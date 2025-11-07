@@ -192,7 +192,7 @@ class ProjectsController < ApplicationController
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
 
-    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps])
+    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps], flo_lam_flag = params[:flo_lam])
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
     redirect_to confirm_optimization_project_path(@project)
@@ -274,7 +274,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def create_microservice_params(stock_flag = false, scraps_flag = false)
+  def create_microservice_params(stock_flag = false, scraps_flag = false, flo_lam_flag = false)
     pieces_to_cut = []
     glasscuttings = @project.glasscuttings
     dvhs = @project.dvhs
@@ -282,43 +282,80 @@ class ProjectsController < ApplicationController
     # Convertir string params a boolean si es necesario
     stock_flag = stock_flag.to_s == 'true' || stock_flag == true
     scraps_flag = scraps_flag.to_s == 'true' || scraps_flag == true
+    flo_lam_flag = flo_lam_flag.to_s == 'true' || flo_lam_flag == true
 
+    # Analizo los glasscuting
     pieces_to_cut += glasscuttings.map do |cut|
+      final_glass_type = cut.glass_type
+      final_thickness = cut.thickness
+
+      # Si la flag está activada y cumple las condiciones, convertir a LAM 3+3
+      if flo_lam_flag && cut.glass_type == "FLO" && cut.thickness == "5mm" && cut.color == "INC" && cut.type_opening == "Aluminio"
+        if (cut.width < 500 && cut.height < 1800) || (cut.width < 1800 && cut.height < 500)
+          final_glass_type = "LAM"
+          final_thickness = "3+3"
+        end
+      end
+
+      # Crear el piece con los valores finales
       {
         id: cut.typology,
         width: cut.width,
         height: cut.height,
         quantity: 1,
         color: cut.color,
-        glass_type: cut.glass_type,
-        thickness: cut.thickness,
-        type_opening: cut.type_opening
+        glass_type: final_glass_type,
+        thickness: final_thickness,
+        type_opening: cut.type_opening,
+        is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness)
       }
     end
 
     pieces_to_cut += dvhs.flat_map do |dvh|
+      # Analizo el primer vidrio
+      glass1_type = dvh.glasscutting1_type
+      glass1_thickness = dvh.glasscutting1_thickness
+
+      if flo_lam_flag && dvh.glasscutting1_type == "FLO" && dvh.glasscutting1_thickness == "5mm" && dvh.glasscutting1_color == "INC" && dvh.type_opening == "Aluminio"
+        if (dvh.width < 500 && dvh.height < 1800) || (dvh.width < 1800 && dvh.height < 500)
+          glass1_type = "LAM"
+          glass1_thickness = "3+3"
+        end
+      end
+
+      glass2_type = dvh.glasscutting2_type
+      glass2_thickness = dvh.glasscutting2_thickness
+
+      if flo_lam_flag && dvh.glasscutting2_type == "FLO" && dvh.glasscutting2_thickness == "5mm" && dvh.glasscutting2_color == "INC" && dvh.type_opening == "Aluminio"
+        if (dvh.width < 500 && dvh.height < 1800) || (dvh.width < 1800 && dvh.height < 500)
+          glass2_type = "LAM"
+          glass2_thickness = "3+3"
+        end
+      end
+
+      # Creo los dos DVh
       [
         {
           id: dvh.typology,
           width: dvh.width,
           height: dvh.height,
           quantity: 1,
-          # For DVHs, we send details of the first glasscutting
           color: dvh.glasscutting1_color,
-          glass_type: dvh.glasscutting1_type,
-          thickness: dvh.glasscutting1_thickness,
-          type_opening: dvh.type_opening
+          glass_type: glass1_type,
+          thickness: glass1_thickness,
+          type_opening: dvh.type_opening,
+          is_transformed: (glass1_type != dvh.glasscutting1_type || glass1_thickness != dvh.glasscutting1_thickness)
         },
         {
           id: dvh.typology,
           width: dvh.width,
           height: dvh.height,
           quantity: 1,
-          # For DVHs, we send details of the second glasscutting
           color: dvh.glasscutting2_color,
-          glass_type: dvh.glasscutting2_type,
-          thickness: dvh.glasscutting2_thickness,
-          type_opening: dvh.type_opening
+          glass_type: glass2_type,
+          thickness: glass2_thickness,
+          type_opening: dvh.type_opening,
+          is_transformed: (glass2_type != dvh.glasscutting2_type || glass2_thickness != dvh.glasscutting2_thickness)
         }
       ]
     end
