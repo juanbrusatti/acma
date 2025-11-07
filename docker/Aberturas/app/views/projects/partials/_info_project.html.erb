@@ -19,12 +19,10 @@
 
   </div>
   <% if @project.persisted? %>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 space-y-6 md:grid-cols-2 gap-3">
         <%= f.hidden_field :price, id: "hidden-project-price" %>
         <%= f.hidden_field :price_without_iva, id: "hidden-project-price-without-iva" %>
         <%= f.submit "Guardar como presupuesto", class: "w-full bg-black text-white font-medium rounded-lg py-2 text-sm hover:opacity-90 transition" %>
-        <%= button_tag "Optimizar", type: "button", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>
-        <%= button_tag "Guardar PDF", type: "button", id: "preview-pdf-btn", class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm hover:bg-gray-50 transition" %>
         <%= link_to "Volver a proyectos", projects_path, class: "w-full border border-gray-300 font-medium rounded-lg py-2 text-sm text-center hover:bg-gray-50 transition" %>
       </div>
     <% else %>

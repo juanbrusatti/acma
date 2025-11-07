@@ -246,7 +246,7 @@ export function handleGlasscuttingEvents(e) {
     const type_openingSelect = editContainer.querySelector('select[name="project[glasscuttings_attributes][][type_opening]"]');
 
     const newValues = {
-      typology: typologyHidden ? typologyHidden.value : '',
+      typology: typologyHidden.value,
       glass_type: typeSelect ? typeSelect.value : '',
       thickness: thicknessSelect ? thicknessSelect.value : '',
       color: colorSelect ? colorSelect.value : '',
@@ -254,6 +254,26 @@ export function handleGlasscuttingEvents(e) {
       width: widthInput ? widthInput.value : '',
       type_opening: type_openingSelect ? type_openingSelect.value : ''
     };
+
+    const requiredFields = [
+      { key: 'typology', label: 'Tipología' },
+      { key: 'glass_type', label: 'Tipo' },
+      { key: 'thickness', label: 'Grosor' },
+      { key: 'color', label: 'Color' },
+      { key: 'height', label: 'Alto' },
+      { key: 'width', label: 'Ancho' },
+      { key: 'type_opening', label: 'Tipo de apertura' }
+    ];
+    
+    const missingField = requireFields(newValues, requiredFields);
+    if (missingField) {
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
+      return;
+    }
 
     // Recalculate price
     const price_m2 = getGlassPriceM2(newValues.glass_type, newValues.thickness, newValues.color);

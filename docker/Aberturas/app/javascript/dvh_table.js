@@ -313,6 +313,43 @@ export function handleDvhEvents(e) {
     const glass2Thickness = (editContainer.querySelector('.glasscutting2-thickness-select') || {}).value || '';
     const glass2Color = (editContainer.querySelector('.glasscutting2-color-select') || {}).value || '';
 
+    const values = {
+      typology,
+      innertube,
+      height,
+      width,
+      glasscutting1_type: glass1Type,
+      glasscutting1_thickness: glass1Thickness,
+      glasscutting1_color: glass1Color,
+      glasscutting2_type: glass2Type,
+      glasscutting2_thickness: glass2Thickness,
+      glasscutting2_color: glass2Color,
+      type_opening
+    };
+
+    const requiredFields = [
+      { key: 'typology', label: 'Tipología' },
+      { key: 'innertube', label: 'Cámara' },
+      { key: 'height', label: 'Alto' },
+      { key: 'width', label: 'Ancho' },
+      { key: 'glasscutting1_type', label: 'Tipo del cristal 1' },
+      { key: 'glasscutting1_thickness', label: 'Grosor del cristal 1' },
+      { key: 'glasscutting1_color', label: 'Color del cristal 1' },
+      { key: 'glasscutting2_type', label: 'Tipo del cristal 2' },
+      { key: 'glasscutting2_thickness', label: 'Grosor del cristal 2' },
+      { key: 'glasscutting2_color', label: 'Color del cristal 2' },
+      { key: 'type_opening', label: 'Tipo de apertura' }
+    ];
+    const missingField = requireFields(values, requiredFields);
+    if (missingField) {
+      const swalConfig = window.getSwalConfig();
+      window.Swal.fire({
+        ...swalConfig,
+        title: 'Falta rellenar: ' + missingField.label
+      });
+      return;
+    }
+
     // Calculate new price
     const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
     const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');

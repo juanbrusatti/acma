@@ -82,10 +82,12 @@
   <% end %>
 
   <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-between" id="project-actions-view">
-    <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
-    <button id="open-optimize-modal" class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
-      Optimizar Corte
-    </button>
+    <% if !@project.date_of_optimization.present? %>
+      <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
+      <button id="open-optimize-modal" class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
+        Optimizar Corte
+      </button>
+    <% end %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
   <div class="mt-8 flex flex-col sm:flex-row gap-4" id="project-actions-edit" style="display:none;">

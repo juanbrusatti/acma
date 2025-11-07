@@ -128,7 +128,7 @@ class ProjectsController < ApplicationController
       Rails.logger.info "Datos recibidos: glasscuttings=#{data['glasscuttings_attributes']&.count || 0}, dvhs=#{data['dvhs_attributes']&.count || 0}"
 
       # Asegurar valores por defecto para campos obligatorios
-      data['name'] ||= 'Proyecto Sin Nombre'
+      data['name'] ||= 'Proyecto sin nombre'
       data['description'] ||= ''
       data['phone'] ||= ''
       data['address'] ||= ''
@@ -199,7 +199,7 @@ class ProjectsController < ApplicationController
   end
 
   # View to confirm optimization results
-  def confirm_optimization  
+  def confirm_optimization
     @project = Project.find(params[:id])
     # Pull optimization data from session
     @optimization_data = session[:optimization_data]
@@ -232,14 +232,14 @@ class ProjectsController < ApplicationController
     delete_used_scraps(used_scraps) if used_scraps.any?
     delete_used_stock(used_stock) if used_stock.any?
 
-    @project.update(date_of_optimization: Date.today)
+    @project.update(date_of_optimization: Date.today, status: "Terminado")
 
     # Clean up session data
     session.delete(:optimization_data)
     zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
     File.delete(zip_path) if File.exist?(zip_path)
 
-    redirect_to project_path(@project), notice: "Optimización aceptada y stock actualizado!!"
+    redirect_to projects_path, notice: "Optimización aceptada y stock actualizado!!"
   end
 
   # Cancel optimization process
@@ -256,9 +256,9 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
 
-    send_file zip_path, 
-              type: "application/zip", 
-              disposition: "attachment", 
+    send_file zip_path,
+              type: "application/zip",
+              disposition: "attachment",
               filename: "optimizacion_proyecto_#{@project.id}.zip"
   end
 
@@ -271,7 +271,7 @@ class ProjectsController < ApplicationController
           file_path = File.join(optimizations_dir, f)
           File.delete(file_path) if File.file?(file_path)
         end
-    end 
+    end
   end
 
   def create_microservice_params(stock_flag = false, scraps_flag = false)
@@ -418,7 +418,7 @@ class ProjectsController < ApplicationController
 
       # Guardar los datos de optimización en la sesión
       session[:optimization_data] = @optimizer_summary
-      
+
       return
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
