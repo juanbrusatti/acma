@@ -44,7 +44,9 @@
   </tbody>
 </table>
 
-<%= render_plates_table(@project.glasscuttings, @project.dvhs)%>
+<% if @project.status == "Finalizado" %>
+  <%= render_plates_table(@project.glasscuttings, @project.dvhs)%>
+<% end %>
 
 <%= render_labels_glasscuttings(@project.name, @project.glasscuttings)%>
 <%= render_labels_dvh(@project.name, @project.dvhs)%>
