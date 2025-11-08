@@ -56,13 +56,6 @@ async def run_optimize(request: Request):
             global_result["deleted_stock"].extend(optimizer_result.get("deleted_stock", []))
             global_result["deleted_scrap"].extend(optimizer_result.get("deleted_scrap", []))
 
-        # Esto es solo para verificar, hay que sacarlo después
-        with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr(
-                "result.json",
-                json.dumps(global_result, indent=2, ensure_ascii=False)
-            )
-
         # Build multipart/mixed response with JSON and ZIP as separate parts
         zip_buffer.seek(0)
         zip_bytes = zip_buffer.getvalue()
@@ -216,9 +209,6 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
                     full_path = os.path.join(root, file)
                     arcname = os.path.relpath(full_path, OUTPUT_VISUALS_DIR)
                     zf.write(full_path, arcname=arcname)
-
-        if os.path.exists(OUTPUT_CSV):
-            zf.write(OUTPUT_CSV, arcname="cutting_plan.csv")
 
     # Retornamos solo el resultado JSON
     return optimizer_result
