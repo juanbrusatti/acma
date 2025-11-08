@@ -268,7 +268,17 @@ module PdfHelper
     html = "<div style=\"page-break-before: always;\"></div>"
     total_pages = (labels.size / 4.0).ceil
     labels.each_slice(4).with_index do |group, idx|
-      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%; text-align: center;")
+      # Si hay menos de 4 etiquetas, agregamos "espacios vacíos" invisibles
+      while group.size < 4
+        group << content_tag(:div, '', style: "width: 72mm; height: 50mm; display: inline-block; margin: 1%; visibility: hidden;")
+      end
+
+      html << content_tag(
+        :div,
+        group.join.html_safe,
+        style: "page-break-inside: avoid; width: 100%; text-align: center;"
+      )
+
       html << '<div style="page-break-after: always;"></div>' unless idx == (total_pages - 1)
     end
     html.html_safe
@@ -296,7 +306,17 @@ module PdfHelper
     html = "<div style=\"page-break-before: always;\"></div>"
     total_pages = (labels.size / 4.0).ceil
     labels.each_slice(4).with_index do |group, idx|
-      html << content_tag(:div, group.join.html_safe, style: "page-break-inside: avoid; width: 100%; text-align: center;")
+      # Si hay menos de 4 etiquetas, agregamos "espacios vacíos" invisibles
+      while group.size < 4
+        group << content_tag(:div, '', style: "width: 72mm; height: 50mm; display: inline-block; margin: 1%; visibility: hidden;")
+      end
+
+      html << content_tag(
+        :div,
+        group.join.html_safe,
+        style: "page-break-inside: avoid; width: 100%; text-align: center;"
+      )
+
       html << '<div style="page-break-after: always;"></div>' unless idx == (total_pages - 1)
     end
     html.html_safe
