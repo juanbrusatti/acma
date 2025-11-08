@@ -209,9 +209,9 @@ module PdfHelper
         precio_total = precio_unitario * cantidad
         row_values = [
           attrs[0].present? ? attrs[0] : '-',
-          attrs[1].present? ? human_glass_type(attrs[1]) : '-',
+          attrs[1].present? ? attrs[1] : '-',
           attrs[2].present? ? attrs[2] : '-',
-          attrs[3].present? ? human_glass_color(attrs[3]) : '-',
+          attrs[3].present? ? attrs[3] : '-',
           attrs[4].present? ? attrs[4] : '-',
           attrs[5].present? ? attrs[5] : '-',
           cantidad,
@@ -300,6 +300,80 @@ module PdfHelper
       html << '<div style="page-break-after: always;"></div>' unless idx == (total_pages - 1)
     end
     html.html_safe
+  end
+
+  def render_plates_table(glasscuttings, dvhs)
+    styles = table_styles
+    # Encabezado personalizado
+    thead = content_tag(:thead) do
+      content_tag(:tr, style: styles[:header]) do
+        %w[Clase Cardinal Tipo Color Grosor Ancho Alto Origen].map do |header|
+          content_tag(:th, header, style: styles[:header_cell])
+        end.join.html_safe
+      end
+    end
+
+    # Filas de glasscuttings (simples)
+    simple_rows = glasscuttings.map do |glass|
+      row_values = [
+        'Simple',
+        '1/1',
+        glass.glass_type.present? ? glass.glass_type : '-',
+        glass.color.present? ? glass.color : '-',
+        glass.thickness.present? ? glass.thickness : '-',
+        glass.width.present? ? glass.width : '-',
+        glass.height.present? ? glass.height : '-',
+        glass.respond_to?(:origin) ? glass.origin : '-'
+      ]
+      content_tag :tr, style: "background: #{glasscuttings.index(glass).even? ? styles[:row_even] : styles[:row_odd]};" do
+        row_values.map { |cell| content_tag(:td, cell, style: styles[:cell]) }.join.html_safe
+      end
+    end
+
+    # Filas de dvhs (cada DVH se descompone en dos placas)
+    dvh_rows = dvhs.flat_map.with_index do |dvh, idx|
+      [
+        # Primer placa
+        [
+          'DVH',
+          '1/2',
+          dvh.glasscutting1_type.present? ? dvh.glasscutting1_type : '-',
+          dvh.glasscutting1_color.present? ? dvh.glasscutting1_color : '-',
+          dvh.glasscutting1_thickness.present? ? dvh.glasscutting1_thickness : '-',
+          dvh.width.present? ? dvh.width : '-',
+          dvh.height.present? ? dvh.height : '-',
+          dvh.respond_to?(:origin) ? dvh.origin : '-'
+        ],
+        # Segunda placa
+        [
+          'DVH',
+          '2/2',
+          dvh.glasscutting2_type.present? ? dvh.glasscutting2_type : '-',
+          dvh.glasscutting2_color.present? ? dvh.glasscutting2_color : '-',
+          dvh.glasscutting2_thickness.present? ? dvh.glasscutting2_thickness : '-',
+          dvh.width.present? ? dvh.width : '-',
+          dvh.height.present? ? dvh.height : '-',
+          dvh.respond_to?(:origin) ? dvh.origin : '-'
+        ]
+      ].map.with_index do |row_values, i|
+        content_tag :tr, style: "background: #{(idx * 2 + i).even? ? styles[:row_even] : styles[:row_odd]};" do
+          row_values.map { |cell| content_tag(:td, cell, style: styles[:cell]) }.join.html_safe
+        end
+      end
+    end
+
+    tbody = content_tag(:tbody) do
+      (simple_rows + dvh_rows).join.html_safe
+    end
+
+    title = content_tag(:h2, "Vidrios del proyecto", style: "text-align: center; margin-top: 40px; margin-bottom: 20px; font-size: 18px; color: #333;")
+    table_html = content_tag(:table, thead.concat(tbody).html_safe, border: "0", cellspacing: "0", cellpadding: "0", style: styles[:table])
+    (
+      '<div style="page-break-before: always;"></div>' +
+      title +
+      table_html +
+      '<div style="page-break-after: always;"></div>'
+    ).html_safe
   end
 
 end
