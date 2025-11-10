@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     member do
       get :pdf
       post :optimize
+      post :refresh_glass_prices
       get :confirm_optimization
       post :accept_optimize
       get :cancel_optimize

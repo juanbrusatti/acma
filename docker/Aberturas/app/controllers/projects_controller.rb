@@ -262,6 +262,73 @@ class ProjectsController < ApplicationController
               filename: "optimizacion_proyecto_#{@project.id}.zip"
   end
 
+  # POST /projects/:id/refresh_glass_prices
+  # Recalcula los precios de los vidrios del proyecto usando los valores actuales en GlassPrice
+  # Sólo actualiza la cotización si hay cambios en los precios de los vidrios (no toca insumos)
+  def refresh_glass_prices
+    @project = Project.find(params[:id])
+
+    updated_items = 0
+    errors = []
+
+    # Actualizar glasscuttings individuales
+    @project.glasscuttings.find_each do |cut|
+      begin
+        price_record = GlassPrice.find_by(glass_type: cut.glass_type, thickness: cut.thickness, color: cut.color)
+        next if price_record.nil? || price_record.selling_price.blank?
+
+        area_m2 = (cut.height.to_f / 1000.0) * (cut.width.to_f / 1000.0)
+        new_price = (area_m2 * price_record.selling_price).round(2)
+
+        if cut.price.to_f.round(2) != new_price
+          cut.update(price: new_price)
+          updated_items += 1
+        end
+      rescue => e
+        Rails.logger.error "Error updating glasscutting price (id=#{cut.id}): #{e.message}"
+        errors << "Glasscutting #{cut.id}: #{e.message}"
+      end
+    end
+
+    # Actualizar DVHs (cada DVH incluye dos vidrios)
+    @project.dvhs.find_each do |dvh|
+      begin
+        area_m2 = (dvh.height.to_f / 1000.0) * (dvh.width.to_f / 1000.0)
+
+        price1 = GlassPrice.find_by(glass_type: dvh.glasscutting1_type, thickness: dvh.glasscutting1_thickness, color: dvh.glasscutting1_color)&.selling_price || 0.0
+        price2 = GlassPrice.find_by(glass_type: dvh.glasscutting2_type, thickness: dvh.glasscutting2_thickness, color: dvh.glasscutting2_color)&.selling_price || 0.0
+
+        innertube_total_price = AppConfig.calculate_innertube_total_price(dvh.innertube, 2 * ((dvh.height.to_f / 1000.0) + (dvh.width.to_f / 1000.0)))
+
+        new_price = (area_m2 * (price1 + price2) + innertube_total_price).round(2)
+
+        if dvh.price.to_f.round(2) != new_price
+          dvh.update(price: new_price)
+          updated_items += 1
+        end
+      rescue => e
+        Rails.logger.error "Error updating dvh price (id=#{dvh.id}): #{e.message}"
+        errors << "DVH #{dvh.id}: #{e.message}"
+      end
+    end
+
+    # Si hubo cambios en los precios de vidrios, actualizar la cotización del proyecto
+    if updated_items > 0
+      # Recalcular subtotal como suma de vidrios + dvhs guardados ahora
+      new_subtotal = @project.glasscuttings.sum("COALESCE(price,0)") + @project.dvhs.sum("COALESCE(price,0)")
+      @project.update(price_without_iva: new_subtotal)
+      notice = "Se actualizaron #{updated_items} ítems de vidrio y la cotización fue recalculada."
+    else
+      notice = "No se detectaron cambios en los precios de los vidrios."
+    end
+
+    if errors.any?
+      redirect_to project_path(@project), alert: "Algunas líneas no pudieron actualizarse: #{errors.join('; ')}"
+    else
+      redirect_to project_path(@project), notice: notice
+    end
+  end
+
   private
 
   def clean_optimizations_dir(optimizations_dir)
