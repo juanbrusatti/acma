@@ -184,6 +184,34 @@
               Considerar transformación FLO por LAM
             </label>
             <p class="text-sm text-gray-500">Tratar a las piezas FLO 5mm INC, de aberturas de Aluminio, menores a 1800x500, como piezas LAM 3+3 INC</p>
+
+            <% convertible = @project.convertible_pieces %>
+            <% if convertible.any? %>
+              <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                <p class="text-sm font-semibold text-yellow-800 mb-1">
+                  Piezas que se convertirán (<%= convertible.count %>):
+                </p>
+                <ul class="text-xs text-yellow-700 space-y-1">
+                  <% convertible.each do |piece| %>
+                    <li>
+                      <% if piece[:type] == 'glasscutting' %>
+                        • Vidrio <%= piece[:typology] %>: <%= piece[:width].to_i %>x<%= piece[:height].to_i %>mm - <%= piece[:glass_type] %> <%= piece[:thickness] %> <%= piece[:color] %>
+                      <% else %>
+                        • DVH <%= piece[:typology] %>: <%= piece[:width].to_i %>x<%= piece[:height].to_i %>mm
+                        <% if piece[:glass1_convertible] %>
+                          → Vidrio 1: <%= piece[:glass1_type] %> <%= piece[:glass1_thickness] %> <%= piece[:glass1_color] %>
+                        <% end %>
+                        <% if piece[:glass2_convertible] %>
+                          → Vidrio 2: <%= piece[:glass2_type] %> <%= piece[:glass2_thickness] %> <%= piece[:glass2_color] %>
+                        <% end %>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+            <% else %>
+              <p class="text-xs text-gray-400 mt-1">No hay piezas convertibles en este proyecto</p>
+            <% end %>
           </div>
         </div>
       </div>
