@@ -46,7 +46,8 @@ async def run_optimize(request: Request):
         global_result = {
             "new_scraps": {},
             "deleted_stock": [],
-            "deleted_scrap": []
+            "deleted_scrap": [],
+            "final_pieces": []
         }
         for pieces_to_cut, stock in optimization_inputs:
             optimizer_result = optimize(pieces_to_cut, stock, zip_buffer)
@@ -55,6 +56,8 @@ async def run_optimize(request: Request):
             global_result["new_scraps"].update(optimizer_result.get("new_scraps", {}))
             global_result["deleted_stock"].extend(optimizer_result.get("deleted_stock", []))
             global_result["deleted_scrap"].extend(optimizer_result.get("deleted_scrap", []))
+            global_result["final_pieces"].extend(optimizer_result.get("final_pieces", []))
+
 
         # Build multipart/mixed response with JSON and ZIP as separate parts
         zip_buffer.seek(0)

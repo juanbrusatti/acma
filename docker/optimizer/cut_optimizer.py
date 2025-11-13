@@ -363,7 +363,7 @@ def run_optimizer(input_data, stock_data):
     scraps_to_create = {}
 
     # Para cada una de las piezas guardamos sus dimensiones originales
-    original_piece_dimensions = {p['id']: (p['width'], p['height']) for p in pieces_to_cut}
+    original_piece_dimensions = {p['id']: (p['width'], p['height'], p['typology'], p['class_cut']) for p in pieces_to_cut}
     # Esto se usa para calcular metricas
     total_piece_area = sum(p['width'] * p['height'] * p['quantity'] for p in pieces_to_cut)
 
@@ -437,7 +437,7 @@ def run_optimizer(input_data, stock_data):
             # Por cada pieza no empacada se queda con el id, luego busca ese id en original_piece_dimensions para obtener sus dimensiones
             rid = item['id']
             quantity = item['quantity_unpacked']
-            original_w, original_h = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut = original_piece_dimensions[rid]
             # Si tenemos 10 piezas V5 va a agregar las 10
             for _ in range(quantity):
                 rects_unfitted.append((original_w, original_h, rid))
@@ -463,7 +463,7 @@ def run_optimizer(input_data, stock_data):
             for item in unpacked_final_list:
                 rid = item['id']
                 quantity = item['quantity_unpacked']
-                original_w, original_h = original_piece_dimensions[rid]
+                original_w, original_h, typology, class_cut = original_piece_dimensions[rid]
                 for _ in range(quantity):
                     rects_unfitted_final.append((original_w, original_h, rid))
 
@@ -603,7 +603,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         for rect in res['best_result']:
             b_idx, x, y, w, h, rid = rect
             bid = str(best_packer[b_idx].bid)
-            original_w, original_h = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut = original_piece_dimensions[rid]
             is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
             
             is_transformed = False
@@ -620,7 +620,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             final_cutting_plan.append({
                 'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
                 'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False,
-                'Is_Unused': False, 'Is_Transformed': is_transformed,
+                'Is_Unused': False, 'Is_Transformed': is_transformed, 'Typology': typology, 'Class_cut': class_cut
             })
 
         # Agregar los free rects (sobrantes) al plan de corte
@@ -751,10 +751,14 @@ if __name__ == "__main__":
 
     # Llamamos al optimizador y guardamos los resultados: los cortes que no entraron en ningun lado, etc
     final_plan, unpacked_items, bin_details, piece_area, id_stock_used, scraps_to_create = run_optimizer(input_data, stock_data)
+
+    filtered_pieces = [p for p in final_plan if str(p.get('Piece_ID', '')).startswith('V')]
+
     result = {
         "new_scraps": scraps_to_create["new_scraps"],
         "deleted_stock": id_stock_used["deleted_stock"],
-        "deleted_scrap": id_stock_used["deleted_scrap"]
+        "deleted_scrap": id_stock_used["deleted_scrap"],
+        "final_pieces": filtered_pieces,
     }
 
     print(json.dumps(result))

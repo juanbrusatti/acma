@@ -117,7 +117,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             if not piece.get('Is_Waste', False):
 
                 if show_dims:
-                    ax.text(sx + sw/2, sy + sh/2, piece.get('Piece_ID', ''),
+                    ax.text(sx + sw/2, sy + sh/2, piece.get('Typology', ''),
                         ha='center', va='center', fontsize=8, color='black', weight='bold')
                     if piece.get('Is_Transformed'):
                         ax.text(sx + sw/2, sy + sh/2 - 0.18, 'FLO',
@@ -134,7 +134,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                     
                     resumen.append({
                         "virtual_id": virtual_id,
-                        "piece_id": piece.get('Piece_ID', ''),
+                        "piece_id": piece.get('Typology', ''),
                         "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)",
                         "is_transformed": piece.get('Is_Transformed')
                     })
