@@ -38,7 +38,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
     fig_width, fig_height = 8.27, 11.69
     
     # Preparar datos para la tabla
-    headers = ['Tipología', 'Clase', 'Cardinal', 'Cam.', 'Tipo', 'Grosor', 'Color', 'Ancho', 'Alto', 'Origen']
+    headers = ['Tipología', 'Clase', 'Cardinal', 'Cam.', 'Comp.', 'Ancho', 'Alto', 'Origen', 'Obra']
     table_data = [headers]
     
     for cut in all_cuts:
@@ -49,17 +49,29 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                 nro_ref = parts[1]
                 origen = f"Sobrante NRO_REF = {nro_ref}"
         
+        # Combinar Tipo, Grosor, Color en una sola columna
+        tipo = cut.get('tipo', '-')
+        grosor = cut.get('grosor', '-')
+        color = cut.get('color', '-')
+        comp = f"{tipo} {grosor} {color}".strip()
+        
+        work_name = cut.get('work', '-')
+        work_id = cut.get('id_work', '')
+        if work_id:
+            work = f"{work_name} ({work_id})"
+        else:
+            work = work_name
+        
         table_data.append([
             cut.get('tipologia', '-'),
             cut.get('clase', 'Simple'),
             cut.get('cardinal', '-'),
             cut.get('innertube', '-'),
-            cut.get('tipo', '-'),
-            cut.get('grosor', '-'),
-            cut.get('color', '-'),
+            comp,
             str(int(cut.get('ancho', 0))),
             str(int(cut.get('alto', 0))),
-            origen
+            origen,
+            work
         ])
     
     # Calcular cuántas filas caben por página (aprox 35-40 filas por página)
@@ -107,12 +119,12 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             table_ax = fig.add_axes([0.03, y_start - table_height, 0.94, table_height])
             table_ax.axis('off')
             
-            # Crear tabla (9 columnas: Tipología, Clase, Cardinal, Tipo, Grosor, Color, Ancho, Alto, Origen)
+            # Crear tabla (8 columnas: Tipología, Clase, Cardinal, Cam., Comp., Ancho, Alto, Origen)
             table = table_ax.table(
                 cellText=page_table_data,
                 cellLoc='center',
                 loc='center',
-                colWidths=[0.10, 0.07, 0.09, 0.06, 0.08, 0.08, 0.08, 0.12, 0.12, 0.22]
+                colWidths=[0.10, 0.08, 0.10, 0.07, 0.13, 0.10, 0.10, 0.21, 0.11]
             )
             
             # Estilizar tabla con letra más grande

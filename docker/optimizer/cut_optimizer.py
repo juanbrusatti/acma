@@ -364,7 +364,7 @@ def run_optimizer(input_data, stock_data):
     scraps_to_create = {}
 
     # Para cada una de las piezas guardamos sus dimensiones originales
-    original_piece_dimensions = {p['id']: (p['width'], p['height'], p['typology'], p['class_cut'], p['cardinal'], p['innertube']) for p in pieces_to_cut}
+    original_piece_dimensions = {p['id']: (p['width'], p['height'], p['typology'], p['class_cut'], p['cardinal'], p['innertube'], p['work'], p['id_work']) for p in pieces_to_cut}
     print(original_piece_dimensions)
     # Esto se usa para calcular metricas
     total_piece_area = sum(p['width'] * p['height'] * p['quantity'] for p in pieces_to_cut)
@@ -451,7 +451,7 @@ def run_optimizer(input_data, stock_data):
             # Por cada pieza no empacada se queda con el id, luego busca ese id en original_piece_dimensions para obtener sus dimensiones
             rid = item['id']
             quantity = item['quantity_unpacked']
-            original_w, original_h, typology, class_cut, cardinal, innertube = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
             # Si tenemos 10 piezas V5 va a agregar las 10
             for _ in range(quantity):
                 rects_unfitted.append((original_w, original_h, rid))
@@ -477,7 +477,7 @@ def run_optimizer(input_data, stock_data):
             for item in unpacked_final_list:
                 rid = item['id']
                 quantity = item['quantity_unpacked']
-                original_w, original_h, typology, class_cut, cardinal, innertube = original_piece_dimensions[rid]
+                original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
                 for _ in range(quantity):
                     rects_unfitted_final.append((original_w, original_h, rid))
 
@@ -534,7 +534,9 @@ def run_optimizer(input_data, stock_data):
                 'ancho': item.get('Packed_Width', 0),
                 'alto': item.get('Packed_Height', 0),
                 'plancha': item.get('Source_Plate_ID', '-'),
-                'is_rotated': item.get('Is_Rotated', False)
+                'is_rotated': item.get('Is_Rotated', False),
+                'work': item.get('Work', '-'),
+                'id_work': item.get('Id_Work', '-'),
             })
     
     return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area, id_stock_used, scraps_to_create, cuts_for_summary
@@ -637,7 +639,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         for rect in res['best_result']:
             b_idx, x, y, w, h, rid = rect
             bid = str(best_packer[b_idx].bid)
-            original_w, original_h, typology, class_cut, cardinal, innertube = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
             is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
             
             is_transformed = False
@@ -654,7 +656,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             final_cutting_plan.append({
                 'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
                 'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False,
-                'Is_Unused': False, 'Is_Transformed': is_transformed, 'Typology': typology, 'Class_Cut': class_cut, 'Cardinal': cardinal, 'Innertube': innertube
+                'Is_Unused': False, 'Is_Transformed': is_transformed, 'Typology': typology, 'Class_Cut': class_cut, 'Cardinal': cardinal, 'Innertube': innertube, 'Work': work,
+                'Id_Work': id_work
             })
 
         # Agregar los free rects (sobrantes) al plan de corte
