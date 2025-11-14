@@ -38,7 +38,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
     fig_width, fig_height = 8.27, 11.69
     
     # Preparar datos para la tabla
-    headers = ['Tipología', 'Clase', 'Cardinal', 'Tipo', 'Grosor', 'Color', 'Ancho', 'Alto', 'Origen']
+    headers = ['Tipología', 'Clase', 'Cardinal', 'Cam.', 'Tipo', 'Grosor', 'Color', 'Ancho', 'Alto', 'Origen']
     table_data = [headers]
     
     for cut in all_cuts:
@@ -53,6 +53,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             cut.get('tipologia', '-'),
             cut.get('clase', 'Simple'),
             cut.get('cardinal', '-'),
+            cut.get('innertube', '-'),
             cut.get('tipo', '-'),
             cut.get('grosor', '-'),
             cut.get('color', '-'),
@@ -84,9 +85,9 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             
             # Información adicional - resumen de cortes
             fig.text(0.5, 0.79, f"Total de cortes: {total_cuts}", 
-                     ha='center', fontsize=10)
-            fig.text(0.5, 0.77, f"Cantidad de DVH: {int(dvh_count/2)} | Cantidad de vidrios simples: {simple_count}", 
                      ha='center', fontsize=9)
+            fig.text(0.5, 0.77, f"Cantidad de DVH: {int(dvh_count/2)} | Cantidad de vidrios simples: {simple_count}", 
+                     ha='center', fontsize=8)
             
             # Calcular rango de filas para esta página
             start_idx = page_num * rows_per_page
@@ -111,12 +112,12 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                 cellText=page_table_data,
                 cellLoc='center',
                 loc='center',
-                colWidths=[0.11, 0.08, 0.09, 0.08, 0.08, 0.08, 0.12, 0.12, 0.22]
+                colWidths=[0.10, 0.07, 0.09, 0.06, 0.08, 0.08, 0.08, 0.12, 0.12, 0.22]
             )
             
             # Estilizar tabla con letra más grande
             table.auto_set_font_size(False)
-            table.set_fontsize(9)
+            table.set_fontsize(8)
             table.scale(1, 2.0)
             
             # Aplicar estilos a celdas
@@ -128,7 +129,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                     
                     if i == 0:  # Header
                         table_cell.set_facecolor('#f3f3f3')
-                        table_cell.set_text_props(weight='bold', color='#222', fontsize=9)
+                        table_cell.set_text_props(weight='bold', color='#222', fontsize=8)
                         table_cell.set_edgecolor('#ddd')
                         table_cell.set_linewidth(1)
                     else:
@@ -137,7 +138,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                             table_cell.set_facecolor('#ffffff')
                         else:
                             table_cell.set_facecolor('#f9f9f9')
-                        table_cell.set_text_props(color='#333', fontsize=9)
+                        table_cell.set_text_props(color='#333', fontsize=8)
             
             pdf.savefig(fig)
             plt.close(fig)
