@@ -311,6 +311,7 @@ class ProjectsController < ApplicationController
         thickness: final_thickness,
         type_opening: cut.type_opening,
         class_cut: 'Simple',
+        cardinal: '1/1',
         is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness)
       }
     end
@@ -340,7 +341,7 @@ class ProjectsController < ApplicationController
       # Creo los dos DVh
       [
         {
-          id: dvh.id,
+          id: dvh.id.to_s + "_1",          
           typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
@@ -350,10 +351,11 @@ class ProjectsController < ApplicationController
           thickness: glass1_thickness,
           type_opening: dvh.type_opening,
           class_cut: 'DVH',
+          cardinal: '1/2',  
           is_transformed: (glass1_type != dvh.glasscutting1_type || glass1_thickness != dvh.glasscutting1_thickness)
         },
         {
-          id: dvh.id,
+          id:  dvh.id.to_s + "_2",
           typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
@@ -363,6 +365,7 @@ class ProjectsController < ApplicationController
           thickness: glass2_thickness,
           type_opening: dvh.type_opening,
           class_cut: 'DVH',
+          cardinal: '2/2',
           is_transformed: (glass2_type != dvh.glasscutting2_type || glass2_thickness != dvh.glasscutting2_thickness)
         }
       ]
