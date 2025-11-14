@@ -75,7 +75,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
         ])
     
     # Calcular cuántas filas caben por página (aprox 35-40 filas por página)
-    rows_per_page = 35
+    rows_per_page = 24
     total_pages = (len(all_cuts) + rows_per_page - 1) // rows_per_page
     
     # Calcular estadísticas de cortes
@@ -91,15 +91,22 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             ax = fig.add_subplot(111)
             ax.axis('off')
             
-            # Título
-            fig.text(0.5, 0.82, "RESUMEN GENERAL DE CORTES", 
+            # Información adicional - resumen de cortes SOLO en la primera página
+            if page_num == 0:
+                # Título
+                fig.text(0.5, 0.84, "RESUMEN GENERAL DE CORTES", 
                      ha='center', fontsize=12, weight='bold')
-            
-            # Información adicional - resumen de cortes
-            fig.text(0.5, 0.79, f"Total de cortes: {total_cuts}", 
-                     ha='center', fontsize=9)
-            fig.text(0.5, 0.77, f"Cantidad de DVH: {int(dvh_count/2)} | Cantidad de vidrios simples: {simple_count}", 
-                     ha='center', fontsize=8)
+                fig.text(0.5, 0.80, f"Total de cortes: {total_cuts}", 
+                         ha='center', fontsize=9)
+                fig.text(0.5, 0.78, f"Cantidad de DVH: {int(dvh_count/2)} | Cantidad de vidrios simples: {simple_count}", 
+                         ha='center', fontsize=8)
+                # Tabla comienza más abajo en primera página (para dejar espacio al resumen)
+                table_y_bottom = 0.05
+                table_height = 0.71
+            else:
+                # En páginas posteriores, la tabla puede empezar más arriba
+                table_y_bottom = 0.05
+                table_height = 0.82
             
             # Calcular rango de filas para esta página
             start_idx = page_num * rows_per_page
@@ -111,19 +118,15 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             if not page_table_data or len(page_table_data) <= 1:
                 continue
             
-            # Calcular posición y tamaño de la tabla (ajustado para dejar espacio al resumen)
-            y_start = 0.73
-            table_height = min(0.63, len(page_table_data) * 0.025 + 0.05)
-            
-            # Posicionar tabla con más ancho
-            table_ax = fig.add_axes([0.03, y_start - table_height, 0.94, table_height])
+            # Posicionar tabla con altura fija
+            table_ax = fig.add_axes([0.03, table_y_bottom, 0.94, table_height])
             table_ax.axis('off')
             
             # Crear tabla (8 columnas: Tipología, Clase, Cardinal, Cam., Comp., Ancho, Alto, Origen)
             table = table_ax.table(
                 cellText=page_table_data,
                 cellLoc='center',
-                loc='center',
+                loc='upper left',
                 colWidths=[0.10, 0.08, 0.10, 0.07, 0.13, 0.10, 0.10, 0.21, 0.11]
             )
             
