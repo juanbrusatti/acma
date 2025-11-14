@@ -6,7 +6,11 @@ Rails.application.routes.draw do
       get :api_status
     end
   end
-  resources :scraps, except: [:show, :index]
+  resources :scraps, except: [:show, :index] do
+    collection do
+      post :import
+    end
+  end
 
   resources :supplies
   resources :glassplates

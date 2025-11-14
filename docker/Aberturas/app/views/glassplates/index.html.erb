@@ -170,9 +170,19 @@
       <!-- Retazos Tab -->
       <div id="sobrantes-tab" class="tab-content hidden">
         <div class="p-6">
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold">Retazos</h3>
-            <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">Retazos</h3>
+              <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
+            </div>
+            <button type="button" id="import-scraps-excel-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-700 h-9 px-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Importar desde Excel
+            </button>
           </div>
 
           <div class="relative w-full overflow-auto">
@@ -229,6 +239,55 @@
 
     </div>
   </main>
+</div>
+
+<!-- Modal para importar sobrantes desde Excel -->
+<div id="import-scraps-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Importar Sobrantes desde Excel</h2>
+        <button type="button" id="close-scraps-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-4">
+          Selecciona un archivo Excel (.xlsx o .xls) con el siguiente formato:
+        </p>
+        <div class="bg-gray-50 p-3 rounded text-xs text-gray-700 mb-4">
+          <p class="font-semibold mb-2">Columnas requeridas:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>COMPOSICION:</strong> Tipo, grosor y color (ej: "COL 4+4 STB")</li>
+            <li><strong>BASE [mm]:</strong> Ancho en milímetros</li>
+            <li><strong>ALTO [mm]:</strong> Alto en milímetros</li>
+            <li><strong>REFERENCIA:</strong> (opcional) Código de referencia del sobrante</li>
+            <li><strong>ORIGEN:</strong> (opcional) Obra de procedencia</li>
+          </ul>
+        </div>
+      </div>
+
+      <%= form_with url: import_scraps_path, method: :post, multipart: true, id: "import-scraps-form", class: "space-y-4" do |form| %>
+        <div>
+          <%= form.file_field :file, accept: ".xlsx,.xls", required: true, class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" %>
+        </div>
+
+        <div id="import-scraps-errors" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded"></div>
+        <div id="import-scraps-success" class="hidden text-sm text-green-600 bg-green-50 p-3 rounded"></div>
+
+        <div class="flex gap-3 justify-end">
+          <button type="button" id="cancel-scraps-import-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+            Cancelar
+          </button>
+          <%= form.submit "Importar", class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors", id: "submit-scraps-import-btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -381,6 +440,121 @@ document.addEventListener('DOMContentLoaded', updateSearchFormTab);
 </script>
 
 <script>
+// Funcionalidad del modal de importación de sobrantes
+function initializeScrapsImportModal() {
+  const importModal = document.getElementById('import-scraps-modal');
+  const importBtn = document.getElementById('import-scraps-excel-btn');
+  const closeModalBtn = document.getElementById('close-scraps-modal-btn');
+  const cancelImportBtn = document.getElementById('cancel-scraps-import-btn');
+  const importForm = document.getElementById('import-scraps-form');
+  const importErrors = document.getElementById('import-scraps-errors');
+  const importSuccess = document.getElementById('import-scraps-success');
+
+  if (!importModal || !importBtn) return;
+
+  // Función para abrir el modal
+  function openModal() {
+    if (importModal) {
+      importModal.classList.remove('hidden');
+      importModal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Función para cerrar el modal
+  function closeModal() {
+    if (importModal) {
+      importModal.classList.add('hidden');
+      importModal.classList.remove('flex');
+      document.body.style.overflow = '';
+      // Limpiar formulario y mensajes
+      if (importForm) {
+        importForm.reset();
+      }
+      if (importErrors) {
+        importErrors.classList.add('hidden');
+        importErrors.textContent = '';
+      }
+      if (importSuccess) {
+        importSuccess.classList.add('hidden');
+        importSuccess.textContent = '';
+      }
+    }
+  }
+
+  // Event listeners
+  if (importBtn) {
+    importBtn.addEventListener('click', openModal);
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeModal);
+  }
+
+  if (cancelImportBtn) {
+    cancelImportBtn.addEventListener('click', closeModal);
+  }
+
+  // Cerrar modal al hacer clic fuera de él
+  if (importModal) {
+    importModal.addEventListener('click', function(e) {
+      if (e.target === importModal) {
+        closeModal();
+      }
+    });
+  }
+
+  // Cerrar modal con tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && importModal && !importModal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+
+  // Manejar envío del formulario
+  if (importForm) {
+    importForm.addEventListener('submit', function(e) {
+      const fileInput = importForm.querySelector('input[type="file"]');
+      
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        e.preventDefault();
+        if (importErrors) {
+          importErrors.textContent = 'Por favor selecciona un archivo.';
+          importErrors.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      const fileName = fileInput.files[0].name;
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+      
+      if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+        e.preventDefault();
+        if (importErrors) {
+          importErrors.textContent = 'El archivo debe ser un Excel (.xlsx o .xls).';
+          importErrors.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      // Mostrar estado de carga
+      const submitBtn = importForm.querySelector('#submit-scraps-import-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Importando...';
+      }
+    });
+  }
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeScrapsImportModal);
+
+// Reinicializar cuando se carga con Turbo
+document.addEventListener('turbo:load', initializeScrapsImportModal);
+</script>
+
+<script>
 // Debug script para verificar que el módulo se carga
 console.log('Glassplates page loaded');
 console.log('Edit buttons found:', document.querySelectorAll('.edit-glassplate-btn').length);
@@ -394,4 +568,119 @@ setTimeout(() => {
     console.log('❌ Glassplate editor not found');
   }
 }, 1000);
+</script>
+
+<script>
+// Funcionalidad del modal de importación de sobrantes
+function initializeScrapsImportModal() {
+  const importModal = document.getElementById('import-scraps-modal');
+  const importBtn = document.getElementById('import-scraps-excel-btn');
+  const closeModalBtn = document.getElementById('close-scraps-modal-btn');
+  const cancelImportBtn = document.getElementById('cancel-scraps-import-btn');
+  const importForm = document.getElementById('import-scraps-form');
+  const importErrors = document.getElementById('import-scraps-errors');
+  const importSuccess = document.getElementById('import-scraps-success');
+
+  if (!importModal || !importBtn) return;
+
+  // Función para abrir el modal
+  function openModal() {
+    if (importModal) {
+      importModal.classList.remove('hidden');
+      importModal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Función para cerrar el modal
+  function closeModal() {
+    if (importModal) {
+      importModal.classList.add('hidden');
+      importModal.classList.remove('flex');
+      document.body.style.overflow = '';
+      // Limpiar formulario y mensajes
+      if (importForm) {
+        importForm.reset();
+      }
+      if (importErrors) {
+        importErrors.classList.add('hidden');
+        importErrors.textContent = '';
+      }
+      if (importSuccess) {
+        importSuccess.classList.add('hidden');
+        importSuccess.textContent = '';
+      }
+    }
+  }
+
+  // Event listeners
+  if (importBtn) {
+    importBtn.addEventListener('click', openModal);
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeModal);
+  }
+
+  if (cancelImportBtn) {
+    cancelImportBtn.addEventListener('click', closeModal);
+  }
+
+  // Cerrar modal al hacer clic fuera de él
+  if (importModal) {
+    importModal.addEventListener('click', function(e) {
+      if (e.target === importModal) {
+        closeModal();
+      }
+    });
+  }
+
+  // Cerrar modal con tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && importModal && !importModal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+
+  // Manejar envío del formulario
+  if (importForm) {
+    importForm.addEventListener('submit', function(e) {
+      const fileInput = importForm.querySelector('input[type="file"]');
+      
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        e.preventDefault();
+        if (importErrors) {
+          importErrors.textContent = 'Por favor selecciona un archivo.';
+          importErrors.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      const fileName = fileInput.files[0].name;
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+      
+      if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+        e.preventDefault();
+        if (importErrors) {
+          importErrors.textContent = 'El archivo debe ser un Excel (.xlsx o .xls).';
+          importErrors.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      // Mostrar estado de carga
+      const submitBtn = importForm.querySelector('#submit-scraps-import-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Importando...';
+      }
+    });
+  }
+}
+
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', initializeScrapsImportModal);
+
+// Reinicializar cuando se carga con Turbo
+document.addEventListener('turbo:load', initializeScrapsImportModal);
 </script>
