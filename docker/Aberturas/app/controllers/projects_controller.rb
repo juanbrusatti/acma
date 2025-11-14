@@ -223,6 +223,7 @@ class ProjectsController < ApplicationController
     new_scraps = optimization_data['new_scraps'] || optimization_data[:new_scraps] || {}
     used_scraps = optimization_data['deleted_scraps'] || optimization_data['deleted_scrap'] || optimization_data[:deleted_scraps] || []
     used_stock = optimization_data['deleted_stock'] || optimization_data[:deleted_stock] || []
+    final_pieces = optimization_data['final_pieces'] || optimization_data[:final_pieces] || []
 
     Rails.logger.info "accept_optimize: new_scraps = #{new_scraps.inspect}"
     Rails.logger.info "accept_optimize: used_scraps = #{used_scraps.inspect}"
@@ -231,6 +232,7 @@ class ProjectsController < ApplicationController
     create_scraps(new_scraps.is_a?(Hash) ? new_scraps.values : Array(new_scraps)) if new_scraps.any?
     delete_used_scraps(used_scraps) if used_scraps.any?
     delete_used_stock(used_stock) if used_stock.any?
+    assign_original_ids_to_pieces(@project, final_pieces)
 
     @project.update(date_of_optimization: Date.today, status: "Terminado")
 
@@ -367,14 +369,18 @@ class ProjectsController < ApplicationController
 
       # Crear el piece con los valores finales
       {
-        id: cut.typology,
+        id: cut.id,
+        typology: cut.typology,
         width: cut.width,
         height: cut.height,
+        innertube: '-',
         quantity: 1,
         color: cut.color,
         glass_type: final_glass_type,
         thickness: final_thickness,
         type_opening: cut.type_opening,
+        class_cut: 'Simple',
+        cardinal: '1/1',
         is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness)
       }
     end
@@ -404,25 +410,33 @@ class ProjectsController < ApplicationController
       # Creo los dos DVh
       [
         {
-          id: dvh.typology,
+          id: dvh.id.to_s + "_1",          
+          typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
+          innertube: dvh.innertube,
           quantity: 1,
           color: dvh.glasscutting1_color,
           glass_type: glass1_type,
           thickness: glass1_thickness,
           type_opening: dvh.type_opening,
+          class_cut: 'DVH',
+          cardinal: '1/2',  
           is_transformed: (glass1_type != dvh.glasscutting1_type || glass1_thickness != dvh.glasscutting1_thickness)
         },
         {
-          id: dvh.typology,
+          id:  dvh.id.to_s + "_2",
+          typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
+          innertube: dvh.innertube,
           quantity: 1,
           color: dvh.glasscutting2_color,
           glass_type: glass2_type,
           thickness: glass2_thickness,
           type_opening: dvh.type_opening,
+          class_cut: 'DVH',
+          cardinal: '2/2',
           is_transformed: (glass2_type != dvh.glasscutting2_type || glass2_thickness != dvh.glasscutting2_thickness)
         }
       ]
@@ -562,6 +576,19 @@ class ProjectsController < ApplicationController
       glassplate.destroy if glassplate
     end
   end
+
+  def assign_original_ids_to_pieces(project, final_pieces)S
+    cuts = []
+
+    dvhs_glasscuttings = dvhs.values.flat_map do |dvh|
+      [
+        { typology: dvh.typology, part: 1, glasscutting: dvh.glasscutting1_type + "_" + dvh.glasscutting1_thickness + "_" + dvh.glasscutting1_color },
+        { typology: dvh.typology, part: 2, glasscutting: dvh.glasscutting2_type + "_" + dvh.glasscutting2_thickness + "_" + dvh.glasscutting2_color }
+      ]
+    end.index_by { |entry| "#{entry[:typology]}_#{entry[:part]}" }
+
+  end
+
 
   def project_basic_params
     params.require(:project).permit(:name, :phone, :address, :delivery_date, :description, :status)

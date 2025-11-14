@@ -21,6 +21,131 @@ def draw_header(fig, page=1, total_pages=1, title="AR Y ASOCIADOS SRL"):
     fig.text(0.97, 0.91, datetime.now().strftime("%d/%m/%Y"),
              ha="right", va="center", fontsize=7)
 
+def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filename='resumen_general.pdf'):
+    import matplotlib.pyplot as plt
+    import os
+    from matplotlib.backends.backend_pdf import PdfPages
+    
+    if not all_cuts:
+        print("[INFO] No hay cortes para generar resumen general")
+        return
+    
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    output_path = os.path.join(output_folder, filename)
+    
+    fig_width, fig_height = 8.27, 11.69
+    
+    # Preparar datos para la tabla
+    headers = ['Tipología', 'Clase', 'Cardinal', 'Cam.', 'Tipo', 'Grosor', 'Color', 'Ancho', 'Alto', 'Origen']
+    table_data = [headers]
+    
+    for cut in all_cuts:
+        origen = cut.get('plancha', '-')
+        if origen.startswith('Sobrante_'):
+            parts = origen.split('_')
+            if len(parts) > 1:
+                nro_ref = parts[1]
+                origen = f"Sobrante NRO_REF = {nro_ref}"
+        
+        table_data.append([
+            cut.get('tipologia', '-'),
+            cut.get('clase', 'Simple'),
+            cut.get('cardinal', '-'),
+            cut.get('innertube', '-'),
+            cut.get('tipo', '-'),
+            cut.get('grosor', '-'),
+            cut.get('color', '-'),
+            str(int(cut.get('ancho', 0))),
+            str(int(cut.get('alto', 0))),
+            origen
+        ])
+    
+    # Calcular cuántas filas caben por página (aprox 35-40 filas por página)
+    rows_per_page = 35
+    total_pages = (len(all_cuts) + rows_per_page - 1) // rows_per_page
+    
+    # Calcular estadísticas de cortes
+    total_cuts = len(all_cuts)
+    dvh_count = sum(1 for cut in all_cuts if cut.get('clase') == 'DVH')
+    simple_count = sum(1 for cut in all_cuts if cut.get('clase') == 'Simple')
+    
+    with PdfPages(output_path) as pdf:
+        for page_num in range(total_pages):
+            fig = plt.figure(figsize=(fig_width, fig_height))
+            draw_header(fig, page=page_num + 1, total_pages=total_pages)
+            
+            ax = fig.add_subplot(111)
+            ax.axis('off')
+            
+            # Título
+            fig.text(0.5, 0.82, "RESUMEN GENERAL DE CORTES", 
+                     ha='center', fontsize=12, weight='bold')
+            
+            # Información adicional - resumen de cortes
+            fig.text(0.5, 0.79, f"Total de cortes: {total_cuts}", 
+                     ha='center', fontsize=9)
+            fig.text(0.5, 0.77, f"Cantidad de DVH: {int(dvh_count/2)} | Cantidad de vidrios simples: {simple_count}", 
+                     ha='center', fontsize=8)
+            
+            # Calcular rango de filas para esta página
+            start_idx = page_num * rows_per_page
+            end_idx = min(start_idx + rows_per_page, len(all_cuts))
+            
+            # Datos de esta página (incluir header + datos)
+            page_table_data = [headers] + table_data[1 + start_idx:1 + end_idx]
+            
+            if not page_table_data or len(page_table_data) <= 1:
+                continue
+            
+            # Calcular posición y tamaño de la tabla (ajustado para dejar espacio al resumen)
+            y_start = 0.73
+            table_height = min(0.63, len(page_table_data) * 0.025 + 0.05)
+            
+            # Posicionar tabla con más ancho
+            table_ax = fig.add_axes([0.03, y_start - table_height, 0.94, table_height])
+            table_ax.axis('off')
+            
+            # Crear tabla (9 columnas: Tipología, Clase, Cardinal, Tipo, Grosor, Color, Ancho, Alto, Origen)
+            table = table_ax.table(
+                cellText=page_table_data,
+                cellLoc='center',
+                loc='center',
+                colWidths=[0.10, 0.07, 0.09, 0.06, 0.08, 0.08, 0.08, 0.12, 0.12, 0.22]
+            )
+            
+            # Estilizar tabla con letra más grande
+            table.auto_set_font_size(False)
+            table.set_fontsize(8)
+            table.scale(1, 2.0)
+            
+            # Aplicar estilos a celdas
+            for i, row in enumerate(page_table_data):
+                for j, cell in enumerate(row):
+                    table_cell = table[(i, j)]
+                    table_cell.set_edgecolor('#ddd')
+                    table_cell.set_linewidth(0.5)
+                    
+                    if i == 0:  # Header
+                        table_cell.set_facecolor('#f3f3f3')
+                        table_cell.set_text_props(weight='bold', color='#222', fontsize=8)
+                        table_cell.set_edgecolor('#ddd')
+                        table_cell.set_linewidth(1)
+                    else:
+                        # Alternar colores
+                        if (start_idx + i - 1) % 2 == 0:
+                            table_cell.set_facecolor('#ffffff')
+                        else:
+                            table_cell.set_facecolor('#f9f9f9')
+                        table_cell.set_text_props(color='#333', fontsize=8)
+            
+            pdf.savefig(fig)
+            plt.close(fig)
+    
+    print(f"✅ Guardado PDF de resumen general: {output_path}")
+    return output_path
+
 def visualize_packing(packed_results, bin_details_map, output_folder='output_visuals'):
     import matplotlib.pyplot as plt
     import matplotlib.patches as patches
@@ -108,7 +233,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             if bin_width > bin_height:
                 min_percentage = 0.08  # % del tamaño de la plancha
             else: 
-                min_percentage = 0.05
+                min_percentage = 0.06  # % del tamaño de la plancha
 
             min_w = bin_width * min_percentage
             min_h = bin_height * min_percentage
@@ -117,7 +242,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             if not piece.get('Is_Waste', False):
 
                 if show_dims:
-                    ax.text(sx + sw/2, sy + sh/2, piece.get('Piece_ID', ''),
+                    ax.text(sx + sw/2, sy + sh/2, piece.get('Typology', ''),
                         ha='center', va='center', fontsize=8, color='black', weight='bold')
                     if piece.get('Is_Transformed'):
                         ax.text(sx + sw/2, sy + sh/2 - 0.18, 'FLO',
@@ -134,7 +259,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
                     
                     resumen.append({
                         "virtual_id": virtual_id,
-                        "piece_id": piece.get('Piece_ID', ''),
+                        "piece_id": piece.get('Typology', ''),
                         "dims": f"{w:.0f} (Ancho) x {h:.0f} (Alto)",
                         "is_transformed": piece.get('Is_Transformed')
                     })
@@ -198,8 +323,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
             # Primera página con el diagrama
             pdf.savefig(fig)
             plt.close(fig)
-            
-            # Segunda página con resumen si hay cortes pequeños
+
             if resumen:
                 fig2, ax2 = plt.subplots(figsize=(fig_width, fig_height))
                 draw_header(fig2, page=2, total_pages=2) # SI no queremos volver a dibujar el header, sacamos esta linea
