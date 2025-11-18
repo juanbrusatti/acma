@@ -99,18 +99,20 @@ class ScrapImporter
     # Normalizar espacios múltiples a uno solo
     normalized = composition.gsub(/\s+/, ' ').strip.upcase
 
-    # Patrón más flexible: permite espacios variables
-    match = normalized.match(/^([A-Z]{3})\s+([\d]+\+[\d]+|5mm)\s+([A-Z]{3})$/)
+    # Patrón más flexible: permite espacios variables y variantes de '5mm' (p.ej. '5MM', '5 MM')
+    match = normalized.match(/^([A-Z]{3})\s+((?:\d+\+\d+)|(?:\d+\s*MM))\s+([A-Z]{3})$/)
 
     return nil unless match
 
     scrap_type = match[1]
-    thickness = match[2]
+    raw_thickness = match[2].gsub(/\s+/, '').upcase
+    # Normalizar el espesor al formato que espera el modelo (modelo usa '5mm' en minúsculas)
+    thickness = (raw_thickness == '5MM') ? '5mm' : raw_thickness
     color = match[3]
 
     # Validar que los valores sean válidos según el modelo
     valid_scrap_types = ["LAM", "FLO", "COL"]
-    valid_thicknesses = ["3+3", "4+4", "5+5", "5MM"]
+    valid_thicknesses = ["3+3", "4+4", "5+5", "5mm"]
     valid_colors = ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"]
 
     return nil unless valid_scrap_types.include?(scrap_type)
