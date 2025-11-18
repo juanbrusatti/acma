@@ -49,6 +49,7 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find(params[:id])
+    @projects = Project.all.excluding(@project).where(date_of_optimization: nil)
   end
 
   def edit
@@ -188,6 +189,12 @@ class ProjectsController < ApplicationController
   # Optimize the project using the python microservice
   def optimize
     @project = Project.find(params[:id])
+
+    # Recibir y mostrar los IDs de proyectos seleccionados
+    if params[:project_ids].present?
+      project_ids = params[:project_ids].split(',').map(&:to_i)
+    end
+
     require 'net/http'
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
@@ -329,6 +336,31 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def convertible_pieces
+    project_ids = params[:project_ids].to_s.split(',').map(&:strip).reject(&:blank?)
+
+    result = []
+
+    project_ids.each do |project_id|
+      begin
+        project = Project.find(project_id)
+        convertible = project.convertible_pieces
+
+        if convertible.any?
+          result << {
+            project_id: project.id,
+            project_name: project.name,
+            pieces: convertible
+          }
+        end
+      rescue ActiveRecord::RecordNotFound
+        # Ignorar proyectos no encontrados
+        next
+      end
+    end
+
+    render json: result
+  end
 
   private
 
