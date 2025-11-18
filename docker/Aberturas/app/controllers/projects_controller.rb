@@ -201,8 +201,14 @@ class ProjectsController < ApplicationController
   # View to confirm optimization results
   def confirm_optimization
     @project = Project.find(params[:id])
-    # Pull optimization data from session
-    @optimization_data = session[:optimization_data]
+    # Pull optimization data from JSON file
+    json_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}_summary.json")
+    
+    if File.exist?(json_path)
+      @optimization_data = JSON.parse(File.read(json_path))
+    else
+      @optimization_data = nil
+    end
 
     if @optimization_data.nil?
       redirect_to project_path(@project), alert: "No hay datos de optimización disponibles....."
@@ -211,7 +217,11 @@ class ProjectsController < ApplicationController
 
   def accept_optimize
     @project = Project.find(params[:id])
-    optimization_data = session[:optimization_data]
+    
+    # Leer optimization_data desde archivo JSON
+    json_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}_summary.json")
+    optimization_data = File.exist?(json_path) ? JSON.parse(File.read(json_path)) : nil
+    
     Rails.logger.info "accept_optimize: optimization_data = #{optimization_data.inspect}"
 
     if optimization_data.nil? || optimization_data.empty?
@@ -234,10 +244,13 @@ class ProjectsController < ApplicationController
 
     @project.update(date_of_optimization: Date.today, status: "Terminado")
 
-    # Clean up session data
-    session.delete(:optimization_data)
-    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+    # Clean up temporary files
+    optimizations_dir = Rails.root.join("tmp", "optimizations")
+    zip_path = optimizations_dir.join("project_#{@project.id}.zip")
+    json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
+    
     File.delete(zip_path) if File.exist?(zip_path)
+    File.delete(json_path) if File.exist?(json_path)
 
     redirect_to projects_path, notice: "Optimización aceptada y stock actualizado!!"
   end
@@ -245,10 +258,14 @@ class ProjectsController < ApplicationController
   # Cancel optimization process
   def cancel_optimize
     @project = Project.find(params[:id])
-    # Clean up session data
-    session.delete(:optimization_data)
-    zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
+    # Clean up temporary files
+    optimizations_dir = Rails.root.join("tmp", "optimizations")
+    zip_path = optimizations_dir.join("project_#{@project.id}.zip")
+    json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
+    
     File.delete(zip_path) if File.exist?(zip_path)
+    File.delete(json_path) if File.exist?(json_path)
+    
     redirect_to project_path(@project), notice: "Optimización cancelada."
   end
 
@@ -256,6 +273,11 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     zip_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}.zip")
 
+    if zip_path.nil? || !File.exist?(zip_path)
+      redirect_to project_path(@project), alert: "No hay datos de optimización disponibles....."
+      return
+    end
+    
     send_file zip_path,
               type: "application/zip",
               disposition: "attachment",
@@ -367,15 +389,21 @@ class ProjectsController < ApplicationController
 
       # Crear el piece con los valores finales
       {
-        id: cut.typology,
+        id: cut.id,
+        typology: cut.typology,
         width: cut.width,
         height: cut.height,
+        innertube: '-',
         quantity: 1,
         color: cut.color,
         glass_type: final_glass_type,
         thickness: final_thickness,
         type_opening: cut.type_opening,
-        is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness)
+        class_cut: 'Simple',
+        cardinal: '1/1',
+        work: @project.name,
+        id_work: @project.id,
+        is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness),
       }
     end
 
@@ -404,25 +432,37 @@ class ProjectsController < ApplicationController
       # Creo los dos DVh
       [
         {
-          id: dvh.typology,
+          id: dvh.id.to_s + "_1",          
+          typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
+          innertube: dvh.innertube,
           quantity: 1,
           color: dvh.glasscutting1_color,
           glass_type: glass1_type,
           thickness: glass1_thickness,
           type_opening: dvh.type_opening,
+          class_cut: 'DVH',
+          cardinal: '1/2',  
+          work: @project.name,
+          id_work: @project.id,
           is_transformed: (glass1_type != dvh.glasscutting1_type || glass1_thickness != dvh.glasscutting1_thickness)
         },
         {
-          id: dvh.typology,
+          id:  dvh.id.to_s + "_2",
+          typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
+          innertube: dvh.innertube,
           quantity: 1,
           color: dvh.glasscutting2_color,
           glass_type: glass2_type,
           thickness: glass2_thickness,
           type_opening: dvh.type_opening,
+          class_cut: 'DVH',
+          cardinal: '2/2',
+          work: @project.name,
+          id_work: @project.id,
           is_transformed: (glass2_type != dvh.glasscutting2_type || glass2_thickness != dvh.glasscutting2_thickness)
         }
       ]
@@ -497,13 +537,17 @@ class ProjectsController < ApplicationController
           json_text = json_part&.decoded
           if zip_part
             optimizations_dir = Rails.root.join("tmp", "optimizations")
-            clean_optimizations_dir(optimizations_dir)
+            # Limpiar solo los archivos del proyecto actual antes de guardar los nuevos
+            FileUtils.mkdir_p(optimizations_dir) unless Dir.exist?(optimizations_dir)
+            old_zip = optimizations_dir.join("project_#{@project.id}.zip")
+            old_json = optimizations_dir.join("project_#{@project.id}_summary.json")
+            File.delete(old_zip) if File.exist?(old_zip)
+            File.delete(old_json) if File.exist?(old_json)
+            
             zip_bytes = zip_part.body.decoded
             zip_filename = zip_part.filename.presence || zip_filename
             if zip_bytes
-              zip_dir = Rails.root.join("tmp", "optimizations")
-              FileUtils.mkdir_p(zip_dir) unless Dir.exist?(zip_dir)
-              zip_path = zip_dir.join("project_#{@project.id}.zip")
+              zip_path = optimizations_dir.join("project_#{@project.id}.zip")
               File.binwrite(zip_path, zip_bytes)
             end
           end
@@ -521,8 +565,13 @@ class ProjectsController < ApplicationController
         @optimizer_summary = json_text # guardar texto crudo como último recurso
       end
 
-      # Guardar los datos de optimización en la sesión
-      session[:optimization_data] = @optimizer_summary
+      # Guardar los datos de optimización en archivo JSON temporal
+      if @optimizer_summary
+        optimizations_dir = Rails.root.join("tmp", "optimizations")
+        FileUtils.mkdir_p(optimizations_dir) unless Dir.exist?(optimizations_dir)
+        json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
+        File.write(json_path, JSON.pretty_generate(@optimizer_summary))
+      end
 
       return
     else

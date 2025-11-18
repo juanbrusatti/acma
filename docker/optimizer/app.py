@@ -22,6 +22,9 @@ OUTPUT_VISUALS_DIR = os.path.join(BASE_DIR, 'output_visuals')
 async def run_optimize(request: Request):
     print("[LOG] POST /optimize iniciado")
     try:
+        # Acumulador local para todos los cortes de esta petición
+        all_cuts_for_summary = []
+        
         # read the JSON body
         body = await request.json()
         print(f"[LOG] Body recibido: {json.dumps(body)[:200]}...")
@@ -46,7 +49,8 @@ async def run_optimize(request: Request):
         global_result = {
             "new_scraps": {},
             "deleted_stock": [],
-            "deleted_scrap": []
+            "deleted_scrap": [],
+            "final_pieces": []
         }
         for pieces_to_cut, stock in optimization_inputs:
             optimizer_result = optimize(pieces_to_cut, stock, zip_buffer)
@@ -55,13 +59,31 @@ async def run_optimize(request: Request):
             global_result["new_scraps"].update(optimizer_result.get("new_scraps", {}))
             global_result["deleted_stock"].extend(optimizer_result.get("deleted_stock", []))
             global_result["deleted_scrap"].extend(optimizer_result.get("deleted_scrap", []))
+            global_result["final_pieces"].extend(optimizer_result.get("final_pieces", []))
+            
+            # Acumular cortes para el resumen
+            cuts = optimizer_result.get("cuts_for_summary", [])
+            if cuts:
+                all_cuts_for_summary.extend(cuts)
+                #print(f"[LOG] Acumulados {len(cuts)} cortes. Total acumulado: {len(all_cuts_for_summary)}")
 
-        # Esto es solo para verificar, hay que sacarlo después
-        with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr(
-                "result.json",
-                json.dumps(global_result, indent=2, ensure_ascii=False)
-            )
+        # Generar PDF de resumen general con todos los cortes acumulados
+        try:
+            if all_cuts_for_summary:
+                print(f"[LOG] Generando PDF de resumen general con {len(all_cuts_for_summary)} cortes...")
+                from visualize import generate_general_summary_pdf
+                summary_pdf_path = generate_general_summary_pdf(all_cuts_for_summary, OUTPUT_VISUALS_DIR)
+                if summary_pdf_path and os.path.exists(summary_pdf_path):
+                    print(f"[LOG] PDF de resumen generado: {summary_pdf_path}")
+                    # Agregar el PDF de resumen al ZIP
+                    with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
+                        zf.write(summary_pdf_path, arcname='Resumen_general.pdf')
+                    print("[LOG] PDF de resumen agregado al ZIP")
+            else:
+                print("[WARN] No hay cortes para generar resumen general")
+        except Exception as e:
+            print(f"[WARN] No se pudo generar el PDF de resumen general: {e}")
+            traceback.print_exc()
 
         # Build multipart/mixed response with JSON and ZIP as separate parts
         zip_buffer.seek(0)
@@ -216,9 +238,6 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
                     full_path = os.path.join(root, file)
                     arcname = os.path.relpath(full_path, OUTPUT_VISUALS_DIR)
                     zf.write(full_path, arcname=arcname)
-
-        if os.path.exists(OUTPUT_CSV):
-            zf.write(OUTPUT_CSV, arcname="cutting_plan.csv")
 
     # Retornamos solo el resultado JSON
     return optimizer_result
