@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resources :scraps, except: [:show, :index] do
     collection do
       post :import
+      get :export
     end
   end
 

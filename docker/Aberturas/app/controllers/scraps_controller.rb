@@ -106,6 +106,19 @@ class ScrapsController < ApplicationController
     end
   end
 
+  # GET /scraps/export
+  def export
+    @scraps = Scrap.all.order(created_at: :desc)
+    
+    respond_to do |format|
+      format.xlsx do
+        exporter = ScrapExporter.new(@scraps)
+        file_path = exporter.generate
+        send_file file_path, filename: "retazos_#{Date.today.strftime('%Y%m%d')}.xlsx", type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_scrap
