@@ -106,7 +106,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             else:
                 # En páginas posteriores, la tabla puede empezar más arriba
                 table_y_bottom = 0.05
-                table_height = 0.78
+                table_height = 0.82
             
             # Calcular rango de filas para esta página
             start_idx = page_num * rows_per_page
@@ -114,20 +114,23 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             
             # Datos de esta página (incluir header + datos)
             page_table_data = [headers] + table_data[1 + start_idx:1 + end_idx]
-            
+                
             if not page_table_data or len(page_table_data) <= 1:
                 continue
             
-            # Posicionar tabla con altura fija
-            table_ax = fig.add_axes([0.03, table_y_bottom, 0.94, table_height])
+            # Posicionar tabla centrada en la página
+            table_ax = fig.add_axes([0.02, table_y_bottom, 0.96, table_height])
             table_ax.axis('off')
-            
-            # Crear tabla (8 columnas: Tipología, Clase, Cardinal, Cam., Comp., Ancho, Alto, Origen)
+
+            # Ajustar colWidths para que sumen 1
+            col_widths = [0.10, 0.07, 0.10, 0.07, 0.12, 0.10, 0.10, 0.20, 0.14]
+
+            # Crear tabla centrada
             table = table_ax.table(
                 cellText=page_table_data,
                 cellLoc='center',
-                loc='upper left',
-                colWidths=[0.10, 0.08, 0.10, 0.07, 0.13, 0.10, 0.10, 0.21, 0.11]
+                loc='center',
+                colWidths=col_widths
             )
             
             # Estilizar tabla con letra más grande
