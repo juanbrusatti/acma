@@ -106,7 +106,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             else:
                 # En páginas posteriores, la tabla puede empezar más arriba
                 table_y_bottom = 0.05
-                table_height = 0.82
+                table_height = 0.78
             
             # Calcular rango de filas para esta página
             start_idx = page_num * rows_per_page
