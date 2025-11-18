@@ -353,6 +353,7 @@ def _try_guillotine_variants(rects_to_add, bins_to_add, bins_map, rotation=True)
         }
 
 def run_optimizer(input_data, stock_data):
+    global GLOBAL_CUTS_ACCUMULATOR
     
     # Guardamos los cortes, los glassplates (planchas) y los scraps (sobrantes)
     pieces_to_cut = input_data['pieces_to_cut']
@@ -363,7 +364,8 @@ def run_optimizer(input_data, stock_data):
     scraps_to_create = {}
 
     # Para cada una de las piezas guardamos sus dimensiones originales
-    original_piece_dimensions = {p['id']: (p['width'], p['height']) for p in pieces_to_cut}
+    original_piece_dimensions = {p['id']: (p['width'], p['height'], p['typology'], p['class_cut'], p['cardinal'], p['innertube'], p['work'], p['id_work']) for p in pieces_to_cut}
+    print(original_piece_dimensions)
     # Esto se usa para calcular metricas
     total_piece_area = sum(p['width'] * p['height'] * p['quantity'] for p in pieces_to_cut)
 
@@ -412,13 +414,25 @@ def run_optimizer(input_data, stock_data):
             scraps_as_plates, bin_details_map, rects_all, final_cutting_plan,
             original_piece_dimensions, unfitted_counts, 'Leftover', f'ETAPA1_{order_name}', pieces_to_cut=pieces_to_cut
         )
-        # Obtener score de la heurística elegida
-        score = None
-        if 'quality_metrics' in bin_details_map:
-            score = bin_details_map['quality_metrics'].get('score')
+        # Calcular métricas para elegir el mejor resultado
         placed_count = sum(1 for item in final_cutting_plan if not item.get('Is_Waste', False))
-        if best_score is None or placed_count > best_score:
-            best_score = placed_count
+        bins_count = len(bins_used)
+        
+        # Calcular área total utilizada de los sobrantes
+        total_bin_area = sum(
+            bin_details_map.get(bid, {}).get('width', 0) * bin_details_map.get(bid, {}).get('height', 0)
+            for bid in bins_used
+        )
+        
+        # Score: priorizar más piezas colocadas, luego menos sobrantes, luego menos área
+        score = (
+            placed_count * 1000000 -     # Prioridad 1: más piezas colocadas
+            bins_count * 10000 -          # Prioridad 2: menos sobrantes usados
+            total_bin_area                # Prioridad 3: menor área total usada
+        )
+        
+        if best_score is None or score > best_score:
+            best_score = score
             best_result = (unpacked_final_list, bins_used, bin_details_map, final_cutting_plan)
 
     # Usar el mejor resultado encontrado
@@ -437,7 +451,7 @@ def run_optimizer(input_data, stock_data):
             # Por cada pieza no empacada se queda con el id, luego busca ese id en original_piece_dimensions para obtener sus dimensiones
             rid = item['id']
             quantity = item['quantity_unpacked']
-            original_w, original_h = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
             # Si tenemos 10 piezas V5 va a agregar las 10
             for _ in range(quantity):
                 rects_unfitted.append((original_w, original_h, rid))
@@ -463,7 +477,7 @@ def run_optimizer(input_data, stock_data):
             for item in unpacked_final_list:
                 rid = item['id']
                 quantity = item['quantity_unpacked']
-                original_w, original_h = original_piece_dimensions[rid]
+                original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
                 for _ in range(quantity):
                     rects_unfitted_final.append((original_w, original_h, rid))
 
@@ -503,7 +517,29 @@ def run_optimizer(input_data, stock_data):
         print("\n✅ ¡Todas las piezas cupieron en las placas de sobrante!")
 
     scraps_to_create = build_new_scraps_dict(final_cutting_plan)
-    return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area, id_stock_used, scraps_to_create
+    
+    # Preparar cortes para retornar (para acumulación externa)
+    cuts_for_summary = []
+    for item in final_cutting_plan:
+        if not item.get('Is_Waste', False):  # Solo piezas reales (no sobrantes)
+            bin_info = bin_details_map.get(item['Source_Plate_ID'], {})
+            cuts_for_summary.append({
+                'tipologia': item.get('Typology', '-'),
+                'clase': item.get('Class_Cut', 'Simple'),
+                'cardinal': item.get('Cardinal', '1/1'),
+                'innertube' : item.get('Innertube', '-'),
+                'tipo': str(bin_info.get('glass_type', '-')).strip(),
+                'grosor': str(bin_info.get('thickness', '-')).strip(),
+                'color': str(bin_info.get('color', '-')).strip(),
+                'ancho': item.get('Packed_Width', 0),
+                'alto': item.get('Packed_Height', 0),
+                'plancha': item.get('Source_Plate_ID', '-'),
+                'is_rotated': item.get('Is_Rotated', False),
+                'work': item.get('Work', '-'),
+                'id_work': item.get('Id_Work', '-'),
+            })
+    
+    return final_cutting_plan, unpacked_final_list, bin_details_map, total_piece_area, id_stock_used, scraps_to_create, cuts_for_summary
 
 # method to get used plate and scrap ids from bin_details_map
 def get_plate_and_scrap_ids_from_bin_details(bins_used):
@@ -603,7 +639,7 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
         for rect in res['best_result']:
             b_idx, x, y, w, h, rid = rect
             bid = str(best_packer[b_idx].bid)
-            original_w, original_h = original_piece_dimensions[rid]
+            original_w, original_h, typology, class_cut, cardinal, innertube, work, id_work = original_piece_dimensions[rid]
             is_rotated = (w == original_h and h == original_w) and (w != original_w or h != original_h)
             
             is_transformed = False
@@ -620,7 +656,8 @@ def pack_plates(plates, bin_details_map, rects_unfitted, final_cutting_plan, ori
             final_cutting_plan.append({
                 'Piece_ID': rid, 'Source_Plate_ID': bid, 'Source_Plate_Type': plate_type,
                 'X_Coordinate': x, 'Y_Coordinate': y, 'Packed_Width': w, 'Packed_Height': h, 'Is_Rotated': is_rotated, 'Is_Waste': False,
-                'Is_Unused': False, 'Is_Transformed': is_transformed,
+                'Is_Unused': False, 'Is_Transformed': is_transformed, 'Typology': typology, 'Class_Cut': class_cut, 'Cardinal': cardinal, 'Innertube': innertube, 'Work': work,
+                'Id_Work': id_work
             })
 
         # Agregar los free rects (sobrantes) al plan de corte
@@ -750,11 +787,16 @@ if __name__ == "__main__":
     cleanup_previous_outputs()
 
     # Llamamos al optimizador y guardamos los resultados: los cortes que no entraron en ningun lado, etc
-    final_plan, unpacked_items, bin_details, piece_area, id_stock_used, scraps_to_create = run_optimizer(input_data, stock_data)
+    final_plan, unpacked_items, bin_details, piece_area, id_stock_used, scraps_to_create, cuts_for_summary = run_optimizer(input_data, stock_data)
+
+    filtered_pieces = [p for p in final_plan if str(p.get('Piece_ID', '')).startswith('V')]
+
     result = {
         "new_scraps": scraps_to_create["new_scraps"],
         "deleted_stock": id_stock_used["deleted_stock"],
-        "deleted_scrap": id_stock_used["deleted_scrap"]
+        "deleted_scrap": id_stock_used["deleted_scrap"],
+        "final_pieces": filtered_pieces,
+        "cuts_for_summary": cuts_for_summary
     }
 
     print(json.dumps(result))
