@@ -1,6 +1,16 @@
 require 'roo'
 
 class ScrapImporter
+  cattr_accessor :last_result
+
+  COLUMN_INDEXES = {
+    composition: 1, # COMPOSICION
+    base: 2,        # BASE [mm]
+    height: 3,      # ALTO [mm]
+    reference: 4,   # REFERENCIA
+    origin: 7       # ORIGEN / OBRA DE PROCEDENCIA
+  }.freeze
+
   attr_reader :errors, :success_count, :total_rows
 
   def initialize(file_path)
@@ -25,14 +35,14 @@ class ScrapImporter
         # Saltar filas vacías
         next if row_data.all?(&:nil?) || row_data.all? { |cell| cell.to_s.strip.empty? }
 
-        composition = row_data[0]&.to_s&.strip # COMPOSICION
-        base = row_data[1]&.to_f # BASE [mm]
-        alto = row_data[2]&.to_f # ALTO [mm]
-        referencia = row_data[3]&.to_s&.strip # REFERENCIA
-        origen = row_data[4]&.to_s&.strip # ORIGEN
+        composition = cell_string(row_data, COLUMN_INDEXES[:composition])
+        base = cell_number(row_data, COLUMN_INDEXES[:base])
+        alto = cell_number(row_data, COLUMN_INDEXES[:height])
+        referencia = cell_string(row_data, COLUMN_INDEXES[:reference])
+        origen = cell_string(row_data, COLUMN_INDEXES[:origin])
 
         # Validar que tengamos los datos mínimos
-        if composition.blank? || base.nil? || base <= 0 || alto.nil? || alto <= 0
+        if composition.blank? || base.nil? || base <= 0 || alto.nil? || alto <= 0 
           @errors << "Fila #{row_num}: Datos incompletos o inválidos (COMPOSICION: #{composition}, BASE: #{base}, ALTO: #{alto})"
           next
         end
@@ -65,12 +75,15 @@ class ScrapImporter
         end
       end
 
-      {
+      result = {
         success: @errors.empty?,
         success_count: @success_count,
         total_rows: @total_rows,
         errors: @errors
       }
+
+      ScrapImporter.last_result = result
+      result
     rescue Roo::HeaderRowNotFoundError
       { success: false, errors: ["No se encontró la fila de encabezado en el archivo"] }
     rescue => e
@@ -97,7 +110,7 @@ class ScrapImporter
 
     # Validar que los valores sean válidos según el modelo
     valid_scrap_types = ["LAM", "FLO", "COL"]
-    valid_thicknesses = ["3+3", "4+4", "5+5", "5mm"]
+    valid_thicknesses = ["3+3", "4+4", "5+5", "5MM"]
     valid_colors = ["INC", "STB", "GRS", "BRC", "BLS", "STG", "NTR"]
 
     return nil unless valid_scrap_types.include?(scrap_type)
@@ -121,6 +134,16 @@ class ScrapImporter
     else
       return "1"
     end
+  end
+
+  def cell_string(row, index)
+    value = row[index]
+    value.present? ? value.to_s.strip : nil
+  end
+
+  def cell_number(row, index)
+    value = row[index]
+    value.present? ? value.to_f : nil
   end
 end
 

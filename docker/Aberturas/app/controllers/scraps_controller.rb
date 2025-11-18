@@ -93,14 +93,14 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if result[:success]
-        format.html { redirect_to glassplates_path(tab: 'sobrantes'), notice: "Importación exitosa: #{result[:success_count]} sobrantes importados de #{result[:total_rows]} filas procesadas." }
+        format.html do
+          redirect_to glassplates_path(tab: 'sobrantes'),
+                      notice: "Importación exitosa: #{result[:success_count]} sobrantes importados de #{result[:total_rows]} filas procesadas."
+        end
         format.json { render json: { success: true, success_count: result[:success_count], total_rows: result[:total_rows] }, status: :ok }
       else
-        error_message = "Error en la importación: #{result[:errors].join('; ')}"
-        if result[:success_count] > 0
-          error_message += " (#{result[:success_count]} sobrantes importados correctamente)"
-        end
-        format.html { redirect_to glassplates_path(tab: 'sobrantes'), alert: error_message }
+        message = "Importación finalizada con errores. #{result[:success_count]} de #{result[:total_rows]} filas se importaron correctamente."
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), alert: message }
         format.json { render json: { success: false, errors: result[:errors], success_count: result[:success_count] }, status: :unprocessable_entity }
       end
     end

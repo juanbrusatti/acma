@@ -94,6 +94,48 @@
       </div>
     </div>
 
+    <% if @last_scrap_import_result.present? %>
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Última importación de retazos</h3>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= @last_scrap_import_result[:success] ? "Se importaron todos los registros correctamente." : "La importación finalizó con algunos errores." %>
+            </p>
+          </div>
+          <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium <%= @last_scrap_import_result[:success] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+            <%= @last_scrap_import_result[:success] ? 'Exitosa' : 'Con errores' %>
+          </span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-sm text-gray-700">
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Total filas procesadas</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:total_rows] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Sobrantes importados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:success_count] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Errores detectados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:errors]&.length || 0 %></p>
+          </div>
+        </div>
+        <% if @last_scrap_import_result[:errors].present? %>
+          <details class="mt-4">
+            <summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800">
+              Ver detalle de errores (<%= @last_scrap_import_result[:errors].length %>)
+            </summary>
+            <div class="mt-3 max-h-48 overflow-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-red-700 space-y-1">
+              <% @last_scrap_import_result[:errors].each do |error| %>
+                <p><%= error %></p>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
+
     <!-- Tabs -->
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
       <div class="border-b p-4">

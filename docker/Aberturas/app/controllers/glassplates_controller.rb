@@ -6,6 +6,7 @@ class GlassplatesController < ApplicationController
     # Aplicar filtros si existen
     @glassplates = Glassplate.all
     @scraps = Scrap.order(created_at: :desc)
+    @last_scrap_import_result = ScrapImporter.last_result
 
     # Búsqueda unificada - busca en ambos tipos según el tab activo
     if params[:search].present?
