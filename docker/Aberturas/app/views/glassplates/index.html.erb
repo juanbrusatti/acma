@@ -379,30 +379,6 @@ document.addEventListener('click', function(e) {
 document.addEventListener('turbo:load', updateSearchFormTab);
 document.addEventListener('DOMContentLoaded', updateSearchFormTab);
 
-function updatePaginationLinks() {
-  const activeTab = document.querySelector('[data-tab].bg-primary');
-  if (!activeTab) return;
-  
-  const tabValue = activeTab.getAttribute('data-tab');
-  const paginationLinks = document.querySelectorAll('.pagination a');
-  
-  paginationLinks.forEach(link => {
-    const url = new URL(link.href, window.location.origin);
-    url.searchParams.set('tab', tabValue);
-    link.href = url.toString();
-  });
-  
-  console.log('Updated', paginationLinks.length, 'pagination links with tab:', tabValue);
-}
-
-document.addEventListener('turbo:load', updatePaginationLinks);
-document.addEventListener('DOMContentLoaded', updatePaginationLinks);
-
-document.addEventListener('click', function(e) {
-  if (e.target.hasAttribute('data-tab')) {
-    setTimeout(updatePaginationLinks, 100);
-  }
-});
 </script>
 
 <script>
