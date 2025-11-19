@@ -125,11 +125,11 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             # Ajustar colWidths para que sumen 1
             col_widths = [0.10, 0.07, 0.10, 0.07, 0.12, 0.10, 0.10, 0.20, 0.14]
 
-            # Crear tabla centrada
+            # Crear tabla centrada horizontalmente y arriba verticalmente
             table = table_ax.table(
                 cellText=page_table_data,
                 cellLoc='center',
-                loc='center',
+                loc='upper center',
                 colWidths=col_widths
             )
             
