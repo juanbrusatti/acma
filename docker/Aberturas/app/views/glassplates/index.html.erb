@@ -327,7 +327,7 @@
         <div>
           <%= form.file_field :file, accept: ".xlsx,.xls", required: true, class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" %>
         </div>
-
+    
         <div id="import-scraps-errors" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded"></div>
         <div id="import-scraps-success" class="hidden text-sm text-green-600 bg-green-50 p-3 rounded"></div>
 
@@ -342,3 +342,32 @@
   </div>
 </div>
 
+<script>
+
+    function updatePaginationLinks() {
+    const activeTab = document.querySelector('[data-tab].bg-primary');
+    if (!activeTab) return;
+
+    const tabValue = activeTab.getAttribute('data-tab');
+    const paginationLinks = document.querySelectorAll('.pagination a');
+
+    paginationLinks.forEach(link => {
+      const url = new URL(link.href, window.location.origin);
+      url.searchParams.set('tab', tabValue);
+      link.href = url.toString();
+    });
+
+    console.log('Updated', paginationLinks.length, 'pagination links with tab:', tabValue);
+  }
+
+  // Actualizar enlaces de paginación al cargar y cuando cambie el tab
+  document.addEventListener('turbo:load', updatePaginationLinks);
+  document.addEventListener('DOMContentLoaded', updatePaginationLinks);
+
+  document.addEventListener('click', function(e) {
+    if (e.target.hasAttribute('data-tab')) {
+      setTimeout(updatePaginationLinks, 100);
+    }
+  });
+
+</script>

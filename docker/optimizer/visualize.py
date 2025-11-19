@@ -83,6 +83,53 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
     dvh_count = sum(1 for cut in all_cuts if cut.get('clase') == 'DVH')
     simple_count = sum(1 for cut in all_cuts if cut.get('clase') == 'Simple')
     
+    # Agrupar DVH por ID base (antes del _)
+    dvh_groups = {}
+    for cut in all_cuts:
+        if cut.get('clase') == 'DVH':
+            id = cut.get('id_pieza', '')
+            # Extraer ID base (antes del _)
+            base_id = id.split('_')[0] if '_' in id else id
+            
+            if base_id not in dvh_groups:
+                dvh_groups[base_id] = []
+            dvh_groups[base_id].append(cut)
+    
+    # Crear tabla de resumen de DVH
+    dvh_summary = []
+    for base_id, cuts in dvh_groups.items():
+        # Procesar los cortes de 2 en 2 (cada DVH tiene 2 vidrios)
+        for i in range(0, len(cuts), 2):
+            if i + 1 < len(cuts):
+                cut1 = cuts[i]
+                cut2 = cuts[i + 1]
+                
+                # Obtener composición de cada vidrio
+                tipo1 = cut1.get('tipo', '-')
+                grosor1 = cut1.get('grosor', '-')
+                color1 = cut1.get('color', '-')
+                comp1 = f"{tipo1} {grosor1} {color1}".strip()
+                
+                tipo2 = cut2.get('tipo', '-')
+                grosor2 = cut2.get('grosor', '-')
+                color2 = cut2.get('color', '-')
+                comp2 = f"{tipo2} {grosor2} {color2}".strip()
+
+                tipologia = cut1.get('tipologia', '')
+                
+                # Cámara (innertube)
+                camara = cut1.get('innertube', '-')
+                
+                # Composición completa del DVH
+                composicion_dvh = f"{comp1} / {camara} / {comp2}"
+                
+                dvh_summary.append({
+                    'tipologia': tipologia,
+                    'composicion': composicion_dvh,
+                    'ancho': int(cut1.get('ancho', 0)),
+                    'alto': int(cut1.get('alto', 0))
+                })
+    
     with PdfPages(output_path) as pdf:
         for page_num in range(total_pages):
             fig = plt.figure(figsize=(fig_width, fig_height))
@@ -91,7 +138,6 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             ax = fig.add_subplot(111)
             ax.axis('off')
             
-            # Información adicional - resumen de cortes SOLO en la primera página
             if page_num == 0:
                 # Título
                 fig.text(0.5, 0.84, "RESUMEN GENERAL DE CORTES", 
@@ -125,11 +171,11 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             # Ajustar colWidths para que sumen 1
             col_widths = [0.10, 0.07, 0.10, 0.07, 0.12, 0.10, 0.10, 0.20, 0.14]
 
-            # Crear tabla centrada
+            # Crear tabla centrada horizontalmente y arriba verticalmente
             table = table_ax.table(
                 cellText=page_table_data,
                 cellLoc='center',
-                loc='center',
+                loc='upper center',
                 colWidths=col_widths
             )
             
@@ -160,6 +206,70 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
             
             pdf.savefig(fig)
             plt.close(fig)
+        
+        # Agregar página con resumen de DVH si hay DVH
+        if dvh_summary:
+            fig_dvh = plt.figure(figsize=(fig_width, fig_height))
+            draw_header(fig_dvh, page=total_pages + 1, total_pages=total_pages + 1)
+            
+            ax_dvh = fig_dvh.add_subplot(111)
+            ax_dvh.axis('off')
+            
+            # Título del resumen de DVH
+            fig_dvh.text(0.5, 0.84, "RESUMEN DE DVH", 
+                         ha='center', fontsize=12, weight='bold')
+            
+            # Preparar datos para la tabla de DVH
+            dvh_headers = ['Tipología', 'Composición', 'Ancho', 'Alto']
+            dvh_table_data = [dvh_headers]
+            
+            for dvh in dvh_summary:
+                dvh_table_data.append([
+                    dvh['tipologia'],
+                    dvh['composicion'],
+                    str(dvh['ancho']),
+                    str(dvh['alto'])
+                ])
+            
+            # Posicionar tabla de DVH
+            dvh_table_ax = fig_dvh.add_axes([0.05, 0.05, 0.90, 0.77])
+            dvh_table_ax.axis('off')
+            
+            # Crear tabla de DVH
+            dvh_table = dvh_table_ax.table(
+                cellText=dvh_table_data,
+                cellLoc='center',
+                loc='upper center',
+                colWidths=[0.15, 0.55, 0.15, 0.15]
+            )
+            
+            # Estilizar tabla de DVH
+            dvh_table.auto_set_font_size(False)
+            dvh_table.set_fontsize(8)
+            dvh_table.scale(1, 2.0)
+            
+            # Aplicar estilos a celdas
+            for i, row in enumerate(dvh_table_data):
+                for j, cell in enumerate(row):
+                    table_cell = dvh_table[(i, j)]
+                    table_cell.set_edgecolor('#ddd')
+                    table_cell.set_linewidth(0.5)
+                    
+                    if i == 0:  # Header
+                        table_cell.set_facecolor('#f3f3f3')
+                        table_cell.set_text_props(weight='bold', color='#222', fontsize=8)
+                        table_cell.set_edgecolor('#ddd')
+                        table_cell.set_linewidth(1)
+                    else:
+                        # Alternar colores
+                        if (i - 1) % 2 == 0:
+                            table_cell.set_facecolor('#ffffff')
+                        else:
+                            table_cell.set_facecolor('#f9f9f9')
+                        table_cell.set_text_props(color='#333', fontsize=8)
+            
+            pdf.savefig(fig_dvh)
+            plt.close(fig_dvh)
     
     print(f"✅ Guardado PDF de resumen general: {output_path}")
     return output_path
@@ -336,7 +446,15 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
         os.makedirs(out_dir, exist_ok=True)
 
         # --- Guardar PDF con múltiples páginas ---
-        base_pdf = os.path.join(out_dir, f"{bin_id}.pdf")
+        # Usar número de referencia para el nombre del archivo
+        if is_scrap and number_ref:
+            pdf_filename = f"Sobrante_{number_ref}.pdf"
+        elif number_ref:
+            pdf_filename = f"Plancha_{number_ref}.pdf"
+        else:
+            pdf_filename = f"{bin_id}.pdf"
+        
+        base_pdf = os.path.join(out_dir, pdf_filename)
         with PdfPages(base_pdf) as pdf:
             # Primera página con el diagrama
             pdf.savefig(fig)

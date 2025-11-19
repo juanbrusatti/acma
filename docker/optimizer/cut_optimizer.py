@@ -525,6 +525,7 @@ def run_optimizer(input_data, stock_data):
             bin_info = bin_details_map.get(item['Source_Plate_ID'], {})
             cuts_for_summary.append({
                 'tipologia': item.get('Typology', '-'),
+                'id_pieza': item.get('Piece_ID', '-'),
                 'clase': item.get('Class_Cut', 'Simple'),
                 'cardinal': item.get('Cardinal', '1/1'),
                 'innertube' : item.get('Innertube', '-'),
