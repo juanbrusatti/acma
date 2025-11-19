@@ -38,7 +38,7 @@
       Cancelar
     <% end %>
 
-    <%= button_to accept_optimize_project_path(@project),
+    <%= button_to accept_optimize_project_path(@project, project_ids: params[:project_ids]),
                   method: :post,
                   class: "inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500",
                   data: { turbo_confirm: "¿Está seguro de confirmar la optimización? Se actualizará el stock y los sobrantes." } do %>

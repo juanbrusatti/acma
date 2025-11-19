@@ -1,4 +1,4 @@
-<div class="flex min-h-screen w-full flex-col">
+<div class="flex min-h-screen w-full flex-col" data-glassplates-page="true">
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
       <h1 class="text-2xl font-semibold">Gestión de Stock</h1>
@@ -94,6 +94,48 @@
       </div>
     </div>
 
+    <% if @last_scrap_import_result.present? %>
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Última importación de retazos</h3>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= @last_scrap_import_result[:success] ? "Se importaron todos los registros correctamente." : "La importación finalizó con algunos errores." %>
+            </p>
+          </div>
+          <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium <%= @last_scrap_import_result[:success] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+            <%= @last_scrap_import_result[:success] ? 'Exitosa' : 'Con errores' %>
+          </span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-sm text-gray-700">
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Total filas procesadas</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:total_rows] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Sobrantes importados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:success_count] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Errores detectados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:errors]&.length || 0 %></p>
+          </div>
+        </div>
+        <% if @last_scrap_import_result[:errors].present? %>
+          <details class="mt-4">
+            <summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800">
+              Ver detalle de errores (<%= @last_scrap_import_result[:errors].length %>)
+            </summary>
+            <div class="mt-3 max-h-48 overflow-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-red-700 space-y-1">
+              <% @last_scrap_import_result[:errors].each do |error| %>
+                <p><%= error %></p>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
+
     <!-- Tabs -->
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
       <div class="border-b p-4">
@@ -170,9 +212,29 @@
       <!-- Retazos Tab -->
       <div id="sobrantes-tab" class="tab-content hidden">
         <div class="p-6">
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold">Retazos</h3>
-            <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">Retazos</h3>
+              <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" id="import-scraps-excel-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-700 h-9 px-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Importar desde Excel
+              </button>
+              <%= link_to export_scraps_path(format: :xlsx), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-9 px-3" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Exportar a Excel
+              <% end %>
+            </div>
           </div>
 
           <div class="relative w-full overflow-auto">
@@ -231,168 +293,81 @@
   </main>
 </div>
 
+<!-- Modal para importar sobrantes desde Excel -->
+<div id="import-scraps-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Importar Sobrantes desde Excel</h2>
+        <button type="button" id="close-scraps-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-4">
+          Selecciona un archivo Excel (.xlsx o .xls) con el siguiente formato:
+        </p>
+        <div class="bg-gray-50 p-3 rounded text-xs text-gray-700 mb-4">
+          <p class="font-semibold mb-2">Columnas requeridas:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>COMPOSICION:</strong> Tipo, grosor y color (ej: "COL 4+4 STB")</li>
+            <li><strong>BASE [mm]:</strong> Ancho en milímetros</li>
+            <li><strong>ALTO [mm]:</strong> Alto en milímetros</li>
+            <li><strong>REFERENCIA:</strong> (opcional) Código de referencia del sobrante</li>
+            <li><strong>ORIGEN:</strong> (opcional) Obra de procedencia</li>
+          </ul>
+        </div>
+      </div>
+
+      <%= form_with url: import_scraps_path, method: :post, multipart: true, id: "import-scraps-form", class: "space-y-4" do |form| %>
+        <div>
+          <%= form.file_field :file, accept: ".xlsx,.xls", required: true, class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" %>
+        </div>
+    
+        <div id="import-scraps-errors" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded"></div>
+        <div id="import-scraps-success" class="hidden text-sm text-green-600 bg-green-50 p-3 rounded"></div>
+
+        <div class="flex gap-3 justify-end">
+          <button type="button" id="cancel-scraps-import-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+            Cancelar
+          </button>
+          <%= form.submit "Importar", class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors", id: "submit-scraps-import-btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
 <script>
-// Función para inicializar el sistema de tabs
-function initializeTabs() {
-  console.log('🚀 Initializing tabs system');
 
-  const tabs = document.querySelectorAll('[data-tab]');
-  const tabContents = document.querySelectorAll('.tab-content');
+    function updatePaginationLinks() {
+    const activeTab = document.querySelector('[data-tab].bg-primary');
+    if (!activeTab) return;
 
-  console.log('🔍 Found tabs:', tabs.length);
-  console.log('🔍 Found tab contents:', tabContents.length);
-
-  if (tabs.length === 0 || tabContents.length === 0) {
-    console.log('❌ Missing required tab elements');
-    return;
-  }
-
-  // Get active tab from URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const activeTabParam = urlParams.get('tab');
-  let initialTab = activeTabParam || 'planchas'; // Default to 'planchas'
-
-  console.log('URL tab parameter:', activeTabParam);
-  console.log('Initial tab:', initialTab);
-
-  // Ensure the initialTab exists, otherwise default to 'planchas'
-  if (!document.getElementById(`${initialTab}-tab`)) {
-    console.log('Tab not found, defaulting to planchas');
-    initialTab = 'planchas';
-  }
-
-  // Limpiar listeners existentes para evitar duplicados
-  tabs.forEach(tab => {
-    const newTab = tab.cloneNode(true);
-    tab.parentNode.replaceChild(newTab, tab);
-  });
-
-  // Obtener los nuevos elementos después del reemplazo
-  const newTabs = document.querySelectorAll('[data-tab]');
-
-  // Set initial active tab based on URL parameter
-  newTabs.forEach(tab => {
-    if (tab.getAttribute('data-tab') === initialTab) {
-      tab.classList.add('bg-primary', 'text-primary-foreground', 'shadow-sm');
-      tab.classList.remove('bg-background', 'text-muted-foreground');
-      console.log('✅ Set initial active tab:', initialTab);
-    } else {
-      tab.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
-      tab.classList.add('bg-background', 'text-muted-foreground');
-    }
-  });
-
-  // Set initial tab content visibility
-  tabContents.forEach(content => {
-    if (content.id === `${initialTab}-tab`) {
-      content.classList.remove('hidden');
-      console.log('✅ Show initial content for tab:', initialTab);
-    } else {
-      content.classList.add('hidden');
-    }
-  });
-
-  newTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      console.log('📝 Tab clicked:', this.getAttribute('data-tab'));
-      const targetTab = this.getAttribute('data-tab');
-
-      // Update tab buttons
-      newTabs.forEach(t => {
-        t.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
-        t.classList.add('bg-background', 'text-muted-foreground');
-      });
-      this.classList.remove('bg-background', 'text-muted-foreground');
-      this.classList.add('bg-primary', 'text-primary-foreground', 'shadow-sm');
-
-      // Update tab content
-      tabContents.forEach(content => {
-        content.classList.add('hidden');
-      });
-      const targetContent = document.getElementById(targetTab + '-tab');
-      if (targetContent) {
-        targetContent.classList.remove('hidden');
-        console.log('✅ Switched to tab:', targetTab);
-      } else {
-        console.log('❌ Target content not found:', targetTab + '-tab');
-      }
-    });
-  });
-
-  console.log('✅ Tabs system initialized');
-}
-
-// Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', initializeTabs);
-
-// También inicializar cuando se navega con Turbo (para Rails 7+)
-document.addEventListener('turbo:load', initializeTabs);
-
-// Función para actualizar el placeholder de búsqueda según el tab activo
-function updateSearchPlaceholder() {
-  const searchInput = document.querySelector('input[name="search"]');
-  const activeTab = document.querySelector('[data-tab].bg-primary') || document.querySelector('[data-tab="planchas"]');
-
-  if (searchInput && activeTab) {
-    const tabType = activeTab.getAttribute('data-tab');
-    if (tabType === 'sobrantes') {
-      searchInput.placeholder = "Buscar retazos por referencia, tipo, grosor, color...";
-    } else {
-      searchInput.placeholder = "Buscar planchas por tipo, grosor, color...";
-    }
-  }
-}
-
-// Actualizar placeholder cuando se cambie de tab
-document.addEventListener('click', function(e) {
-  if (e.target.hasAttribute('data-tab')) {
-    setTimeout(updateSearchPlaceholder, 100); // Pequeño delay para que se actualice el tab
-  }
-});
-
-// Inicializar placeholder al cargar
-document.addEventListener('turbo:load', updateSearchPlaceholder);
-
-// Función para actualizar el campo tab del formulario cuando se cambia de tab
-function updateSearchFormTab() {
-  const activeTab = document.querySelector('[data-tab].bg-primary');
-  const tabInput = document.getElementById('current-tab');
-
-  if (activeTab && tabInput) {
     const tabValue = activeTab.getAttribute('data-tab');
-    tabInput.value = tabValue;
-    console.log('✅ Updated search form tab to:', tabValue);
+    const paginationLinks = document.querySelectorAll('.pagination a');
+
+    paginationLinks.forEach(link => {
+      const url = new URL(link.href, window.location.origin);
+      url.searchParams.set('tab', tabValue);
+      link.href = url.toString();
+    });
+
+    console.log('Updated', paginationLinks.length, 'pagination links with tab:', tabValue);
   }
-}
 
-// Actualizar el campo tab cuando se cambie de tab
-document.addEventListener('click', function(e) {
-  if (e.target.hasAttribute('data-tab')) {
-    setTimeout(() => {
-      updateSearchFormTab();
-      updateSearchPlaceholder();
-    }, 100);
-  }
-});
+  // Actualizar enlaces de paginación al cargar y cuando cambie el tab
+  document.addEventListener('turbo:load', updatePaginationLinks);
+  document.addEventListener('DOMContentLoaded', updatePaginationLinks);
 
-// Inicializar el campo tab al cargar
-document.addEventListener('turbo:load', updateSearchFormTab);
-document.addEventListener('DOMContentLoaded', updateSearchFormTab);
+  document.addEventListener('click', function(e) {
+    if (e.target.hasAttribute('data-tab')) {
+      setTimeout(updatePaginationLinks, 100);
+    }
+  });
 
-</script>
-
-<script>
-// Debug script para verificar que el módulo se carga
-console.log('Glassplates page loaded');
-console.log('Edit buttons found:', document.querySelectorAll('.edit-glassplate-btn').length);
-
-// Verificar si el módulo se inicializó
-setTimeout(() => {
-  console.log('Checking if glassplate editor is initialized...');
-  if (window.glassplateEditor) {
-    console.log('✅ Glassplate editor is initialized');
-  } else {
-    console.log('❌ Glassplate editor not found');
-  }
-}, 1000);
 </script>
