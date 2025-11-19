@@ -193,24 +193,27 @@ class ProjectsController < ApplicationController
     # Recibir y mostrar los IDs de proyectos seleccionados
     if params[:project_ids].present?
       project_ids = params[:project_ids].split(',').map(&:to_i)
+      project_ids.delete(@project.id) # Delete current project ID
     end
 
     require 'net/http'
     optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
     uri = URI.parse(optimizer_url)
 
-    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps], flo_lam_flag = params[:flo_lam])
+    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps], flo_lam_flag = params[:flo_lam], project_ids = project_ids.nil? ? nil : project_ids)
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
-    redirect_to confirm_optimization_project_path(@project)
+    redirect_to confirm_optimization_project_path(@project, project_ids: project_ids.nil? ? nil : project_ids)
   end
 
   # View to confirm optimization results
   def confirm_optimization
     @project = Project.find(params[:id])
+    # @project_ids = params[:project_ids]
+
     # Pull optimization data from JSON file
     json_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}_summary.json")
-    
+
     if File.exist?(json_path)
       @optimization_data = JSON.parse(File.read(json_path))
     else
@@ -224,11 +227,12 @@ class ProjectsController < ApplicationController
 
   def accept_optimize
     @project = Project.find(params[:id])
-    
+    @project_ids = params[:project_ids].present? ? params[:project_ids] : []
+
     # Leer optimization_data desde archivo JSON
     json_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}_summary.json")
     optimization_data = File.exist?(json_path) ? JSON.parse(File.read(json_path)) : nil
-    
+
     Rails.logger.info "accept_optimize: optimization_data = #{optimization_data.inspect}"
 
     if optimization_data.nil? || optimization_data.empty?
@@ -250,12 +254,20 @@ class ProjectsController < ApplicationController
     delete_used_stock(used_stock) if used_stock.any?
 
     @project.update(date_of_optimization: Date.today, status: "Terminado")
+    @project_ids.each do |proj_id|
+      begin
+        proj = Project.find(proj_id)
+        proj.update(date_of_optimization: Date.today, status: "Terminado")
+      rescue ActiveRecord::RecordNotFound
+        next
+      end
+    end
 
     # Clean up temporary files
     optimizations_dir = Rails.root.join("tmp", "optimizations")
     zip_path = optimizations_dir.join("project_#{@project.id}.zip")
     json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
-    
+
     File.delete(zip_path) if File.exist?(zip_path)
     File.delete(json_path) if File.exist?(json_path)
 
@@ -269,10 +281,10 @@ class ProjectsController < ApplicationController
     optimizations_dir = Rails.root.join("tmp", "optimizations")
     zip_path = optimizations_dir.join("project_#{@project.id}.zip")
     json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
-    
+
     File.delete(zip_path) if File.exist?(zip_path)
     File.delete(json_path) if File.exist?(json_path)
-    
+
     redirect_to project_path(@project), notice: "Optimización cancelada."
   end
 
@@ -284,7 +296,7 @@ class ProjectsController < ApplicationController
       redirect_to project_path(@project), alert: "No hay datos de optimización disponibles....."
       return
     end
-    
+
     send_file zip_path,
               type: "application/zip",
               disposition: "attachment",
@@ -396,10 +408,19 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def create_microservice_params(stock_flag = false, scraps_flag = false, flo_lam_flag = false)
+  def create_microservice_params(stock_flag = false, scraps_flag = false, flo_lam_flag = false, project_ids = nil)
     pieces_to_cut = []
     glasscuttings = @project.glasscuttings
     dvhs = @project.dvhs
+
+    # Other projects
+    if project_ids.present?
+      additional_projects = Project.where(id: project_ids)
+      additional_projects.each do |proj|
+        glasscuttings += proj.glasscuttings
+        dvhs += proj.dvhs
+      end
+    end
 
     # Convertir string params a boolean si es necesario
     stock_flag = stock_flag.to_s == 'true' || stock_flag == true
@@ -433,8 +454,8 @@ class ProjectsController < ApplicationController
         type_opening: cut.type_opening,
         class_cut: 'Simple',
         cardinal: '1/1',
-        work: @project.name,
-        id_work: @project.id,
+        work: cut.project.name,
+        id_work: cut.project.id,
         is_transformed: (final_glass_type != cut.glass_type || final_thickness != cut.thickness),
       }
     end
@@ -464,7 +485,7 @@ class ProjectsController < ApplicationController
       # Creo los dos DVh
       [
         {
-          id: dvh.id.to_s + "_1",          
+          id: dvh.id.to_s + "_1",
           typology: dvh.typology,
           width: dvh.width,
           height: dvh.height,
@@ -475,9 +496,9 @@ class ProjectsController < ApplicationController
           thickness: glass1_thickness,
           type_opening: dvh.type_opening,
           class_cut: 'DVH',
-          cardinal: '1/2',  
-          work: @project.name,
-          id_work: @project.id,
+          cardinal: '1/2',
+          work: dvh.project.name,
+          id_work: dvh.project.id,
           is_transformed: (glass1_type != dvh.glasscutting1_type || glass1_thickness != dvh.glasscutting1_thickness)
         },
         {
@@ -493,8 +514,8 @@ class ProjectsController < ApplicationController
           type_opening: dvh.type_opening,
           class_cut: 'DVH',
           cardinal: '2/2',
-          work: @project.name,
-          id_work: @project.id,
+          work: dvh.project.name,
+          id_work: dvh.project.id,
           is_transformed: (glass2_type != dvh.glasscutting2_type || glass2_thickness != dvh.glasscutting2_thickness)
         }
       ]
@@ -575,7 +596,6 @@ class ProjectsController < ApplicationController
             old_json = optimizations_dir.join("project_#{@project.id}_summary.json")
             File.delete(old_zip) if File.exist?(old_zip)
             File.delete(old_json) if File.exist?(old_json)
-            
             zip_bytes = zip_part.body.decoded
             zip_filename = zip_part.filename.presence || zip_filename
             if zip_bytes
