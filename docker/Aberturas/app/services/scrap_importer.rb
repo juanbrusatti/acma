@@ -7,7 +7,7 @@ class ScrapImporter
     composition: 1, # COMPOSICION
     base: 2,        # BASE [mm]
     height: 3,      # ALTO [mm]
-    reference: 4,   # REFERENCIA
+    reference: 5,   # REFERENCIA
     origin: 7       # ORIGEN / OBRA DE PROCEDENCIA
   }.freeze
 
