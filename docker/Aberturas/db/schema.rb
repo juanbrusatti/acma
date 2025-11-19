@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_224540) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_010820) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,7 +114,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_224540) do
   end
 
   create_table "scraps", force: :cascade do |t|
-    t.string "ref_number"
+    t.integer "ref_number"
     t.string "scrap_type"
     t.string "thickness"
     t.float "width"
