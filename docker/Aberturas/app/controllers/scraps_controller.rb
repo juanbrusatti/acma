@@ -84,13 +84,14 @@ class ScrapsController < ApplicationController
     temp_file.rewind
 
     # Procesar el archivo
-    importer = ScrapImporter.new(temp_file.path)
-    result = importer.import
-
-    # Limpiar archivo temporal
-    temp_file.close
-    temp_file.unlink
-
+    begin
+      importer = ScrapImporter.new(temp_file.path)
+      result = importer.import
+    ensure
+      # Limpiar archivo temporal
+      temp_file.close unless temp_file.closed?
+      temp_file.unlink if File.exist?(temp_file.path)
+    end
     respond_to do |format|
       if result[:success]
         format.html do

@@ -55,7 +55,7 @@ class ScrapImporter
         end
 
         # Usar la referencia del Excel si viene, o generar una automáticamente
-        ref_number = referencia.present? ? referencia : generate_ref_number(parsed_data[:scrap_type], parsed_data[:thickness], parsed_data[:color])
+        ref_number = referencia.present? ? referencia.to_i : generate_ref_number(parsed_data[:scrap_type], parsed_data[:thickness], parsed_data[:color])
 
         # Crear el scrap
         scrap = Scrap.new(
