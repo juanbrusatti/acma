@@ -462,7 +462,7 @@ def visualize_packing(packed_results, bin_details_map, output_folder='output_vis
 
             if resumen:
                 fig2, ax2 = plt.subplots(figsize=(fig_width, fig_height))
-                draw_header(fig2, page=2, total_pages=2) # SI no queremos volver a dibujar el header, sacamos esta linea
+                draw_header(fig2, page=2, total_pages=2) # Si no queremos volver a dibujar el header, sacamos esta línea
                 ax2.axis('off')
                 
                 # Título para la segunda página
