@@ -154,6 +154,13 @@ const GlassplatesPage = (() => {
     if (importForm) {
       const submitHandler = (event) => {
         const fileInput = importForm.querySelector('input[type="file"]');
+
+        const showError = (message) => {
+          if (!importErrors) return;
+          importErrors.textContent = message;
+          importErrors.classList.remove("hidden");
+        };
+
         if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
           event.preventDefault();
           showError("Por favor selecciona un archivo.");
@@ -174,11 +181,6 @@ const GlassplatesPage = (() => {
         }
       };
 
-      const showError = (message) => {
-        if (!importErrors) return;
-        importErrors.textContent = message;
-        importErrors.classList.remove("hidden");
-      };
 
       register(importForm, "submit", submitHandler);
     }
