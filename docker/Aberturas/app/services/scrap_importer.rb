@@ -42,7 +42,7 @@ class ScrapImporter
         origen = cell_string(row_data, COLUMN_INDEXES[:origin])
 
         # Validar que tengamos los datos mínimos
-        if composition.blank? || base.nil? || base <= 0 || alto.nil? || alto <= 0 
+        if composition.blank? || base.nil? || base <= 0 || alto.nil? || alto <= 0
           @errors << "Fila #{row_num}: Datos incompletos o inválidos (COMPOSICION: #{composition}, BASE: #{base}, ALTO: #{alto})"
           next
         end
@@ -127,14 +127,11 @@ class ScrapImporter
   end
 
   def generate_ref_number(scrap_type, thickness, color)
-    # Generar ref_number automáticamente si no viene en el Excel
     last_scrap = Scrap.where(scrap_type: scrap_type, thickness: thickness, color: color).order(ref_number: :desc).first
     if last_scrap
-      last_scrap_ref_number_int = last_scrap.ref_number.to_i
-      last_scrap_ref_number_int += 1
-      return last_scrap_ref_number_int.to_s
+      last_scrap.ref_number + 1
     else
-      return "1"
+      1
     end
   end
 
@@ -148,4 +145,3 @@ class ScrapImporter
     value.present? ? value.to_f : nil
   end
 end
-
