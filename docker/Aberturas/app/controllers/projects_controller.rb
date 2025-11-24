@@ -415,12 +415,12 @@ class ProjectsController < ApplicationController
 
     # Other projects
     if project_ids.present?
-      additional_projects = Project.where(id: project_ids)
-      additional_projects.each do |proj|
-        glasscuttings += proj.glasscuttings
-        dvhs += proj.dvhs
-      end
+    additional_projects = Project.includes(:glasscuttings, :dvhs).where(id: project_ids)
+    additional_projects.each do |proj|
+      glasscuttings += proj.glasscuttings
+      dvhs += proj.dvhs
     end
+  end
 
     # Convertir string params a boolean si es necesario
     stock_flag = stock_flag.to_s == 'true' || stock_flag == true
