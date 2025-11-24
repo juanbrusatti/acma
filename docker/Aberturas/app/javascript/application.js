@@ -12,6 +12,7 @@ import "quantity_editor"
 import "glassplate_inline_edit"
 import "scrap_inline_edit"
 import "optimize_modal"
+import "glassplates_page"
 
 document.addEventListener("turbo:load", () => {
 	// Inicializar selects dinámicos para glassplates y scraps

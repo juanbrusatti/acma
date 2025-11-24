@@ -6,7 +6,12 @@ Rails.application.routes.draw do
       get :api_status
     end
   end
-  resources :scraps, except: [:show, :index]
+  resources :scraps, except: [:show, :index] do
+    collection do
+      post :import
+      get :export
+    end
+  end
 
   resources :supplies
   resources :glassplates
@@ -28,6 +33,7 @@ Rails.application.routes.draw do
       post :accept_optimize
       get :cancel_optimize
       get :download_optimization_zip
+      get :convertible_pieces
     end
     collection do
       post :preview_pdf

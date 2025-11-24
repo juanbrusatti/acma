@@ -1,4 +1,22 @@
 <div class="container mx-auto mt-10 bg-white rounded-lg shadow p-6 sm:p-8 max-w-7xl" id="project-details">
+  <style>
+    /* Estilos del scrollbar del contenedor que realmente scrollea */
+    .scroll-area::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .scroll-area::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    .scroll-area::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
   <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <h1 class="text-4xl lg:text-5xl font-bold" id="project-name-view"><%= @project.name %></h1>
     <div class="flex gap-2">
@@ -105,10 +123,10 @@
 </div>
 
 <!-- Modal de Optimización -->
-<div id="optimize-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4" style="display: none;">
-  <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+<div id="optimize-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4" style="display: none;" data-current-project-id="<%= @project.id %>">
+  <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
     <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
       <h2 class="text-2xl font-bold text-gray-900">Opciones de Optimización</h2>
       <button id="close-optimize-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,42 +197,81 @@
               class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
             >
           </div>
-          <div class="ml-3">
+          <div class="ml-3 w-full">
             <label for="flo-lam-checkbox" class="font-medium text-gray-900 cursor-pointer">
               Considerar transformación FLO por LAM
             </label>
             <p class="text-sm text-gray-500">Tratar a las piezas FLO 5mm INC, de aberturas de Aluminio, menores a 1800x500, como piezas LAM 3+3 INC</p>
 
-            <% convertible = @project.convertible_pieces %>
-            <% if convertible.any? %>
-              <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                <p class="text-sm font-semibold text-yellow-800 mb-1">
-                  Piezas que se convertirán (<%= convertible.count %>):
-                </p>
-                <ul class="text-xs text-yellow-700 space-y-1">
-                  <% convertible.each do |piece| %>
-                    <li>
-                      <% if piece[:type] == 'glasscutting' %>
-                        • Vidrio <%= piece[:typology] %>: <%= piece[:width].to_i %>x<%= piece[:height].to_i %>mm - <%= piece[:glass_type] %> <%= piece[:thickness] %> <%= piece[:color] %>
-                      <% else %>
-                        • DVH <%= piece[:typology] %>: <%= piece[:width].to_i %>x<%= piece[:height].to_i %>mm
-                        <% if piece[:glass1_convertible] %>
-                          → Vidrio 1: <%= piece[:glass1_type] %> <%= piece[:glass1_thickness] %> <%= piece[:glass1_color] %>
-                        <% end %>
-                        <% if piece[:glass2_convertible] %>
-                          → Vidrio 2: <%= piece[:glass2_type] %> <%= piece[:glass2_thickness] %> <%= piece[:glass2_color] %>
-                        <% end %>
-                      <% end %>
-                    </li>
-                  <% end %>
-                </ul>
-              </div>
-            <% else %>
-              <p class="text-xs text-gray-400 mt-1">No hay piezas convertibles en este proyecto</p>
-            <% end %>
+            <!-- Grid de piezas convertibles con scroll -->
+            <div class="overflow-x-auto border border-gray-200 rounded-lg p-3 bg-gray-50 scroll-area max-w-full">
+            <div id="convertible-pieces-container" class="flex gap-3 pb-2">
+              <% convertible = @project.convertible_pieces %>
+              <% if convertible.any? %>
+                <div class="p-3 bg-yellow-50 border border-yellow-200 rounded flex-shrink-0 w-auto" data-project-id="<%= @project.id %>">
+                  <p class="text-sm font-semibold text-yellow-800">
+                    <span class="text-blue-600"><%= @project.name %></span>: <span class="text-yellow-900"><%= convertible.count %> piezas</span>
+                  </p>
+                </div>
+              <% else %>
+                <p class="text-xs text-gray-400">No hay piezas convertibles en este proyecto</p>
+              <% end %>
+            </div>
+          </div>
+
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Sección de Proyectos Múltiples (inicialmente oculta) -->
+    <div id="multiple-projects-section" class="p-6 border-t border-gray-200" style="display: none;">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Selecciona proyectos adicionales</h3>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">Proyectos seleccionados:</span>
+          <span id="selected-projects-count" class="inline-flex items-center justify-center min-w-[2rem] h-8 px-3 bg-blue-600 text-white text-sm font-bold rounded-full">1</span>
+        </div>
+      </div>
+
+      <!-- Grid de proyectos con scroll -->
+      <div class="overflow-x-auto border border-gray-200 rounded-lg p-3 bg-gray-50 scroll-area">
+        <div id="projects-grid" class="flex gap-3 pb-2">
+          <% if @projects.any? %>
+            <% @projects.each do |project| %>
+               <div class="project-card cursor-pointer border-2 border-gray-300 rounded-lg p-3 bg-white hover:border-blue-400 transition-all flex-shrink-0 w-64"
+                  data-project-id="<%= project.id %>"
+                  onclick="toggleProjectSelection(this)">
+                <div class="flex items-start justify-between mb-2">
+                  <h4 class="text-sm font-semibold text-gray-900 truncate flex-1" title="<%= project.name %>">
+                    <%= project.name %>
+                  </h4>
+                  <div class="project-checkbox ml-2 w-5 h-5 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0">
+                    <svg class="checkmark w-4 h-4 text-white hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-xs text-gray-500">
+                    <span class="font-medium">ID:</span> <%= project.id %>
+                  </p>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500 w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <p class="text-sm">No hay otros proyectos disponibles para optimizar</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">
+        * Solo se muestran proyectos sin optimizar
+      </p>
     </div>
 
     <!-- Modal footer -->
@@ -225,10 +282,23 @@
       >
         Cancelar
       </button>
+
+      <button
+        id="toggle-multiple-projects-btn"
+        class="flex-1 inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-blue-600 bg-white text-blue-600 hover:bg-blue-50 h-10 px-6 transition-colors"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span id="toggle-multiple-text">Más opciones de optimización</span>
+      </button>
+
       <%= form_with url: optimize_project_path(@project), method: :post, id: "optimize-form", class: "flex-1", data: { turbo: false } do |f| %>
         <input type="hidden" name="stock" id="optimize-stock-input" value="false">
         <input type="hidden" name="scraps" id="optimize-scraps-input" value="false">
         <input type="hidden" name="flo_lam" id="flo-lam-input" value="false">
+        <input type="hidden" name="project_ids" id="optimize-project-ids-input" value="<%= @project.id %>">
         <button
           type="submit"
           class="w-full inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 transition-colors"

@@ -54,6 +54,72 @@ class ScrapsController < ApplicationController
     end
   end
 
+  # POST /scraps/import
+  def import
+    unless params[:file].present?
+      respond_to do |format|
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), alert: "Por favor selecciona un archivo." }
+        format.json { render json: { success: false, errors: ["Por favor selecciona un archivo."] }, status: :unprocessable_entity }
+      end
+      return
+    end
+
+    # Validar extensión del archivo
+    unless params[:file].original_filename.match?(/\.(xlsx|xls)$/i)
+      respond_to do |format|
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), alert: "El archivo debe ser un Excel (.xlsx o .xls)." }
+        format.json { render json: { success: false, errors: ["El archivo debe ser un Excel (.xlsx o .xls)."] }, status: :unprocessable_entity }
+      end
+      return
+    end
+
+    # Guardar archivo temporalmente
+    uploaded_file = params[:file]
+    temp_file = Tempfile.new(['scrap_import', File.extname(uploaded_file.original_filename)])
+    temp_file.binmode
+    
+    # Copiar el contenido del archivo subido al archivo temporal
+    uploaded_file.rewind if uploaded_file.respond_to?(:rewind)
+    temp_file.write(uploaded_file.read)
+    temp_file.rewind
+
+    # Procesar el archivo
+    begin
+      importer = ScrapImporter.new(temp_file.path)
+      result = importer.import
+    ensure
+      # Limpiar archivo temporal
+      temp_file.close unless temp_file.closed?
+      temp_file.unlink if File.exist?(temp_file.path)
+    end
+    respond_to do |format|
+      if result[:success]
+        format.html do
+          redirect_to glassplates_path(tab: 'sobrantes'),
+                      notice: "Importación exitosa: #{result[:success_count]} sobrantes importados de #{result[:total_rows]} filas procesadas."
+        end
+        format.json { render json: { success: true, success_count: result[:success_count], total_rows: result[:total_rows] }, status: :ok }
+      else
+        message = "Importación finalizada con errores. #{result[:success_count]} de #{result[:total_rows]} filas se importaron correctamente."
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), alert: message }
+        format.json { render json: { success: false, errors: result[:errors], success_count: result[:success_count] }, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # GET /scraps/export
+  def export
+    @scraps = Scrap.all.order(created_at: :desc)
+    
+    respond_to do |format|
+      format.xlsx do
+        exporter = ScrapExporter.new(@scraps)
+        file_path = exporter.generate
+        send_file file_path, filename: "retazos_#{Date.today.strftime('%Y%m%d')}.xlsx", type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_scrap

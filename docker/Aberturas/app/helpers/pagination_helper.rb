@@ -16,6 +16,9 @@ module PaginationHelper
   def render_pagination(collection, params = {})
     return unless collection.respond_to?(:current_page) && collection.total_pages > 1
     
+    pagination_params = params.dup
+    pagination_params[:tab] ||= request.params[:tab] if request.params[:tab].present?
+    
     will_paginate collection,
       renderer: WillPaginate::ActionView::LinkRenderer,
       class: "pagination",
@@ -23,7 +26,7 @@ module PaginationHelper
       next_label: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>',
       inner_window: 2,
       outer_window: 1,
-      params: params
+      params: pagination_params
   end
 
   # Método para renderizar el contenedor completo de paginación
