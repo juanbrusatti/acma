@@ -30,11 +30,11 @@ RUN npm install -g yarn
 WORKDIR /app
 
 # Copiar Gemfile primero para aprovechar cache
-COPY ./Aberturas/Gemfile ./Aberturas/Gemfile.lock ./
+COPY ./Aberturas/Gemfile ./Aberturas/Gemfile.lock /app/
 RUN gem install bundler && bundle install --jobs 4 --retry 3
 
 # Copiar el resto del código
-COPY ./Aberturas/ .
+COPY ./Aberturas/ /app/
 
 # Instalar Node.js dependencies si hay package.json
 RUN if [ -f package.json ]; then yarn install; fi
