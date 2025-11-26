@@ -209,16 +209,6 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
         
         # Agregar página con resumen de DVH si hay DVH
         if dvh_summary:
-            fig_dvh = plt.figure(figsize=(fig_width, fig_height))
-            draw_header(fig_dvh, page=total_pages + 1, total_pages=total_pages + 1)
-            
-            ax_dvh = fig_dvh.add_subplot(111)
-            ax_dvh.axis('off')
-            
-            # Título del resumen de DVH
-            fig_dvh.text(0.5, 0.84, "RESUMEN DE DVH", 
-                         ha='center', fontsize=12, weight='bold')
-            
             # Preparar datos para la tabla de DVH
             dvh_headers = ['Tipología', 'Composición', 'Ancho', 'Alto']
             dvh_table_data = [dvh_headers]
@@ -231,45 +221,70 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                     str(dvh['alto'])
                 ])
             
-            # Posicionar tabla de DVH
-            dvh_table_ax = fig_dvh.add_axes([0.05, 0.05, 0.90, 0.77])
-            dvh_table_ax.axis('off')
+            # Calcular cuántas filas de DVH caben por página
+            dvh_rows_per_page = 25
+            total_dvh_pages = (len(dvh_summary) + dvh_rows_per_page - 1) // dvh_rows_per_page
             
-            # Crear tabla de DVH
-            dvh_table = dvh_table_ax.table(
-                cellText=dvh_table_data,
-                cellLoc='center',
-                loc='upper center',
-                colWidths=[0.15, 0.55, 0.15, 0.15]
-            )
-            
-            # Estilizar tabla de DVH
-            dvh_table.auto_set_font_size(False)
-            dvh_table.set_fontsize(8)
-            dvh_table.scale(1, 2.0)
-            
-            # Aplicar estilos a celdas
-            for i, row in enumerate(dvh_table_data):
-                for j, cell in enumerate(row):
-                    table_cell = dvh_table[(i, j)]
-                    table_cell.set_edgecolor('#ddd')
-                    table_cell.set_linewidth(0.5)
-                    
-                    if i == 0:  # Header
-                        table_cell.set_facecolor('#f3f3f3')
-                        table_cell.set_text_props(weight='bold', color='#222', fontsize=8)
+            for dvh_page_num in range(total_dvh_pages):
+                fig_dvh = plt.figure(figsize=(fig_width, fig_height))
+                draw_header(fig_dvh, page=total_pages + dvh_page_num + 1, total_pages=total_pages + total_dvh_pages)
+                
+                ax_dvh = fig_dvh.add_subplot(111)
+                ax_dvh.axis('off')
+                
+                # Título del resumen de DVH
+                fig_dvh.text(0.5, 0.84, "RESUMEN DE DVH", 
+                             ha='center', fontsize=12, weight='bold')
+                
+                # Calcular rango de filas para esta página de DVH
+                dvh_start_idx = dvh_page_num * dvh_rows_per_page
+                dvh_end_idx = min(dvh_start_idx + dvh_rows_per_page, len(dvh_summary))
+                
+                # Datos de esta página (incluir header + datos)
+                page_dvh_table_data = [dvh_headers] + dvh_table_data[1 + dvh_start_idx:1 + dvh_end_idx]
+                
+                if not page_dvh_table_data or len(page_dvh_table_data) <= 1:
+                    continue
+                
+                # Posicionar tabla de DVH
+                dvh_table_ax = fig_dvh.add_axes([0.05, 0.05, 0.90, 0.77])
+                dvh_table_ax.axis('off')
+                
+                # Crear tabla de DVH
+                dvh_table = dvh_table_ax.table(
+                    cellText=page_dvh_table_data,
+                    cellLoc='center',
+                    loc='upper center',
+                    colWidths=[0.15, 0.55, 0.15, 0.15]
+                )
+                
+                # Estilizar tabla de DVH
+                dvh_table.auto_set_font_size(False)
+                dvh_table.set_fontsize(8)
+                dvh_table.scale(1, 2.0)
+                
+                # Aplicar estilos a celdas
+                for i, row in enumerate(page_dvh_table_data):
+                    for j, cell in enumerate(row):
+                        table_cell = dvh_table[(i, j)]
                         table_cell.set_edgecolor('#ddd')
-                        table_cell.set_linewidth(1)
-                    else:
-                        # Alternar colores
-                        if (i - 1) % 2 == 0:
-                            table_cell.set_facecolor('#ffffff')
+                        table_cell.set_linewidth(0.5)
+                        
+                        if i == 0:  # Header
+                            table_cell.set_facecolor('#f3f3f3')
+                            table_cell.set_text_props(weight='bold', color='#222', fontsize=8)
+                            table_cell.set_edgecolor('#ddd')
+                            table_cell.set_linewidth(1)
                         else:
-                            table_cell.set_facecolor('#f9f9f9')
-                        table_cell.set_text_props(color='#333', fontsize=8)
-            
-            pdf.savefig(fig_dvh)
-            plt.close(fig_dvh)
+                            # Alternar colores
+                            if (dvh_start_idx + i - 1) % 2 == 0:
+                                table_cell.set_facecolor('#ffffff')
+                            else:
+                                table_cell.set_facecolor('#f9f9f9')
+                            table_cell.set_text_props(color='#333', fontsize=8)
+                
+                pdf.savefig(fig_dvh)
+                plt.close(fig_dvh)
     
     print(f"✅ Guardado PDF de resumen general: {output_path}")
     return output_path
