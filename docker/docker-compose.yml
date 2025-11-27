@@ -5,8 +5,6 @@ services:
       dockerfile: ./Aberturas/Dockerfile
     env_file:
       - .env
-    volumes:
-      - ./Aberturas:/app
     ports:
       - "${RAILS_PORT:-3000}:3000"
     environment:
