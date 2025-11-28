@@ -6,15 +6,15 @@
       <th class="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">Tipo</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Espesor</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Color</th>
-      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ancho</th>
+      <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Alto</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Abertura</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Cantidad</th>
       <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Precio</th>
     </tr>
   </thead>
   <tbody class="divide-y divide-gray-100" id="glasscuttings-table-body">
-    <% grouped = project.glasscuttings.group_by { |g| [g.typology, g.glass_type, g.thickness, g.color, g.height, g.width, g.type_opening, g.price] } %>
+    <% grouped = project.glasscuttings.group_by { |g| [g.typology, g.glass_type, g.thickness, g.color, g.width, g.height, g.type_opening, g.price] } %>
     <% grouped.each do |attrs, glasses| %>
       <tr>
         <% attrs[0..6].each do |val| %>
