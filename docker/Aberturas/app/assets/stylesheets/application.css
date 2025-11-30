@@ -1,7 +1,18 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "dashboard";
+
+/*
+ *= require dashboard
+ *= require quantity_controls
+ *= require glassplate_inline_edit
+ *= require scrap_inline_edit
+ */
+
+/* NOTE:
+  This file is served directly by the asset pipeline. Avoid using CSS @import
+  for Tailwind layers or other local stylesheets here because the browser
+  will try to fetch /assets/... URLs that do not exist, resulting in 404s.
+  Tailwind directives live in `application.tailwind.css` and are compiled
+  into the Tailwind bundle included in the layout via `stylesheet_link_tag "tailwind"`.
+*/
 
 @layer base {
   :root {
@@ -69,10 +80,11 @@
 @layer base {
   /* Scoped border application */
   .bordered-elements {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: Arial, Helvetica, sans-serif;
   }
 }
@@ -87,8 +99,8 @@
   backdrop-filter: blur(24px) saturate(120%);
   transform: translateZ(0);
   will-change: transform, box-shadow, border-color;
-  background: linear-gradient(135deg, 
-    rgba(255,255,255,0.1) 0%, 
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.1) 0%,
     rgba(255,255,255,0.05) 100%);
 }
 
@@ -97,9 +109,9 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, 
-              rgba(255,255,255,0.15) 0%, 
-              rgba(255,255,255,0.08) 50%, 
+  background: linear-gradient(135deg,
+              rgba(255,255,255,0.15) 0%,
+              rgba(255,255,255,0.08) 50%,
               rgba(255,255,255,0.2) 100%);
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
@@ -122,8 +134,8 @@
   inset: 1px;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(180deg, 
-              rgba(255,255,255,0.15) 0%, 
+  background: linear-gradient(180deg,
+              rgba(255,255,255,0.15) 0%,
               rgba(255,255,255,0.05) 100%);
   mix-blend-mode: overlay;
   opacity: 0.7;

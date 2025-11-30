@@ -1,37 +1,35 @@
 #!/bin/bash
 set -e
 
-# Determinar la ruta de la aplicación
-APP_ROOT="/app"
-SETUP_DONE_FILE="/app/tmp/db_setup_done"
-
-# Crear directorio tmp si no existe
-mkdir -p /app/tmp
-
-echo "🔍 Directorio de trabajo actual: $(pwd)"
-echo "🔍 Verificando si existe el archivo indicador: ${SETUP_DONE_FILE}"
-
-# Usar un archivo indicador para saber si ya se ha configurado la BD
-if [ -f "$SETUP_DONE_FILE" ]; then
-  echo "📦 El archivo indicador existe - saltando configuración inicial"
-else
-  echo "📦 No se encontró archivo indicador - realizando configuración inicial"
-
-  # Verificar si ya existe la BD para no recrearla
-  if [ -f "${APP_ROOT}/storage/development.sqlite3" ]; then
-    echo "📦 Base de datos existente encontrada, usando base de datos actual"
-
-    # Correr migraciones pendientes sin recrear la BD
-    echo "📦 Ejecutando migraciones pendientes..."
-    bundle exec rails db:migrate
-  else
-    echo "📦 No se encontró base de datos, creando desde cero..."
-    bundle exec rails db:setup
-  fi
-
-  # Crear el archivo indicador para futuras ejecuciones
-  touch "$SETUP_DONE_FILE"
-  echo "📦 Archivo indicador creado para futuras ejecuciones"
-fi
+rm -f /app/tmp/pids/server.pid
 
 exec "$@"
+
+APP_ROOT="/app"
+SETUP_DONE_FILE="$APP_ROOT/tmp/db_setup_done"
+
+mkdir -p "$APP_ROOT/tmp"
+
+echo "🔍 Directorio de trabajo actual: $(pwd)"
+echo "🔍 RAILS_ENV = $RAILS_ENV"
+echo "🔍 DATABASE_URL = $DATABASE_URL"
+
+# Migraciones / Setup
+if [ -f "$SETUP_DONE_FILE" ]; then
+  echo "📦 Archivo indicador existe - corriendo migraciones pendientes..."
+  bundle exec rails db:migrate
+else
+  echo "📦 No se encontró archivo indicador - configurando base de datos..."
+  if bundle exec rails runner "ActiveRecord::Base.connection" 2>/dev/null; then
+    echo "📦 Base de datos ya existe, corriendo migraciones..."
+    bundle exec rails db:migrate
+  else
+    echo "📦 No se encontró base de datos, creando..."
+    bundle exec rails db:setup
+  fi
+  touch "$SETUP_DONE_FILE"
+  echo "📦 Archivo indicador creado"
+fi
+
+echo "🚀 Iniciando servidor Rails en $RAILS_ENV..."
+exec bundle exec rails server -b 0.0.0.0 -p "${RAILS_PORT:-3000}"

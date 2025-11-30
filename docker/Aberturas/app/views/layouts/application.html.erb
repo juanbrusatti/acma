@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Aberturas" %></title>
+    <title><%= content_for(:title) || "AR Aberturas" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -13,34 +13,41 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="<%= asset_path('logo-ar-transparente.png') %>" type="image/png">
+    <link rel="shortcut icon" href="<%= asset_path('logo-ar-transparente.png') %>" type="image/png">
+    <link rel="apple-touch-icon" sizes="192x192" href="<%= asset_path('logo-ar-transparente.png') %>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('logo-ar-transparente.png') %>">
+
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "projects_form", "data-turbo-track": "reload" %>
-    <%#= javascript_include_tag "preview_pdf", "data-turbo-track": "reload" %>
+
+    <style>
+      .swal2-popup-custom {
+        font-family: inherit;
+      }
+      .swal2-popup-custom .swal2-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      .swal2-popup-custom .swal2-content {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        white-space: pre-line;
+      }
+    </style>
+
+  <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <div class="flex h-screen overflow-hidden">
+  <body class="overflow-hidden">
+    <div class="flex h-screen">
       <div class="fixed h-screen w-64 z-10">
         <%= render 'shared/sidebar' %>
       </div>
-      <div class="flex-1 ml-64 overflow-auto">
-        <% if flash[:notice] %>
-          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
-            <%= flash[:notice] %>
-          </div>
-        <% end %>
-        <% if flash[:alert] %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
-            <%= flash[:alert] %>
-          </div>
-        <% end %>
+      <div class="flex-1 ml-64 overflow-y-auto">
+  <%= render 'shared/flash' %>
         <%= yield %>
       </div>
     </div>
@@ -55,9 +62,9 @@
           percentage: gp.percentage.to_f
         }
       }.to_json.html_safe %>;
-      
+
       window.INNERTUBE_PRICES = <%= AppConfig.get_all_innertube_prices.to_json.html_safe %>;
-      
+
       window.SUPPLY_PRICES = <%= Supply.all.pluck(:name, :price_peso).to_h.to_json.html_safe %>;
     </script>
   </body>

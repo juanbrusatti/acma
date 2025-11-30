@@ -1,22 +1,32 @@
-<div class="flex min-h-screen w-full flex-col">
+<div class="flex min-h-screen w-full flex-col" data-glassplates-page="true">
   <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
     <div class="flex items-center">
       <h1 class="text-2xl font-semibold">Gestión de Stock</h1>
-      <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3 ml-auto" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M8 12h8"></path>
-          <path d="M12 8v8"></path>
-        </svg>
-        Agregar Material
-      <% end %>
+      <div class="flex gap-2 ml-auto">
+        <%= link_to new_glassplate_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar plancha
+        <% end %>
+        <%= link_to new_scrap_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-black hover:text-white h-9 px-3" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12h8"></path>
+            <path d="M12 8v8"></path>
+          </svg>
+          Agregar retazo
+        <% end %>
+      </div>
     </div>
 
     <!-- Stock Summary Cards -->
     <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Planchas Completas</h3>
+          <h3 class="text-sm font-medium">Planchas completas</h3>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
             <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
             <path d="M2 17l10 5l10-5"></path>
@@ -24,14 +34,14 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:total_sheets] %></div>
+          <div class="text-2xl font-bold"><%= @glassplates.sum(&:quantity).to_i %></div>
           <p class="text-xs text-muted-foreground">Planchas en stock</p>
         </div>
       </div>
 
       <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Sobrantes</h3>
+          <h3 class="text-sm font-medium">Retazos</h3>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
             <path d="M6 8L2 12L6 16"></path>
             <path d="M22 12L18 8L22 12L18 16"></path>
@@ -40,49 +50,101 @@
           </svg>
         </div>
         <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:total_scraps] %></div>
-          <p class="text-xs text-muted-foreground">Recortes disponibles</p>
-        </div>
-      </div>
-
-      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
-        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Disponibles</h3>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
-            <path d="M9 12l2 2 4-4"></path>
-            <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
-            <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
-          </svg>
-        </div>
-        <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:available_scraps] %></div>
-          <p class="text-xs text-muted-foreground">Sobrantes libres</p>
-        </div>
-      </div>
-
-      <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
-        <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 class="text-sm font-medium">Reservados</h3>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <div class="p-6 pt-0">
-          <div class="text-2xl font-bold"><%= @stock_summary[:reserved_scraps] %></div>
-          <p class="text-xs text-muted-foreground">Sobrantes reservados</p>
+          <div class="text-2xl font-bold"><%= @scraps.count() %></div>
+          <p class="text-xs text-muted-foreground">Cantidad de retazos</p>
         </div>
       </div>
     </div>
+
+    <!-- Barra de búsqueda unificada -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <div class="px-8 pt-8 pb-4 border-b border-gray-100 rounded-t-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 class="text-3xl font-bold mb-1 text-gray-900">Gestión de Stock</h2>
+            <p class="text-gray-400 text-base mb-2">Planchas completas y retazos de vidrio en el taller.</p>
+          </div>
+
+          <!-- Barra de búsqueda -->
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <%= form_tag glassplates_path, method: :get, class: "flex flex-col md:flex-row gap-3 w-full", id: "search-form" do %>
+              <%= hidden_field_tag :tab, params[:tab] || 'planchas', id: 'current-tab' %>
+              <div class="relative w-full md:w-64">
+                <%= text_field_tag :search, params[:search],
+                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...",
+                    class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="flex gap-2 w-full md:w-auto">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex-1">
+                  Buscar
+                </button>
+                <% if params[:search].present? %>
+                  <%= link_to "Limpiar", glassplates_path(tab: params[:tab] || 'planchas'), class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300 flex-1 text-center" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if @last_scrap_import_result.present? %>
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Última importación de retazos</h3>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= @last_scrap_import_result[:success] ? "Se importaron todos los registros correctamente." : "La importación finalizó con algunos errores." %>
+            </p>
+          </div>
+          <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium <%= @last_scrap_import_result[:success] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+            <%= @last_scrap_import_result[:success] ? 'Exitosa' : 'Con errores' %>
+          </span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-sm text-gray-700">
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Total filas procesadas</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:total_rows] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Sobrantes importados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:success_count] || 0 %></p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">Errores detectados</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @last_scrap_import_result[:errors]&.length || 0 %></p>
+          </div>
+        </div>
+        <% if @last_scrap_import_result[:errors].present? %>
+          <details class="mt-4">
+            <summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800">
+              Ver detalle de errores (<%= @last_scrap_import_result[:errors].length %>)
+            </summary>
+            <div class="mt-3 max-h-48 overflow-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-red-700 space-y-1">
+              <% @last_scrap_import_result[:errors].each do |error| %>
+                <p><%= error %></p>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
 
     <!-- Tabs -->
     <div class="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-lg">
       <div class="border-b p-4">
         <div class="flex space-x-2">
-          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90" data-tab="planchas">
-            Planchas Completas
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90" data-tab="planchas" onclick="window.location.href='?tab=planchas&page=1'">
+            Planchas completas
           </button>
           <button class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground" data-tab="sobrantes">
-            Sobrantes (Recortes)
+            Retazos
           </button>
         </div>
       </div>
@@ -91,7 +153,7 @@
       <div id="planchas-tab" class="tab-content">
         <div class="p-6">
           <div class="mb-4">
-            <h3 class="text-lg font-semibold">Planchas Completas</h3>
+            <h3 class="text-lg font-semibold">Planchas completas</h3>
             <p class="text-sm text-muted-foreground">Listado de planchas de vidrio estándar en el taller.</p>
           </div>
 
@@ -99,35 +161,38 @@
             <table class="w-full caption-bottom text-sm">
               <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Grosor</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Color</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Medidas Estándar</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Grosor</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Cantidad</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
-                <% @complete_sheets.each do |glassplate| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.glass_type %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.thickness %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.color %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.standard_measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-center">
-                      <div class="flex justify-center space-x-2">
-                        <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                            <path d="m15 5 4 4"></path>
-                          </svg>
-                        <% end %>
-                        <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 6h18"></path>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                          </svg>
-                        <% end %>
+                <% @glassplates&.each do |glassplate| %>
+                  <tr class="border-b transition-colors hover:bg-muted/50" data-glassplate-id="<%= glassplate.id %>">
+                    <td class="px-4 py-2 text-center"><%= glassplate.glass_type %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.thickness %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.color %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.width %></td>
+                    <td class="px-4 py-2 text-center"><%= glassplate.height %></td>
+                    <td class="px-4 py-2 text-center">
+                      <span class="text-lg font-medium"><%= glassplate.quantity.to_i %></span>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                      <div class="flex gap-2 justify-center">
+                        <button type="button" class="edit-glassplate-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        </button>
+                      <%= link_to glassplate_path(glassplate), data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar esta plancha?", url: glassplate_path(glassplate), type: "plancha" }, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar" do %>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      <% end %>
                       </div>
                     </td>
                   </tr>
@@ -135,56 +200,79 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación para Glassplates -->
+          <%= pagination_container(@glassplates, "planchas", {
+            search: params[:search],
+            tab: params[:tab]
+          }) %>
         </div>
       </div>
 
-      <!-- Sobrantes Tab -->
+      <!-- Retazos Tab -->
       <div id="sobrantes-tab" class="tab-content hidden">
         <div class="p-6">
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold">Sobrantes</h3>
-            <p class="text-sm text-muted-foreground">Recortes de vidrio reutilizables.</p>
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">Retazos</h3>
+              <p class="text-sm text-muted-foreground">Listado de retazos de vidrio en el taller.</p>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" id="import-scraps-excel-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-700 h-9 px-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Importar desde Excel
+              </button>
+              <%= link_to export_scraps_path(format: :xlsx), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-9 px-3" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Exportar a Excel
+              <% end %>
+            </div>
           </div>
 
           <div class="relative w-full overflow-auto">
             <table class="w-full caption-bottom text-sm">
               <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">ID</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Medidas (mm)</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Tipo</th>
-                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Ubicación</th>
-                  <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Estado</th>
-                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Acciones</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Referencia</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Grosor</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Color</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Obra de procedencia</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody class="[&_tr:last-child]:border-0">
-                <% @scraps.each do |glassplate| %>
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"><%= glassplate.id %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.measures %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.glass_type %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0"><%= glassplate.location %></td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
-                      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 <%= glassplate.available? ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80' : 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80' %>">
-                        <%= glassplate.status %>
-                      </span>
-                    </td>
-                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-center">
-                      <div class="flex justify-center space-x-2">
-                        <%= link_to edit_glassplate_path(glassplate), class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                            <path d="m15 5 4 4"></path>
-                          </svg>
-                        <% end %>
-                        <%= link_to glassplate_path(glassplate), method: :delete, data: { confirm: "¿Estás seguro?" }, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                            <path d="M3 6h18"></path>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                          </svg>
-                        <% end %>
+                <% @scraps&.each do |scrap| %>
+                  <tr class="border-b transition-colors hover:bg-muted/50" data-scrap-id="<%= scrap.id %>">
+                    <td class="px-4 py-2 text-center"><%= scrap.ref_number %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.scrap_type %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.thickness %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.color %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.width %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.height %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.input_work %></td>
+                    <td class="px-4 py-2 text-center">
+                      <div class="flex gap-2 justify-center">
+                        <button type="button" class="edit-scrap-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        </button>
+                      <%= link_to scrap_path(scrap), data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar este retazo?", url: scrap_path(scrap), type: "retazo" }, class: "w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors duration-150 inline-flex items-center justify-center delete-btn", title: "Eliminar" do %>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      <% end %>
                       </div>
                     </td>
                   </tr>
@@ -192,35 +280,94 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación para Scraps -->
+          <%= pagination_container(@scraps, "retazos", {
+            search: params[:search],
+            tab: params[:tab]
+          }) %>
         </div>
       </div>
+
     </div>
   </main>
 </div>
 
+<!-- Modal para importar sobrantes desde Excel -->
+<div id="import-scraps-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Importar Sobrantes desde Excel</h2>
+        <button type="button" id="close-scraps-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-4">
+          Selecciona un archivo Excel (.xlsx o .xls) con el siguiente formato:
+        </p>
+        <div class="bg-gray-50 p-3 rounded text-xs text-gray-700 mb-4">
+          <p class="font-semibold mb-2">Columnas requeridas:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>COMPOSICION:</strong> Tipo, grosor y color (ej: "COL 4+4 STB")</li>
+            <li><strong>BASE [mm]:</strong> Ancho en milímetros</li>
+            <li><strong>ALTO [mm]:</strong> Alto en milímetros</li>
+            <li><strong>REFERENCIA:</strong> (opcional) Código de referencia del sobrante</li>
+            <li><strong>ORIGEN:</strong> (opcional) Obra de procedencia</li>
+          </ul>
+        </div>
+      </div>
+
+      <%= form_with url: import_scraps_path, method: :post, multipart: true, id: "import-scraps-form", class: "space-y-4" do |form| %>
+        <div>
+          <%= form.file_field :file, accept: ".xlsx,.xls", required: true, class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" %>
+        </div>
+
+        <div id="import-scraps-errors" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded"></div>
+        <div id="import-scraps-success" class="hidden text-sm text-green-600 bg-green-50 p-3 rounded"></div>
+
+        <div class="flex gap-3 justify-end">
+          <button type="button" id="cancel-scraps-import-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+            Cancelar
+          </button>
+          <%= form.submit "Importar", class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors", id: "submit-scraps-import-btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const tabs = document.querySelectorAll('[data-tab]');
-  const tabContents = document.querySelectorAll('.tab-content');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      const targetTab = this.getAttribute('data-tab');
+    function updatePaginationLinks() {
+    const activeTab = document.querySelector('[data-tab].bg-primary');
+    if (!activeTab) return;
 
-      // Update tab buttons
-      tabs.forEach(t => {
-        t.classList.remove('bg-primary', 'text-primary-foreground', 'shadow-sm');
-        t.classList.add('bg-background', 'text-muted-foreground');
-      });
-      this.classList.remove('bg-background', 'text-muted-foreground');
-      this.classList.add('bg-primary', 'text-primary-foreground', 'shadow-sm');
+    const tabValue = activeTab.getAttribute('data-tab');
+    const paginationLinks = document.querySelectorAll('.pagination a');
 
-      // Update tab content
-      tabContents.forEach(content => {
-        content.classList.add('hidden');
-      });
-      document.getElementById(targetTab + '-tab').classList.remove('hidden');
+    paginationLinks.forEach(link => {
+      const url = new URL(link.href, window.location.origin);
+      url.searchParams.set('tab', tabValue);
+      link.href = url.toString();
     });
+
+    console.log('Updated', paginationLinks.length, 'pagination links with tab:', tabValue);
+  }
+
+  // Actualizar enlaces de paginación al cargar y cuando cambie el tab
+  document.addEventListener('turbo:load', updatePaginationLinks);
+  document.addEventListener('DOMContentLoaded', updatePaginationLinks);
+
+  document.addEventListener('click', function(e) {
+    if (e.target.hasAttribute('data-tab')) {
+      setTimeout(updatePaginationLinks, 100);
+    }
   });
-});
+
 </script>

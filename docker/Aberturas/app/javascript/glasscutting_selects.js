@@ -61,7 +61,7 @@ export function updateGlassSelects(container) {
   // Listeners
   typeSelect.addEventListener('change', () => {
     updateThicknessOptions();
-    updateColorOptions(); // Opcional: si querés limpiar colores al cambiar tipo
+    updateColorOptions(); 
   });
 
   thicknessSelect.addEventListener('change', updateColorOptions);

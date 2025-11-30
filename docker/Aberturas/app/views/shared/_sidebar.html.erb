@@ -2,16 +2,9 @@
   <!-- Header -->
   <div class="flex h-14 items-center border-b px-4">
     <div class="flex items-center gap-2">
-      <div class="p-1 bg-primary rounded-lg text-primary-foreground">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
-          <path d="M6 8L2 12L6 16"></path>
-          <path d="M22 12L18 8L22 12L18 16"></path>
-          <path d="M22 4L12 14L2 24"></path>
-          <path d="M2 4L12 14L22 24"></path>
-        </svg>
-      </div>
-      <span class="font-semibold">AR Aberturas</span>
+<%= image_tag 'logo-ar-transparente.png', alt: 'AR Aberturas Logo', width: 95, height: 95 %>
     </div>
+    <span class="font-semibold">AR Aberturas</span>
   </div>
 
   <!-- Navigation -->
@@ -28,15 +21,18 @@
           </svg>
           Pagina Principal
         <% end %>
-        <%= link_to "glassplates", class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path.start_with?('/glassplates') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
+        <!-- Stock Section - Enabled -->
+
+        <%= link_to glassplates_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{request.path == glassplates_path ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-            <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
-            <path d="M2 17l10 5l10-5"></path>
-            <path d="M2 12l10 5l10-5"></path>
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
           </svg>
           Stock
         <% end %>
-        <%= link_to projects_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" do %>
+
+        <%= link_to projects_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{current_page?(projects_path) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
             <polyline points="14,2 14,8 20,8"></polyline>
@@ -46,20 +42,12 @@
           </svg>
           Proyectos
         <% end %>
-        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+
+        <%= link_to glass_prices_path, class: "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium #{current_page?(glass_prices_path) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-            <path d="M6 8L2 12L6 16"></path>
-            <path d="M22 12L18 8L22 12L18 16"></path>
-            <path d="M22 4L12 14L2 24"></path>
-            <path d="M2 4L12 14L22 24"></path>
-          </svg>
-          Optimizador
-        </a>
-        <%= link_to glass_prices_path, class:"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-            <path d="M12 2L2 7l10 5l10-5l-10-5z"></path>
-            <path d="M2 17l10 5l10-5"></path>
-            <path d="M2 12l10 5l10-5"></path>
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
           </svg>
           Precios
         <% end %>
@@ -70,9 +58,7 @@
   <!-- Footer -->
   <div class="border-t p-4">
     <div class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ml-auto">
-
-      </svg>
+      <span class="text-xs text-gray-500">Versión 2.0.0</span>
     </div>
   </div>
 </div>

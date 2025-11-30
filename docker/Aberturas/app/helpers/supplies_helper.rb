@@ -2,7 +2,7 @@ module SuppliesHelper
   # Format supply USD price for display
   def format_supply_usd_price(supply)
     if supply.price_usd.present? && supply.price_usd > 0
-      number_to_currency(supply.price_usd, unit: "US$", precision: 2)
+      format_argentine_currency(supply.price_usd, unit: "US$", precision: 2)
     else
       "N/A"
     end
@@ -11,7 +11,7 @@ module SuppliesHelper
   # Format supply peso price for display
   def format_supply_peso_price(supply)
     if supply.price_peso.present? && supply.price_peso > 0
-      number_to_currency(supply.price_peso, unit: "$", precision: 2)
+      format_argentine_currency(supply.price_peso, unit: "$", precision: 2)
     else
       "N/A"
     end

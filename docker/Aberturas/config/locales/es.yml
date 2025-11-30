@@ -2,50 +2,162 @@ es:
   activerecord:
     attributes:
       project:
-        name: ""
-        phone: ""
-        status: ""
-        description: ""
-        delivery_date: ""
+        name: "Nombre del proyecto"
+        phone: "Teléfono"
+        status: "Estado"
+        description: "Descripción"
+        delivery_date: "Fecha de entrega"
       dvh:
-        innertube: ""
-        typology: ""
-        height: ""
-        width: ""
-        glasscutting1_type: ""
-        glasscutting1_thickness: ""
-        glasscutting1_color: ""
-        glasscutting2_type: ""
-        glasscutting2_thickness: ""
-        glasscutting2_color: ""
+        innertube: "Cámara"
+        typology: "Tipología"
+        height: "Alto"
+        width: "Ancho"
+        glasscutting1_type: "Tipo de vidrio 1"
+        glasscutting1_thickness: "Espesor del vidrio 1"
+        glasscutting1_color: "Color del vidrio 1"
+        glasscutting2_type: "Tipo de vidrio 2"
+        glasscutting2_thickness: "Espesor del vidrio 2"
+        glasscutting2_color: "Color del vidrio 2"
       glasscutting:
-        glass_type: ""
-        thickness: ""
-        height: ""
-        width: ""
-        color: ""
-        typology: ""
-        price: ""
+        glass_type: "Tipo de vidrio"
+        thickness: "Espesor"
+        height: "Alto"
+        width: "Ancho"
+        color: "Color"
+        typology: "Tipología"
+        price: "Precio"
       glasscuttings:
-        glass_type: ""
-        thickness: ""
-        height: ""
-        width: ""
-        color: ""
-        typology: ""
-        price: ""
-    models:
-      glasscutting: ""
-      glasscuttings: ""
-      dvh: ""
-      project: ""
+        glass_type: "Tipo de vidrio"
+        thickness: "Espesor"
+        height: "Alto"
+        width: "Ancho"
+        color: "Color"
+        typology: "Tipología"
+        price: "Precio"
+      glassplates:
+        glass_type: "Tipo de vidrio"
+        thickness: "Espesor"
+        height: "Alto"
+        width: "Ancho"
+        color: "Color"
+        quantity: "Cantidad"
+      scraps:
+        scrap_type: "Tipo de retazo"
+        thickness: "Espesor"
+        height: "Alto"
+        width: "Ancho"
+        color: "Color"
+        status: "Estado"
+        output_work: "Obra de salida"
+        ref_number: "Número de referencia"
     errors:
-      format: "%{message}"
+      format: "%{attribute} %{message}"
       messages:
         blank: "no puede estar en blanco"
-        not_a_number: "no es un número"
+        taken: "ya está en uso"
+        invalid: "no es válido"
+        too_short: "es demasiado corto (mínimo %{count} caracteres)"
+        too_long: "es demasiado largo (máximo %{count} caracteres)"
+        not_a_number: "debe ser un número"
         greater_than: "debe ser mayor que %{count}"
-        greater_than_or_equal_to: "debe ser mayor o igual que %{count}"
-        taken: "ya ha sido tomado"
-        inclusion: "no está incluido en la lista"
-        record_invalid: "Los datos no son válidos"
+        inclusion: "debe ser uno de: %{value}"
+      models:
+        project:
+          attributes:
+            name:
+              blank: "El nombre del proyecto no puede estar en blanco"
+            phone:
+              blank: "El teléfono no puede estar en blanco"
+            status:
+              blank: "El estado no puede estar en blanco"
+              inclusion: "debe ser uno de: Pendiente, En Proceso, Terminado"
+        dvh:
+          attributes:
+            height:
+              blank: "El alto del vidrio no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho del vidrio no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            typology:
+              blank: "La tipología del DVH no puede estar en blanco"
+            innertube:
+              inclusion: "La cámara del vidrio no es válida"
+            glasscutting1_type:
+              blank: "El tipo de vidrio 1 no puede estar en blanco"
+              inclusion: "El tipo de vidrio 1 no es válido"
+            glasscutting1_thickness:
+              blank: "El espesor del vidrio 1 no puede estar en blanco"
+              inclusion: "El grosor del vidrio 1 no es válido"
+            glasscutting1_color:
+              blank: "El color del vidrio 1 no puede estar en blanco"
+              inclusion: "El color del vidrio 1 no es válido"
+            glasscutting2_type:
+              blank: "El tipo de vidrio 2 no puede estar en blanco"
+              inclusion: "El tipo de vidrio 2 no es válido"
+            glasscutting2_thickness:
+              blank: "El espesor del vidrio 2 no puede estar en blanco"
+              inclusion: "El grosor del vidrio 2 no es válido"
+            glasscutting2_color:
+              blank: "El color del vidrio 2 no puede estar en blanco"
+              inclusion: "El color del vidrio 2 no es válido"
+            project:
+              required: "debe existir"
+        scrap:
+          attributes:
+            ref_number:
+              blank: "El número de referencia no puede estar en blanco"
+            color:
+              blank: "El color no puede estar en blanco"
+              inclusion: "El color debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+            scrap_type:
+              blank: "El tipo de vidrio no puede estar en blanco"
+              inclusion: "El tipo debe ser uno de: LAM, FLO, COL"
+            height:
+              blank: "El alto del retazo no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho del retazo no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            thickness:
+              blank: "El grosor del retazo no puede estar en blanco"
+              inclusion: "El grosor debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+            output_work:
+              blank: "La obra de salida no puede estar en blanco"
+            status:
+              blank: "El estado no puede estar en blanco"
+              inclusion: "El estado debe ser uno de: Disponible, Reservado"
+        glassplate:
+          attributes:
+            glass_type:
+              blank: "El tipo de vidrio no puede estar en blanco"
+              inclusion: "El tipo de vidrio debe ser uno de: LAM, FLO, COL"
+            color:
+              blank: "El color no puede estar en blanco"
+              inclusion: "El color debe ser uno de: INC, STB, GRS, BRC, BLS, STG, NTR"
+            height:
+              blank: "El alto no puede estar en blanco"
+              not_a_number: "El alto debe ser un número"
+              greater_than: "El alto debe ser mayor que 0"
+            width:
+              blank: "El ancho no puede estar en blanco"
+              not_a_number: "El ancho debe ser un número"
+              greater_than: "El ancho debe ser mayor que 0"
+            thickness:
+              blank: "El espesor no puede estar en blanco"
+              inclusion: "El espesor debe ser uno de: 3+3, 4+4, 5+5, 5mm"
+            quantity:
+              blank: "La cantidad no puede estar en blanco"
+              not_a_number: "La cantidad debe ser un número"
+              greater_than: "La cantidad debe ser mayor que 0"
+    models:
+      glasscutting: "Corte de vidrio"
+      glasscuttings: "Cortes de vidrio"
+      dvh: "DVH"
+      project: "Proyecto"
+      glassplate: "Placa de vidrio"
+      scrap: "Retazo"

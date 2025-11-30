@@ -5,36 +5,29 @@
 <div style="margin-bottom: 10px;">
 <img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
 </div>
-<h1 style="text-align:center; margin-bottom: 0;">PRESUPUESTO</h1>
-<hr>
-<table style="width:100%; margin-bottom: 10px;">
+
+<h1 style="text-align:center; margin-bottom: 20px; color: #444;">PRESUPUESTO</h1>
+<hr style="border: 1px solid #ddd;">
+
+<table style="width:100%; margin-bottom: 20px; font-size: 14px;">
   <tr>
-    <td><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
-    <td><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
+    <td style="padding: 5px;"><strong>Cliente:</strong> <%= @project.name.present? ? @project.name : 'No especificado' %></td>
+    <td style="padding: 5px;"><strong>Telefono:</strong> <%= @project.phone.present? ? @project.phone : 'No especificado' %></td>
   </tr>
   <tr>
-    <td><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
-    <td><strong>Estado:</strong> <%= @project.status.present? ? @project.status : 'Pendiente' %></td>
-  </tr>
-  <tr>
-    <td colspan="2"><strong>Descripcion:</strong> <%= @project.description.present? ? @project.description : 'Sin descripcion' %></td>
+    <td style="padding: 5px;" colspan="2"><strong>Domicilio:</strong> <%= @project.address.present? ? @project.address : 'No especificado' %></td>
   </tr>
 </table>
 
-<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados al proyecto</h2>
+<h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">DVH asignados</h2>
 
 <% dvh_total_con_iva = calculate_dvh_total_with_iva(@project.dvhs) %>
-<%= render_dvh_table(@project.dvhs) %> 
+<%= render_dvh_table(@project.dvhs) %>
 
-<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados al proyecto</h2>
+<h2 style="margin-bottom: 5px; margin-top: 30px; font-size: 20px; color: #222;">Vidrios simples asignados</h2>
 
 <% total_con_iva = calculate_glasscuttings_total_with_iva(@project.glasscuttings) %>
 <%= render_glasscuttings_table(@project.glasscuttings) %>
-
-
-
-
-<p style="margin-top: 20px;"><strong>Nota:</strong> Precios IVA incluido.</p> 
 
 <% # Tabla resumen de totales %>
 <h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">Resumen de Totales</h2>
@@ -45,8 +38,10 @@
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0;">Total General con IVA</td>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
         <% total_general_con_iva = (total_con_iva || 0) + (dvh_total_con_iva || 0) %>
-        <%= number_to_currency(total_general_con_iva, unit: "$", precision: 2) %>
+        <%= format_argentine_currency(total_general_con_iva, unit: "$", precision: 2) %>
       </td>
     </tr>
   </tbody>
 </table>
+
+<%= render_glass(@project.name, @project.dvhs, @project.glasscuttings)%>

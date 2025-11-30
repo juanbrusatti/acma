@@ -3,14 +3,57 @@ services:
     build:
       context: .
       dockerfile: ./Aberturas/Dockerfile
-    volumes:
-      - ./Aberturas:/app
-      # Asegura que la base de datos y los indicadores persistan entre reinicios
-      - ./Aberturas/storage:/app/storage
-      - ./Aberturas/tmp:/app/tmp
+    env_file:
+      - .env
     ports:
-      - "3000:3000"
+      - "${RAILS_PORT:-3000}:3000"
     environment:
-      - RAILS_ENV=development
+      - RAILS_ENV=${RAILS_ENV}
+      - DATABASE_URL=${DATABASE_URL}
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
     stdin_open: true
     tty: true
+    restart: unless-stopped
+    container_name: web
+    profiles: ["development", "production"]
+    networks:
+      - acma_net
+
+  db:
+    image: postgres:17
+    profiles: ["development"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DEV_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - acma_net
+
+  optimizer:
+    build:
+      context: .
+      dockerfile: ./optimizer/Dockerfile
+    container_name: optimizer
+    working_dir: /app
+    volumes:
+      - ./optimizer:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    profiles: ["development", "production"]
+    networks:
+      - acma_net
+
+volumes:
+  pgdata:
+
+networks:
+  acma_net:
+    driver: bridge

@@ -1,14 +1,40 @@
 <div class="container mx-auto mt-10 bg-white rounded-lg shadow p-6 sm:p-8 max-w-7xl" id="project-details">
+  <style>
+    /* Estilos del scrollbar del contenedor que realmente scrollea */
+    .scroll-area::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .scroll-area::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    .scroll-area::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
   <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <h1 class="text-4xl lg:text-5xl font-bold" id="project-name-view"><%= @project.name %></h1>
     <div class="flex gap-2">
       <%= link_to pdf_project_path(@project, format: :pdf), class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", download: "proyecto_#{@project.id}.pdf", title: "Descargar PDF" do %>
         <%= image_tag "/download.svg", class: "w-6 h-6 sm:w-8 sm:h-8", alt: "Descargar PDF" %>
       <% end %>
-      <%= button_to project_path(@project), 
-                  method: :delete, 
-                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2", 
-                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.", 
+      <% if @project.status != 'Terminado' %>
+        <%= button_to refresh_glass_prices_project_path(@project), method: :post, class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 h-10 w-10 sm:h-12 sm:w-12 p-2", title: "Actualizar precios de vidrios", data: { turbo_confirm: "¿Actualizar precios de vidrios para este proyecto? Solo afectará a los vidrios, no a insumos." } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-6.219-8.48" />
+            <polyline stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="23 4 23 10 17 10" />
+          </svg>
+        <% end %>
+      <% end %>
+      <%= button_to project_path(@project),
+                  method: :delete,
+                  class: "inline-flex items-center justify-center rounded-md border border-red-300 bg-white hover:bg-red-50 h-10 w-10 sm:h-12 sm:w-12 p-2",
+                  data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.",
                           turbo_method: :delete },
                   title: "Eliminar proyecto" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,6 +68,10 @@
       <option value="Terminado" <%= 'selected' if @project.status == 'Terminado' %>>Terminado</option>
     </select>
   </div>
+  <% if @project.date_of_optimization.present? && @project.status == 'Terminado' %>
+    <p class="mb-2"><strong>Fecha de optimización:</strong> <span id="project-optimization-date-view"><%= @project.date_of_optimization.strftime('%Y-%m-%d') %></span></p>
+    <input type="date" id="project-optimization-date-edit" value="<%= @project.date_of_optimization.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
+  <% end %>
   <% if @project.delivery_date.present? %>
     <p class="mb-2"><strong>Fecha de entrega:</strong> <span id="project-date-view"><%= @project.delivery_date.strftime('%Y-%m-%d') %></span></p>
     <input type="date" id="project-date-edit" value="<%= @project.delivery_date.strftime('%Y-%m-%d') %>" style="display:none;" class="w-full border rounded px-2 py-1 mb-2" />
@@ -51,15 +81,15 @@
   <div class="mb-4 flex gap-8 items-center">
     <div>
       <span class="font-semibold">Precio sin IVA:</span>
-      <span id="project-price-view" class="ml-2">$<%= number_with_precision(@project.subtotal, precision: 2) %></span>
+      <span id="project-price-view" class="ml-2"><%= format_argentine_currency((@project.price_without_iva || @project.subtotal), unit: "$", precision: 2) %></span>
     </div>
     <div>
       <span class="font-semibold">IVA (21%):</span>
-      <span id="project-iva-view" class="ml-2">$<%= number_with_precision(@project.iva, precision: 2) %></span>
+      <span id="project-iva-view" class="ml-2"><%= format_argentine_currency((@project.price_without_iva || @project.subtotal) * 0.21, unit: "$", precision: 2) %></span>
     </div>
     <div>
       <span class="font-semibold">Total:</span>
-      <span id="project-price-iva-view" class="ml-2 text-lg font-bold">$<%= number_with_precision(@project.total, precision: 2) %></span>
+      <span id="project-price-iva-view" class="ml-2 text-lg font-bold"><%= format_argentine_currency((@project.price_without_iva || @project.subtotal) * 1.21, unit: "$", precision: 2) %></span>
     </div>
   </div>
 
@@ -78,11 +108,207 @@
   <% end %>
 
   <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-between" id="project-actions-view">
-    <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
+    <% if !@project.date_of_optimization.present? %>
+      <%= link_to "Editar", new_project_path(project_id: @project.id), class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6" %>
+      <button id="open-optimize-modal" class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6">
+        Optimizar Corte
+      </button>
+    <% end %>
     <%= link_to "Volver", projects_path, class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
   </div>
   <div class="mt-8 flex flex-col sm:flex-row gap-4" id="project-actions-edit" style="display:none;">
     <%= button_tag "Confirmar", id: "confirm-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-green-600 text-white h-10 px-6" %>
     <%= button_tag "Cancelar", id: "cancel-btn", class: "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6" %>
+  </div>
+</div>
+
+<!-- Modal de Optimización -->
+<div id="optimize-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4" style="display: none;" data-current-project-id="<%= @project.id %>">
+  <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+      <h2 class="text-2xl font-bold text-gray-900">Opciones de Optimización</h2>
+      <button id="close-optimize-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <p class="text-gray-600 mb-6">Selecciona qué elementos quieres incluir en la optimización del corte:</p>
+
+      <div class="space-y-4">
+        <!-- Checkbox Stock -->
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="optimize-stock-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="optimize-stock-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Usar planchas de stock
+            </label>
+            <p class="text-sm text-gray-500">Incluir planchas completas disponibles en el taller</p>
+          </div>
+        </div>
+
+        <!-- Checkbox Scraps -->
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="optimize-scraps-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="optimize-scraps-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Usar retazos
+            </label>
+            <p class="text-sm text-gray-500">Incluir retazos de vidrio disponibles en el taller</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="flex items-start">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm text-blue-700">
+            Puedes seleccionar una, ambas o ninguna opción. Si no seleccionas ninguna, se optimizará sin considerar el inventario existente.
+          </p>
+        </div>
+      </div>
+
+    <div class="space-y-4">
+      <!-- Checkbox FLO<->LAM -->
+        <p class="text-gray-600 mb-6">Tratamiento diferencial:</p>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="flo-lam-checkbox"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+            >
+          </div>
+          <div class="ml-3 w-full">
+            <label for="flo-lam-checkbox" class="font-medium text-gray-900 cursor-pointer">
+              Considerar transformación FLO por LAM
+            </label>
+            <p class="text-sm text-gray-500">Tratar a las piezas FLO 5mm INC, de aberturas de Aluminio, menores a 1800x500, como piezas LAM 3+3 INC</p>
+
+            <!-- Grid de piezas convertibles con scroll -->
+            <div class="overflow-x-auto border border-gray-200 rounded-lg p-3 bg-gray-50 scroll-area max-w-full">
+            <div id="convertible-pieces-container" class="flex gap-3 pb-2">
+              <% convertible = @project.convertible_pieces %>
+              <% if convertible.any? %>
+                <div class="p-3 bg-yellow-50 border border-yellow-200 rounded flex-shrink-0 w-auto" data-project-id="<%= @project.id %>">
+                  <p class="text-sm font-semibold text-yellow-800">
+                    <span class="text-blue-600"><%= @project.name %></span>: <span class="text-yellow-900"><%= convertible.count %> piezas</span>
+                  </p>
+                </div>
+              <% else %>
+                <p class="text-xs text-gray-400">No hay piezas convertibles en este proyecto</p>
+              <% end %>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de Proyectos Múltiples (inicialmente oculta) -->
+    <div id="multiple-projects-section" class="p-6 border-t border-gray-200" style="display: none;">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Selecciona proyectos adicionales</h3>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">Proyectos seleccionados:</span>
+          <span id="selected-projects-count" class="inline-flex items-center justify-center min-w-[2rem] h-8 px-3 bg-blue-600 text-white text-sm font-bold rounded-full">1</span>
+        </div>
+      </div>
+
+      <!-- Grid de proyectos con scroll -->
+      <div class="overflow-x-auto border border-gray-200 rounded-lg p-3 bg-gray-50 scroll-area">
+        <div id="projects-grid" class="flex gap-3 pb-2">
+          <% if @projects.any? %>
+            <% @projects.each do |project| %>
+               <div class="project-card cursor-pointer border-2 border-gray-300 rounded-lg p-3 bg-white hover:border-blue-400 transition-all flex-shrink-0 w-64"
+                  data-project-id="<%= project.id %>"
+                  onclick="toggleProjectSelection(this)">
+                <div class="flex items-start justify-between mb-2">
+                  <h4 class="text-sm font-semibold text-gray-900 truncate flex-1" title="<%= project.name %>">
+                    <%= project.name %>
+                  </h4>
+                  <div class="project-checkbox ml-2 w-5 h-5 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0">
+                    <svg class="checkmark w-4 h-4 text-white hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-xs text-gray-500">
+                    <span class="font-medium">ID:</span> <%= project.id %>
+                  </p>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500 w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <p class="text-sm">No hay otros proyectos disponibles para optimizar</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">
+        * Solo se muestran proyectos sin optimizar
+      </p>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="flex gap-3 p-6 border-t border-gray-200">
+      <button
+        id="cancel-optimize-btn"
+        class="flex-1 inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-gray-300 bg-white hover:bg-gray-50 h-10 px-6 transition-colors"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="toggle-multiple-projects-btn"
+        class="flex-1 inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium border border-blue-600 bg-white text-blue-600 hover:bg-blue-50 h-10 px-6 transition-colors"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span id="toggle-multiple-text">Más opciones de optimización</span>
+      </button>
+
+      <%= form_with url: optimize_project_path(@project), method: :post, id: "optimize-form", class: "flex-1", data: { turbo: false } do |f| %>
+        <input type="hidden" name="stock" id="optimize-stock-input" value="false">
+        <input type="hidden" name="scraps" id="optimize-scraps-input" value="false">
+        <input type="hidden" name="flo_lam" id="flo-lam-input" value="false">
+        <input type="hidden" name="project_ids" id="optimize-project-ids-input" value="<%= @project.id %>">
+        <button
+          type="submit"
+          class="w-full inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Comenzar Optimización
+        </button>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -1,6 +1,21 @@
 Rails.application.routes.draw do
+
+  resources :official_rates, only: [:index, :show] do
+    collection do
+      post :update_manual
+      get :api_status
+    end
+  end
+  resources :scraps, except: [:show, :index] do
+    collection do
+      post :import
+      get :export
+    end
+  end
+
   resources :supplies
   resources :glassplates
+
   get "static_pages/home"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -8,19 +23,23 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Projects routes
-  resources :projects
-
   # Nested routes for projects, dvhs, and glasscuttings
   resources :projects do
     member do
       get :pdf
+      post :optimize
+      post :refresh_glass_prices
+      get :confirm_optimization
+      post :accept_optimize
+      get :cancel_optimize
+      get :download_optimization_zip
+      get :convertible_pieces
     end
     collection do
       post :preview_pdf
     end
-    resources :dvhs, only: [ :create ]
-    resources :glasscuttings, only: [ :create ]
+    resources :dvhs, only: [ :create, :edit ]
+    resources :glasscuttings, only: [ :create, :edit ]
   end
 
   resources :glass_prices do

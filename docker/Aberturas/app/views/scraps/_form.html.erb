@@ -1,0 +1,61 @@
+<%= form_with(model: scrap, local: true, class: "space-y-4") do |form| %>
+  <% if scrap.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold mb-2">Errores al guardar el retazo:</h2>
+      <ul>
+        <% scrap.errors.messages.each do |attribute, messages| %>
+          <% messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 scrap-fields" id="scrap-fields-debug">
+
+    <div class="space-y-4">
+      <%= form.label :input_work, "Obra de procedencia", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.text_field :input_work, placeholder: "ej: Obra ABC", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <label for="scrap_scrap_type">Tipo</label>
+      <select name="scrap[scrap_type]" id="scrap_scrap_type" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-type-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar tipo</option>
+        <option value="LAM">LAM</option>
+        <option value="FLO">FLO</option>
+        <option value="COL">COL</option>
+      </select>
+    </div>
+
+    <div class="space-y-2">
+      <label for="scrap_thickness">Espesor</label>
+      <select name="scrap[thickness]" id="scrap_thickness" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-thickness-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-2">
+      <label for="scrap_color">Color</label>
+      <select name="scrap[color]" id="scrap_color" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background scrap-color-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :width, "Ancho (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :width, step: 0.1, placeholder: "ej: 2500", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-3 pt-6 border-t">
+    <%= link_to "Cancelar", glassplates_path, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" %>
+    <%= form.submit "Guardar Retazo", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
+  </div>
+<% end %>

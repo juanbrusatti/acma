@@ -1,0 +1,20 @@
+# PostgreSQL data directory (persistent volume)
+postgres_data/
+
+# Environment variables (contains passwords)
+.env
+
+# Log files
+*.log
+
+# Temporary files
+tmp/
+
+# Backup files
+backup_*.sql
+
+optimizer/__pycache__
+optimizer/output_plan
+optimizer/output_visuals
+optimizer/test_outputs
+optimizer/test/__pycache__

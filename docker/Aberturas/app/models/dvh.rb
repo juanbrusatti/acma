@@ -1,6 +1,7 @@
 class Dvh < ApplicationRecord
   belongs_to :project
-  #has_many :glasscuttings, dependent: :nullify
+  belongs_to :scrap1, class_name: "Scrap", optional: true
+  belongs_to :scrap2, class_name: "Scrap", optional: true
 
   validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }
   validates :width, presence: { message: "El ancho del vidrio no puede estar en blanco" }
@@ -10,7 +11,7 @@ class Dvh < ApplicationRecord
 
   validates :innertube, inclusion: {
     in: [6, 9, 12, 20],
-    message: "La camara del vidrio no es valida"
+    message: "La cámara del vidrio no es válida"
   }
 
   validates :glasscutting1_type, presence: { message: "El tipo de vidrio 1 no puede estar en blanco" }
@@ -50,6 +51,12 @@ class Dvh < ApplicationRecord
     message: "El color del vidrio 2 no es valido"
   }
 
+  validates :type_opening, presence: { message: "El tipo de abertura no puede estar en blanco" }
+  validates :type_opening, inclusion: {
+    in: ["PVC", "Aluminio"],
+    message: "El tipo de abertura no es valido"
+  }
+
   # Set price if not provided by frontend
   before_save :ensure_price_is_set
 
@@ -78,11 +85,6 @@ class Dvh < ApplicationRecord
   def get_glass_price(type, thickness, color)
     price_record = GlassPrice.find_by(glass_type: type, thickness: thickness, color: color)
     price_record&.selling_price || 0.0
-  end
-
-  # Update project typologies when DVH changes
-  def update_project_typologies
-    project.send(:assign_typologies) if project
   end
 
 end

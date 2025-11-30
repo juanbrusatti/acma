@@ -1,5 +1,6 @@
 require "ostruct"
 
+# === STATIC PAGES CONTROLLER ===
 class StaticPagesController < ApplicationController
   def home
     load_dashboard_data
@@ -7,21 +8,25 @@ class StaticPagesController < ApplicationController
 
   private
 
+  # === DASHBOARD DATA LOADING ===
   def load_dashboard_data
     @stock_data = load_stock_data
     @projects_data = load_projects_data
-    @recent_projects = Project.all.order(created_at: :desc).limit(3).map do |project|
-      project
-    end
+    @recent_projects = Project.order(created_at: :desc).limit(3)
   end
 
   def load_stock_data
     {
-      total_sheets: Glassplate.complete_sheets.count,
-      available_scraps: Glassplate.scraps.count,
+      glassplates: {
+        total: Glassplate.count.to_i
+      },
+      scraps: {
+        total: Scrap.count.to_i
+      }
     }
   end
 
+  # === PROJECTS DATA LOADING ===
   def load_projects_data
     {
       active_projects: Project.where(status: 'En Proceso').count,

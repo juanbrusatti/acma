@@ -36,7 +36,7 @@ docker compose up -d
 ```bash
 cd acma
 mkdir -p backups
-cp ./Aberturas/storage/development.sqlite3 backups/dev_$(date +"%Y%m%d_%H%M%S").sqlite3
+cp ./Aberturas/storage/production.sqlite3 backups/dev_$(date +"%Y%m%d_%H%M%S").sqlite3
 ```
 - Revisar que las migraciones nuevas no borren datos.
 - Probar migraciones localmente con copia de la DB de producción.

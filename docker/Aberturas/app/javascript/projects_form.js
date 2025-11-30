@@ -31,93 +31,124 @@ if (!window._projectsFormEventRegistered) {
 }
 
 document.addEventListener('turbo:load', () => {
-  // Reset variables for new page load
-  resetGlasscuttingTableVars();
-  resetDvhTableVars();
+  // Solo ejecutar en páginas de formulario (new/edit), no en show
+  const projectForm = document.getElementById('project-form');
+  if (projectForm) {
+    // Reset variables for new page load
+    resetGlasscuttingTableVars();
+    resetDvhTableVars();
 
-  // Remove previous listeners if any by replacing the button with its clone
-  const addGlasscuttingBtn = document.getElementById('add-glasscutting');
-  if (addGlasscuttingBtn) {
-    addGlasscuttingBtn.replaceWith(addGlasscuttingBtn.cloneNode(true));
-  }
-  const addDvhBtn = document.getElementById('add-dvh');
-  if (addDvhBtn) {
-    addDvhBtn.replaceWith(addDvhBtn.cloneNode(true));
-  }
+    // Remove previous listeners if any by replacing the button with its clone
+    const addGlasscuttingBtn = document.getElementById('add-glasscutting');
+    if (addGlasscuttingBtn) {
+      addGlasscuttingBtn.replaceWith(addGlasscuttingBtn.cloneNode(true));
+    }
+    const addDvhBtn = document.getElementById('add-dvh');
+    if (addDvhBtn) {
+      addDvhBtn.replaceWith(addDvhBtn.cloneNode(true));
+    }
 
-  // Now re-select the new buttons (with no previous listeners)
-  const newAddGlasscuttingBtn = document.getElementById('add-glasscutting');
-  if (newAddGlasscuttingBtn) {
-    newAddGlasscuttingBtn.addEventListener('click', () => {
-      const template = document.getElementById('glasscutting-template').content.cloneNode(true);
-      document.getElementById('glasscuttings-wrapper').appendChild(template);
-      setTimeout(() => {
-        // Only the last added one
-        const fields = document.querySelectorAll('.glasscutting-fields');
-        updateGlassSelects(fields[fields.length - 1]);
-      }, 0);
-    });
-  }
+    // Now re-select the new buttons (with no previous listeners)
+    const newAddGlasscuttingBtn = document.getElementById('add-glasscutting');
+    if (newAddGlasscuttingBtn) {
+      newAddGlasscuttingBtn.addEventListener('click', () => {
+        const template = document.getElementById('glasscutting-template').content.cloneNode(true);
+        document.getElementById('glasscuttings-wrapper').appendChild(template);
+        setTimeout(() => {
+          // Only the last added one
+          const fields = document.querySelectorAll('.glasscutting-fields');
+          updateGlassSelects(fields[fields.length - 1]);
+        }, 0);
+      });
+    }
 
-  const newAddDvhBtn = document.getElementById('add-dvh');
-  console.log('DVH button found:', newAddDvhBtn);
-  if (newAddDvhBtn) {
-    newAddDvhBtn.addEventListener('click', () => {
-      console.log('DVH button clicked');
-      const template = document.getElementById('dvh-template');
-      console.log('DVH Template found:', template);
-      const templateContent = template.content.cloneNode(true);
-      console.log('DVH Template content:', templateContent);
-      const wrapper = document.getElementById('dvhs-wrapper');
-      console.log('DVH Wrapper found:', wrapper);
-      wrapper.appendChild(templateContent);
-      setTimeout(() => {
-        // Only the last added one
-        const fields = document.querySelectorAll('.dvh-fields');
-        console.log('DVH Fields found:', fields.length);
-        updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting1');
-        updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting2');
-      }, 0);
-    });
-  }
+    const newAddDvhBtn = document.getElementById('add-dvh');
+    console.log('DVH button found:', newAddDvhBtn);
+    if (newAddDvhBtn) {
+      newAddDvhBtn.addEventListener('click', () => {
+        console.log('DVH button clicked');
+        const template = document.getElementById('dvh-template');
+        console.log('DVH Template found:', template);
+        const templateContent = template.content.cloneNode(true);
+        console.log('DVH Template content:', templateContent);
+        const wrapper = document.getElementById('dvhs-wrapper');
+        console.log('DVH Wrapper found:', wrapper);
+        wrapper.appendChild(templateContent);
+        setTimeout(() => {
+          // Only the last added one
+          const fields = document.querySelectorAll('.dvh-fields');
+          console.log('DVH Fields found:', fields.length);
+          updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting1');
+          updateDvhGlassSelects(fields[fields.length - 1], 'glasscutting2');
+        }, 0);
+      });
+    }
 
-  // Initialize dependent selects on existing ones
-  setupAllGlassSelects();
-  setupAllDvhGlassSelects();
-  
-  // Initialize project totals on page load
-  setTimeout(() => {
-    updateProjectTotals();
-  }, 100);
+    // Initialize dependent selects on existing ones
+    setupAllGlassSelects();
+    setupAllDvhGlassSelects();
+
+    // Initialize project totals on page load
+    setTimeout(() => {
+      updateProjectTotals();
+    }, 100);
+  }
 });
+
+// Función para formatear números en formato argentino
+function formatArgentineCurrency(amount, unit = "$") {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return "N/A";
+  }
+  
+  // Convertir a número y redondear a 2 decimales
+  const num = Math.round(parseFloat(amount) * 100) / 100;
+  
+  // Convertir a string y separar parte entera y decimal
+  const parts = num.toString().split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1] || '00';
+  
+  // Agregar separadores de miles (puntos)
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Asegurar que la parte decimal tenga 2 dígitos
+  const formattedDecimal = decimalPart.padEnd(2, '0').substring(0, 2);
+  
+  return `${unit}${formattedInteger},${formattedDecimal}`;
+}
 
 function updateProjectTotals() {
   let subtotal = 0;
   
   console.log('=== updateProjectTotals called ===');
 
-  // Sum all simple glass prices (column 7, not 8)
   document.querySelectorAll('#glasscuttings-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(7)');
+    if (tr.style.display === 'none') return; // Ignore hidden (deleted) rows
+    const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
-      // Clean the text: remove $, commas, and handle decimal points
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      // Limpiar símbolo de moneda/espacios y normalizar formato AR -> JS
+      priceText = priceText
+        .replace(/[^\d,.-]/g, '') // quita $, espacios, etc.
+        .replace(/\./g, '')        // quita separadores de miles
+        .replace(',', '.');         // convierte decimal
       const price = parseFloat(priceText) || 0;
-      console.log('Glasscutting price:', priceText, '->', price);
       subtotal += price;
     }
   });
 
-  // Sum all DVH prices (column 7, not 8)
   document.querySelectorAll('#dvhs-table-body tr').forEach(tr => {
-    const priceCell = tr.querySelector('td:nth-child(7)');
+    if (tr.style.display === 'none') return; // Ignore hidden (deleted) rows
+    const priceCell = tr.querySelector('td:nth-child(8)');
     if (priceCell) {
-      // Clean the text: remove $, commas, and handle decimal points
       let priceText = priceCell.textContent.trim();
-      priceText = priceText.replace(/[$,]/g, ''); // Remove $ and commas
+      // Limpiar símbolo de moneda/espacios y normalizar formato AR -> JS
+      priceText = priceText
+        .replace(/[^\d,.-]/g, '') // quita $, espacios, etc.
+        .replace(/\./g, '')        // quita separadores de miles
+        .replace(',', '.');         // convierte decimal
       const price = parseFloat(priceText) || 0;
-      console.log('DVH price:', priceText, '->', price);
       subtotal += price;
     }
   });
@@ -127,8 +158,8 @@ function updateProjectTotals() {
   // Try to update both possible element IDs for subtotal
   const subtotalPriceElem = document.getElementById('subtotal-price') || document.getElementById('project-price-view');
   if (subtotalPriceElem) {
-    subtotalPriceElem.textContent = '$' + subtotal.toFixed(2);
-    console.log('Updated subtotal element:', subtotalPriceElem.id, 'to:', '$' + subtotal.toFixed(2));
+    subtotalPriceElem.textContent = formatArgentineCurrency(subtotal, '$');
+    console.log('Updated subtotal element:', subtotalPriceElem.id, 'to:', formatArgentineCurrency(subtotal, '$'));
   } else {
     console.log('No subtotal element found');
   }
@@ -137,8 +168,8 @@ function updateProjectTotals() {
   const iva = subtotal * 0.21;
   const ivaElem = document.getElementById('iva-value') || document.getElementById('project-iva-view');
   if (ivaElem) {
-    ivaElem.textContent = '$' + iva.toFixed(2);
-    console.log('Updated IVA element:', ivaElem.id, 'to:', '$' + iva.toFixed(2));
+    ivaElem.textContent = formatArgentineCurrency(iva, '$');
+    console.log('Updated IVA element:', ivaElem.id, 'to:', formatArgentineCurrency(iva, '$'));
   } else {
     console.log('No IVA element found');
   }
@@ -147,13 +178,13 @@ function updateProjectTotals() {
   const total = subtotal + iva;
   const totalElem = document.getElementById('price-total') || document.getElementById('project-price-iva-view');
   if (totalElem) {
-    totalElem.textContent = '$' + total.toFixed(2);
-    console.log('Updated total element:', totalElem.id, 'to:', '$' + total.toFixed(2));
+    totalElem.textContent = formatArgentineCurrency(total, '$');
+    console.log('Updated total element:', totalElem.id, 'to:', formatArgentineCurrency(total, '$'));
   } else {
     console.log('No total element found');
   }
 
-  // Update hidden fields with the calculated prices
+  // Update hidden fields with the calculated prices (sin formato para el backend)
   const hiddenPriceField = document.getElementById('hidden-project-price');
   if (hiddenPriceField) {
     hiddenPriceField.value = total.toFixed(2);
@@ -166,16 +197,30 @@ function updateProjectTotals() {
 }
 
 window.updateProjectTotals = updateProjectTotals;
-
 document.addEventListener('turbo:load', () => {
   const projectForm = document.getElementById('project-form');
   if (projectForm) {
     projectForm.addEventListener('submit', function(event) {
-      const openGlasscuttingForms = document.querySelectorAll('.glasscutting-fields:not(.hidden) input:not([disabled])');
-      const openDvhForms = document.querySelectorAll('.dvh-fields:not(.hidden) input:not([disabled])');
-      if (openGlasscuttingForms.length > 0 || openDvhForms.length > 0) {
-        alert('Faltan vidrios por confirmar');
+      console.log('Form submit event triggered');
+      console.log('Form action:', this.action);
+      console.log('Form method:', this.method);
+      
+      // Only check for forms that are actually open and need confirmation
+      // This prevents interference with the normal add/edit process
+      const hasUnconfirmedForms = document.querySelectorAll('#glasscuttings-wrapper .glasscutting-fields, #dvhs-wrapper .dvh-fields, .glasscutting-edit-form, .dvh-edit-form').length > 0;
+      
+      console.log('Has unconfirmed forms:', hasUnconfirmedForms);
+      
+      if (hasUnconfirmedForms) {
+        console.log('Preventing form submission - unconfirmed forms detected');
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Faltan vidrios por confirmar',
+        });
         event.preventDefault();
+      } else {
+        console.log('Form submission allowed - no unconfirmed forms');
       }
     });
   }

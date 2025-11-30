@@ -1,23 +1,10 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  height: 1.5
-  width: 1.5
-  color: INC
-  glass_type: LAM
-  thickness: 3+3
-  typology: V1
-  price: 9.99
   project: one
-  #glassplate: one
-
-two:
-  height: 1.5
-  width: 1.5
-  color: GRS
-  glass_type: FLO
-  thickness: 4+4
-  typology: V2
-  price: 9.99
-  project: two
-  #glassplate: two
+  glass_type: "LAM"
+  thickness: "5mm"
+  height: 100
+  width: 80
+  color: "BLS"
+  typology: "Fijo"
+  type_opening: "PVC"
+  price: 150.0

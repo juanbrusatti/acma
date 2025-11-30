@@ -1,94 +1,71 @@
-<%= form_with(model: glassplate, class: "contents") do |form| %>
-  <% if glassplate.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(glassplate.errors.count, "error") %> impidieron guardar este material:</h2>
-      <ul class="list-disc ml-6">
-        <% glassplate.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<%= form_with model: @glassplate, local: true, class: "space-y-6" do |form| %>
+  <% if @glassplate.errors.any? %>
+    <div class="rounded-md bg-destructive/15 p-4">
+      <div class="flex">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-destructive">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="m15 9-6 6"></path>
+          <path d="m9 9 6 6"></path>
+        </svg>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-destructive">Se encontraron los siguientes errores:</h3>
+          <div class="mt-2 text-sm text-destructive">
+            <ul class="list-disc space-y-1 pl-5">
+              <% @glassplate.errors.messages.each do |attribute, messages| %>
+                <% messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :glass_type, "Tipo de vidrio" %>
-    <%= form.select :glass_type, options_for_select([
-      ['Laminado', 'Laminado'],
-      ['Float', 'Float'],
-      ['Cool Lite', 'Cool Lite']
-    ], glassplate.glass_type), { prompt: 'Selecciona un tipo de vidrio' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 glassplate-fields">
+    <div class="space-y-4">
+      <label for="glassplate_glass_type">Tipo</label>
+      <select name="glassplate[glass_type]" id="glassplate_glass_type" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background glassplate-type-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar tipo</option>
+        <option value="LAM">LAM</option>
+        <option value="FLO">FLO</option>
+        <option value="COL">COL</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <label for="glassplate_thickness">Espesor</label>
+      <select name="glassplate[thickness]" id="glassplate_thickness" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background glassplate-thickness-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <label for="glassplate_color">Color</label>
+      <select name="glassplate[color]" id="glassplate_color" class="flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background glassplate-color-select file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+        <option value="">Seleccionar</option>
+      </select>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :width, "Ancho (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :width, step: 0.1, placeholder: "ej: 2500", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :height, "Alto (mm)", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :height, step: 0.1, placeholder: "ej: 3600", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
+
+    <div class="space-y-4">
+      <%= form.label :quantity, "Cantidad", class: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" %>
+      <%= form.number_field :quantity, step: 1, placeholder: "Ej: 10", class: "flex h-12 w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" %>
+    </div>
   </div>
 
-  <div class="my-5">
-    <%= form.label :thickness, "Espesor" %>
-    <%= form.select :thickness, options_for_select([
-      ['3+3', '3+3'],
-      ['4+4', '4+4'],
-      ['5+5', '5+5'],
-      ['5mm', '5mm']
-    ], glassplate.thickness), { prompt: 'Selecciona un espesor' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :color %>
-    <%= form.select :color, options_for_select([
-      ['Incoloro', 'Incoloro'],
-      ['Esmerilado', 'Esmerilado'],
-      ['Gris', 'Gris'],
-      ['Bronce', 'Bronce']
-    ], glassplate.color), { prompt: 'Selecciona un color' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :standard_measures, "Medidas estándar" %>
-    <%= form.text_field :standard_measures, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :width, "Ancho (mm)" %>
-    <%= form.number_field :width, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :height, "Alto (mm)" %>
-    <%= form.number_field :height, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :location, "Ubicación" %>
-    <%= form.text_field :location, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :status, "Estado" %>
-    <%= form.select :status, options_for_select([
-      ['Disponible', 'disponible'],
-      ['Reservado', 'reservado'],
-      ['Usado', 'usado']
-    ], glassplate.status), { prompt: 'Selecciona un estado' }, { class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :is_scrap, "¿Es sobrante/recorte?" %>
-    <%= form.check_box :is_scrap %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :work, "Trabajo/Obra" %>
-    <%= form.text_field :work, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :origin, "Origen" %>
-    <%= form.text_field :origin, class: "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :deleted, "¿Eliminado?" %>
-    <%= form.check_box :deleted %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="flex justify-end space-x-3 pt-6 border-t">
+    <%= link_to "Cancelar", glassplates_path, class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" %>
+    <%= form.submit "Guardar Material", class: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" %>
   </div>
 <% end %>

@@ -1,6 +1,6 @@
-<div class="glass-card rounded-3xl border border-gray-200 bg-card 
-            shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] text-card-foreground 
-            transition-all duration-500 ease-out 
+<div class="glass-card rounded-3xl border border-gray-200 bg-card
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] text-card-foreground
+            transition-all duration-500 ease-out
             hover:shadow-[0_20px_48px_rgba(0,0,0,0.25)] hover:-translate-y-0.5">
   <div class="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
     <h3 class="text-sm font-medium gradient-text">Generar Presupuesto</h3>
@@ -15,12 +15,12 @@
   <div class="p-6 pt-0">
     <div class="text-2xl font-bold gradient-text-primary animated-number">Nuevo Cliente</div>
     <p class="text-xs text-muted-foreground pulse-text">Crea y envía presupuestos</p>
-    <a href="#" class="modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-300 h-9 px-3 mt-4 ripple-effect">
+    <%= link_to new_project_path, class: "modern-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-300 h-9 px-3 mt-4 ripple-effect" do %>
       Crear Presupuesto
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
         <path d="M7 7L17 17"></path>
         <path d="M17 7V17H7"></path>
       </svg>
-    </a>
+    <% end %>
   </div>
 </div>

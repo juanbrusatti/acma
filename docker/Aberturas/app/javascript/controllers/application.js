@@ -1,4 +1,10 @@
 import { Application } from "@hotwired/stimulus"
+import { getSwalConfig } from "utils";
+
+import Swal from "sweetalert2"
+
+window.Swal = Swal
+window.getSwalConfig = getSwalConfig;
 
 const application = Application.start()
 

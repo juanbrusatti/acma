@@ -1,6 +1,6 @@
 class Glasscutting < ApplicationRecord
   belongs_to :project 
-  belongs_to :glassplate, optional: true 
+  belongs_to :scrap, optional: true
 
   # Validates that height and width are present and greater than 0
   validates :height, presence: { message: "El alto del vidrio no puede estar en blanco" }, numericality: { greater_than: 0, message: "El alto debe ser mayor que 0" } 
@@ -24,6 +24,12 @@ class Glasscutting < ApplicationRecord
   validates :thickness, inclusion: {
     in: ["3+3", "4+4", "5+5", "5mm"],
     message: "El grosor del vidrios no es valido"
+  }
+
+  validates :type_opening, presence: { message: "El tipo de abertura no puede estar en blanco" }
+  validates :type_opening, inclusion: {
+    in: ["PVC", "Aluminio"],
+    message: "El tipo de abertura no es valido"
   }
 
   before_save :ensure_price_is_set

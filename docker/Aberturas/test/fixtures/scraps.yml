@@ -1,0 +1,29 @@
+# Fixtures para Scrap
+
+one:
+  ref_number: "SCR001"
+  input_work: "OBRA TEST 1"
+  scrap_type: "LAM"
+  thickness: "3+3"
+  color: "INC"
+  width: 100
+  height: 100
+
+# Otros ejemplos
+scrap_2:
+  ref_number: "SCR002"
+  input_work: "OBRA TEST 1"
+  scrap_type: "FLO"
+  thickness: "4+4"
+  color: "BRC"
+  width: 150
+  height: 200
+
+scrap_3:
+  ref_number: "SCR003"
+  input_work: "OBRA TEST 1"
+  scrap_type: "COL"
+  thickness: "5+5"
+  color: "BLS"
+  width: 80
+  height: 120

@@ -18,37 +18,16 @@
     </div>
   <% end %>
 
-  <%# Use the correct URL and method for new or existing projects %>
-  <%= form_with(model: @project, 
-                url: @project.persisted? ? project_path(@project) : projects_path, 
-                method: @project.persisted? ? :patch : :post, 
-                local: true) do |f| %>
-
-    <% if @project.persisted? %>
-      <%= hidden_field_tag :project_id, @project.id %>
-    <% end %>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%= render partial: "projects/partials/info_client", locals: { f: f, readonly: @project.persisted? } %>
-      <%= render partial: "projects/partials/info_project", locals: { f: f, readonly: @project.persisted? } %>
-    </div>
-
-    <% if @project.persisted? %>
-      <!-- Solo mostrar formularios de DVH y glasscutting después de crear el proyecto base -->
-      <%= render partial: "projects/partials/info_dvhs", locals: { f: f } %>
-      <%= render partial: "projects/partials/info_glasscuttings", locals: { f: f } %>
-    <% end %>
-  <% end %>
+  <%= render partial: "projects/partials/form" %>
 </div>
 
 <!-- Hidden template for cloning DVH fields -->
 <!--  Template for dynamically adding new DVH rows -->
 <template id="dvh-template">
-  <div class="border border-gray-300 rounded p-4 mb-4 dvh-fields space-y-4">
+  <div class="border border-gray-300 rounded p-4 mb-4 dvh-fields space-y-4 mt-6">
 
-    <!-- Row 1: Basic DVH information -->
-    <!--  First row: basic DVH information (innertube, typology, width, height) -->
-    <div class="grid grid-cols-5 gap-4">
+    <!-- Fila 1: Tipología, Cámara, Ancho, Alto, Abertura, Cantidad -->
+    <div class="grid grid-cols-6 gap-6 mb-4">
       <div>
         <label>Tipología</label>
         <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
@@ -76,15 +55,27 @@
         <label>Alto</label>
         <input type="number" name="project[dvhs_attributes][][height]" class="w-full border rounded px-2 py-1" />
       </div>
+      <div>
+        <label>Abertura</label>
+        <select name="project[dvhs_attributes][][type_opening]" class="w-full border rounded px-2 py-1">
+          <option value="">Seleccionar</option>
+          <option value="PVC">PVC</option>
+          <option value="Aluminio">Aluminio</option>
+        </select>
+      </div>
+      <div class="quantity-field" data-only-create>
+        <label>Cantidad</label>
+        <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
+      </div>
     </div>
 
-    <!-- Row 2: Glass 1 specifications -->
-    <!--  Second row: specifications for Glass 1 -->
-    <div>
-      <h3 class="font-semibold text-sm mb-2">Cristal 1</h3>
-      <div class="grid grid-cols-5 gap-4">
+    <!-- Fila 2: Cristal 1 y Cristal 2 -->
+    <div class="mb-4">
+      <h3 class="font-semibold text-sm mb-2">Cristales</h3>
+      <div class="grid grid-cols-6 gap-6">
+        <!-- Cristal 1 -->
         <div>
-          <label>Tipo de vidrio</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Tipo</label>
           <select name="project[dvhs_attributes][][glasscutting1_type]" class="w-full border rounded px-2 py-1 glasscutting1-type-select">
             <option value="">Seleccionar</option>
             <option value="LAM">LAM</option>
@@ -93,27 +84,20 @@
           </select>
         </div>
         <div>
-          <label>Grosor</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Grosor</label>
           <select name="project[dvhs_attributes][][glasscutting1_thickness]" class="w-full border rounded px-2 py-1 glasscutting1-thickness-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
         <div>
-          <label>Color</label>
+          <label class="text-xs text-gray-600">Cristal 1 - Color</label>
           <select name="project[dvhs_attributes][][glasscutting1_color]" class="w-full border rounded px-2 py-1 glasscutting1-color-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
-      </div>
-    </div>
-
-    <!-- Row 3: Glass 2 specifications -->
-    <!--  Third row: specifications for Glass 2 -->
-    <div>
-      <h3 class="font-semibold text-sm mb-2">Cristal 2</h3>
-      <div class="grid grid-cols-5 gap-4">
+        <!-- Cristal 2 -->
         <div>
-          <label>Tipo de vidrio</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Tipo</label>
           <select name="project[dvhs_attributes][][glasscutting2_type]" class="w-full border rounded px-2 py-1 glasscutting2-type-select">
             <option value="">Seleccionar</option>
             <option value="LAM">LAM</option>
@@ -122,13 +106,13 @@
           </select>
         </div>
         <div>
-          <label>Grosor</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Grosor</label>
           <select name="project[dvhs_attributes][][glasscutting2_thickness]" class="w-full border rounded px-2 py-1 glasscutting2-thickness-select">
             <option value="">Seleccionar</option>
           </select>
         </div>
         <div>
-          <label>Color</label>
+          <label class="text-xs text-gray-600">Cristal 2 - Color</label>
           <select name="project[dvhs_attributes][][glasscutting2_color]" class="w-full border rounded px-2 py-1 glasscutting2-color-select">
             <option value="">Seleccionar</option>
           </select>
@@ -136,11 +120,13 @@
       </div>
     </div>
 
-    <!-- Confirm button -->
-    <!--  Button to confirm the DVH row -->
-    <div class="mt-4">
-      <button type="button" class="confirm-dvh bg-black text-white px-3 py-1 rounded">Confirmar</button>
-      <button type="button" class="cancel-dvh bg-gray-100 text-gray-800 px-3 py-1 rounded ml-2">Cancelar</button>
+    <div class="flex items-center gap-1 col-span-1 mt-6">
+      <div>
+        <button type="button" class="confirm-dvh bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+      </div>
+      <div> 
+        <button type="button" class="cancel-dvh bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
+      </div>
     </div>
 
   </div>
@@ -149,7 +135,7 @@
 <!-- Hidden template for cloning glasscutting fields -->
 <!--  Template for dynamically adding new glasscutting rows -->
 <template id="glasscutting-template">
-  <div class="grid grid-cols-8 gap-4 mb-4 glasscutting-fields">
+  <div class="grid grid-cols-9 gap-4 mb-4 glasscutting-fields mt-8">
     <div>
       <label>Tipología</label>
       <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
@@ -188,9 +174,28 @@
         <option value="">Seleccionar</option>
       </select>
     </div>
-    <div class="actions space-x-2 mt-2 col-span-2 flex gap-2">
-      <button type="button" class="confirm-glass bg-black text-white px-3 py-1 rounded mt-4">Confirmar</button>
-      <button type="button" class="cancel-glass bg-gray-100 text-gray-800 px-3 py-1 rounded mt-4">Cancelar</button>
+
+    <div>
+      <label>Abertura</label>
+      <select name="project[glasscuttings_attributes][][type_opening]" class="w-full border rounded px-2 py-1">
+        <option value="">Seleccionar</option>
+        <option value="PVC">PVC</option>
+        <option value="Aluminio">Aluminio</option>
+      </select>
+    </div>
+    <div class="quantity-field" data-only-create>
+      <label>Cantidad</label>
+      <input type="number" class="w-full border rounded px-2 py-1 quantity-input" value="1" min="1" max="100">
+    </div>
+    <div class="flex items-center gap-2 col-span-1 mt-3">
+      <div class="btns-create-glass flex gap-2 mt-3">
+        <button type="button" class="confirm-glass btn-create-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Confirmar</button>
+        <button type="button" class="cancel-glass btn-create-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:1;">Cancelar</button>
+      </div>
+      <div class="btns-edit-glass flex gap-2 hidden">
+        <button type="button" class="save-glasscutting-edit btn-edit-glass bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:0.5;">Guardar</button>
+        <button type="button" class="cancel-glasscutting-edit btn-edit-glass bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-2 rounded text-xs font-semibold leading-tight" style="min-width:0.5;">Cancelar</button>
+      </div>
     </div>
   </div>
 </template>
