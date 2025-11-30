@@ -62,14 +62,27 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
         else:
             work = work_name
         
+        # Ajustar dimensiones según rotación
+        width_original = int(cut.get('ancho', 0))
+        height_original = int(cut.get('alto', 0))
+        is_rotated = cut.get('is_rotated', False)
+        
+        if is_rotated:
+            # Si está rotada, invertir las dimensiones
+            width_display = height_original
+            height_display = width_original
+        else:
+            width_display = width_original
+            height_display = height_original
+        
         table_data.append([
             cut.get('tipologia', '-'),
             cut.get('clase', 'Simple'),
             cut.get('cardinal', '-'),
             cut.get('innertube', '-'),
             comp,
-            str(int(cut.get('ancho', 0))),
-            str(int(cut.get('alto', 0))),
+            str(width_display),
+            str(height_display),
             origen,
             work
         ])
@@ -123,11 +136,33 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                 # Composición completa del DVH
                 composicion_dvh = f"{comp1} / {camara} / {comp2}"
                 
+                # Obra (nombre e id)
+                work_name = cut1.get('work', '-')
+                work_id = cut1.get('id_work', '')
+                if work_id:
+                    obra = f"{work_name} ({work_id})"
+                else:
+                    obra = work_name
+                
+                # Ajustar dimensiones según rotación
+                width_original = int(cut1.get('ancho', 0))
+                height_original = int(cut1.get('alto', 0))
+                is_rotated = cut1.get('is_rotated', False)
+                
+                if is_rotated:
+                    # Si está rotada, invertir las dimensiones
+                    width_display = height_original
+                    height_display = width_original
+                else:
+                    width_display = width_original
+                    height_display = height_original
+                
                 dvh_summary.append({
                     'tipologia': tipologia,
                     'composicion': composicion_dvh,
-                    'ancho': int(cut1.get('ancho', 0)),
-                    'alto': int(cut1.get('alto', 0))
+                    'ancho': width_display,
+                    'alto': height_display,
+                    'obra': obra
                 })
     
     with PdfPages(output_path) as pdf:
@@ -210,7 +245,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
         # Agregar página con resumen de DVH si hay DVH
         if dvh_summary:
             # Preparar datos para la tabla de DVH
-            dvh_headers = ['Tipología', 'Composición', 'Ancho', 'Alto']
+            dvh_headers = ['Tipología', 'Composición', 'Ancho', 'Alto', 'Obra']
             dvh_table_data = [dvh_headers]
             
             for dvh in dvh_summary:
@@ -218,7 +253,8 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                     dvh['tipologia'],
                     dvh['composicion'],
                     str(dvh['ancho']),
-                    str(dvh['alto'])
+                    str(dvh['alto']),
+                    dvh['obra']
                 ])
             
             # Calcular cuántas filas de DVH caben por página
@@ -255,7 +291,7 @@ def generate_general_summary_pdf(all_cuts, output_folder='output_visuals', filen
                     cellText=page_dvh_table_data,
                     cellLoc='center',
                     loc='upper center',
-                    colWidths=[0.15, 0.55, 0.15, 0.15]
+                    colWidths=[0.12, 0.45, 0.10, 0.10, 0.23]
                 )
                 
                 # Estilizar tabla de DVH

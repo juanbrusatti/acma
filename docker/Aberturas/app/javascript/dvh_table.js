@@ -350,6 +350,32 @@ export function handleDvhEvents(e) {
       return;
     }
 
+    // Validar dimensiones máximas según tipo de vidrio
+    const widthNum = parseFloat(width);
+    const heightNum = parseFloat(height);
+    
+    if (glass1Type === 'COL' || glass2Type === 'COL') {
+      // Vidrio COL: máximo 3210x2400 mm
+      if (!((widthNum <= 3210 && heightNum <= 2400) || (widthNum <= 2400 && heightNum <= 3210))) {
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Dimensiones máximas para vidrio de tipo COL son 3210x2400 mm.'
+        });
+        return;
+      }
+    } else {
+      // Otros vidrios: máximo 3600x2500 mm
+      if (!((widthNum <= 3600 && heightNum <= 2500) || (widthNum <= 2500 && heightNum <= 3600))) {
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Dimensiones máximas para vidrio son 3600x2500 mm.'
+        });
+        return;
+      }
+    }
+
     // Calculate new price
     const glass1Display = [glass1Type, glass1Thickness, glass1Color].join(' / ');
     const glass2Display = [glass2Type, glass2Thickness, glass2Color].join(' / ');
@@ -512,6 +538,32 @@ export function handleDvhEvents(e) {
         title: 'Falta rellenar: ' + missingField.label
       });
       return;
+    }
+
+    // Validar dimensiones máximas según tipo de vidrio
+    const widthNum = parseFloat(values.width);
+    const heightNum = parseFloat(values.height);
+    
+    if (values.glasscutting1_type === 'COL' || values.glasscutting2_type === 'COL') {
+      // Vidrio COL: máximo 3210x2400 mm
+      if (!((widthNum <= 3210 && heightNum <= 2400) || (widthNum <= 2400 && heightNum <= 3210))) {
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Dimensiones máximas para vidrio de tipo COL son 3210x2400 mm.'
+        });
+        return;
+      }
+    } else {
+      // Otros vidrios: máximo 3600x2500 mm
+      if (!((widthNum <= 3600 && heightNum <= 2500) || (widthNum <= 2500 && heightNum <= 3600))) {
+        const swalConfig = window.getSwalConfig();
+        window.Swal.fire({
+          ...swalConfig,
+          title: 'Dimensiones máximas para vidrio son 3600x2500 mm.'
+        });
+        return;
+      }
     }
 
     const quantity = parseInt(values.quantity);
