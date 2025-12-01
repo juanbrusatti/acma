@@ -221,12 +221,9 @@ export function handleDvhEvents(e) {
       row.parentNode.insertBefore(editRow, row);
 
       // Prefill values
-      // Typology: template uses number + hidden Vx
-      const typologyInput = editContainer.querySelector('.typology-number-input');
-      const typologyHidden = editContainer.querySelector('.typology-hidden-field');
-      const typologyNumber = typology.replace(/^V/i, '');
-      if (typologyInput) typologyInput.value = typologyNumber;
-      if (typologyHidden) typologyHidden.value = typology;
+      // Typology: simple text field
+      const typologyInput = editContainer.querySelector('input[name="project[dvhs_attributes][][typology]"]');
+      if (typologyInput) typologyInput.value = typology;
 
       const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
       const widthInput = editContainer.querySelector('input[name="project[dvhs_attributes][][width]"]');
@@ -292,9 +289,8 @@ export function handleDvhEvents(e) {
     const row = editRow.nextElementSibling; // original hidden row
 
     // Get values from template-based edit form
-    const typologyHidden = editContainer.querySelector('.typology-hidden-field');
-    const typologyNumberInput = editContainer.querySelector('.typology-number-input');
-    const typology = (typologyHidden && typologyHidden.value) || (typologyNumberInput && typologyNumberInput.value ? 'V' + typologyNumberInput.value : '');
+    const typologyInput = editContainer.querySelector('input[name="project[dvhs_attributes][][typology]"]');
+    const typology = typologyInput ? typologyInput.value : '';
 
     const type_openingSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][type_opening]"]');
     const innertubeSelect = editContainer.querySelector('select[name="project[dvhs_attributes][][innertube]"]');
@@ -493,13 +489,6 @@ export function handleDvhEvents(e) {
   // CONFIRM: Add new DVH entry to table
   if (e.target.classList.contains("confirm-dvh")) {
     const container = e.target.closest(".dvh-fields");
-    
-    // Before processing, ensure typology hidden field is updated
-    const typologyNumberInput = container.querySelector('.typology-number-input');
-    const typologyHidden = container.querySelector('.typology-hidden-field');
-    if (typologyNumberInput && typologyHidden && typologyNumberInput.value) {
-      typologyHidden.value = "V" + typologyNumberInput.value;
-    }
     
     const fields = container.querySelectorAll("input, select");
     
