@@ -164,11 +164,8 @@ export function handleGlasscuttingEvents(e) {
       editContainer.classList.add('glasscutting-edit-form');
 
       // Prefill fields
-      const typologyNumberInput = editContainer.querySelector('.typology-number-input');
-      const typologyHidden = editContainer.querySelector('.typology-hidden-field');
-      const numberOnly = typology.replace(/^V/i, '');
-      if (typologyNumberInput) typologyNumberInput.value = numberOnly;
-      if (typologyHidden) typologyHidden.value = typology;
+      const typologyInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][typology]"]');
+      if (typologyInput) typologyInput.value = typology;
 
       const typeSelect = editContainer.querySelector('.glass-type-select');
       const thicknessSelect = editContainer.querySelector('.glass-thickness-select');
@@ -237,7 +234,7 @@ export function handleGlasscuttingEvents(e) {
     if (!row) { return; }
 
     // Get values from form
-    const typologyHidden = editContainer.querySelector('.typology-hidden-field');
+    const typologyInput = editContainer.querySelector('input[name="project[glasscuttings_attributes][][typology]"]');
     const typeSelect = editContainer.querySelector('.glass-type-select');
     const thicknessSelect = editContainer.querySelector('.glass-thickness-select');
     const colorSelect = editContainer.querySelector('.glass-color-select');
@@ -246,7 +243,7 @@ export function handleGlasscuttingEvents(e) {
     const type_openingSelect = editContainer.querySelector('select[name="project[glasscuttings_attributes][][type_opening]"]');
 
     const newValues = {
-      typology: typologyHidden.value,
+      typology: typologyInput ? typologyInput.value : '',
       glass_type: typeSelect ? typeSelect.value : '',
       thickness: thicknessSelect ? thicknessSelect.value : '',
       color: colorSelect ? colorSelect.value : '',
