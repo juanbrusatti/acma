@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse, JSONResponse, Response
 import traceback
 from fastapi import Request
 import sys
+from PyPDF2 import PdfMerger
 
 app = FastAPI()
 
@@ -230,14 +231,40 @@ def optimize(pieces_to_cut, stock, zip_buffer: io.BytesIO):
         print(f"[WARN] No se pudo parsear JSON del optimizador: {e}")
         optimizer_result = {}
 
-    # Agregar PDFs y CSV al ZIP
+    def merge_pdfs(pdf_paths, output_path):
+        if not pdf_paths:
+            return None
+        merger = PdfMerger()
+        for pdf in pdf_paths:
+            merger.append(pdf)
+        merger.write(output_path)
+        merger.close()
+        return output_path
+
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zf:
         for root, _, files in os.walk(OUTPUT_VISUALS_DIR):
+            # Solo procesar carpetas, no archivos sueltos
+            planchas_pdfs = []
+            sobrantes_pdfs = []
             for file in files:
                 if file.endswith('.pdf'):
                     full_path = os.path.join(root, file)
-                    arcname = os.path.relpath(full_path, OUTPUT_VISUALS_DIR)
-                    zf.write(full_path, arcname=arcname)
+                    # Clasificación: Sobrante si el nombre empieza con 'Sobrante'
+                    if file.startswith('Sobrante'):
+                        sobrantes_pdfs.append(full_path)
+                    else:
+                        planchas_pdfs.append(full_path)
+            # Merge y agregar al ZIP
+            if planchas_pdfs:
+                merged_planchas = os.path.join(root, 'Planchas.pdf')
+                merge_pdfs(planchas_pdfs, merged_planchas)
+                arcname = os.path.relpath(merged_planchas, OUTPUT_VISUALS_DIR)
+                zf.write(merged_planchas, arcname=arcname)
+            if sobrantes_pdfs:
+                merged_sobrantes = os.path.join(root, 'Sobrantes.pdf')
+                merge_pdfs(sobrantes_pdfs, merged_sobrantes)
+                arcname = os.path.relpath(merged_sobrantes, OUTPUT_VISUALS_DIR)
+                zf.write(merged_sobrantes, arcname=arcname)
 
     # Retornamos solo el resultado JSON
     return optimizer_result
