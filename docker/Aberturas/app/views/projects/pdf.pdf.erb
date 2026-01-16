@@ -3,7 +3,7 @@
 <% dvh_total_con_iva = 0 %>
 
 <div style="margin-bottom: 10px;">
-<img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
+  <img src="file://<%= Rails.root.join('public', 'banner.png') %>" alt="Banner" style="width:100%;">
 </div>
 
 <h1 style="text-align:center; margin-bottom: 20px; color: #444;">PRESUPUESTO</h1>
@@ -33,7 +33,6 @@
 <h2 style="margin-top: 40px; margin-bottom: 5px; font-size: 20px; color: #222;">Resumen de Totales</h2>
 <table border="0" cellspacing="0" cellpadding="0" style="width:50%; margin-bottom: 20px; font-size: 16px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #eee;">
   <tbody>
-
     <tr>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0;">Total General con IVA</td>
       <td style="padding: 8px; font-weight: bold; background: #e0e0e0; text-align: right;">
@@ -43,5 +42,15 @@
     </tr>
   </tbody>
 </table>
+
+<div style="page-break-before: always;"></div>
+
+<h2 style="margin-top: 60px; margin-bottom: 10px; font-size: 20px; color: #222;">DVH asignados</h2>
+
+<%= render_dvh_table(@project.dvhs, false) %>
+
+<h2 style="margin-bottom: 10px; font-size: 20px; color: #222;">Vidrios simples asignados</h2>
+
+<%= render_glasscuttings_table(@project.glasscuttings, false) %>
 
 <%= render_glass(@project.name, @project.dvhs, @project.glasscuttings)%>
