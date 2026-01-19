@@ -80,30 +80,34 @@ module PdfHelper
   end
 
   # Renderiza una tabla de DVH
-  def render_dvh_table(dvhs)
+  def render_dvh_table(dvhs, price = true)
     return render_empty_message("No se han agregado DVH a este proyecto.") if dvhs.blank?
 
     styles = table_styles
     dvh_total = calculate_dvh_total(dvhs)
 
     content_tag :table, border: "0", cellspacing: "0", cellpadding: "0", style: styles[:table] do
-      concat(render_dvh_header(styles))
-      concat(render_dvh_body(dvhs, styles))
-      concat(render_dvh_footer(dvh_total, styles))
+      concat(render_dvh_header(styles, price))
+      concat(render_dvh_body(dvhs, styles, price))
+      if price 
+        concat(render_dvh_footer(dvh_total, styles))
+      end
     end
   end
 
   # Renderiza una tabla de vidrios simples
-  def render_glasscuttings_table(glasscuttings)
+  def render_glasscuttings_table(glasscuttings, price = true)
     return render_empty_message("No se han agregado vidrios simples a este proyecto.") if glasscuttings.blank?
 
     styles = table_styles
     glasscuttings_total = calculate_glasscuttings_total(glasscuttings)
 
     content_tag :table, border: "0", cellspacing: "0", cellpadding: "0", style: styles[:table] do
-      concat(render_glasscuttings_header(styles))
-      concat(render_glasscuttings_body(glasscuttings, styles))
-      concat(render_glasscuttings_footer(glasscuttings_total, styles))
+      concat(render_glasscuttings_header(styles, price))
+      concat(render_glasscuttings_body(glasscuttings, styles, price))
+      if price 
+        concat(render_glasscuttings_footer(glasscuttings_total, styles))
+      end
     end
   end
 
@@ -114,17 +118,25 @@ module PdfHelper
       style: "padding: 20px; text-align: center; color: #666; font-style: italic; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;"
   end
 
-  def render_dvh_header(styles)
+  def render_dvh_header(styles, price)
     content_tag :thead do
-      content_tag :tr, style: styles[:header] do
-        %w[Tipologia Cristal\ 1 Cristal\ 2 Camara Alto Ancho Cantidad Precio].map do |header|
-          content_tag :th, header, style: styles[:header_cell]
-        end.join.html_safe
+      if price 
+        content_tag :tr, style: styles[:header] do
+          %w[Tipologia Cristal\ 1 Cristal\ 2 Camara Alto Ancho Cantidad Precio].map do |header|
+            content_tag :th, header, style: styles[:header_cell]
+          end.join.html_safe
+        end
+      else 
+        content_tag :tr, style: styles[:header] do
+          %w[Tipologia Cristal\ 1 Cristal\ 2 Camara Alto Ancho Cantidad].map do |header|
+            content_tag :th, header, style: styles[:header_cell]
+          end.join.html_safe
+        end
       end
     end
   end
 
-  def render_dvh_body(dvhs, styles)
+  def render_dvh_body(dvhs, styles, price)
     # Agrupar DVH por todos los atributos relevantes, incluyendo type_opening (Abertura)
     grouped = dvhs.group_by do |dvh|
       [
@@ -142,15 +154,20 @@ module PdfHelper
       grouped.map do |attrs, dvh_group|
         idx += 1
         cantidad = dvh_group.size
-        precio_unitario = attrs[6].to_f
-        precio_total = precio_unitario * cantidad
-        row_values = attrs[0..5] + [cantidad] + [precio_total]
+        
+        row_values = attrs[0..5] + [cantidad]
+        
+        if price
+          precio_unitario = attrs[6].to_f
+          precio_total = precio_unitario * cantidad
+          row_values << precio_total
+        end
+        
         content_tag :tr, style: "background: #{idx.even? ? styles[:row_even] : styles[:row_odd]};" do
           row_values.each_with_index.map do |cell_content, i|
-            if i == 7 # Solo la última columna (precio total)
+            if price && i == row_values.size - 1
               formatted_content = format_argentine_currency(cell_content, unit: "$", precision: 2)
             else
-              # Si es numérico, mostrar como número plano (con coma decimal si es float)
               formatted_content = cell_content.is_a?(Float) ? sprintf('%.2f', cell_content).tr('.', ',') : cell_content
             end
             content_tag :td, formatted_content, style: styles[:cell]
@@ -177,17 +194,25 @@ module PdfHelper
     end
   end
 
-  def render_glasscuttings_header(styles)
+  def render_glasscuttings_header(styles, price)
     content_tag :thead do
-      content_tag :tr, style: styles[:header] do
-        %w[Tipologia Tipo Espesor Color Alto Ancho Cantidad Precio].map do |header|
-          content_tag :th, header, style: styles[:header_cell]
-        end.join.html_safe
+      if price 
+        content_tag :tr, style: styles[:header] do
+          %w[Tipologia Tipo Espesor Color Alto Ancho Cantidad Precio].map do |header|
+            content_tag :th, header, style: styles[:header_cell]
+          end.join.html_safe
+        end
+      else 
+        content_tag :tr, style: styles[:header] do
+          %w[Tipologia Tipo Espesor Color Alto Ancho Cantidad].map do |header|
+            content_tag :th, header, style: styles[:header_cell]
+          end.join.html_safe
+        end
       end
     end
   end
 
-  def render_glasscuttings_body(glasscuttings, styles)
+  def render_glasscuttings_body(glasscuttings, styles, price)
     # Agrupar vidrios simples por todos los atributos relevantes, incluyendo type_opening (Abertura)
     grouped = glasscuttings.group_by do |glass|
       [
@@ -205,8 +230,7 @@ module PdfHelper
       grouped.map do |attrs, group|
         idx += 1
         cantidad = group.size
-        precio_unitario = attrs[6].to_f
-        precio_total = precio_unitario * cantidad
+        
         row_values = [
           attrs[0].present? ? attrs[0] : '-',
           attrs[1].present? ? attrs[1] : '-',
@@ -214,12 +238,18 @@ module PdfHelper
           attrs[3].present? ? attrs[3] : '-',
           attrs[4].present? ? attrs[4] : '-',
           attrs[5].present? ? attrs[5] : '-',
-          cantidad,
-          precio_total
+          cantidad
         ]
+        
+        if price
+          precio_unitario = attrs[6].to_f
+          precio_total = precio_unitario * cantidad
+          row_values << precio_total
+        end
+        
         content_tag :tr, style: "background: #{idx.even? ? styles[:row_even] : styles[:row_odd]};" do
           row_values.each_with_index.map do |cell_content, i|
-            if i == 7 # Solo la última columna (precio total)
+            if price && i == row_values.size - 1 # Solo la última columna si es precio
               formatted_content = number_to_currency(cell_content, unit: "$", precision: 2)
             else
               formatted_content = cell_content.is_a?(Float) ? sprintf('%.2f', cell_content).tr('.', ',') : cell_content
@@ -293,7 +323,6 @@ module PdfHelper
     html = "<div style=\"page-break-before: always;\"></div>"
     total_pages = (labels.size / 4.0).ceil
     labels.each_slice(4).with_index do |group, idx|
-      # Si hay menos de 4 etiquetas, agregamos "espacios vacíos" invisibles
       while group.size < 4
         group << content_tag(:div, '', style: "width: 72mm; height: 50mm; display: inline-block; margin: 1%; visibility: hidden;")
       end
@@ -311,7 +340,6 @@ module PdfHelper
 
   def render_plates_table(glasscuttings, dvhs)
     styles = table_styles
-    # Encabezado personalizado
     thead = content_tag(:thead) do
       content_tag(:tr, style: styles[:header]) do
         %w[Clase Cardinal Tipo Color Grosor Ancho Alto Origen].map do |header|
@@ -320,7 +348,6 @@ module PdfHelper
       end
     end
 
-    # Filas de glasscuttings (simples)
     simple_rows = glasscuttings.map do |glass|
       row_values = [
         'Simple',
@@ -337,10 +364,8 @@ module PdfHelper
       end
     end
 
-    # Filas de dvhs (cada DVH se descompone en dos placas)
     dvh_rows = dvhs.flat_map.with_index do |dvh, idx|
       [
-        # Primer placa
         [
           'DVH',
           '1/2',
@@ -351,7 +376,6 @@ module PdfHelper
           dvh.height.present? ? dvh.height : '-',
           dvh.respond_to?(:origin) ? dvh.origin : '-'
         ],
-        # Segunda placa
         [
           'DVH',
           '2/2',
