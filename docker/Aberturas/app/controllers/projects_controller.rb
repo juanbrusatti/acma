@@ -1,4 +1,5 @@
 class ProjectsController < ApplicationController
+  require 'stringio'
   include ScrapsHelper
   def index
     @projects = Project.all
@@ -188,22 +189,67 @@ class ProjectsController < ApplicationController
 
   # Optimize the project using the python microservice
   def optimize
+    # Limpiar sesión antes de procesar para evitar cookie overflow
+    session.clear if session.to_s.bytesize > 2000
+    
     @project = Project.find(params[:id])
+    project_ids = params[:project_ids].nil? ? nil : params[:project_ids].split(',')
 
-    # Recibir y mostrar los IDs de proyectos seleccionados
-    if params[:project_ids].present?
-      project_ids = params[:project_ids].split(',').map(&:to_i)
-      project_ids.delete(@project.id) # Delete current project ID
+    pieces_to_cut, stock = create_microservice_params(
+      stock_flag = params[:stock], 
+      scraps_flag = params[:scraps], 
+      flo_lam_flag = params[:flo_lam], 
+      project_ids = project_ids
+    )
+
+    # Usar el servicio local del optimizador
+    result = OptimizerService.new.optimize(pieces_to_cut, stock)
+    
+    if result[:success]
+      # Procesar resultado exitoso
+      process_optimizer_result(result[:data], result[:zip_bytes])
+      
+      redirect_to confirm_optimization_project_path(@project, project_ids: project_ids)
+    else
+      # Manejar error
+      flash[:error] = "Error en el optimizador: #{result[:error]}"
+      redirect_back(fallback_location: project_path(@project))
     end
+  end
 
-    require 'net/http'
-    optimizer_url = ENV.fetch('OPTIMIZER_URL', 'http://optimizer:8000/optimize')
-    uri = URI.parse(optimizer_url)
-
-    pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps], flo_lam_flag = params[:flo_lam], project_ids = project_ids.nil? ? nil : project_ids)
-
-    call_microservice_optimizer(uri, pieces_to_cut, stock)
-    redirect_to confirm_optimization_project_path(@project, project_ids: project_ids.nil? ? nil : project_ids)
+  def process_optimizer_result(data, zip_bytes)
+    # Guardar datos de optimización
+    if data.present?
+      begin
+        @optimizer_summary = data.is_a?(String) ? JSON.parse(data) : data
+      rescue JSON::ParserError
+        @optimizer_summary = { "raw_data" => data }
+      end
+    else
+      @optimizer_summary = nil
+    end
+    
+    # Guardar en archivo temporal
+    if @optimizer_summary
+      optimizations_dir = Rails.root.join("tmp", "optimizations")
+      FileUtils.mkdir_p(optimizations_dir) unless Dir.exist?(optimizations_dir)
+      json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
+      File.write(json_path, JSON.pretty_generate(@optimizer_summary))
+    end
+    
+    # Convertir zip_bytes de hex a bytes si existe
+    if zip_bytes.present?
+      begin
+        zip_data = zip_bytes.is_a?(String) ? [zip_bytes].pack('H*') : zip_bytes
+        zip_filename = "cutting_plan_visuals.zip"
+        send_data StringIO.open(zip_data, "rb") { |io| io.read },
+                  filename: zip_filename,
+                  type: 'application/zip'
+        return  # Importante: retornar después de send_data
+      rescue => e
+        Rails.logger.error "Error processing ZIP: #{e.message}"
+      end
+    end
   end
 
   # View to confirm optimization results
@@ -554,15 +600,31 @@ class ProjectsController < ApplicationController
 
   def call_microservice_optimizer(uri, pieces_to_cut, stock)
     http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == 'https'
     http.read_timeout = 180
-    req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
-    req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body
+    http.open_timeout = 30
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme == 'https'
+    
+    req = Net::HTTP::Post.new(uri, { 
+      'Content-Type' => 'application/json',
+      'User-Agent' => 'ACMA-Optimizer-Client/1.0'
+    })
+    req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json
 
-    response = http.request(req)
-
-    # Manage the response from the optimizer
-    manage_response(response)
-
+    begin
+      response = http.request(req)
+      manage_response(response)
+    rescue Net::TimeoutError, Net::OpenTimeout => e
+      Rails.logger.error "Optimizer timeout: #{e.message}"
+      flash[:error] = "El optimizador está tardando demasiado en responder. Por favor, intenta nuevamente."
+      redirect_back(fallback_location: project_path(@project))
+      return
+    rescue Net::HTTPError, EOFError, SocketError => e
+      Rails.logger.error "Optimizer connection error: #{e.message}"
+      flash[:error] = "Error de conexión con el optimizador. Por favor, intenta nuevamente en unos momentos."
+      redirect_back(fallback_location: project_path(@project))
+      return
+    end
   end
 
   def manage_response(response)
@@ -628,11 +690,15 @@ class ProjectsController < ApplicationController
       return
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
-      redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
+      flash[:error] = "Error al ejecutar optimizador (#{response.code}): #{response.body[0..100]}"
+      redirect_to project_path(@project)
+      return
     end
   rescue => e
     Rails.logger.error "Optimizer request error: #{e.message}"
-    redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
+    flash[:error] = "Error conectando al servicio de optimización: #{e.message}"
+    redirect_to project_path(@project)
+    return
   end
 
   # Private methods for scraps creation post optimization

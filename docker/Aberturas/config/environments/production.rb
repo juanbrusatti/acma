@@ -88,7 +88,9 @@ Rails.application.configure do
     /192\.168\.\d+\.\d+/, # Allow requests from any 192.168.x.x IP
     /.*\.localhost/,      # Allow requests from subdomains of localhost
     "127.0.0.1",          # Allow requests from 127.0.0.1
-    "0.0.0.0"             # Allow requests from 0.0.0.0
+    "0.0.0.0",            # Allow requests from 0.0.0.0
+    "acma-morning-rain-7029.fly.dev",  # Allow Fly.io domain
+    /.*\.fly\.dev/        # Allow all Fly.io subdomains
   ]
   #
   # Skip DNS rebinding protection for the default health check endpoint.

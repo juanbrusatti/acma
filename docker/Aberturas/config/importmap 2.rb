@@ -26,3 +26,4 @@ pin "sweetalert2", to: "https://ga.jspm.io/npm:sweetalert2@11.22.3/dist/sweetale
 pin "confirmations", to: "confirmations.js"
 pin "utils", to: "utils.js"
 pin "optimize_modal", to: "optimize_modal.js"
+pin "glassplates_page", to: "glassplates_page.js"

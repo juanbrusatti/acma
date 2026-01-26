@@ -1,0 +1,91 @@
+# flyctl launch added from .gitignore
+# Global ignores
+**/.DS_Store
+**/Thumbs.db
+**/*.log
+
+# Env files
+**/.env
+**/.env.*
+!**/.env.example
+
+# VS Code
+**/.vscode
+
+# Node/Electron (root & subprojects)
+**/node_modules
+**/**/node_modules
+
+# Electron app build artifacts
+electron-app/dist
+electron-app/out
+electron-app/release
+electron-app/build
+electron-app/*.asar
+electron-app/*.dmg
+electron-app/*.AppImage
+electron-app/*.exe
+electron-app/.webpack
+electron-app/.parcel-cache
+
+# Rails app is inside docker/Aberturas — keep its ignores local in that folder
+# (See docker/Aberturas/.gitignore)
+
+# flyctl launch added from docker/.gitignore
+# PostgreSQL data directory (persistent volume)
+docker/**/postgres_data
+
+# Environment variables (contains passwords)
+docker/**/.env
+
+# Log files
+docker/**/*.log
+
+# Temporary files
+docker/**/tmp
+
+# Backup files
+docker/**/backup_*.sql
+
+docker/**/optimizer/__pycache__
+docker/**/optimizer/output_plan
+docker/**/optimizer/output_visuals
+docker/**/optimizer/test_outputs
+docker/**/optimizer/test/__pycache__
+
+# flyctl launch added from docker/Aberturas/.gitignore
+# Rails
+docker/Aberturas/log/*
+!docker/Aberturas/log/.keep
+docker/Aberturas/tmp/*
+!docker/Aberturas/tmp/.keep
+docker/Aberturas/storage/*
+!docker/Aberturas/storage/.keep
+docker/Aberturas/public/assets
+docker/Aberturas/public/packs
+docker/Aberturas/public/packs-test
+docker/Aberturas/public/system
+docker/Aberturas/public/uploads
+
+# Node & frontend
+docker/Aberturas/node_modules
+docker/Aberturas/yarn-error.log
+docker/Aberturas/.byebug_history
+docker/Aberturas/.bundle
+docker/Aberturas/vendor/bundle
+docker/Aberturas/app/assets/builds
+docker/Aberturas/app/assets/.sprockets-manifest-*.json
+
+# Databases (SQLite)
+docker/Aberturas/**/*.sqlite3
+docker/Aberturas/**/*.sqlite3-shm
+docker/Aberturas/**/*.sqlite3-wal
+docker/Aberturas/**/*.sqlite3-*
+
+# Credentials (keep only in secure secret storage, not in git)
+docker/Aberturas/config/master.key
+docker/Aberturas/config/credentials/*.key
+
+# Misc
+docker/Aberturas/**/.DS_Store
+fly.toml

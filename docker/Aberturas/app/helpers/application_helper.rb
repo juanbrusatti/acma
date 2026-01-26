@@ -18,14 +18,10 @@ module ApplicationHelper
       'Incoloro'
     when 'GRIS'
       'Gris'
-    when 'BRC'
+    when 'BRONCE'
       'Bronce'
     when 'ESMERILADO'
       'Esmerilado'
-    when 'NTR'
-      'Neutro'
-    when 'STB'
-      'Satinado'
     else
       color.to_s
     end

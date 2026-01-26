@@ -52,20 +52,27 @@
       </div>
     </div>
     <script>
-      window.GLASS_PRICES = <%= GlassPrice.all.map { |gp|
-        {
-          glass_type: gp.glass_type,
-          thickness: gp.thickness,
-          color: gp.color,
-          buying_price: gp.buying_price.to_f,
-          selling_price: gp.selling_price.to_f,
-          percentage: gp.percentage.to_f
-        }
-      }.to_json.html_safe %>;
+      <% begin %>
+        window.GLASS_PRICES = <%= GlassPrice.all.map { |gp|
+          {
+            glass_type: gp.glass_type,
+            thickness: gp.thickness,
+            color: gp.color,
+            buying_price: gp.buying_price.to_f,
+            selling_price: gp.selling_price.to_f,
+            percentage: gp.percentage.to_f
+          }
+        }.to_json.html_safe %>;
 
-      window.INNERTUBE_PRICES = <%= AppConfig.get_all_innertube_prices.to_json.html_safe %>;
+        window.INNERTUBE_PRICES = <%= AppConfig.get_all_innertube_prices.to_json.html_safe %>;
 
-      window.SUPPLY_PRICES = <%= Supply.all.pluck(:name, :price_peso).to_h.to_json.html_safe %>;
+        window.SUPPLY_PRICES = <%= Supply.all.pluck(:name, :price_peso).to_h.to_json.html_safe %>;
+      <% rescue ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad, StandardError => e %>
+        window.GLASS_PRICES = [];
+        window.INNERTUBE_PRICES = {};
+        window.SUPPLY_PRICES = {};
+        console.warn('Database not connected - using empty data');
+      <% end %>;
     </script>
   </body>
 </html>
