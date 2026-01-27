@@ -4,7 +4,7 @@
 #
 
 app = 'acma-optimizer'
-primary_region = 'gru'
+primary_region = 'sjc'
 
 [build]
   dockerfile = 'Dockerfile.fly'
@@ -35,6 +35,7 @@ primary_region = 'gru'
   tls_skip_verify = false
 
 [[vm]]
-  memory = "2048mb"
+  count = 1
+  memory = "1024mb"
   cpu_kind = "shared"
   cpus = 1
