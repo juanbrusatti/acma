@@ -1,13 +1,20 @@
 #!/bin/bash
 
-echo "🛑 Deteniendo aplicaciones ACMA..."
+echo "🛑 Apagando aplicaciones ACMA..."
 
-# Detener Rails
-flyctl scale count 0 -a acma-rails
-echo "✅ Rails detenido"
+# Apagar Rails
+if flyctl scale count 0 -a acma-rails -y; then
+    echo "✅ Rails apagado"
+else
+    echo "❌ Error al apagar Rails"
+fi
 
-# Detener Optimizer  
-flyctl scale count 0 -a acma-optimizer
-echo "✅ Optimizer detenido"
+# Apagar Optimizer  
+if flyctl scale count 0 -a acma-optimizer -y; then
+    echo "✅ Optimizer apagado"
+else
+    echo "❌ Error al apagar Optimizer"
+fi
 
-echo "🎉 Todas las aplicaciones detenidas. Consumo mínimo."
+echo "🔌 Aplicaciones apagadas. Consumo: $0"
+echo "💡 Para volver a iniciarlas: ./start-apps.sh"
