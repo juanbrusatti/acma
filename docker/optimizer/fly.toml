@@ -1,0 +1,40 @@
+# fly.toml app configuration file generated for acma-optimizer on 2026-01-27T16:05:05-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'acma-optimizer'
+primary_region = 'gru'
+
+[build]
+  dockerfile = 'Dockerfile.fly'
+
+[env]
+  PYTHONUNBUFFERED = '1'
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 3
+    soft_limit = 2
+
+  [[http_service.checks]]
+  grace_period = "30s"
+  interval = "1m"
+  method = "GET"
+  path = "/health"
+  protocol = "http"
+  timeout = "5s"
+  tls_skip_verify = false
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

@@ -443,7 +443,7 @@ class ProjectsController < ApplicationController
       # Crear el piece con los valores finales
       {
         id: cut.id,
-        typology: cut.typology,
+        typology: cut.typology || 'v3', # Valor por defecto si es nil
         width: cut.width,
         height: cut.height,
         innertube: '-',
@@ -486,7 +486,7 @@ class ProjectsController < ApplicationController
       [
         {
           id: dvh.id.to_s + "_1",
-          typology: dvh.typology,
+          typology: dvh.typology || 'v3', # Valor por defecto si es nil
           width: dvh.width,
           height: dvh.height,
           innertube: dvh.innertube,
@@ -503,7 +503,7 @@ class ProjectsController < ApplicationController
         },
         {
           id:  dvh.id.to_s + "_2",
-          typology: dvh.typology,
+          typology: dvh.typology || 'v3', # Valor por defecto si es nil
           width: dvh.width,
           height: dvh.height,
           innertube: dvh.innertube,
@@ -554,6 +554,8 @@ class ProjectsController < ApplicationController
 
   def call_microservice_optimizer(uri, pieces_to_cut, stock)
     http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == 'https'  # Usar SSL si es HTTPS
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme == 'https'  # Para Fly.io
     http.read_timeout = 180
     req = Net::HTTP::Post.new(uri, { 'Content-Type' => 'application/json' })   # Server expects JSON in body
     req.body = { pieces_to_cut: pieces_to_cut, stock: stock }.to_json # Send as pieces_to_cut and stock in body

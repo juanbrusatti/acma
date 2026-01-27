@@ -4,21 +4,26 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
   url: <%= ENV['DATABASE_URL'] %>
+  # Supabase specific settings
+  prepared_statements: false
+  # SSL configuration for Supabase
+  sslmode: <%= ENV.fetch('DB_SSLMODE', 'require') %>
 
 production:
   primary:
     <<: *default
+    database: <%= ENV.fetch('PROD_POSTGRES_DB', 'postgres') %>
   cache:
     <<: *default
-    database: <%= ENV['PROD_POSTGRES_DB'] %>_cache
+    database: <%= ENV.fetch('PROD_POSTGRES_DB', 'postgres') %>_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    database: <%= ENV['PROD_POSTGRES_DB'] %>_queue
+    database: <%= ENV.fetch('PROD_POSTGRES_DB', 'postgres') %>_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    database: <%= ENV['PROD_POSTGRES_DB'] %>_cable
+    database: <%= ENV.fetch('PROD_POSTGRES_DB', 'postgres') %>_cable
     migrations_paths: db/cable_migrate
 
 development:

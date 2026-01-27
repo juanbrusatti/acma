@@ -88,8 +88,12 @@ Rails.application.configure do
     /192\.168\.\d+\.\d+/, # Allow requests from any 192.168.x.x IP
     /.*\.localhost/,      # Allow requests from subdomains of localhost
     "127.0.0.1",          # Allow requests from 127.0.0.1
-    "0.0.0.0"             # Allow requests from 0.0.0.0
-  ]
+    "0.0.0.0",            # Allow requests from 0.0.0.0
+    # Fly.io domains
+    /.*\.fly\.dev/,       # Allow Fly.io development domains
+    /.*\.fly\.io/,        # Allow Fly.io production domains
+    ENV.fetch('RAILS_HOST', nil) # Allow custom host from environment
+  ].compact
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }

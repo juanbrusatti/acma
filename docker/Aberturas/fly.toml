@@ -1,0 +1,47 @@
+# fly.toml app configuration file generated for acma-rails on 2026-01-27T16:04:35-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'acma-rails'
+primary_region = 'gru'
+
+[build]
+  dockerfile = 'Dockerfile.fly'
+
+[deploy]
+  release_command = './bin/rails db:prepare'
+
+[env]
+  DATABASE_URL = '${DATABASE_URL}'
+  RAILS_ENV = 'production'
+  RAILS_LOG_LEVEL = 'info'
+  RAILS_MASTER_KEY = '${RAILS_MASTER_KEY}'
+  RAILS_SERVE_STATIC_FILES = 'true'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 5
+    soft_limit = 3
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "1m"
+    method = "GET"
+    path = "/up"
+    protocol = "http"
+    timeout = "5s"
+    tls_skip_verify = false
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
