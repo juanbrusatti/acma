@@ -20,12 +20,12 @@ echo "✅ Verificaciones completadas"
 
 # Desplegar aplicación Rails
 echo "📦 Desplegando aplicación Rails..."
-cd /Users/juan/Desktop/acma/docker/Aberturas
+cd docker/Aberturas
 flyctl deploy
 
 # Desplegar optimizer
 echo "🤖 Desplegando optimizer..."
-cd /Users/juan/Desktop/acma/docker/optimizer
+cd docker/optimizer
 flyctl deploy
 
 echo "✅ Despliegue completado!"
