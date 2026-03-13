@@ -203,6 +203,14 @@ class ProjectsController < ApplicationController
     pieces_to_cut, stock = create_microservice_params(stock_flag = params[:stock], scraps_flag = params[:scraps], flo_lam_flag = params[:flo_lam], project_ids = project_ids.nil? ? nil : project_ids)
 
     call_microservice_optimizer(uri, pieces_to_cut, stock)
+    
+    # Verify that optimization was successful and JSON summary was saved
+    json_path = Rails.root.join("tmp", "optimizations", "project_#{@project.id}_summary.json")
+    if @optimization_failed || !File.exist?(json_path)
+      redirect_to project_path(@project), alert: "Error al procesar la respuesta del optimizador. Intente nuevamente."
+      return
+    end
+    
     redirect_to confirm_optimization_project_path(@project, project_ids: project_ids.nil? ? nil : project_ids)
   end
 
@@ -303,7 +311,6 @@ class ProjectsController < ApplicationController
               filename: "optimizacion_proyecto_#{@project.id}.zip"
   end
 
-  # POST /projects/:id/refresh_glass_prices
   # Recalcula los precios de los vidrios del proyecto usando los valores actuales en GlassPrice
   # Sólo actualiza la cotización si hay cambios en los precios de los vidrios (no toca insumos)
   def refresh_glass_prices
@@ -578,8 +585,16 @@ class ProjectsController < ApplicationController
 
       parsed_ok = false
 
+      # Prepare optimization dir
+      optimizations_dir = Rails.root.join("tmp", "optimizations")
+      FileUtils.mkdir_p(optimizations_dir)
+      # Clean old files for this project to avoid confusion
+      old_zip = optimizations_dir.join("project_#{@project.id}.zip")
+      old_json = optimizations_dir.join("project_#{@project.id}_summary.json")
+      File.delete(old_zip) if File.exist?(old_zip)
+      File.delete(old_json) if File.exist?(old_json)
+
       # Try with MIME parser from 'mail' gem (available in Rails)
-      # Si esto no anda fijate de hacerlo manual matute.
       begin
         require 'mail'
         raw_mime = "Content-Type: #{content_type}\r\nMIME-Version: 1.0\r\n\r\n#{body}"
@@ -589,13 +604,6 @@ class ProjectsController < ApplicationController
           zip_part  = mail.parts.find { |p| p.mime_type&.include?('application/zip') }
           json_text = json_part&.decoded
           if zip_part
-            optimizations_dir = Rails.root.join("tmp", "optimizations")
-            # Limpiar solo los archivos del proyecto actual antes de guardar los nuevos
-            FileUtils.mkdir_p(optimizations_dir) unless Dir.exist?(optimizations_dir)
-            old_zip = optimizations_dir.join("project_#{@project.id}.zip")
-            old_json = optimizations_dir.join("project_#{@project.id}_summary.json")
-            File.delete(old_zip) if File.exist?(old_zip)
-            File.delete(old_json) if File.exist?(old_json)
             zip_bytes = zip_part.body.decoded
             zip_filename = zip_part.filename.presence || zip_filename
             if zip_bytes
@@ -609,12 +617,46 @@ class ProjectsController < ApplicationController
         Rails.logger.warn "Fallo parseo MIME con 'mail': #{e.class} #{e.message}."
       end
 
-      # Persistir JSON en variable de instancia para uso posterior
+      # Fallback for manual parsing if MIME parser failed and content type indicates multipart
+      if !parsed_ok && content_type&.include?('multipart')
+        Rails.logger.info "manage_response: Intentando parseo manual del multipart"
+        begin
+          boundary_match = content_type.match(/boundary=([^\s;]+)/)
+          if boundary_match
+            boundary = boundary_match[1].gsub(/\A["']|["']\z/, '') # strip quotes
+            parts = body.split("--#{boundary}")
+            parts.each do |part|
+              if part.include?('application/json')
+                # Extract JSON body, removing headers and boundary markers
+                json_body = part.split("\r\n\r\n", 2).last&.strip
+                # Remove trailing boundary markers
+                json_body = json_body&.sub(/\r?\n?--\z/, '')&.strip
+                json_text = json_body if json_body.present?
+              elsif part.include?('application/zip')
+                zip_body = part.split("\r\n\r\n", 2).last
+                if zip_body.present?
+                  # Remove trailing boundary markers
+                  zip_body = zip_body.sub(/\r?\n--\z/, '')
+                  zip_path = optimizations_dir.join("project_#{@project.id}.zip")
+                  File.binwrite(zip_path, zip_body)
+                  Rails.logger.info "manage_response: ZIP guardado vía parseo manual"
+                end
+              end
+            end
+            parsed_ok = json_text.present?
+            Rails.logger.info "manage_response: Parseo manual #{parsed_ok ? 'exitoso' : 'fallido'}"
+          end
+        rescue => e
+          Rails.logger.warn "Fallo parseo manual multipart: #{e.class} #{e.message}"
+        end
+      end
+
+      # Persist JSON summary in @optimizer_summary for use in confirm_optimization view
       begin
         @optimizer_summary = json_text.present? ? JSON.parse(json_text) : nil
       rescue JSON::ParserError => e
         Rails.logger.warn "No se pudo parsear JSON de resumen: #{e.message}"
-        @optimizer_summary = json_text # guardar texto crudo como último recurso
+        @optimizer_summary = nil # guardar texto crudo como último recurso
       end
 
       # Guardar los datos de optimización en archivo JSON temporal
@@ -623,16 +665,18 @@ class ProjectsController < ApplicationController
         FileUtils.mkdir_p(optimizations_dir) unless Dir.exist?(optimizations_dir)
         json_path = optimizations_dir.join("project_#{@project.id}_summary.json")
         File.write(json_path, JSON.pretty_generate(@optimizer_summary))
+      else
+        @optimization_failed = true
       end
 
       return
     else
       Rails.logger.error "Optimizer failed: #{response.code} #{response.body[0..200]}"
-      redirect_to project_path(@project), alert: "Error al ejecutar optimizador (#{response.code})"
+      @optimization_failed = true
     end
   rescue => e
     Rails.logger.error "Optimizer request error: #{e.message}"
-    redirect_to project_path(@project), alert: "Error conectando al servicio de optimización"
+    @optimization_failed = true
   end
 
   # Private methods for scraps creation post optimization

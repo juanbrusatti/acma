@@ -29,12 +29,7 @@
     <div class="grid grid-cols-6 gap-6 mb-4">
       <div>
         <label>Tipología</label>
-        <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
-          <span class="text-gray-700 font-medium mr-1">V</span>
-          <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1"
-                 oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
-          <input type="hidden" name="project[dvhs_attributes][][typology]" class="typology-hidden-field" value="" />
-        </div>
+        <input type="text" name="project[dvhs_attributes][][typology]" class="w-full border rounded px-2 py-1" placeholder="Ej: V-1" />
       </div>
       <div>
         <label>Cámara</label>
@@ -137,12 +132,7 @@
   <div class="grid grid-cols-9 gap-4 mb-4 glasscutting-fields mt-8">
     <div>
       <label>Tipología</label>
-      <div class="flex items-center border border-gray-300 rounded px-2 py-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white">
-        <span class="text-gray-700 font-medium mr-1">V</span>
-        <input type="number" class="flex-1 border-0 outline-none typology-number-input bg-transparent" placeholder="1" min="1"
-               oninput="this.parentElement.querySelector('.typology-hidden-field').value = this.value ? 'V' + this.value : ''" />
-        <input type="hidden" name="project[glasscuttings_attributes][][typology]" class="typology-hidden-field" value="" />
-      </div>
+      <input type="text" name="project[glasscuttings_attributes][][typology]" class="w-full border rounded px-2 py-1" placeholder="Ej: V-1" />
     </div>
     <div>
       <label>Tipo</label>
