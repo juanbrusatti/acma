@@ -349,7 +349,7 @@
     function updatePaginationLinks() {
     const activeTab = document.querySelector('[data-tab].bg-primary');
     const urlParams = new URLSearchParams(window.location.search);
-    const tabValue = urlParams.get('tab') || (activeTab ? activeTab.getAttribute('data-tab') : 'planchas');
+    const tabValue = activeTab?.getAttribute('data-tab') || urlParams.get('tab') || 'planchas';    
     const paginationLinks = document.querySelectorAll('.pagination a');
 
     paginationLinks.forEach(link => {
