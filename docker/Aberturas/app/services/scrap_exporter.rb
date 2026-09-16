@@ -28,11 +28,11 @@ class ScrapExporter
     worksheet = workbook.add_worksheet(name: 'Retazos')
 
     # Escribir encabezados
-    headers = ['Referencia', 'Tipo', 'Grosor', 'Color', 'Ancho (mm)', 'Alto (mm)', 'Obra de procedencia']
+    headers = ['Referencia', 'Tipo', 'Grosor', 'Color', 'Ancho (mm)', 'Alto (mm)', 'Obra de procedencia', 'Ubicación']
     worksheet.add_row headers, style: header_style
 
     # Ajustar ancho de columnas
-    worksheet.column_widths 15, 12, 12, 12, 15, 15, 25
+    worksheet.column_widths 15, 12, 12, 12, 15, 15, 25, 20
 
     # Escribir datos
     @scraps.each do |scrap|
@@ -44,7 +44,8 @@ class ScrapExporter
           scrap.color,
           scrap.width,
           scrap.height,
-          scrap.input_work
+          scrap.input_work,
+          scrap.location
         ],
         style: data_style
       )

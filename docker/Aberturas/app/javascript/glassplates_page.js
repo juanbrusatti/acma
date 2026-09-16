@@ -1,7 +1,7 @@
 const GlassplatesPage = (() => {
   const PLACEHOLDERS = {
     planchas: "Buscar planchas por tipo, grosor, color...",
-    sobrantes: "Buscar retazos por referencia, tipo, grosor, color...",
+    sobrantes: "Buscar retazos por referencia, tipo, grosor, color, ubicación...",
   };
 
   let pageRoot = null;

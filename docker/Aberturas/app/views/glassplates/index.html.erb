@@ -71,7 +71,7 @@
               <%= hidden_field_tag :tab, params[:tab] || 'planchas', id: 'current-tab' %>
               <div class="relative w-full md:w-64">
                 <%= text_field_tag :search, params[:search],
-                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color..." : "Buscar planchas por tipo, grosor, color...",
+                    placeholder: params[:tab] == 'sobrantes' ? "Buscar retazos por referencia, tipo, grosor, color, ubicación..." : "Buscar planchas por tipo, grosor, color...",
                     class: "pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -248,6 +248,7 @@
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ancho (mm)</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Alto (mm)</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Obra de procedencia</th>
+                  <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Ubicación</th>
                   <th class="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
@@ -261,6 +262,7 @@
                     <td class="px-4 py-2 text-center"><%= scrap.width %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.height %></td>
                     <td class="px-4 py-2 text-center"><%= scrap.input_work %></td>
+                    <td class="px-4 py-2 text-center"><%= scrap.location %></td>
                     <td class="px-4 py-2 text-center">
                       <div class="flex gap-2 justify-center">
                         <button type="button" class="edit-scrap-btn w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors duration-150 inline-flex items-center justify-center" title="Editar">
@@ -346,9 +348,8 @@
 
     function updatePaginationLinks() {
     const activeTab = document.querySelector('[data-tab].bg-primary');
-    if (!activeTab) return;
-
-    const tabValue = activeTab.getAttribute('data-tab');
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabValue = urlParams.get('tab') || (activeTab ? activeTab.getAttribute('data-tab') : 'planchas');
     const paginationLinks = document.querySelectorAll('.pagination a');
 
     paginationLinks.forEach(link => {

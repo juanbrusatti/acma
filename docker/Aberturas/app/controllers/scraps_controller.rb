@@ -18,7 +18,7 @@ class ScrapsController < ApplicationController
 
     respond_to do |format|
       if @scrap.save
-        format.html { redirect_to glassplates_path, notice: "Retazo agregado exitosamente al stock." }
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), notice: "Retazo agregado exitosamente al stock." }
         format.json { render json: { status: 'success', message: 'Retazo agregado exitosamente.', scrap: @scrap }, status: :created }
       else
         # Filtrar mensajes de error para eliminar redundancias
@@ -33,7 +33,7 @@ class ScrapsController < ApplicationController
   def update
     respond_to do |format|
       if @scrap.update(scrap_params)
-        format.html { redirect_to glassplates_path, notice: "Retazo actualizado exitosamente." }
+        format.html { redirect_to glassplates_path(tab: 'sobrantes'), notice: "Retazo actualizado exitosamente." }
         format.json { render json: { status: 'success', message: 'Retazo actualizado exitosamente.', scrap: @scrap } }
       else
         # Filtrar mensajes de error para eliminar redundancias
@@ -49,7 +49,7 @@ class ScrapsController < ApplicationController
     @scrap.destroy!
 
     respond_to do |format|
-      format.html { redirect_to glassplates_path, status: :see_other, notice: "Retazo eliminado exitosamente de la base de datos." }
+      format.html { redirect_to glassplates_path(tab: 'sobrantes'), status: :see_other, notice: "Retazo eliminado exitosamente de la base de datos." }
       format.json { head :no_content }
     end
   end
@@ -128,7 +128,7 @@ class ScrapsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def scrap_params
-      params.require(:scrap).permit(:scrap_type, :color, :thickness, :width, :height, :input_work)
+      params.require(:scrap).permit(:scrap_type, :color, :thickness, :width, :height, :input_work, :location)
     end
 
     def filter_duplicate_errors
